@@ -1,0 +1,24 @@
+{
+    "version": "1",
+    "title": "Rename payment method on config",
+    "description": "Rename payment method on configuration",
+    "configurationUi": true,
+    "configuration": {
+        "type": "single",
+        "schema": [
+            {
+                "key": "nameToMatch",
+                "name": "Payment option",
+                "helpText": "Payment option to rename.",
+                "type": "single_line_text_field"
+            },
+            {
+                "key": "renameTo",
+                "name": "Rename To",
+                "helpText": "Rename to this",
+                "defaultValue": "Invoice Net-30",
+                "type": "single_line_text_field"
+            }
+        ]
+    }
+}

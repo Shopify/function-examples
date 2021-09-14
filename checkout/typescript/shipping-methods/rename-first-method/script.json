@@ -1,0 +1,10 @@
+{
+    "version": "1",
+    "title": "Rename first shipping method",
+    "description": "Rename first shipping method",
+    "configurationUi": true,
+    "configuration": {
+      "type": "single",
+      "schema": []
+    }
+}

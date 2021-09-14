@@ -1,0 +1,18 @@
+{
+    "version": "1",
+    "title": "Sort shipping methods",
+    "description": "Sort shipping methods alphabetically at checkout",
+    "configurationUi": true,
+    "configuration": {
+        "type": "single",
+        "schema": [
+            {
+                "key": "sortDirection",
+                "name": "Sort order",
+                "helpText": "Enter ASCENDING or DESCENDING.",
+                "defaultValue": "ASCENDING",
+                "type": "single_line_text_field"
+            }
+        ]
+    }
+}
