@@ -1320,9 +1320,9 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@shopify/scripts-checkout-apis-ts@link:../../..":
-  version "0.0.0"
-  uid ""
+"@shopify/scripts-checkout-apis-ts@file:shopify-scripts-checkout-apis-ts-0.1.0.tgz":
+  version "0.1.0"
+  resolved "file:shopify-scripts-checkout-apis-ts-0.1.0.tgz#e504bc5e61a9f6fa8a66e0a87ab02122232b0313"
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"

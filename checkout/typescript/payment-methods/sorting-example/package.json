@@ -3,7 +3,7 @@
   "description": "",
   "version": "1.0.0",
   "dependencies": {
-    "@shopify/scripts-checkout-apis-ts": "link:../../../"
+    "@shopify/scripts-checkout-apis-ts": "file:shopify-scripts-checkout-apis-ts-0.1.0.tgz"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.15.4",
@@ -25,6 +25,7 @@
     "compile": "tsc",
     "prebuild": "webpack",
     "build": "javy build/index.js -o build/index.wasm",
+    "gen-metadata": "get-api-metadata payment-methods build/metadata.json",
     "test": "tsc --noEmit && jest"
   },
   "engines": {
