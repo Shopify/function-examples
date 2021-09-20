@@ -4,7 +4,7 @@ type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;
 type Configuration = Configuration.Configuration;
 
-enum ProviceCodeMatchType {
+enum ProvinceCodeMatchType {
   ALL = 'All',
   INCLUDE = 'Include',
   EXCLUDE = 'Exclude',
@@ -45,14 +45,14 @@ const findSuffix = (conf: Configuration, address: Address): string | null => {
     const provinceCodeMatchType = Configuration.getIndexed(conf, 'provinceCodeMatchType', i);
     const countryCode = Configuration.getIndexed(conf, 'countryCode', i);
 
-    const countryMatch = address.countryCode === countryCode && provinceCodeMatchType === ProviceCodeMatchType.ALL;
+    const countryMatch = address.countryCode === countryCode && provinceCodeMatchType === ProvinceCodeMatchType.ALL;
     const inclusiveMatch =
-      provinceCodeMatchType === ProviceCodeMatchType.INCLUDE &&
+      provinceCodeMatchType === ProvinceCodeMatchType.INCLUDE &&
       provinceCodes &&
       provinceCodes.includes(address.provinceCode);
     const exclusiveMatch =
       provinceCodes &&
-      provinceCodeMatchType === ProviceCodeMatchType.EXCLUDE &&
+      provinceCodeMatchType === ProvinceCodeMatchType.EXCLUDE &&
       !provinceCodes.includes(address.provinceCode);
 
     if (countryMatch || inclusiveMatch || exclusiveMatch) {
