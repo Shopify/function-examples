@@ -5,8 +5,8 @@ type Output = PaymentMethodsAPI.Output;
 type Configuration = Configuration.Configuration;
 
 export const main = ({input, configuration}: Payload): Output => ({
-  sortResponse: null,
-  filterResponse: null,
+  sortResponse: {proposedOrder: []},
+  filterResponse: {hiddenMethods: []},
   renameResponse: {
     renameProposals: rename(input.paymentMethods, configuration),
   },

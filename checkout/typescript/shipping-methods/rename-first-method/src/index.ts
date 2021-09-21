@@ -4,8 +4,8 @@ type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;
 
 export const main = ({input}: Payload): Output => ({
-  sortResponse: null,
-  filterResponse: null,
+  sortResponse: {proposedOrder: []},
+  filterResponse: {hiddenMethods: []},
   renameResponse: rename(input.shippingMethods),
 });
 

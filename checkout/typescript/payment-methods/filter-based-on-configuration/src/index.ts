@@ -12,11 +12,15 @@ export const main = (payload: Payload): Output => {
   const totalPrice = proposalTotalPrice(purchaseProposal);
 
   return {
-    sortResponse: null,
+    sortResponse: {
+      proposedOrder: [],
+    },
     filterResponse: {
       hiddenMethods: paymentMethods.filter((method) => method.name === name && totalPrice.gt(configuredThreshold)),
     },
-    renameResponse: null,
+    renameResponse: {
+      renameProposals: [],
+    },
   };
 };
 

@@ -9,7 +9,11 @@ export const main = (payload: Payload): Output => {
     sortResponse: {
       proposedOrder: payload.input.paymentMethods,
     },
-    filterResponse: null,
-    renameResponse: null,
+    filterResponse: {
+      hiddenMethods: [],
+    },
+    renameResponse: {
+      renameProposals: [],
+    },
   };
 };
