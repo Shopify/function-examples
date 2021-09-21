@@ -4,8 +4,8 @@ type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;
 
 export const main = ({input}: Payload): Output => ({
-  sortResponse: null,
-  filterResponse: null,
+  sortResponse: {proposedOrder: []},
+  filterResponse: {hiddenMethods: []},
   renameResponse: rename(input.paymentMethods),
 });
 

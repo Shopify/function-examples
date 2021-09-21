@@ -12,9 +12,9 @@ describe('filter based on configuration', () => {
       },
     });
 
-    expect(renameResponse).toBe(null);
+    expect(renameResponse).toEqual({renameProposals: []});
     expect(filterResponse).toEqual({hiddenMethods: []});
-    expect(sortResponse).toBe(null);
+    expect(sortResponse).toEqual({proposedOrder: []});
   });
 
   it('should not filter if the total price is less than the threshold', () => {
@@ -34,15 +34,15 @@ describe('filter based on configuration', () => {
       },
     });
 
+    expect(renameResponse).toEqual({renameProposals: []});
     expect(filterResponse).toEqual({hiddenMethods: []});
-    expect(renameResponse).toBe(null);
-    expect(sortResponse).toBe(null);
+    expect(sortResponse).toEqual({proposedOrder: []});
   });
 
   it('should filter if the shipping method name matches and the price is above the threshold', () => {
     const {renameResponse, sortResponse, filterResponse} = main(input as any);
-    expect(renameResponse).toBe(null);
-    expect(sortResponse).toBe(null);
+    expect(renameResponse).toEqual({renameProposals: []});
+    expect(sortResponse).toEqual({proposedOrder: []});
     expect(filterResponse).toEqual({
       hiddenMethods: [
         {

@@ -13,8 +13,8 @@ export const main = ({input, configuration}: Payload): Output => ({
   sortResponse: {
     proposedOrder: sort(input.paymentMethods, configuration),
   },
-  filterResponse: null,
-  renameResponse: null,
+  filterResponse: {hiddenMethods: []},
+  renameResponse: {renameProposals: []},
 });
 
 const sort = (methods: Array<PaymentMethod>, conf: Configuration): Array<PaymentMethod> => {
