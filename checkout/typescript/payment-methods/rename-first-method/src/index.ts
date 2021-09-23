@@ -1,9 +1,16 @@
+/* 
+ * This script renames the first payment method to `Renamed payment method`,
+ * if there are one or more payment methods.
+ *
+ */
+
 import {PaymentMethodsAPI, PaymentMethod} from '@shopify/scripts-checkout-apis-ts';
 
 type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;
 
 export const main = ({input}: Payload): Output => ({
+  // The checkout will be unaffected if you return empty responses
   sortResponse: {proposedOrder: []},
   filterResponse: {hiddenMethods: []},
   renameResponse: rename(input.paymentMethods),

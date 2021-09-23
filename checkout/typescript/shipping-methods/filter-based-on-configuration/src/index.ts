@@ -1,3 +1,12 @@
+/*
+ * This script filters shipping methods when both of the following conditions are met:
+ *
+ *  - The shipping method name matches the `shippingMethodName` field from the configuration
+ *  - The total price of the checkout (purchase proposal) is greater than the threshold field
+ *    from the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
+ *
+ */
+
 import {Money, PurchaseProposal, ShippingMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis-ts';
 
 type Payload = ShippingMethodsAPI.Payload;
@@ -11,6 +20,7 @@ export const main = (payload: Payload): Output => {
   const configuredThreshold = threshold(configuration);
   const totalPrice = proposalTotalPrice(purchaseProposal);
 
+  // The checkout will remain unaffected if you return empty responses
   return {
     sortResponse: {
       proposedOrder: [],

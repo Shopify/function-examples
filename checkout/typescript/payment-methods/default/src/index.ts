@@ -4,6 +4,7 @@ type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;
 
 export const main = (payload: Payload): Output => {
+  // Use console.log to print output from your script
   console.log('Hello, world!');
   return {
     sortResponse: {
