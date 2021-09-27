@@ -1,0 +1,10 @@
+{
+    "version": "1",
+    "title": "Discount Type script",
+    "description": "Discount Type default script",
+    "configurationUi": true,
+    "configuration": {
+        "type": "single",
+        "schema": []
+    }
+}

@@ -1,0 +1,108 @@
+{
+  "extensionPoint": "discounts",
+  "input": {
+    "merchandiseLines": [
+      {
+        "id": 0,
+        "variant": {
+          "id": 1,
+          "product": {
+            "id": 2,
+            "title": "oranges",
+            "tags": ["tagA", "tagB"],
+            "giftCard": false,
+            "vendor": "Shopifruit",
+            "type": "fruit"
+          },
+          "sku": "navel-oranges",
+          "compareAtPrice": {
+            "subunits": 500
+          }
+        },
+        "quantity": 4,
+        "title": "navel oranges",
+        "properties": [
+          { "key": "k1", "value": "v1" },
+          { "key": "k2", "value": "v2" }
+        ],
+        "price": {
+          "subunits": 2000
+        },
+        "giftCard": false,
+        "subscription": null,
+        "weight": 1.0
+      },
+      {
+        "id": 1,
+        "variant": {
+          "id": 2,
+          "product": {
+            "id": 2,
+            "title": "oranges",
+            "tags": ["tagA", "tagB"],
+            "giftCard": false,
+            "vendor": "Shopifruit",
+            "type": "fruit"
+          },
+          "sku": "blood-oranges",
+          "compareAtPrice": {
+            "subunits": 600
+          }
+        },
+        "quantity": 2,
+        "title": "blood oranges",
+        "properties": [
+          { "key": "k1", "value": "v1" },
+          { "key": "k2", "value": "v2" }
+        ],
+        "price": {
+          "subunits": 1200
+        },
+        "giftCard": false,
+        "subscription": null,
+        "weight": 1.5
+      }
+    ],
+    "shippingLines": [{
+      "destination": {
+        "firstName": "Ordinary",
+        "lastName": "Joe",
+        "company": "Shopify",
+        "address1": "123 Fake Street",
+        "address2": "",
+        "address3": "",
+        "phone": "1111111111",
+        "city": "Waterloo",
+        "zip": "N2L0B6",
+        "provinceCode": "ON",
+        "countryCode": "CA",
+        "poBox": false
+      },
+      "merchandiseLineIds": [0, 1],
+      "method": {
+        "id": 1,
+        "name": "name",
+        "code": "code",
+        "source": "source",
+        "phoneRequired": true
+      },
+      "price": {
+        "subunits": 1000
+      },
+      "subscription": null
+    }],
+    "locale": "en",
+    "customer": {
+      "id": 1,
+      "email": "joe@ordinary.com",
+      "phone": "1111111111",
+      "tags": ["vip"],
+      "orderCount": 3,
+      "totalSpent": {
+        "subunits": 1000
+      },
+      "acceptsMarketing": true
+    }
+  },
+  "configuration": {}
+}
