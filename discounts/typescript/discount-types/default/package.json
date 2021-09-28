@@ -25,6 +25,7 @@
     "compile": "tsc",
     "prebuild": "webpack",
     "build": "javy build/index.js -o build/index.wasm",
+    "gen-metadata": "get-api-metadata payment-methods build/metadata.json",
     "test": "tsc --noEmit && jest"
   },
   "engines": {
