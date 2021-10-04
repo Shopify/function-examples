@@ -8,7 +8,7 @@ module.exports = {
     "^.+\\.(ts|tsx|js)$": "babel-jest"
   },
   transformIgnorePatterns: [
-    "node_modules/(?!@shopify\/scripts-checkout-apis-ts/.+\\.js$)"
+    "node_modules/(?!@shopify\/scripts-checkout-apis-temp/.+\\.js$)"
   ],
 }
 
