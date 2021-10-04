@@ -1,9 +1,10 @@
 {
-  "name": "rate-naming-per-province-or-country",
+  "name": "shipping-methods-rate-naming-per-province-or-country-script",
   "description": "",
   "version": "1.0.0",
+  "private": true,
   "dependencies": {
-    "@shopify/scripts-checkout-apis-ts": "file:shopify-scripts-checkout-apis-ts-0.1.0.tgz"
+    "@shopify/scripts-checkout-apis-temp": "0.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.15.4",

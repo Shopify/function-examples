@@ -1,4 +1,4 @@
-import {ShippingMethodsAPI} from '@shopify/scripts-checkout-apis-ts';
+import {ShippingMethodsAPI} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;

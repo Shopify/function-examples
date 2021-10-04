@@ -1,10 +1,10 @@
-/* 
+/*
  * This script renames the first payment method to `Renamed payment method`,
  * if there are one or more payment methods.
  *
  */
 
-import {PaymentMethodsAPI, PaymentMethod} from '@shopify/scripts-checkout-apis-ts';
+import {PaymentMethodsAPI, PaymentMethod} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;
