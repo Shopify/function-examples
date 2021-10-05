@@ -1,4 +1,4 @@
-/* 
+/*
  * This script renames any payment method with a name equal to
  * the `nameToMatch` field from the configuration to the name specified
  * in the `renameTo` field from the configuration.
@@ -8,7 +8,7 @@
  * that the rename will be perform on the first matching method only
  *
  */
-import {PaymentMethodsAPI, Configuration, PaymentMethod} from '@shopify/scripts-checkout-apis-ts';
+import {PaymentMethodsAPI, Configuration, PaymentMethod} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;

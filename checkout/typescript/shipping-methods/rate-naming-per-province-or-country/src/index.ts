@@ -14,7 +14,7 @@
  * of its name with a dash (`-`) as a separator.
  */
 
-import {ShippingMethodsAPI, Configuration, Address} from '@shopify/scripts-checkout-apis-ts';
+import {ShippingMethodsAPI, Configuration, Address} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;

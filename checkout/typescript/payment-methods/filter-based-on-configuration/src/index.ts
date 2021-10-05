@@ -1,12 +1,11 @@
- /* 
-* This script filters payment methods when both of the following conditions are met:
-*   - The payment method name matches the `paymentMethodName` field from the configuration
-*   - The total price of the checkout (purchase proposal) is greater than the threshold field 
-*     rom the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
-*/
+/*
+ * This script filters payment methods when both of the following conditions are met:
+ *   - The payment method name matches the `paymentMethodName` field from the configuration
+ *   - The total price of the checkout (purchase proposal) is greater than the threshold field
+ *     rom the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
+ */
 
-
-import {Money, PurchaseProposal, PaymentMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis-ts';
+import {Money, PurchaseProposal, PaymentMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;
@@ -42,7 +41,7 @@ const threshold = (conf: Configuration.Configuration): Money => {
   const configuredThreshold = parseFloat(Configuration.get(conf, 'threshold')!);
   const threshold = isNaN(configuredThreshold) ? 100 : configuredThreshold;
 
-  // You can do math with Money types! 
+  // You can do math with Money types!
   // It's recommended to perform any Math operations
   // that involve money using the Money API
   // to prevent precision loss

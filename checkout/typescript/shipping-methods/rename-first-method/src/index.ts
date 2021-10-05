@@ -1,9 +1,9 @@
-/* 
+/*
  * This script renames the first shipping method to `Renamed shipping method`
  * if there are one or more shipping methods.
  *
  */
-import {ShippingMethodsAPI, ShippingMethod} from '@shopify/scripts-checkout-apis-ts';
+import {ShippingMethodsAPI, ShippingMethod} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;

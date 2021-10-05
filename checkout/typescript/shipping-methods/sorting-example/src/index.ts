@@ -1,4 +1,3 @@
- /*
 /* This script sorts shipping methods by name.
  *  - If no configuration is provided, then shipping methods are sorted in ascending order.
  *  - If the `sortDirection` field of the configuration is set to `ascending`,
@@ -9,7 +8,7 @@
  *    then the script raises an error.
  */
 
-import {ShippingMethodsAPI, Configuration, ShippingMethod} from '@shopify/scripts-checkout-apis-ts';
+import {ShippingMethodsAPI, Configuration, ShippingMethod} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;
