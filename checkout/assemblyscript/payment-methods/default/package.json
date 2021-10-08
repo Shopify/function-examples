@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "asp --summary --verbose",
-    "build": "shopify-scripts-toolchain-as build --src src/shopify_main.ts --binary build/payment-methods-default.wasm --metadata build/metadata.json --domain checkout --ep payment-methods -- --lib node_modules --optimize --use Date="
+    "build": "shopify-scripts-toolchain-as build --src src/shopify_main.ts --binary build/script.wasm --metadata build/metadata.json --domain checkout --ep payment-methods -- --lib node_modules --optimize --use Date="
   },
   "engines": {
     "node": ">=14.5.0"
