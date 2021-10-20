@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Add a message to rate names for countries or provinces",
     "description": "Add a message to rate names for countries or provinces",
-    "configurationUi": true,
     "configuration": {
       "type": "list",
       "schema": [

@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Filter payment method on threshold",
     "description": "Hide payment methods based on the order amount",
-    "configurationUi": true,
     "configuration": {
       "type": "single",
         "schema": [
