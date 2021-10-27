@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Filter shipping method on threshold",
     "description": "Hide shipping methods based on the order amount",
-    "configurationUi": true,
     "configuration": {
       "type": "single",
         "schema": [

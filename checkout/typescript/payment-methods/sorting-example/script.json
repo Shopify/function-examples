@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Sort payment methods",
     "description": "Sort payment methods alphabetically at checkout",
-    "configurationUi": true,
     "configuration": {
         "type": "single",
         "schema": [

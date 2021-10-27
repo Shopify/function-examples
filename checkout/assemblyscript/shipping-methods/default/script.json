@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Shipping methods script",
     "description": "Shipping methods default script",
-    "configurationUi": true,
     "configuration": {
         "type": "single",
         "schema": []

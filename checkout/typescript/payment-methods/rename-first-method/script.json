@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Rename first payment method",
     "description": "Rename first payment method",
-    "configurationUi": true,
     "configuration": {
       "type": "single",
       "schema": []

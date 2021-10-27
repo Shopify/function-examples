@@ -2,7 +2,6 @@
     "version": "1",
     "title": "Rename payment method on config",
     "description": "Rename payment method on configuration",
-    "configurationUi": true,
     "configuration": {
         "type": "single",
         "schema": [
