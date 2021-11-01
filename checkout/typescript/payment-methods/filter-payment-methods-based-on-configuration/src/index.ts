@@ -2,7 +2,7 @@
  * This script filters payment methods when both of the following conditions are met:
  *   - The payment method name matches the `paymentMethodName` field from the configuration
  *   - The total price of the checkout (purchase proposal) is greater than the threshold field
- *     rom the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
+ *     from the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
  */
 
 import {Money, PurchaseProposal, PaymentMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis-temp';

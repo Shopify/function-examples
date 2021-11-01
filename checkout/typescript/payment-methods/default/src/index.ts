@@ -1,3 +1,9 @@
+/*
+ * This script does nothing: it leaves the payment methods unchanged.
+ * This is the script that gets created when you run `shopify script create`
+ * for the payment methods API.
+ */
+
 import {PaymentMethodsAPI} from '@shopify/scripts-checkout-apis-temp';
 
 type Payload = PaymentMethodsAPI.Payload;
