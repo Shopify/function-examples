@@ -4,7 +4,7 @@
  *
  */
 
-import {PaymentMethodsAPI, PaymentMethod} from '@shopify/scripts-checkout-apis-temp';
+import {PaymentMethodsAPI, PaymentMethod} from '@shopify/scripts-checkout-apis';
 
 type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;

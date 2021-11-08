@@ -8,7 +8,7 @@
  *    then the script raises an error.
  */
 
-import {ShippingMethodsAPI, Configuration, ShippingMethod} from '@shopify/scripts-checkout-apis-temp';
+import {ShippingMethodsAPI, Configuration, ShippingMethod} from '@shopify/scripts-checkout-apis';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;

@@ -7,13 +7,7 @@
  *
  */
 
-import {
-  Money,
-  PurchaseProposal,
-  ShippingMethodsAPI,
-  Configuration,
-  Currency,
-} from '@shopify/scripts-checkout-apis-temp';
+import {Money, PurchaseProposal, ShippingMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;
