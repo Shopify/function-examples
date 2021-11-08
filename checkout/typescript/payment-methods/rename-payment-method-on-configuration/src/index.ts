@@ -5,7 +5,7 @@
  *
  * Note:
  * Although most payment methods have unique names, there's no guarantee
- * that the rename will be perform on the first matching method only
+ * that the rename will be performed on the first matching method only
  *
  */
 import {PaymentMethodsAPI, Configuration, PaymentMethod} from '@shopify/scripts-checkout-apis-temp';
