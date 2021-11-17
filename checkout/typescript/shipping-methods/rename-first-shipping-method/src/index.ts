@@ -3,7 +3,7 @@
  * if there are one or more shipping methods.
  *
  */
-import {ShippingMethodsAPI, ShippingMethod} from '@shopify/scripts-checkout-apis-temp';
+import {ShippingMethodsAPI, ShippingMethod} from '@shopify/scripts-checkout-apis';
 
 type Payload = ShippingMethodsAPI.Payload;
 type Output = ShippingMethodsAPI.Output;

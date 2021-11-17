@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@shopify/scripts-checkout-apis-temp": "0.1.0"
+    "@shopify/scripts-checkout-apis": "2.0.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.15.4",

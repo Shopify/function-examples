@@ -5,7 +5,7 @@
  *     from the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
  */
 
-import {Money, PurchaseProposal, PaymentMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis-temp';
+import {Money, PurchaseProposal, PaymentMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis';
 
 type Payload = PaymentMethodsAPI.Payload;
 type Output = PaymentMethodsAPI.Output;
