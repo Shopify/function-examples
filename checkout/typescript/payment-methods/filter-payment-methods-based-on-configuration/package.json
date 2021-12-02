@@ -25,7 +25,7 @@
   "scripts": {
     "compile": "tsc",
     "prebuild": "webpack",
-    "build": "javy build/index.js -o build/index.wasm",
+    "build": "shopify script javy -i build/index.js -o build/index.wasm",
     "test": "tsc --noEmit && jest",
     "gen-metadata": "get-api-metadata payment-methods build/metadata.json"
   },
