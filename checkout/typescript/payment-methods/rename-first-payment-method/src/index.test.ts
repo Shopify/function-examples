@@ -1,5 +1,8 @@
 import {main} from './';
-import * as input from './input.json';
+import camelcaseKeys from 'camelcase-keys';
+import * as rawInput from './input.json';
+
+const input = camelcaseKeys(rawInput, {deep: true});
 
 describe('rename first payment method', () => {
   it('renames the first payment method', () => {

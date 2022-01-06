@@ -1,5 +1,8 @@
 import {main} from './';
-import * as input from './input.json';
+import camelcaseKeys from 'camelcase-keys';
+import * as rawInput from './input.json';
+
+const input = camelcaseKeys(rawInput, {deep: true});
 
 describe('sorting payment methods', () => {
   it('should sort payment methods in descending order if specified in the configuration.', () => {
@@ -11,7 +14,10 @@ describe('sorting payment methods', () => {
   it('should sort payment methos in ascending order by default', () => {
     const {sortResponse} = main({
       ...(input as any),
-      configuration: {entries: []},
+      configuration: {
+        ...input.configuration,
+        sortDirection: '',
+      },
     });
     const actual = sortResponse?.proposedOrder.map(({name}) => name);
     expect(['A', 'B', 'Z']).toEqual(actual);
@@ -22,7 +28,8 @@ describe('sorting payment methods', () => {
       main({
         ...(input as any),
         configuration: {
-          entries: [{key: 'sortDirection', value: 'SOUTH_EAST'}],
+          ...input.configuration,
+          sortDirection: 'SOUTH_EAST',
         },
       });
     }).toThrow();

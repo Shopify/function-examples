@@ -1,9 +1,0 @@
-{
-    "version": "1",
-    "title": "Rename first payment method",
-    "description": "Rename first payment method",
-    "configuration": {
-      "type": "single",
-      "schema": []
-    }
-}

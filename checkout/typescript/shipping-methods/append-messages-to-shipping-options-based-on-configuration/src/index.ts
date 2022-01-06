@@ -14,11 +14,11 @@
  * of its name with a dash (`-`) as a separator.
  */
 
-import {ShippingMethodsAPI, Configuration, Address} from '@shopify/scripts-checkout-apis';
+import {ShippingMethodsAPI, LegacyConfiguration as Configuration, Address} from '@shopify/scripts-checkout-apis';
 
-type Payload = ShippingMethodsAPI.Payload;
-type Output = ShippingMethodsAPI.Output;
 type Configuration = Configuration.Configuration;
+type Payload = ShippingMethodsAPI.Payload<Configuration>;
+type Output = ShippingMethodsAPI.Output;
 
 enum ProvinceCodeMatchType {
   ALL = 'All',

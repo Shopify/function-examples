@@ -1,5 +1,5 @@
 /*
- * This script renames the first payment method to `Renamed payment method`,
+ * This script renames the first payment method to `Renamed payment method`
  * if there are one or more payment methods.
  *
  */

@@ -11,11 +11,14 @@
  *
  */
 
-import {PaymentMethodsAPI, Configuration, PaymentMethod} from '@shopify/scripts-checkout-apis';
+import {PaymentMethodsAPI, PaymentMethod} from '@shopify/scripts-checkout-apis';
 
-type Payload = PaymentMethodsAPI.Payload;
+interface Configuration {
+  sortDirection: string;
+}
+
+type Payload = PaymentMethodsAPI.Payload<Configuration>;
 type Output = PaymentMethodsAPI.Output;
-type Configuration = Configuration.Configuration;
 
 enum SortingDirection {
   ASC = 'ascending',
@@ -26,7 +29,7 @@ export const main = ({input, configuration}: Payload): Output => ({
   sortResponse: {
     proposedOrder: sort(input.paymentMethods, configuration),
   },
-  // The checkout will rename unaffected if you return empty responses
+  // The checkout will remain unaffected if you return empty responses
   filterResponse: {hiddenMethods: []},
   renameResponse: {renameProposals: []},
 });
@@ -47,7 +50,7 @@ const configuredSortDirection = (conf: Configuration): SortingDirection => {
   // the Configuration object. You can choose to provide default
   // values if one was not provided, and/or you can raise errors
   // if the value is missing or of an unexpected type.
-  const direction = Configuration.get(conf, 'sortDirection')?.toLowerCase();
+  const direction = conf.sortDirection.toLowerCase();
 
   if (!direction) {
     return SortingDirection.ASC;

@@ -1,20 +1,25 @@
 /*
  * This script filters payment methods when both of the following conditions are met:
- *   - The payment method name matches the `paymentMethodName` field from the configuration
+ *   - The payment method name matches the `paymentMethodName` field from the configuration.
  *   - The total price of the checkout (purchase proposal) is greater than the threshold field
- *     from the configuration in CAD, or $100.00 CAD if the field wasn't set in the configuration.
+ *     from the configuration in CAD.
  */
 
-import {Money, PurchaseProposal, PaymentMethodsAPI, Configuration, Currency} from '@shopify/scripts-checkout-apis';
+import {Money, PurchaseProposal, PaymentMethodsAPI, Currency} from '@shopify/scripts-checkout-apis';
 
-type Payload = PaymentMethodsAPI.Payload;
+interface Configuration {
+  paymentMethodName: string;
+  threshold: string;
+}
+
+type Payload = PaymentMethodsAPI.Payload<Configuration>;
 type Output = PaymentMethodsAPI.Output;
 
 export const main = (payload: Payload): Output => {
   const {paymentMethods, purchaseProposal} = payload.input;
   const configuration = payload.configuration;
 
-  const name = Configuration.get(configuration, 'paymentMethodName') || 'Unknown';
+  const name = configuration.paymentMethodName;
   const configuredThreshold = threshold(configuration);
   const totalPrice = proposalTotalPrice(purchaseProposal);
 
@@ -37,11 +42,11 @@ const proposalTotalPrice = (proposal: PurchaseProposal): Money =>
     return total;
   }, Money.fromAmount(0, Currency.fromCode('CAD')));
 
-const threshold = (conf: Configuration.Configuration): Money => {
-  const configuredThreshold = parseFloat(Configuration.get(conf, 'threshold')!);
+const threshold = (conf: Configuration): Money => {
+  const configuredThreshold = parseFloat(conf.threshold);
   const threshold = isNaN(configuredThreshold) ? 100 : configuredThreshold;
 
-  // You can do math with Money types!
+  // You can do math with Money types.
   // It's recommended to perform any Math operations
   // that involve money using the Money API
   // to prevent precision loss

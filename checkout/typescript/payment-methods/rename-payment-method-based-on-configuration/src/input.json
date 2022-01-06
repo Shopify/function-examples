@@ -1,4 +1,5 @@
 {
+  "extension_point": "payment_methods",
   "input": {
     "purchase_proposal": {
       "merchandise_lines": [
@@ -139,7 +140,7 @@
     ]
   },
   "configuration": {
-    "paymentMethodName": "Shopify payments",
-    "threshold": "1.0"
+    "nameToMatch": "Shopify payments",
+    "renameTo": "Renamed via config"
   }
 }

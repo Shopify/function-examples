@@ -1,0 +1,15 @@
+---
+version: '2'
+title: Rename payment method on config
+description: Rename payment method on configuration
+configuration:
+  type: object
+  fields:
+    nameToMatch:
+      name: Payment option
+      helpText: Payment option to rename.
+      type: single_line_text_field
+    renameTo:
+      name: Rename To
+      helpText: Rename to this
+      type: single_line_text_field

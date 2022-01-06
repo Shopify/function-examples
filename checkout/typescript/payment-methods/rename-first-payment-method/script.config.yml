@@ -1,0 +1,7 @@
+---
+version: '2'
+title: Rename first payment method
+description: Rename first payment method
+configuration:
+  type: object
+  fields: {}
