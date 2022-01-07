@@ -1,0 +1,23 @@
+---
+version: '1'
+title: Add a message to rate names for countries or provinces
+description: Add a message to rate names for countries or provinces
+configuration:
+  type: list
+  schema:
+  - key: countryCode
+    type: single_line_text_field
+    name: Country Code
+    helpText: The desired country
+  - key: provinceCodeMatchType
+    type: single_line_text_field
+    name: Province/State Code Match Type
+    helpText: Include, Exclude, or All
+  - key: provinceCodes
+    type: single_line_text_field
+    name: Province/State Codes
+    helpText: Comma-delimited list of the desired provinces and states
+  - key: message
+    type: single_line_text_field
+    name: Message
+    helpText: Message to add to the shipping rate name

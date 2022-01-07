@@ -1,7 +1,7 @@
 /*
- * This script does nothing: it leaves the payment methods unchanged.
- * This is the script that gets created when you run `shopify script create`
- * for the payment methods API.
+ * This script is created by default when you run the `shopify script create`
+ * command in Shopify CLI, and use the payment methods API. The script does
+ * nothing and leaves payment methods unchanged.
  */
 
 import {PaymentMethodsAPI} from '@shopify/scripts-checkout-apis';

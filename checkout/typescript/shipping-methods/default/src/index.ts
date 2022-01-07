@@ -1,7 +1,7 @@
 /*
- * This script does nothing: it leaves the shipping methods unchanged.
- * This is the script that gets created when you run `shopify script create`
- * for the shipping methods API.
+ * This script is created by default when you run the `shopify script create`
+ * command in Shopify CLI, and use the shipping methods API. The script does
+ * nothing and leaves shipping methods unchanged.
  */
 
 import {ShippingMethodsAPI} from '@shopify/scripts-checkout-apis';

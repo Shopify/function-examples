@@ -1,4 +1,5 @@
 /* This script sorts shipping methods by name.
+ *
  *  - If no configuration is provided, then shipping methods are sorted in ascending order.
  *  - If the `sortDirection` field of the configuration is set to `ascending`,
  *    then shipping methods are sorted in ascending order.
@@ -8,11 +9,13 @@
  *    then the script raises an error.
  */
 
-import {ShippingMethodsAPI, Configuration, ShippingMethod} from '@shopify/scripts-checkout-apis';
+import {ShippingMethodsAPI, ShippingMethod} from '@shopify/scripts-checkout-apis';
 
-type Payload = ShippingMethodsAPI.Payload;
+interface Configuration {
+  sortDirection: string;
+}
+type Payload = ShippingMethodsAPI.Payload<Configuration>;
 type Output = ShippingMethodsAPI.Output;
-type Configuration = Configuration.Configuration;
 
 enum SortingDirection {
   ASC = 'ascending',
@@ -39,7 +42,7 @@ const sort = (methods: Array<ShippingMethod>, conf: Configuration): Array<Shippi
 };
 
 const configuredSortDirection = (conf: Configuration): SortingDirection => {
-  const direction = Configuration.get(conf, 'sortDirection')?.toLowerCase();
+  const direction = conf.sortDirection.toLowerCase();
 
   if (!direction) {
     return SortingDirection.ASC;

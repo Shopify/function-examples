@@ -1,0 +1,11 @@
+---
+version: '2'
+title: Sort shipping methods
+description: Sort shipping methods alphabetically at checkout
+configuration:
+  type: object
+  fields:
+    sortDirection:
+      name: Sort order
+      helpText: Enter ASCENDING or DESCENDING.
+      type: single_line_text_field

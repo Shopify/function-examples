@@ -1,5 +1,8 @@
 import {main} from './';
-import * as input from './input.json';
+import camelcaseKeys from 'camelcase-keys';
+import * as rawInput from './input.json';
+
+const input = camelcaseKeys(rawInput, {deep: true});
 
 describe('filter based on configuration', () => {
   it('should not filter any shipping methods if the names do not match', () => {
@@ -8,7 +11,8 @@ describe('filter based on configuration', () => {
     const {renameResponse, filterResponse, sortResponse} = main({
       ...(input as any),
       configuration: {
-        entries: configuration.entries.map((e: any) => ({key: e.key, value: `${e.value}_1`})),
+        ...input.configuration,
+        shippingMethodName: `${input.configuration.shippingMethodName}_1`,
       },
     });
 
@@ -22,15 +26,8 @@ describe('filter based on configuration', () => {
     const {filterResponse, renameResponse, sortResponse} = main({
       ...(input as any),
       configuration: {
-        entries: configuration.entries.map((e: any) => {
-          if (e.key === 'threshold') {
-            return {
-              key: e.key,
-              value: '10000000000',
-            };
-          }
-          return e;
-        }),
+        ...input.configuration,
+        threshold: '10000000000.0',
       },
     });
 
