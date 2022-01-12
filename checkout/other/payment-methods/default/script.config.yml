@@ -1,6 +1,6 @@
 ---
 version: '2'
-title: Payment methods script
+title: payment-methods-default-script
 description: Payment methods base script
 configuration:
   type: object

@@ -1,6 +1,6 @@
 ---
 version: '2'
-title: Shipping methods script
+title: shipping-methods-default-script
 description: Shipping methods base script
 configuration:
   type: object
