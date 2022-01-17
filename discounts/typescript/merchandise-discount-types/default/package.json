@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@shopify/scripts-discounts-apis": "0.1.0"
+    "@shopify/scripts-discounts-apis": "file:shopify-scripts-discounts-apis-v0.1.0.tgz"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.15.4",
