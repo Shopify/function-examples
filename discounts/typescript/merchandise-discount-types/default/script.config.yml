@@ -1,0 +1,7 @@
+---
+version: '2'
+title: Merchandise discount types script
+description: Merchandise discount types default script
+configuration:
+  type: object
+  fields: {}

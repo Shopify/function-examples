@@ -1,0 +1,7 @@
+---
+version: '2'
+title: Delivery discount types script
+description: Delivery discount types default script
+configuration:
+  type: object
+  fields: {}
