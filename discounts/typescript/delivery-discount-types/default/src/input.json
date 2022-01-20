@@ -110,6 +110,15 @@
           "country_code": "CA",
           "po_box": false
         },
+        "strategy": {
+          "name": "Shipify Express",
+          "code": "shipify_express_code",
+          "source": "Shipify",
+          "phone_required": true
+        },
+        "price": {
+          "subunits": 1000
+        },
         "subscription": false
       }
     ],
