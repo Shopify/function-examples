@@ -1,6 +1,6 @@
 {
   "name": "delivery-discount-types-default-script",
-  "description": "Delivery discount types default script",
+  "description": "Delivery discount types demo script",
   "version": "1.0.0",
   "private": true,
   "dependencies": {

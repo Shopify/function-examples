@@ -1,7 +1,7 @@
 ---
 version: '2'
-title: Delivery discount types script
-description: Delivery discount types default script
+title: Free shipping
+description: 100% discount on all shipping lines
 configuration:
   type: object
   fields: {}

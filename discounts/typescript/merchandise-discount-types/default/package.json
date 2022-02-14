@@ -1,6 +1,6 @@
 {
   "name": "merchandise-discount-types-default-script",
-  "description": "Merchandise discount types default script",
+  "description": "Merchandise discount types demo script",
   "version": "1.0.0",
   "private": true,
   "dependencies": {

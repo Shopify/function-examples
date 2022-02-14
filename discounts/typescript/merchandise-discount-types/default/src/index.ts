@@ -1,16 +1,19 @@
-/*
- * This script is created by default when you run the `shopify script create`
- * command in Shopify CLI, and use the payment methods API. The script does
- * nothing and leaves payment methods unchanged.
- */
-
-import {MerchandiseDiscountTypesAPI} from '@shopify/scripts-discounts-apis';
+import {MerchandiseDiscountTypesAPI, Discounts} from '@shopify/scripts-discounts-apis';
 
 type Payload = MerchandiseDiscountTypesAPI.Payload;
 type Output = MerchandiseDiscountTypesAPI.Output;
 
 export const main = ({input, configuration}: Payload): Output => {
-  // Use console.log to print output from your script
-  console.log('Hello, world!');
-  return {discounts: []};
+  console.log('[Merchandise Demo]', configuration);
+  const percentage = configuration.value ? parseFloat(configuration.value) : 100;
+  const title = configuration.title || `${percentage}% off`;
+  return {
+    discounts: [
+      MerchandiseDiscountTypesAPI.discountForEachLine({
+        title,
+        value: Discounts.percentage(percentage),
+        allocations: input.merchandiseLines.map(({index: lineIndex}) => ({lineIndex})),
+      }),
+    ],
+  };
 };
