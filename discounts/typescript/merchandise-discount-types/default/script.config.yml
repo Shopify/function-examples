@@ -11,3 +11,8 @@ configuration:
     value:
       type: number_integer
       name: Value
+      validations:
+      - name: min
+        value: "0"
+      - name: max
+        value: "100"
