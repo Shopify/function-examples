@@ -6,11 +6,10 @@ type Output = MerchandiseDiscountTypesAPI.Output;
 export const main = ({input, configuration}: Payload): Output => {
   console.log('[Merchandise Demo]', configuration);
   const percentage = configuration.value ? parseFloat(configuration.value) : 100;
-  const title = configuration.title || `${percentage}% off`;
   return {
     discounts: [
       MerchandiseDiscountTypesAPI.discountForEachLine({
-        title,
+        title: `${percentage}% off`,
         value: Discounts.percentage(percentage),
         allocations: input.merchandiseLines.map(({index: lineIndex}) => ({lineIndex})),
       }),
