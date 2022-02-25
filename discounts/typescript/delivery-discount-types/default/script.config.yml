@@ -1,7 +1,18 @@
 ---
 version: '2'
-title: Free shipping
-description: 100% discount on all shipping lines
+title: Percentage off shipping
+description: Percentage discount on a shipping line
 configuration:
   type: object
-  fields: {}
+  fields:
+    title:
+      type: single_line_text_field
+      name: Title
+    value:
+      type: number_integer
+      name: Value
+      validations:
+      - name: min
+        value: "0"
+      - name: max
+        value: "100"
