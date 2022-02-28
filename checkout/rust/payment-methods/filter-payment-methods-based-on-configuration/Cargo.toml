@@ -1,0 +1,12 @@
+[package]
+name = "checkout_payment_method_script_rs-script"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+rmp-serde = "0.15.5"
+serde = { version = "1.0.13", features = ["derive"] }
+
+[profile.release]
+lto = true
+opt-level = 's'
