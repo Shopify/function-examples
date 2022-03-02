@@ -4,7 +4,6 @@ type Payload = MerchandiseDiscountTypesAPI.Payload;
 type Output = MerchandiseDiscountTypesAPI.Output;
 
 export const main = ({input, configuration}: Payload): Output => {
-  console.log('[Merchandise Demo]', configuration);
   const percentage = configuration.value ? parseFloat(configuration.value) : 100;
   return {
     discounts: [
