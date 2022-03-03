@@ -1,7 +1,5 @@
 ---
 version: '2'
-title: Percentage off shipping
-description: Percentage discount on a shipping line
 configuration:
   type: object
   fields:

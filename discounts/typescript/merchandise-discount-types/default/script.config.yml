@@ -1,7 +1,5 @@
 ---
 version: '2'
-title: Percentage
-description: Percentage discount
 configuration:
   type: object
   fields:
