@@ -6,7 +6,7 @@ const payload = camelcaseKeys(rawPayload, {deep: true});
 
 describe('Percentage discount type script', () => {
   it('returns 100% discount off merchandise lines by default', () => {
-    const result = main(payload);
+    const result = main(payload as any);
 
     expect(result.discounts).toStrictEqual([
       expect.objectContaining({
@@ -20,7 +20,7 @@ describe('Percentage discount type script', () => {
 
   it('returns configured percentage value if present', () => {
     const configuration = {value: 20};
-    const result = main({...payload, configuration});
+    const result = main({...payload, configuration} as any);
 
     expect(result.discounts).toStrictEqual([
       expect.objectContaining({

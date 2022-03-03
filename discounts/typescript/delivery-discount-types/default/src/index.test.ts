@@ -6,7 +6,7 @@ const payload = camelcaseKeys(rawPayload, {deep: true});
 
 describe('percentage shipping discount type', () => {
   it('returns free shipping discount by default', () => {
-    const result = main(payload);
+    const result = main(payload as any);
 
     expect(result.discounts).toStrictEqual([
       expect.objectContaining({
@@ -19,7 +19,7 @@ describe('percentage shipping discount type', () => {
 
   it('returns configured percentage value if present', () => {
     const configuration = {value: 20};
-    const result = main({...payload, configuration});
+    const result = main({...payload, configuration} as any);
 
     expect(result.discounts).toStrictEqual([
       expect.objectContaining({
@@ -32,7 +32,7 @@ describe('percentage shipping discount type', () => {
 
   it('returns configured discount title if present', () => {
     const configuration = {title: 'BFCM free shipping'};
-    const result = main({...payload, configuration});
+    const result = main({...payload, configuration} as any);
 
     expect(result.discounts).toStrictEqual([
       expect.objectContaining({
