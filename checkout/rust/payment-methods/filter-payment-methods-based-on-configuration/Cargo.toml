@@ -1,7 +1,7 @@
 [package]
-name = "checkout_payment_method_script_rs-script"
+name = "filter_payment_method_by_threshold_script"
 version = "1.0.0"
-edition = "2021"
+edition = "2022"
 
 [dependencies]
 rmp-serde = "0.15.5"
