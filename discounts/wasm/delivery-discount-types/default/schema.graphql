@@ -1,0 +1,89 @@
+schema {
+  query: DeliveryDiscountRoot
+}
+
+type Address {
+  city: String
+  countryCode: String
+  phone: String
+  poBox: Boolean!
+  provinceCode: String
+  zip: String
+}
+
+type Customer {
+  acceptsMarketing: Boolean
+  email: String
+  id: Int!
+  orderCount: Int
+  phone: String
+  tags: [String!]
+  totalSpent: Money
+}
+
+type DeliveryDiscountRoot {
+  customer: Customer
+  deliveryLines: [DeliveryLineWithStrategy!]
+  locale: String
+  merchandiseLines: [MerchandiseLine!]
+}
+
+type DeliveryLineWithStrategy {
+  destination: Address
+  index: Int
+  price: Money!
+  strategy: DeliveryStrategy!
+  subscription: Boolean
+}
+
+type DeliveryStrategy {
+  code: String
+  name: String
+  source: String
+}
+
+type MerchandiseLine {
+  index: Int
+  price: Money!
+  properties: [Property!]
+  quantity: Int
+  sellingPlan: SellingPlan
+  variant: Variant
+  weight: Int
+}
+
+type Money {
+  currency: String!
+  subunits: UnsignedInt64!
+}
+
+type Product {
+  giftCard: Boolean
+  id: Int!
+  tags: [String!]
+  title: String
+  type: String
+  vendor: String
+}
+
+type Property {
+  key: String!
+  value: String!
+}
+
+type SellingPlan {
+  id: Int!
+}
+
+"""
+Unsigned integer of up to 64 bits, encoded as a msgpack unsinged integer.
+"""
+scalar UnsignedInt64
+
+type Variant {
+  compareAtPrice: Money
+  id: Int!
+  product: Product
+  sku: String
+  title: String
+}
