@@ -169,7 +169,8 @@ type QueryRoot {
 }
 
 """
-Unsigned integer of up to 64 bits, encoded as a msgpack unsinged integer.
+Unsigned integer of up to 64 bit, encoded as a number (not a string).
+Example value: `1099511627776`
 """
 scalar UnsignedInt64
 
