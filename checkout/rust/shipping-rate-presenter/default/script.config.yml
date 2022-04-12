@@ -1,7 +1,7 @@
 ---
 version: '2'
-title: Payment methods script
-description: Payment methods default script
+title: Shipping Rate Presenter Default Script 
+description: Sets all shipping rate names to match the customer's email address 
 configuration:
   type: object
   fields: {}
