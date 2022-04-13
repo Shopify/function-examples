@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn script(payload: &Payload) -> Result<Output, Box<dyn std::error::Error>> {
-    let customer_email = &payload.input.purchase_proposal.buyer_identity.customer.email;
+    let customer_email = &payload.input.purchase_proposal.buyer_identity.email;
     let shipping_rates = &payload.input.shipping_rates;
 
     return Ok(
@@ -48,9 +48,7 @@ mod tests {
             input: Input {
                 purchase_proposal: PurchaseProposal {
                     buyer_identity: BuyerIdentity {
-                        customer: Customer {
-                            email: "bob@gmail.com".to_string(),
-                        }
+                        email: "bob@gmail.com".to_string(),
                     }
                 },
                 shipping_rates: vec![
@@ -109,6 +107,6 @@ mod tests {
         let output = script(&payload).unwrap();
 
         assert_eq!(output.rename_proposals.len(), 3);
-        assert!(output.rename_proposals.iter().all(|proposal| proposal.name == payload.input.purchase_proposal.buyer_identity.customer.email));
+        assert!(output.rename_proposals.iter().all(|proposal| proposal.name == payload.input.purchase_proposal.buyer_identity.email));
     }
 }
