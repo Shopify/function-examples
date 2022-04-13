@@ -8,6 +8,7 @@ pub struct Payload {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
+    pub new_name: String
 }
 
 #[derive(Clone, Debug, Deserialize)]
