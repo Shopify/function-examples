@@ -3,6 +3,8 @@ name: Rust
 on:
   push:
     branches: [ master ]
+    paths:
+      - "checkout/rust/payment-methods/default/**"
   pull_request:
     branches: [ master ]
     paths:
