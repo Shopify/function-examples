@@ -1,0 +1,30 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - "checkout/rust/shipping-rate-presenter/default/**"
+  pull_request:
+    branches: [ master ]
+    paths:
+      - "checkout/rust/shipping-rate-presenter/default/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  
+defaults:
+  run:
+    working-directory: "checkout/rust/shipping-rate-presenter/default"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
