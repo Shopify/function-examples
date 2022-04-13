@@ -6,14 +6,14 @@ on:
   pull_request:
     branches: [ master ]
     paths:
-      - "checkout/rust/payment_methods/default/**"
+      - "checkout/rust/payment-methods/default/**"
 
 env:
   CARGO_TERM_COLOR: always
   
 defaults:
   run:
-    working-directory: "checkout/rust/payment_methods/default"
+    working-directory: "checkout/rust/payment-methods/default"
 
 jobs:
   build:
