@@ -3,5 +3,5 @@ project_type: :script
 organization_id: 0
 extension_point_type: payment_methods
 title: Default Payment Methods Script
-description: 
+description: Template script that does nothing
 language: rust
