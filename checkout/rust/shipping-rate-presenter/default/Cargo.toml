@@ -4,7 +4,7 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-rmp-serde = "0.15.5"
+serde_json = "1.0"
 serde = { version = "1.0.13", features = ["derive"] }
 
 [profile.release]

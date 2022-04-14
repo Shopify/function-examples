@@ -25,11 +25,6 @@ pub struct PurchaseProposal {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct BuyerIdentity {
-    pub customer: Customer,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct Customer {
     pub email: String,
 }
 

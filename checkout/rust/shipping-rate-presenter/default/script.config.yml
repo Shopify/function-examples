@@ -1,7 +1,7 @@
 ---
 version: '2'
-title: Shipping Rate Presenter Default Script 
-description: Sets all shipping rate names to match the customer's email address 
+title: Shipping Rate Presenter 
+description: Shipping Rate Presenter default script
 configuration:
   type: object
-  fields: {}
+  fields: {} 
