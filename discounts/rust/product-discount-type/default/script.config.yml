@@ -1,0 +1,22 @@
+---
+version: '2'
+configuration:
+  type: object
+  fields:
+    percentage_off:
+      type: number_integer
+      name: Percentage off
+      validations:
+      - name: min
+        value: "0"
+      - name: max
+        value: "100"
+    excluded_variant_ids:
+      type: array
+      name: Excluded Product Variant IDs
+      elementType:
+        type: number_integer
+        name: Product Variant ID
+        validations:
+        - name: min
+          value: "0"
