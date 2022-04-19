@@ -7,7 +7,7 @@ pub struct Payload {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename(deserialize = "camelCase"))]
+#[serde(rename_all(deserialize = "camelCase"))]
 pub struct Input {
     pub merchandise_lines: Vec<MerchandiseLine>,
 }
@@ -23,7 +23,7 @@ pub struct Variant {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename(deserialize = "camelCase"))]
+#[serde(rename_all(deserialize = "camelCase"))]
 pub struct Config {
     pub percentage_off: Option<u64>,
     pub excluded_variant_ids: Option<Vec<u64>>,
