@@ -69,7 +69,7 @@ type SellingPlan {
 }
 
 """
-Unsigned integer of up to 64 bits, encoded as a msgpack unsinged integer.
+Unsigned integer of up to 64 bits, encoded as a msgpack unsigned integer.
 """
 scalar UnsignedInt64
 

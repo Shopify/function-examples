@@ -1,6 +1,5 @@
 ---
 version: '2'
-title: Merchandise discount types script
 title: Merchandise discount types default script
 configuration:
   type: object
