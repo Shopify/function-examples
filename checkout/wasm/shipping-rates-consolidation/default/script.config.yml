@@ -1,0 +1,7 @@
+---
+version: '2'
+title: shipping-rates-consolidation-default-script
+description: Shipping rates consolidation base script
+configuration:
+  type: object
+  fields: {}
