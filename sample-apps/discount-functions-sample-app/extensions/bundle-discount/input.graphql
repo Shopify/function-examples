@@ -1,0 +1,9 @@
+query Input {
+  merchandiseLines {
+    index
+    quantity
+    variant {
+      id
+    }
+  }
+}
