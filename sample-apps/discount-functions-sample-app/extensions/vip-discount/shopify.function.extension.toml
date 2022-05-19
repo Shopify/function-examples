@@ -1,10 +1,10 @@
-name = "Bundle Discount"
-title = "Bundle Discount"
-type = "product_discount_type"
+name = "VIP discount"
+type = "order_discount_type"
+title = "VIP discount"
 
 [functions.ui]
-createPath = "/bundle/new"
-detailsPath = "/bundle/:id"
+createPath = "/vip/new"
+detailsPath = "/vip/:id"
 
 # TODO: When the metaobject format is finalized, update this to match script.config.yml
 [functions.metaObject]

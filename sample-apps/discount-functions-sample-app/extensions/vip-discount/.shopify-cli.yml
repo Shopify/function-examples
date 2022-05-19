@@ -2,8 +2,8 @@
 ---
 project_type: :script
 organization_id: 0
-title: Bundle Discount
-extension_point_type: product_discounts
+title: VIP Discount
+extension_point_type: order_discounts
 language: wasm
-app_bridge_create_path: /bundle/new
-app_bridge_details_path: /bundle/:id
+app_bridge_create_path: /vip/new
+app_bridge_details_path: /vip/:id

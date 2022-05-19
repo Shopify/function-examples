@@ -1,0 +1,12 @@
+{
+  "input": {
+    "customer": {
+      "tags": ["vip"]
+    }
+  },
+  "configuration": {
+    "message": "VIP",
+    "vipTag": "vip",
+    "discountAmount": 25
+  }
+}
