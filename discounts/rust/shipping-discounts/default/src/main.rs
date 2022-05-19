@@ -1,87 +1,68 @@
 use serde::{Deserialize, Serialize};
 
-use graphql_client::GraphQLQuery;
-
-type UnsignedInt64 = u64;
-type Void = ();
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "schema.graphql",
-    query_path = "input.graphql",
-    response_derives = "Debug, Clone, PartialEq",
-    normalization = "rust"
-)]
-struct Input;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "schema.graphql",
-    query_path = "output.graphql",
-    response_derives = "Debug, Clone, PartialEq",
-    normalization = "rust"
-)]
-struct HandleResult;
+mod api;
+use api::*;
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Config {
-    value: Option<String>,
+pub struct Payload {
+    pub input: Input,
+    pub configuration: Configuration,
 }
 
 #[derive(Clone, Debug, Deserialize)]
-struct Payload {
-    input: input::ResponseData,
-    configuration: Config,
+pub struct Configuration {
+    pub value: Option<String>,
+}
+
+impl Configuration {
+    const DEFAULT_VALUE: f64 = 50.0;
+
+    fn get_value(&self) -> f64 {
+        match &self.value {
+            Some(value) => value.parse().unwrap(),
+            _ => Self::DEFAULT_VALUE,
+        }
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let payload: Payload = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
     let mut out = std::io::stdout();
     let mut serializer = serde_json::Serializer::new(&mut out);
-    script(payload)?.serialize(&mut serializer)?;
+    function(payload)?.serialize(&mut serializer)?;
     Ok(())
 }
 
-fn script(payload: Payload) -> Result<handle_result::FunctionResult, Box<dyn std::error::Error>> {
-    const DEFAULT_VALUE: f64 = 50.0;
-
+fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let (input, config) = (payload.input, payload.configuration);
-    let value: f64 = if let Some(value) = config.value {
-        value.parse()?
-    } else {
-        DEFAULT_VALUE
-    };
-    let delivery_lines = &input.delivery_lines.unwrap_or_default();
-    let targets = delivery_lines
-        .iter()
-        .map(|line| handle_result::Target {
-            shippingLine: Some(handle_result::ShippingLineTarget { id: line.id }),
-        })
-        .collect();
-    Ok(build_result(value, targets))
-}
-
-fn build_result(value: f64, targets: Vec<handle_result::Target>) -> handle_result::FunctionResult {
-    handle_result::FunctionResult {
-        discounts: vec![handle_result::Discount {
+    let value = config.get_value();
+    Ok(FunctionResult {
+        discounts: vec![Discount {
+            value: Value::Percentage(Percentage { value }),
+            targets: targets(&input.delivery_lines.unwrap_or_default()),
             message: Some(format!("{}% off", value)),
             conditions: None,
-            targets,
-            value: handle_result::Value {
-                percentage: Some(handle_result::Percentage { value }),
-                fixedAmount: None,
-            },
         }],
-        discountApplicationStrategy: handle_result::DiscountApplicationStrategy::First,
-    }
+        discount_application_strategy: DiscountApplicationStrategy::First,
+    })
+}
+
+fn targets(delivery_lines: &[DeliveryLineWithStrategy]) -> Vec<Target> {
+    delivery_lines
+        .iter()
+        .filter_map(|line| {
+            line.id
+                .as_ref()
+                .map(|id| Target::ShippingLine { id: id.to_string() })
+        })
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn payload(configuration: Config) -> Payload {
+    fn payload(configuration: Configuration) -> Payload {
         let input = r#"
         {
             "input": {
@@ -104,57 +85,49 @@ mod tests {
 
     #[test]
     fn test_discount_with_default_value() {
-        let payload = payload(Config { value: None });
-        let output = serde_json::json!(script(payload).unwrap());
+        let payload = payload(Configuration { value: None });
+        let result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
                     "message": "50% off",
-                    "conditions": null,
                     "targets": [
                         { "shippingLine": { "id": "gid://shopify/DeliveryLine/0" } },
                         { "shippingLine": { "id": "gid://shopify/DeliveryLine/1" } }
                     ],
-                    "value": {
-                        "percentage": { "value": 50.0 },
-                        "fixedAmount": null
-                    }
+                    "value": { "percentage": { "value": 50.0 } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
         "#;
 
-        let expected_output: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(output.to_string(), expected_output.to_string());
+        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
+        assert_eq!(result.to_string(), expected_result.to_string());
     }
 
     #[test]
     fn test_discount_with_value() {
-        let payload = payload(Config {
+        let payload = payload(Configuration {
             value: Some("10".to_string()),
         });
-        let output = serde_json::json!(script(payload).unwrap());
+        let result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
                     "message": "10% off",
-                    "conditions": null,
                     "targets": [
                         { "shippingLine": { "id": "gid://shopify/DeliveryLine/0" } },
                         { "shippingLine": { "id": "gid://shopify/DeliveryLine/1" } }
                     ],
-                    "value": {
-                        "percentage": { "value": 10.0 },
-                        "fixedAmount": null
-                    }
+                    "value": { "percentage": { "value": 10.0 } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
         "#;
 
-        let expected_output: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(output.to_string(), expected_output.to_string());
+        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
+        assert_eq!(result.to_string(), expected_result.to_string());
     }
 }

@@ -1,76 +1,64 @@
 use serde::{Deserialize, Serialize};
 
-use graphql_client::GraphQLQuery;
-
-type Void = ();
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "schema.graphql",
-    query_path = "input.graphql",
-    response_derives = "Debug, Clone, PartialEq",
-    normalization = "rust"
-)]
-struct Input;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "schema.graphql",
-    query_path = "handle-result.graphql",
-    response_derives = "Debug, Clone, PartialEq",
-    normalization = "rust"
-)]
-struct HandleResult;
+mod api;
+use api::*;
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Config {
-    value: Option<String>,
-    excluded_variant_ids: Option<Vec<String>>,
+pub struct Payload {
+    pub input: Input,
+    pub configuration: Configuration,
 }
 
 #[derive(Clone, Debug, Deserialize)]
-struct Payload {
-    input: input::ResponseData,
-    configuration: Config,
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct Configuration {
+    pub value: Option<String>,
+    pub excluded_variant_ids: Option<Vec<String>>,
+}
+
+impl Configuration {
+    const DEFAULT_VALUE: f64 = 50.0;
+
+    fn get_value(&self) -> f64 {
+        match &self.value {
+            Some(value) => value.parse().unwrap(),
+            _ => Self::DEFAULT_VALUE,
+        }
+    }
+
+    fn excluded_variant_ids(&self) -> Vec<ID> {
+        self.excluded_variant_ids
+            .as_ref()
+            .unwrap_or(&vec![])
+            .to_vec()
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let payload: Payload = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
     let mut out = std::io::stdout();
     let mut serializer = serde_json::Serializer::new(&mut out);
-    script(payload)?.serialize(&mut serializer)?;
+    function(payload)?.serialize(&mut serializer)?;
     Ok(())
 }
 
-fn script(payload: Payload) -> Result<handle_result::FunctionResult, Box<dyn std::error::Error>> {
-    const DEFAULT_VALUE: f64 = 50.0;
-
+fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let (input, config) = (payload.input, payload.configuration);
-    let value: f64 = if let Some(value) = config.value {
-        value.parse()?
-    } else {
-        DEFAULT_VALUE
-    };
+    let value: f64 = config.get_value();
     let merchandise_lines = &input.merchandise_lines.unwrap_or_default();
-    let excluded_variant_ids = &config.excluded_variant_ids.unwrap_or_default();
-    let targets = targets(&merchandise_lines, &excluded_variant_ids);
+    let excluded_variant_ids = config.excluded_variant_ids();
+    let targets = targets(merchandise_lines, &excluded_variant_ids);
     Ok(build_result(value, targets))
 }
 
-fn targets(
-    merchandise_lines: &Vec<input::InputMerchandiseLines>,
-    excluded_variant_ids: &[String],
-) -> Vec<handle_result::Target> {
+fn targets(merchandise_lines: &[MerchandiseLine], excluded_variant_ids: &[String]) -> Vec<Target> {
     merchandise_lines
         .iter()
         .filter_map(|line| match line.variant {
             Some(ref variant) if !excluded_variant_ids.contains(&(variant.id)) => {
-                Some(handle_result::Target {
-                    productVariant: Some(handle_result::ProductVariantTarget {
-                        id: variant.id,
-                        quantity: None,
-                    }),
+                Some(Target::ProductVariant {
+                    id: variant.id.to_string(),
+                    quantity: None,
                 })
             }
             _ => None,
@@ -78,18 +66,15 @@ fn targets(
         .collect()
 }
 
-fn build_result(value: f64, targets: Vec<handle_result::Target>) -> handle_result::FunctionResult {
-    handle_result::FunctionResult {
-        discounts: vec![handle_result::Discount {
+fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
+    FunctionResult {
+        discounts: vec![Discount {
             message: Some(format!("{}% off", value)),
             conditions: None,
             targets,
-            value: handle_result::Value {
-                percentage: Some(handle_result::Percentage { value }),
-                fixedAmount: None,
-            },
+            value: Value::Percentage(Percentage { value }),
         }],
-        discountApplicationStrategy: handle_result::DiscountApplicationStrategy::First,
+        discount_application_strategy: DiscountApplicationStrategy::First,
     }
 }
 
@@ -97,7 +82,7 @@ fn build_result(value: f64, targets: Vec<handle_result::Target>) -> handle_resul
 mod tests {
     use super::*;
 
-    fn payload(configuration: Config) -> Payload {
+    fn payload(configuration: Configuration) -> Payload {
         let input = r#"
         {
             "input": {
@@ -112,7 +97,7 @@ mod tests {
             }
         }
         "#;
-        let default_payload: Payload = serde_json::from_str(&input).unwrap();
+        let default_payload: Payload = serde_json::from_str(input).unwrap();
         Payload {
             configuration,
             ..default_payload
@@ -121,25 +106,21 @@ mod tests {
 
     #[test]
     fn test_discount_with_default_value() {
-        let payload = payload(Config {
+        let payload = payload(Configuration {
             value: None,
             excluded_variant_ids: None,
         });
-        let handle_result = serde_json::json!(script(payload).unwrap());
+        let handle_result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
                     "message": "50% off",
-                    "conditions": null,
                     "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0", "quantity": null } },
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1", "quantity": null } }
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
                     ],
-                    "value": {
-                        "percentage": { "value": 50.0 },
-                        "fixedAmount": null
-                    }
+                    "value": { "percentage": { "value": 50.0 } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
@@ -155,25 +136,21 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let payload = payload(Config {
+        let payload = payload(Configuration {
             value: Some("10".to_string()),
-            excludedVariantIds: None,
+            excluded_variant_ids: None,
         });
-        let handle_result = serde_json::json!(script(payload).unwrap());
+        let handle_result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
                     "message": "10% off",
-                    "conditions": null,
                     "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0", "quantity": null } },
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1", "quantity": null } }
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
                     ],
-                    "value": {
-                        "percentage": { "value": 10.0 },
-                        "fixedAmount": null
-                    }
+                    "value": { "percentage": { "value": 10.0 } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
@@ -189,24 +166,20 @@ mod tests {
 
     #[test]
     fn test_discount_with_excluded_variant_gids() {
-        let payload = payload(Config {
+        let payload = payload(Configuration {
             value: None,
             excluded_variant_ids: Some(vec!["gid://shopify/ProductVariant/0".to_string()]),
         });
-        let handle_result = serde_json::json!(script(payload).unwrap());
+        let handle_result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
                     "message": "50% off",
-                    "conditions": null,
                     "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1", "quantity": null } }
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
                     ],
-                    "value": {
-                        "percentage": { "value": 50.0 },
-                        "fixedAmount": null
-                    }
+                    "value": { "percentage": { "value": 50.0 } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
