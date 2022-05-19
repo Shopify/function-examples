@@ -13,7 +13,7 @@ pub struct Payload {
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Configuration {
     pub value: Option<String>,
-    pub excluded_variant_ids: Option<Vec<String>>,
+    pub excluded_variant_ids: Option<Vec<ID>>,
 }
 
 impl Configuration {
