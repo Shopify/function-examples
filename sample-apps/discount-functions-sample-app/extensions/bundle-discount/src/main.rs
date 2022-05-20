@@ -2,6 +2,7 @@ use graphql_client::GraphQLQuery;
 use serde::{Deserialize, Serialize};
 
 type UnsignedInt64 = u64;
+type Void = ();
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -19,13 +20,13 @@ struct Input;
     response_derives = "Debug, Clone",
     normalization = "rust"
 )]
-struct Output;
+struct HandleResult;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Configuration {
     message: String,
-    variant_id: u64,
+    variant_id: String,
     minimum_quantity: i64,
     discount_percentage: f64,
 }
@@ -49,33 +50,40 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn calculate_discounts(payload: Payload) -> Result<output::Variables, Box<dyn std::error::Error>> {
+fn calculate_discounts(
+    payload: Payload,
+) -> Result<handle_result::Variables, Box<dyn std::error::Error>> {
     let (input, configuration) = (payload.input, payload.configuration);
 
-    let targets: Vec<output::ProductVariantTarget> = input
+    let targets: Vec<handle_result::Target> = input
         .merchandise_lines
         .unwrap_or(vec![])
         .iter()
         .filter(|line| {
-            !line.index.is_none()
+            !line.id.is_none()
                 && !line.variant.is_none()
                 && line.variant.as_ref().unwrap().id == configuration.variant_id
                 && line.quantity.unwrap_or(0) >= configuration.minimum_quantity
         })
-        .map(|line| output::ProductVariantTarget {
-            id: line.variant.as_ref().unwrap().id,
-            quantity: line.quantity,
+        .map(|line| handle_result::Target {
+            productVariant: Some(handle_result::ProductVariantTarget {
+                id: line.variant.as_ref().unwrap().id.clone(),
+                quantity: line.quantity,
+            }),
         })
         .collect();
 
-    let discounts: Vec<output::Discount> = if targets.len() > 0 {
-        let discount = output::Discount {
-            message: Some(configuration.message),
-            value: output::Value {
-                value: configuration.discount_percentage,
-            },
-            targets,
+    let discounts: Vec<handle_result::Discount> = if targets.len() > 0 {
+        let discount = handle_result::Discount {
             conditions: None,
+            message: Some(configuration.message),
+            targets,
+            value: handle_result::Value {
+                fixedAmount: None,
+                percentage: Some(handle_result::Percentage {
+                    value: configuration.discount_percentage,
+                }),
+            },
         };
 
         vec![discount]
@@ -83,5 +91,10 @@ fn calculate_discounts(payload: Payload) -> Result<output::Variables, Box<dyn st
         vec![]
     };
 
-    Ok(output::Variables { discounts })
+    Ok(handle_result::Variables {
+        result: handle_result::FunctionResult {
+            discountApplicationStrategy: handle_result::DiscountApplicationStrategy::Maximum,
+            discounts,
+        },
+    })
 }

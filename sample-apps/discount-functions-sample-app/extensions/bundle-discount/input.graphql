@@ -1,6 +1,6 @@
 query Input {
   merchandiseLines {
-    index
+    id
     quantity
     variant {
       id

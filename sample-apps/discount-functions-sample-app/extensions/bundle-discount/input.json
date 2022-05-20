@@ -2,17 +2,17 @@
   "input": {
     "merchandiseLines": [
       {
-        "index": 0,
-        "quantity": 5,
+        "id": "0",
+        "quantity": 2,
         "variant": {
-          "id": 123
+          "id": "123"
         }
       }
     ]
   },
   "configuration": {
-    "title": "Bundle discount!",
-    "variantId": 123,
+    "message": "Bundle discount!",
+    "variantId": "123",
     "minimumQuantity": 5,
     "discountPercentage": 25
   }
