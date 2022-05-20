@@ -24,7 +24,7 @@ struct Output;
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Configuration {
-    title: String,
+    message: String,
     variant_id: u64,
     minimum_quantity: i64,
     discount_percentage: f64,
@@ -70,7 +70,7 @@ fn calculate_discounts(payload: Payload) -> Result<output::Variables, Box<dyn st
 
     let discounts: Vec<output::Discount> = if targets.len() > 0 {
         let discount = output::Discount {
-            message: Some(configuration.title),
+            message: Some(configuration.message),
             value: output::Value {
                 value: configuration.discount_percentage,
             },

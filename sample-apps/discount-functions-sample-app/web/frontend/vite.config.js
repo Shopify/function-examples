@@ -1,33 +1,36 @@
-import { defineConfig } from "vite";
-import path from "path";
+import { defineConfig } from 'vite';
+import path from 'path';
 
 // prettier-ignore
 const INDEX_ROUTE = "^/(\\?.*)?$";
-const API_ROUTE = "^/api/";
+const API_ROUTE = '^/api/';
 
-const root = new URL(".", import.meta.url).pathname;
+const root = new URL('.', import.meta.url).pathname;
 export default defineConfig({
   root,
   define: {
-    "process.env.SHOPIFY_API_KEY": JSON.stringify(process.env.SHOPIFY_API_KEY),
+    'process.env.SHOPIFY_API_KEY': JSON.stringify(process.env.SHOPIFY_API_KEY),
+    'process.env.BUNDLE_DISCOUNT_ID': JSON.stringify(
+      '99429149-fd13-4d3f-8ea6-cb982e63e291',
+    ),
   },
   esbuild: {
     jsxInject: `import React from 'react'`,
   },
   resolve: {
     alias: {
-      assets: path.resolve(root, "./assets"),
-      components: path.resolve(root, "./components"),
-      pages: path.resolve(root, "./pages"),
-      test: path.resolve(root, "./test"),
+      assets: path.resolve(root, './assets'),
+      components: path.resolve(root, './components'),
+      pages: path.resolve(root, './pages'),
+      test: path.resolve(root, './test'),
     },
   },
   server: {
     port: process.env.FRONTEND_PORT,
-    middlewareMode: "html",
+    middlewareMode: 'html',
     hmr: {
-      protocol: "ws",
-      host: "localhost",
+      protocol: 'ws',
+      host: 'localhost',
       port: 64999,
       clientPort: 64999,
     },
@@ -48,10 +51,10 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: "./test/setup.js",
+    environment: 'jsdom',
+    setupFiles: './test/setup.js',
     deps: {
-      inline: ["@shopify/react-testing"],
+      inline: ['@shopify/react-testing'],
     },
   },
 });

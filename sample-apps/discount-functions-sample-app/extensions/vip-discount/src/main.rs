@@ -57,8 +57,6 @@ fn calculate_discounts(payload: Payload) -> Result<output::Variables, Box<dyn st
         .tags
         .unwrap_or_default();
 
-    eprintln!("{:#?}", customer_tags);
-
     let discounts = if customer_tags.contains(&configuration.vip_tag) {
         vec![output::Discount {
             value: output::Value {

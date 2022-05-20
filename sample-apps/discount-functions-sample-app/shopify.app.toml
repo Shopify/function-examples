@@ -2,4 +2,4 @@
 
 name = "Discount Functions Sample App"
 id = "5b486eb7915cce3df6b2c5256f315071"
-scopes = "write_products, read_discounts, write_discounts, read_price_rules, write_price_rules"
+scopes = "write_products,read_discounts,write_discounts,read_price_rules,write_price_rules"

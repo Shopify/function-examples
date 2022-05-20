@@ -3,8 +3,8 @@ version: 2
 configuration:
   type: object
   fields:
-    title:
-      name: Discount title
+    message:
+      name: Discount message
       type: single_line_text_field
     variantId:
       name: Variant ID
