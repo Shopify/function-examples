@@ -1,3 +1,0 @@
-mutation Output($discounts: [Discount!]!) {
-    outputDiscounts(discounts: $discounts)
-}
