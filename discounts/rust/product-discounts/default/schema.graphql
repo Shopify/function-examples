@@ -70,6 +70,14 @@ input FixedAmount {
   value: Float!
 }
 
+"""
+The result of the function.
+"""
+input FunctionResult {
+  discountApplicationStrategy: DiscountApplicationStrategy!
+  discounts: [Discount!]!
+}
+
 interface HasMetafields {
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -105,6 +113,7 @@ type Input {
 
 """
 A [JSON](https://www.json.org/json-en.html) object.
+
 Example value:
 `{
   "product": {
@@ -202,14 +211,6 @@ input ProductVariantTarget {
 type Property {
   key: String!
   value: String!
-}
-
-"""
-The result of the function.
-"""
-input FunctionResult {
-  discountApplicationStrategy: DiscountApplicationStrategy!
-  discounts: [Discount!]!
 }
 
 type SellingPlan {

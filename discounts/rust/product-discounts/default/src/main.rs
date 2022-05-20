@@ -5,7 +5,7 @@ use api::*;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Payload {
-    pub input: Input,
+    pub input: input::Input,
     pub configuration: Configuration,
 }
 
@@ -51,7 +51,10 @@ fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Erro
     Ok(build_result(value, targets))
 }
 
-fn targets(merchandise_lines: &[MerchandiseLine], excluded_variant_ids: &[String]) -> Vec<Target> {
+fn targets(
+    merchandise_lines: &[input::MerchandiseLine],
+    excluded_variant_ids: &[String],
+) -> Vec<Target> {
     merchandise_lines
         .iter()
         .filter_map(|line| match line.variant {
