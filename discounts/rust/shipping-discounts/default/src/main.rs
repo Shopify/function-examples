@@ -36,15 +36,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let (input, config) = (payload.input, payload.configuration);
     let value = config.get_value();
-    Ok(FunctionResult {
-        discounts: vec![Discount {
-            message: Some(format!("{}% off", value)),
-            conditions: None,
-            value: Value::Percentage(Percentage { value }),
-            targets: targets(&input.delivery_lines.unwrap_or_default()),
-        }],
-        discount_application_strategy: DiscountApplicationStrategy::First,
-    })
+    let delivery_lines = input.delivery_lines.unwrap_or_default();
+    Ok(build_result(value, targets(&delivery_lines)))
 }
 
 fn targets(delivery_lines: &[input::DeliveryLineWithStrategy]) -> Vec<Target> {
@@ -56,6 +49,23 @@ fn targets(delivery_lines: &[input::DeliveryLineWithStrategy]) -> Vec<Target> {
                 .map(|id| Target::ShippingLine { id: id.to_string() })
         })
         .collect()
+}
+
+fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
+    let discounts = if targets.is_empty() {
+        vec![]
+    } else {
+        vec![Discount {
+            message: Some(format!("{}% off", value)),
+            conditions: None,
+            targets,
+            value: Value::Percentage(Percentage { value }),
+        }]
+    };
+    FunctionResult {
+        discounts,
+        discount_application_strategy: DiscountApplicationStrategy::First,
+    }
 }
 
 #[cfg(test)]
@@ -129,5 +139,67 @@ mod tests {
 
         let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
         assert_eq!(result.to_string(), expected_result.to_string());
+    }
+
+    #[test]
+    fn test_discount_with_no_delivery_lines() {
+        let payload = Payload {
+            input: input::Input {
+                delivery_lines: None,
+                merchandise_lines: None,
+                customer: None,
+                locale: None,
+            },
+            configuration: Configuration { value: None },
+        };
+        let handle_result = serde_json::json!(function(payload).unwrap());
+
+        let expected_json = r#"
+            {
+                "discounts": [],
+                "discountApplicationStrategy": "FIRST"
+            }
+        "#;
+
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
+    }
+
+    #[test]
+    fn test_discount_with_no_delivery_line_ids() {
+        let payload = Payload {
+            input: input::Input {
+                delivery_lines: Some(vec![input::DeliveryLineWithStrategy {
+                    id: None,
+                    destination: None,
+                    price: None,
+                    strategy: None,
+                    subscription: None,
+                }]),
+                merchandise_lines: None,
+                customer: None,
+                locale: None,
+            },
+            configuration: Configuration { value: None },
+        };
+        let handle_result = serde_json::json!(function(payload).unwrap());
+
+        let expected_json = r#"
+            {
+                "discounts": [],
+                "discountApplicationStrategy": "FIRST"
+            }
+        "#;
+
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
     }
 }

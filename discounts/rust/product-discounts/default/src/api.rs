@@ -1,4 +1,5 @@
-// Types defined in this file conforms to the schema https://github.com/Shopify/shopify/blob/main/db/graphql/shopify_vm/product_discounts.graphql
+// Types defined in this file conforms to the schema https://github.com/Shopify/shopify/blob/main/db/graphql/shopify_vm/order_discounts.graphql
+// All input fields are optional as they may not be included in the input query
 #![allow(dead_code)]
 
 pub type Boolean = bool;
@@ -51,7 +52,7 @@ pub mod input {
         pub city: Option<String>,
         pub country_code: Option<String>,
         pub phone: Option<String>,
-        pub po_box: Boolean,
+        pub po_box: Option<Boolean>,
         pub province_code: Option<String>,
         pub zip: Option<String>,
     }
@@ -70,20 +71,20 @@ pub mod input {
 
     #[derive(Clone, Debug, Deserialize)]
     pub struct Properties {
-        pub key: String,
-        pub value: String,
+        pub key: Option<String>,
+        pub value: Option<String>,
     }
 
     #[derive(Clone, Debug, Deserialize)]
     pub struct SellingPlan {
-        pub id: ID,
+        pub id: Option<ID>,
     }
 
     #[derive(Clone, Debug, Deserialize)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Variant {
         pub compare_at_price: Option<Money>,
-        pub id: ID,
+        pub id: Option<ID>,
         pub product: Option<Product>,
         pub sku: Option<String>,
         pub title: Option<String>,
@@ -93,7 +94,7 @@ pub mod input {
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Product {
         pub gift_card: Option<Boolean>,
-        pub id: ID,
+        pub id: Option<ID>,
         pub tags: Option<Vec<String>>,
         pub title: Option<String>,
         pub type_: Option<String>,

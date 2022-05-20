@@ -51,32 +51,46 @@ fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Erro
     Ok(build_result(value, targets))
 }
 
-fn targets(
-    merchandise_lines: &[input::MerchandiseLine],
-    excluded_variant_ids: &[String],
-) -> Vec<Target> {
+fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
     merchandise_lines
         .iter()
-        .filter_map(|line| match line.variant {
-            Some(ref variant) if !excluded_variant_ids.contains(&(variant.id)) => {
+        .filter_map(|line| line.variant.as_ref())
+        .filter_map(|variant| variant.id.as_ref().map(String::from))
+        .collect()
+}
+
+fn targets(
+    merchandise_lines: &[input::MerchandiseLine],
+    excluded_variant_ids: &[ID],
+) -> Vec<Target> {
+    variant_ids(merchandise_lines)
+        .iter()
+        .filter_map(|id| {
+            if !excluded_variant_ids.contains(id) {
                 Some(Target::ProductVariant {
-                    id: variant.id.to_string(),
+                    id: id.to_string(),
                     quantity: None,
                 })
+            } else {
+                None
             }
-            _ => None,
         })
         .collect()
 }
 
 fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
-    FunctionResult {
-        discounts: vec![Discount {
+    let discounts = if targets.is_empty() {
+        vec![]
+    } else {
+        vec![Discount {
             message: Some(format!("{}% off", value)),
             conditions: None,
             targets,
             value: Value::Percentage(Percentage { value }),
-        }],
+        }]
+    };
+    FunctionResult {
+        discounts,
         discount_application_strategy: DiscountApplicationStrategy::First,
     }
 }
@@ -176,14 +190,90 @@ mod tests {
         let handle_result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
+        {
+            "discounts": [{
+                "message": "50% off",
+                "targets": [
+                    { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
+                ],
+                "value": { "percentage": { "value": 50.0 } }
+            }],
+            "discountApplicationStrategy": "FIRST"
+        }
+        "#;
+
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
+    }
+
+    #[test]
+    fn test_discount_with_no_merchandise_lines() {
+        let payload = Payload {
+            input: input::Input {
+                delivery_lines: None,
+                merchandise_lines: None,
+                customer: None,
+                locale: None,
+            },
+            configuration: Configuration {
+                value: None,
+                excluded_variant_ids: None,
+            },
+        };
+        let handle_result = serde_json::json!(function(payload).unwrap());
+
+        let expected_json = r#"
             {
-                "discounts": [{
-                    "message": "50% off",
-                    "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
-                    ],
-                    "value": { "percentage": { "value": 50.0 } }
-                }],
+                "discounts": [],
+                "discountApplicationStrategy": "FIRST"
+            }
+        "#;
+
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
+    }
+
+    #[test]
+    fn test_discount_with_no_variant_ids() {
+        let payload = Payload {
+            input: input::Input {
+                delivery_lines: None,
+                merchandise_lines: Some(vec![input::MerchandiseLine {
+                    id: None,
+                    variant: Some(input::Variant {
+                        id: None,
+                        compare_at_price: None,
+                        product: None,
+                        sku: None,
+                        title: None,
+                    }),
+                    price: None,
+                    properties: None,
+                    quantity: None,
+                    selling_plan: None,
+                    weight: None,
+                }]),
+                customer: None,
+                locale: None,
+            },
+            configuration: Configuration {
+                value: None,
+                excluded_variant_ids: None,
+            },
+        };
+        let handle_result = serde_json::json!(function(payload).unwrap());
+
+        let expected_json = r#"
+            {
+                "discounts": [],
                 "discountApplicationStrategy": "FIRST"
             }
         "#;
