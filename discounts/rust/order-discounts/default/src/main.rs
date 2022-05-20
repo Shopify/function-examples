@@ -5,6 +5,7 @@ use api::*;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Payload {
+    pub input: input::Input,
     pub configuration: Configuration,
 }
 
@@ -12,7 +13,7 @@ pub struct Payload {
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Configuration {
     pub value: Option<String>,
-    pub excluded_variant_ids: Option<Vec<String>>,
+    pub excluded_variant_ids: Option<Vec<ID>>,
 }
 
 impl Configuration {
@@ -44,14 +45,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let config = payload.configuration;
     let value = config.get_value();
+    let excluded_variant_ids = config.excluded_variant_ids();
     Ok(FunctionResult {
         discounts: vec![Discount {
-            value: Value::Percentage(Percentage { value }),
-            targets: vec![Target::OrderSubtotal {
-                excluded_variant_ids: config.excluded_variant_ids(),
-            }],
             message: Some(format!("{}% off", value)),
             conditions: None,
+            targets: vec![Target::OrderSubtotal {
+                excluded_variant_ids,
+            }],
+            value: Value::Percentage(Percentage { value }),
         }],
         discount_application_strategy: DiscountApplicationStrategy::First,
     })
@@ -61,14 +63,40 @@ fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Erro
 mod tests {
     use super::*;
 
+    fn payload(configuration: Configuration) -> Payload {
+        let input = r#"
+        {
+            "input": {
+                "merchandiseLines": [
+                    {
+                        "variant": { "id": "gid://shopify/ProductVariant/0" },
+                        "price": { "currency": "CAD", "subunits": 100 }
+                    },
+                    {
+                        "variant": { "id": "gid://shopify/ProductVariant/1" },
+                        "price": { "currency": "CAD", "subunits": 100 }
+                    }
+                ]
+            },
+            "configuration": {
+                "value": null,
+                "excludedVariantIds": null
+            }
+        }
+        "#;
+        let default_payload: Payload = serde_json::from_str(input).unwrap();
+        Payload {
+            configuration,
+            ..default_payload
+        }
+    }
+
     #[test]
     fn test_discount_with_default_value() {
-        let payload = Payload {
-            configuration: Configuration {
-                value: None,
-                excluded_variant_ids: None,
-            },
-        };
+        let payload = payload(Configuration {
+            value: None,
+            excluded_variant_ids: None,
+        });
         let result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
@@ -88,12 +116,10 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let payload = Payload {
-            configuration: Configuration {
-                value: Some("10".to_string()),
-                excluded_variant_ids: None,
-            },
-        };
+        let payload = payload(Configuration {
+            value: Some("10".to_string()),
+            excluded_variant_ids: None,
+        });
         let result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"
@@ -113,12 +139,10 @@ mod tests {
 
     #[test]
     fn test_discount_with_excluded_variant_ids() {
-        let payload = Payload {
-            configuration: Configuration {
-                value: None,
-                excluded_variant_ids: Some(vec!["gid://shopify/ProductVariant/1".to_string()]),
-            },
-        };
+        let payload = payload(Configuration {
+            value: None,
+            excluded_variant_ids: Some(vec!["gid://shopify/ProductVariant/1".to_string()]),
+        });
         let result = serde_json::json!(function(payload).unwrap());
 
         let expected_json = r#"

@@ -15,7 +15,7 @@ pub mod input {
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub customer: Option<Customer>,
-        pub delivery_lines: Option<Vec<DeliveryLines>>,
+        pub delivery_lines: Option<Vec<DeliveryLine>>,
         pub locale: Option<String>,
         pub merchandise_lines: Option<Vec<MerchandiseLine>>,
     }
@@ -39,7 +39,7 @@ pub mod input {
     }
 
     #[derive(Clone, Debug, Deserialize)]
-    pub struct DeliveryLines {
+    pub struct DeliveryLine {
         pub destination: Option<Address>,
         pub id: Option<ID>,
         pub subscription: Option<Boolean>,
