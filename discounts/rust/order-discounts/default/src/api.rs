@@ -60,7 +60,7 @@ pub mod input {
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct MerchandiseLine {
         pub id: Option<ID>,
-        pub price: Money,
+        pub price: Option<Money>,
         pub properties: Option<Vec<Properties>>,
         pub quantity: Option<Int>,
         pub selling_plan: Option<SellingPlan>,

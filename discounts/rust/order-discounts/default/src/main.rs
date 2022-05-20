@@ -68,14 +68,8 @@ mod tests {
         {
             "input": {
                 "merchandiseLines": [
-                    {
-                        "variant": { "id": "gid://shopify/ProductVariant/0" },
-                        "price": { "currency": "CAD", "subunits": 100 }
-                    },
-                    {
-                        "variant": { "id": "gid://shopify/ProductVariant/1" },
-                        "price": { "currency": "CAD", "subunits": 100 }
-                    }
+                    { "variant": { "id": "gid://shopify/ProductVariant/0" } },
+                    { "variant": { "id": "gid://shopify/ProductVariant/1" } }
                 ]
             },
             "configuration": {

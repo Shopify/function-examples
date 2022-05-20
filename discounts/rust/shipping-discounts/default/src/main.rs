@@ -67,8 +67,8 @@ mod tests {
         {
             "input": {
                 "deliveryLines": [
-                    { "id": "gid://shopify/DeliveryLine/0", "price": { "currency": "CAD", "subunits": 100 }, "strategy": {} },
-                    { "id": "gid://shopify/DeliveryLine/1", "price": { "currency": "CAD", "subunits": 100 }, "strategy": {} }
+                    { "id": "gid://shopify/DeliveryLine/0" },
+                    { "id": "gid://shopify/DeliveryLine/1" }
                 ]
             },
             "configuration": {
