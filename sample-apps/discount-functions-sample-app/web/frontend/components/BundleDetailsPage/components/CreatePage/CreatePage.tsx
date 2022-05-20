@@ -1,59 +1,22 @@
 import { Page, Card, PageActions, TextField } from '@shopify/polaris';
-import { gql } from 'graphql-request';
 
 import { Details } from '..';
 import { useRedirectToDiscounts } from '../../../../hooks/useRedirectToDiscounts';
-import { useShopifyMutation } from '../../../../hooks/useShopifyMutation';
-import useBundleDiscount from '../../hooks/useBundleDiscount';
-import serializeBundleDiscount from '../../utilities/serializeBundleDiscount';
-import { Configuration } from '../../types';
-
-const CREATE_MUTATION = gql`
-  mutation CreateBundleDiscount($discount: DiscountAutomaticAppInput!) {
-    discountAutomaticAppCreate(automaticAppDiscount: $discount) {
-      userErrors {
-        code
-        message
-        field
-      }
-    }
-  }
-`;
+import { serializeBundleDiscount } from '../../utilities/serializeBundleDiscount';
+import { configurationsAreEqual } from '../../utilities/configurationsAreEqual';
+import { useDiscount } from '../../../../hooks/useDiscount';
+import { DEFAULT_CONFIGURATION } from '../../consts';
+import { useCreateDiscount } from '../../../../hooks/useCreateDiscount';
 
 export default function CreatePage() {
   const redirectToDiscounts = useRedirectToDiscounts();
-  const { discount, setDiscount } = useBundleDiscount();
-
-  const [createBundleDiscount, { isLoading }] = useShopifyMutation({
-    query: CREATE_MUTATION,
-  }) as any;
-
-  const handleSaveClick = async () => {
-    try {
-      createBundleDiscount({
-        discount: {
-          ...serializeBundleDiscount(discount),
-          scriptUuid: process.env.BUNDLE_DISCOUNT_ID,
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleTitleChange = (title: string) => {
-    setDiscount({
-      ...discount,
-      title,
+  const { discount, title, configuration, setTitle, setConfiguration } =
+    useDiscount({
+      defaultConfiguration: DEFAULT_CONFIGURATION,
+      configurationsAreEqual,
     });
-  };
 
-  const handleConfigurationChange = (configuration: Configuration) => {
-    setDiscount({
-      ...discount,
-      configuration,
-    });
-  };
+  const [createDiscount, { isLoading }] = useCreateDiscount();
 
   return (
     <Page
@@ -63,23 +26,29 @@ export default function CreatePage() {
       <Card>
         <Card.Section>
           <TextField
-            value={discount.title}
-            onChange={handleTitleChange}
+            value={title}
+            onChange={setTitle}
             label="Discount title"
             autoComplete="on"
           />
         </Card.Section>
         <Card.Section>
           <Details
-            configuration={discount.configuration}
-            onConfigurationChange={handleConfigurationChange}
+            configuration={configuration}
+            onConfigurationChange={setConfiguration}
           />
         </Card.Section>
       </Card>
       <PageActions
         primaryAction={{
           content: 'Save',
-          onAction: handleSaveClick,
+          onAction: async () => {
+            await createDiscount(
+              process.env.BUNDLE_DISCOUNT_ID,
+              serializeBundleDiscount(discount),
+            );
+            redirectToDiscounts();
+          },
           loading: isLoading,
         }}
       />

@@ -2,6 +2,7 @@ use graphql_client::GraphQLQuery;
 use serde::{Deserialize, Serialize};
 
 type UnsignedInt64 = u64;
+type Void = ();
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -19,7 +20,7 @@ struct Input;
     response_derives = "Debug, Clone",
     normalization = "rust"
 )]
-struct Output;
+struct HandleResult;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -48,7 +49,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn calculate_discounts(payload: Payload) -> Result<output::Variables, Box<dyn std::error::Error>> {
+fn calculate_discounts(
+    payload: Payload,
+) -> Result<handle_result::Variables, Box<dyn std::error::Error>> {
     let configuration = payload.configuration;
     let customer_tags = payload
         .input
@@ -58,19 +61,27 @@ fn calculate_discounts(payload: Payload) -> Result<output::Variables, Box<dyn st
         .unwrap_or_default();
 
     let discounts = if customer_tags.contains(&configuration.vip_tag) {
-        vec![output::Discount {
-            value: output::Value {
-                value: configuration.discount_amount,
-            },
-            message: Some(configuration.message),
+        vec![handle_result::Discount {
             conditions: None,
+            message: Some(configuration.message),
             targets: vec![],
+            value: handle_result::Value {
+                percentage: None,
+                fixedAmount: Some(handle_result::FixedAmount {
+                    value: configuration.discount_amount,
+                }),
+            },
         }]
     } else {
         vec![]
     };
 
-    Ok(output::Variables { discounts })
+    Ok(handle_result::Variables {
+        result: handle_result::FunctionResult {
+            discountApplicationStrategy: handle_result::DiscountApplicationStrategy::Maximum,
+            discounts,
+        },
+    })
 }
 
 impl Default for input::InputCustomer {

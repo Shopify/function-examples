@@ -1,108 +1,44 @@
-import { useMemo } from 'react';
-import { gql } from 'graphql-request';
 import { Page, Card, TextField, PageActions, Spinner } from '@shopify/polaris';
 
-import { useShopifyQuery } from '../../../../hooks/useShopifyQuery';
-import { idToGid } from '../../../../utilities/gid';
-import { BundleDiscount, Configuration } from '../../types';
-import Details from '../Details';
+import { configurationsAreEqual } from '../../utilities/configurationsAreEqual';
+import { DEFAULT_CONFIGURATION } from '../../consts';
+import { serializeBundleDiscount } from '../../utilities/serializeBundleDiscount';
+import { useDeleteDiscount } from '../../../../hooks/useDeleteDiscount';
+import { useDiscount } from '../../../../hooks/useDiscount';
 import { useRedirectToDiscounts } from '../../../../hooks/useRedirectToDiscounts';
+import { useUpdateDiscount } from '../../../../hooks/useUpdateDiscount';
+import Details from '../Details';
 import styles from './UpdatePage.module.css';
-import useBundleDiscount from '../../hooks/useBundleDiscount';
-import { useShopifyMutation } from '../../../../hooks/useShopifyMutation';
-import serializeBundleDiscount from '../../utilities/serializeBundleDiscount';
+import { useSavedDiscount } from '../../../../hooks/useSavedDiscount';
+import { Configuration } from '../../types';
 
 interface Props {
   id: string;
 }
 
-const GET_BUNDLE_DISCOUNT = gql`
-  query GetBundleDiscount($id: ID!) {
-    automaticDiscountNode(id: $id) {
-      automaticDiscount {
-        ... on DiscountAutomaticApp {
-          title
-          configuration
-        }
-      }
-    }
-  }
-`;
-
-const UPDATE_MUTATION = gql`
-  mutation UpdateBundleDiscount(
-    $id: ID!
-    $discount: DiscountAutomaticAppInput!
-  ) {
-    discountAutomaticAppUpdate(id: $id, automaticAppDiscount: $discount) {
-      userErrors {
-        code
-        message
-        field
-      }
-    }
-  }
-`;
-
 export default function UpdatePage({ id }: Props) {
   const redirectToDiscounts = useRedirectToDiscounts();
-  const { data, isLoading, error } = useShopifyQuery({
-    key: 'GetBundleDiscount',
-    query: GET_BUNDLE_DISCOUNT,
-    variables: { id: idToGid('DiscountAutomaticApp', id) },
+  const {
+    discount: savedDiscount,
+    isLoading,
+    isError,
+  } = useSavedDiscount<Configuration>(id);
+  const {
+    discount,
+    isDirty,
+    title,
+    setTitle,
+    configuration,
+    setConfiguration,
+  } = useDiscount({
+    savedDiscount,
+    configurationsAreEqual,
+    defaultConfiguration: DEFAULT_CONFIGURATION,
   });
-  const [updateBundleDiscount, { isLoading: updateInProgress }] =
-    useShopifyMutation({
-      query: UPDATE_MUTATION,
-    }) as any;
 
-  const savedDiscount: BundleDiscount | undefined = useMemo(() => {
-    if (!data) {
-      return;
-    }
-
-    const { configuration: jsonConfiguration } =
-      data.data.automaticDiscountNode.automaticDiscount;
-
-    const configuration = JSON.parse(jsonConfiguration);
-
-    return {
-      title: data.data.automaticDiscountNode.automaticDiscount.title,
-      configuration: {
-        message: configuration.title,
-        discountPercentage: Number(configuration.discountPercentage),
-        minimumQuantity: Number(configuration.minimumQuantity),
-        variantId: configuration.variantId,
-      },
-    };
-  }, [data]);
-
-  const { discount, setDiscount, isDirty } = useBundleDiscount(savedDiscount);
-
-  const handleTitleChange = (title: string) => {
-    setDiscount({
-      ...discount,
-      title,
-    });
-  };
-
-  const handleConfigurationChange = (configuration: Configuration) => {
-    setDiscount({
-      ...discount,
-      configuration,
-    });
-  };
-
-  const handleSaveClick = async () => {
-    try {
-      updateBundleDiscount({
-        id: idToGid('DiscountAutomaticNode', id),
-        discount: serializeBundleDiscount(discount),
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();
+  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount();
+  const mutationInProgress = updateInProgress || deleteInProgress;
 
   if (isLoading) {
     return (
@@ -112,7 +48,7 @@ export default function UpdatePage({ id }: Props) {
     );
   }
 
-  if (error) {
+  if (isError) {
     return <div>Something went wrong!</div>;
   }
 
@@ -121,26 +57,37 @@ export default function UpdatePage({ id }: Props) {
       <Card>
         <Card.Section>
           <TextField
-            value={discount.title}
-            onChange={handleTitleChange}
+            value={title}
+            onChange={setTitle}
             label="Discount title"
             autoComplete="on"
           />
         </Card.Section>
         <Card.Section>
           <Details
-            configuration={discount.configuration}
-            onConfigurationChange={handleConfigurationChange}
+            configuration={configuration}
+            onConfigurationChange={setConfiguration}
           />
         </Card.Section>
       </Card>
       <PageActions
         primaryAction={{
           content: 'Save',
-          onAction: handleSaveClick,
-          loading: updateInProgress,
+          onAction: () => updateDiscount(id, serializeBundleDiscount(discount)),
+          loading: mutationInProgress,
           disabled: !isDirty,
         }}
+        secondaryActions={[
+          {
+            content: 'Delete',
+            destructive: true,
+            loading: mutationInProgress,
+            onAction: async () => {
+              await deleteDiscount(id);
+              redirectToDiscounts();
+            },
+          },
+        ]}
       />
     </Page>
   );
