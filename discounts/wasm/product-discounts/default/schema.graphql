@@ -1,6 +1,12 @@
 schema {
-  query: MerchandiseDiscountRoot
+  query: Input
+  mutation: MutationRoot
 }
+
+"""
+Exactly one field of input must be provided, and all others omitted.
+"""
+directive @oneOf on INPUT_OBJECT
 
 type Address {
   city: String
@@ -11,10 +17,15 @@ type Address {
   zip: String
 }
 
+input Condition @oneOf {
+  productMinimumQuantity: ProductMinimumQuantity
+  productMinimumSubtotal: ProductMinimumSubtotal
+}
+
 type Customer implements HasMetafields {
   acceptsMarketing: Boolean
   email: String
-  id: UnsignedInt64!
+  id: ID
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -38,8 +49,33 @@ type Customer implements HasMetafields {
 
 type DeliveryLine {
   destination: Address
-  index: Int
+  id: ID
   subscription: Boolean
+}
+
+input Discount {
+  conditions: [Condition!]
+  message: String
+  targets: [Target!]!
+  value: Value!
+}
+
+enum DiscountApplicationStrategy {
+  FIRST
+  MAXIMUM
+}
+
+input FixedAmount {
+  appliesToEachItem: Boolean
+  value: Float!
+}
+
+"""
+The result of the function.
+"""
+input FunctionResult {
+  discountApplicationStrategy: DiscountApplicationStrategy!
+  discounts: [Discount!]!
 }
 
 interface HasMetafields {
@@ -60,6 +96,22 @@ interface HasMetafields {
 }
 
 """
+Represents a unique identifier that is Base64 obfuscated. It is often used to
+refetch an object or as key for a cache. The ID type appears in a JSON response
+as a String; however, it is not intended to be human-readable. When expected as
+an input type, any string (such as `"VXNlci0xMA=="`) or integer (such as `4`)
+input value will be accepted as an ID.
+"""
+scalar ID
+
+type Input {
+  customer: Customer
+  deliveryLines: [DeliveryLine!]
+  locale: String
+  merchandiseLines: [MerchandiseLine!]
+}
+
+"""
 A [JSON](https://www.json.org/json-en.html) object.
 
 Example value:
@@ -76,15 +128,8 @@ Example value:
 """
 scalar JSON
 
-type MerchandiseDiscountRoot {
-  customer: Customer
-  deliveryLines: [DeliveryLine!]
-  locale: String
-  merchandiseLines: [MerchandiseLine!]
-}
-
 type MerchandiseLine {
-  index: Int
+  id: ID
   price: Money!
   properties: [Property!]
   quantity: Int
@@ -103,9 +148,28 @@ type Money {
   subunits: UnsignedInt64!
 }
 
+"""
+The root mutation for the API.
+"""
+type MutationRoot {
+  """
+  The mutation that defines the structure of a valid result for the function.
+  """
+  handleResult(
+    """
+    The result of the function.
+    """
+    result: FunctionResult!
+  ): Void!
+}
+
+input Percentage {
+  value: Float!
+}
+
 type Product implements HasMetafields {
   giftCard: Boolean
-  id: UnsignedInt64!
+  id: ID!
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -127,13 +191,39 @@ type Product implements HasMetafields {
   vendor: String
 }
 
+input ProductMinimumQuantity {
+  ids: [ID!]!
+  minimumQuantity: Int!
+  targetType: TargetType!
+}
+
+input ProductMinimumSubtotal {
+  ids: [ID!]!
+  minimumAmount: Float!
+  targetType: TargetType!
+}
+
+input ProductVariantTarget {
+  id: ID!
+  quantity: Int
+}
+
 type Property {
   key: String!
   value: String!
 }
 
 type SellingPlan {
-  id: UnsignedInt64!
+  id: ID!
+}
+
+input Target @oneOf {
+  productVariant: ProductVariantTarget
+}
+
+enum TargetType {
+  ORDER_SUBTOTAL
+  PRODUCT_VARIANT
 }
 
 """
@@ -142,9 +232,14 @@ Example value: `1099511627776`
 """
 scalar UnsignedInt64
 
+input Value @oneOf {
+  fixedAmount: FixedAmount
+  percentage: Percentage
+}
+
 type Variant implements HasMetafields {
   compareAtPrice: Money
-  id: UnsignedInt64!
+  id: ID!
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -164,3 +259,8 @@ type Variant implements HasMetafields {
   sku: String
   title: String
 }
+
+"""
+A void type that can be used to return a null value from a mutation.
+"""
+scalar Void
