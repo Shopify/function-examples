@@ -1,7 +1,7 @@
-import { Discount } from '../../../types';
-import { Configuration } from '../types';
+import { Discount } from '../../types';
+import { Configuration } from './types';
 
-export function serializeBundleDiscount(
+export function serializeDiscount(
   discount: Discount<Configuration>,
 ): Discount<string> {
   return {

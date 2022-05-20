@@ -1,4 +1,4 @@
-import { Configuration } from '../types';
+import { Configuration } from './types';
 
 export function configurationsAreEqual(
   left: Configuration,

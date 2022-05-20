@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ResourcePicker } from '@shopify/app-bridge-react';
 import { Button, Stack, TextContainer, TextField } from '@shopify/polaris';
 
-import { Configuration } from '../../types';
+import { Configuration } from './types';
 
 interface Props {
   configuration: Configuration;

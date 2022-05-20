@@ -4,8 +4,3 @@ export interface Configuration {
   minimumQuantity: number;
   discountPercentage: number;
 }
-
-export interface BundleDiscount {
-  title: string;
-  configuration: Configuration;
-}

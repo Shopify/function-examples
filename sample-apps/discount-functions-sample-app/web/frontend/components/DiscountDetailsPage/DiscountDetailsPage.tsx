@@ -1,22 +1,40 @@
-import { Page, Card, TextField, PageActions, Spinner } from '@shopify/polaris';
+import {
+  Page,
+  Card,
+  TextField,
+  PageActions,
+  Spinner,
+  Stack,
+} from '@shopify/polaris';
 
-import { configurationsAreEqual } from '../../utilities/configurationsAreEqual';
-import { DEFAULT_CONFIGURATION } from '../../consts';
-import { serializeBundleDiscount } from '../../utilities/serializeBundleDiscount';
-import { useDeleteDiscount } from '../../../../hooks/useDeleteDiscount';
-import { useDiscount } from '../../../../hooks/useDiscount';
-import { useRedirectToDiscounts } from '../../../../hooks/useRedirectToDiscounts';
-import { useUpdateDiscount } from '../../../../hooks/useUpdateDiscount';
-import Details from '../Details';
-import styles from './UpdatePage.module.css';
-import { useSavedDiscount } from '../../../../hooks/useSavedDiscount';
-import { Configuration } from '../../types';
+import { Discount } from '../../types';
+import { useDeleteDiscount } from '../../hooks/useDeleteDiscount';
+import { useDiscount } from '../../hooks/useDiscount';
+import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
+import { useSavedDiscount } from '../../hooks/useSavedDiscount';
+import { useUpdateDiscount } from '../../hooks/useUpdateDiscount';
 
-interface Props {
+interface Props<Configuration> {
   id: string;
+  defaultConfiguration: Configuration;
+  configurationsAreEqual: (
+    left: Configuration,
+    right: Configuration,
+  ) => boolean;
+  serializeDiscount: (discount: Discount<Configuration>) => Discount<string>;
+  renderConfigurationForm(
+    configuration: Configuration,
+    onConfigurationChange: (configuration: Configuration) => void,
+  );
 }
 
-export default function UpdatePage({ id }: Props) {
+export default function DiscountDetailsPage<Configuration>({
+  id,
+  configurationsAreEqual,
+  defaultConfiguration,
+  renderConfigurationForm,
+  serializeDiscount,
+}: Props<Configuration>) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const {
     discount: savedDiscount,
@@ -33,7 +51,7 @@ export default function UpdatePage({ id }: Props) {
   } = useDiscount({
     savedDiscount,
     configurationsAreEqual,
-    defaultConfiguration: DEFAULT_CONFIGURATION,
+    defaultConfiguration,
   });
 
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();
@@ -42,9 +60,9 @@ export default function UpdatePage({ id }: Props) {
 
   if (isLoading) {
     return (
-      <div className={styles.loadingContainer}>
+      <Stack distribution="center">
         <Spinner size="large" />
-      </div>
+      </Stack>
     );
   }
 
@@ -64,16 +82,13 @@ export default function UpdatePage({ id }: Props) {
           />
         </Card.Section>
         <Card.Section>
-          <Details
-            configuration={configuration}
-            onConfigurationChange={setConfiguration}
-          />
+          {renderConfigurationForm(configuration, setConfiguration)}
         </Card.Section>
       </Card>
       <PageActions
         primaryAction={{
           content: 'Save',
-          onAction: () => updateDiscount(id, serializeBundleDiscount(discount)),
+          onAction: () => updateDiscount(id, serializeDiscount(discount)),
           loading: mutationInProgress,
           disabled: !isDirty,
         }}
