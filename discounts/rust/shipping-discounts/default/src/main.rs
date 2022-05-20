@@ -5,7 +5,7 @@ use api::*;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Payload {
-    pub input: Input,
+    pub input: input::Input,
     pub configuration: Configuration,
 }
 
@@ -38,16 +38,16 @@ fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Erro
     let value = config.get_value();
     Ok(FunctionResult {
         discounts: vec![Discount {
-            value: Value::Percentage(Percentage { value }),
-            targets: targets(&input.delivery_lines.unwrap_or_default()),
             message: Some(format!("{}% off", value)),
             conditions: None,
+            value: Value::Percentage(Percentage { value }),
+            targets: targets(&input.delivery_lines.unwrap_or_default()),
         }],
         discount_application_strategy: DiscountApplicationStrategy::First,
     })
 }
 
-fn targets(delivery_lines: &[DeliveryLineWithStrategy]) -> Vec<Target> {
+fn targets(delivery_lines: &[input::DeliveryLineWithStrategy]) -> Vec<Target> {
     delivery_lines
         .iter()
         .filter_map(|line| {
@@ -67,8 +67,8 @@ mod tests {
         {
             "input": {
                 "deliveryLines": [
-                    { "id": "gid://shopify/DeliveryLine/0" },
-                    { "id": "gid://shopify/DeliveryLine/1" }
+                    { "id": "gid://shopify/DeliveryLine/0", "price": { "currency": "CAD", "subunits": 100 }, "strategy": {} },
+                    { "id": "gid://shopify/DeliveryLine/1", "price": { "currency": "CAD", "subunits": 100 }, "strategy": {} }
                 ]
             },
             "configuration": {

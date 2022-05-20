@@ -48,18 +48,10 @@ type Customer implements HasMetafields {
   totalSpent: Money
 }
 
-type DeliveryLineWithStrategy {
+type DeliveryLine {
   destination: Address
   id: ID
-  price: Money!
-  strategy: DeliveryStrategy!
   subscription: Boolean
-}
-
-type DeliveryStrategy {
-  code: String
-  name: String
-  source: String
 }
 
 input Discount {
@@ -76,6 +68,14 @@ enum DiscountApplicationStrategy {
 
 input FixedAmount {
   value: Float!
+}
+
+"""
+The result of the function.
+"""
+input FunctionResult {
+  discountApplicationStrategy: DiscountApplicationStrategy!
+  discounts: [Discount!]!
 }
 
 interface HasMetafields {
@@ -106,13 +106,14 @@ scalar ID
 
 type Input {
   customer: Customer
-  deliveryLines: [DeliveryLineWithStrategy!]
+  deliveryLines: [DeliveryLine!]
   locale: String
   merchandiseLines: [MerchandiseLine!]
 }
 
 """
 A [JSON](https://www.json.org/json-en.html) object.
+
 Example value:
 `{
   "product": {
@@ -168,6 +169,10 @@ input OrderMinimumSubtotal {
   targetType: TargetType!
 }
 
+input OrderSubtotalTarget {
+  excludedVariantIds: [ID!]!
+}
+
 input Percentage {
   value: Float!
 }
@@ -208,29 +213,23 @@ input ProductMinimumSubtotal {
   targetType: TargetType!
 }
 
+input ProductVariantTarget {
+  id: ID!
+  quantity: Int
+}
+
 type Property {
   key: String!
   value: String!
-}
-
-"""
-The result of the function.
-"""
-input FunctionResult {
-  discountApplicationStrategy: DiscountApplicationStrategy!
-  discounts: [Discount!]!
 }
 
 type SellingPlan {
   id: ID!
 }
 
-input ShippingLineTarget {
-  id: ID!
-}
-
 input Target @oneOf {
-  shippingLine: ShippingLineTarget
+  orderSubtotal: OrderSubtotalTarget
+  productVariant: ProductVariantTarget
 }
 
 enum TargetType {
