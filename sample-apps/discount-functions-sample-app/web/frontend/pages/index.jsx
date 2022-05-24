@@ -1,11 +1,4 @@
-import {
-  Card,
-  Heading,
-  Layout,
-  Link,
-  Page,
-  TextContainer,
-} from '@shopify/polaris';
+import { Card, Layout, Link, Page } from '@shopify/polaris';
 import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
 
 export default function HomePage() {

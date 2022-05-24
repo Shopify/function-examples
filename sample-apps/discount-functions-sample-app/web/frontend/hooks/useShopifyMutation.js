@@ -1,4 +1,4 @@
-import { useMutation, MutationObserverResult } from 'react-query';
+import { useMutation } from 'react-query';
 import { GraphQLClient } from 'graphql-request';
 
 import { useAuthenticatedFetch } from './useAuthenticatedFetch.js';
@@ -13,5 +13,5 @@ export const useShopifyMutation = ({ query }) => {
     graphQLClient.rawRequest(query, variables),
   );
 
-  return [mutateAsync as Function, mutationProps as any];
+  return [mutateAsync, mutationProps];
 };

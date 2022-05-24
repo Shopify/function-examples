@@ -7,40 +7,21 @@ import {
   Stack,
 } from '@shopify/polaris';
 
-import { Discount } from '../../types';
-import { useDeleteDiscount } from '../../hooks/useDeleteDiscount';
-import { useDiscount } from '../../hooks/useDiscount';
-import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
-import { useSavedDiscount } from '../../hooks/useSavedDiscount';
-import { useUpdateDiscount } from '../../hooks/useUpdateDiscount';
+import { useDeleteDiscount } from '../hooks/useDeleteDiscount';
+import { useDiscount } from '../hooks/useDiscount';
+import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
+import { useSavedDiscount } from '../hooks/useSavedDiscount';
+import { useUpdateDiscount } from '../hooks/useUpdateDiscount';
 
-interface Props<Configuration> {
-  id: string;
-  defaultConfiguration: Configuration;
-  configurationsAreEqual: (
-    left: Configuration,
-    right: Configuration,
-  ) => boolean;
-  serializeDiscount: (discount: Discount<Configuration>) => Discount<string>;
-  renderConfigurationForm(
-    configuration: Configuration,
-    onConfigurationChange: (configuration: Configuration) => void,
-  );
-}
-
-export default function DiscountDetailsPage<Configuration>({
+export default function DiscountDetailsPage({
   id,
   configurationsAreEqual,
   defaultConfiguration,
   renderConfigurationForm,
   serializeDiscount,
-}: Props<Configuration>) {
+}) {
   const redirectToDiscounts = useRedirectToDiscounts();
-  const {
-    discount: savedDiscount,
-    isLoading,
-    isError,
-  } = useSavedDiscount<Configuration>(id);
+  const { discount: savedDiscount, isLoading, isError } = useSavedDiscount(id);
   const {
     discount,
     isDirty,

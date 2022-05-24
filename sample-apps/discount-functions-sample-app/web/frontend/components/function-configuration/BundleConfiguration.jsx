@@ -2,31 +2,21 @@ import { useState } from 'react';
 import { ResourcePicker } from '@shopify/app-bridge-react';
 import { Button, Stack, TextContainer, TextField } from '@shopify/polaris';
 
-import { Configuration } from './types';
-
-interface Props {
-  configuration: Configuration;
-  onConfigurationChange: (configuration: Configuration) => void;
-}
-
-export default function Details({
-  configuration,
-  onConfigurationChange,
-}: Props) {
+export default function Details({ configuration, onConfigurationChange }) {
   const [showResourcePicker, setShowResourcePicker] = useState(false);
 
-  const handleMessageChange = (message: string) => {
+  const handleMessageChange = (message) => {
     onConfigurationChange({ ...configuration, message });
   };
 
-  const handlePercentageChange = (discountPercentage: string) => {
+  const handlePercentageChange = (discountPercentage) => {
     onConfigurationChange({
       ...configuration,
       discountPercentage: Number(discountPercentage),
     });
   };
 
-  const handleMinimumQuantityChange = (minimumQuantity: string) => {
+  const handleMinimumQuantityChange = (minimumQuantity) => {
     onConfigurationChange({
       ...configuration,
       minimumQuantity: Math.floor(Number(minimumQuantity)),
@@ -98,5 +88,34 @@ export default function Details({
         </Stack>
       </Stack>
     </>
+  );
+}
+
+export function serializeDiscount(discount) {
+  return {
+    title: discount.title,
+    configuration: JSON.stringify({
+      message: discount.configuration.message,
+      variantId: discount.configuration.variantId,
+      discountPercentage: discount.configuration.discountPercentage.toString(),
+      minimumQuantity: discount.configuration.minimumQuantity.toString(),
+    }),
+    startsAt: new Date(),
+  };
+}
+
+export const DEFAULT_CONFIGURATION = {
+  message: '',
+  discountPercentage: 0,
+  minimumQuantity: 0,
+  variantId: '',
+};
+
+export function configurationsAreEqual(left, right) {
+  return (
+    left.message === right.message &&
+    left.discountPercentage === right.discountPercentage &&
+    left.minimumQuantity === right.minimumQuantity &&
+    left.variantId === right.variantId
   );
 }

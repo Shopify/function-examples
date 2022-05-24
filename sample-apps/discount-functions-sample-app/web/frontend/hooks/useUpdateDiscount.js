@@ -1,5 +1,4 @@
 import { gql } from 'graphql-request';
-import { Discount } from '../types';
 import { idToGid } from '../utilities/gid';
 
 import { useShopifyMutation } from './useShopifyMutation';
@@ -19,18 +18,12 @@ const UPDATE_MUTATION = gql`
   }
 `;
 
-export function useUpdateDiscount(): [
-  (id: string, discount: Discount<string>) => Promise<void>,
-  { isLoading: boolean },
-] {
+export function useUpdateDiscount() {
   const [triggerMutation, { isLoading }] = useShopifyMutation({
     query: UPDATE_MUTATION,
   });
 
-  const updateDiscount = async (
-    id: string,
-    discount: Discount<string>,
-  ): Promise<void> => {
+  const updateDiscount = async (id, discount) => {
     try {
       await triggerMutation({
         id: idToGid('DiscountAutomaticApp', id),

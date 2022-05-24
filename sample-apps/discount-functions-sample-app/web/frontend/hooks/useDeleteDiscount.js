@@ -14,15 +14,12 @@ const DELETE_MUTATION = gql`
   }
 `;
 
-export function useDeleteDiscount(): [
-  (id: string) => Promise<void>,
-  { isLoading: boolean },
-] {
+export function useDeleteDiscount() {
   const [triggerMutation, { isLoading }] = useShopifyMutation({
     query: DELETE_MUTATION,
-  }) as any;
+  });
 
-  const deleteDiscount = async (id: string): Promise<void> => {
+  const deleteDiscount = async (id) => {
     try {
       await triggerMutation({
         id: idToGid('DiscountAutomaticApp', id),

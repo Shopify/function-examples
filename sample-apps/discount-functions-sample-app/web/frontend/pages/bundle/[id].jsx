@@ -1,10 +1,12 @@
 import { useParams } from 'react-router-dom';
 
-import { configurationsAreEqual } from '../../components/BundleConfiguration/configurationsAreEqual';
-import { DEFAULT_CONFIGURATION } from '../../components/BundleConfiguration/consts';
-import { serializeDiscount } from '../../components/BundleConfiguration/serializeDiscount';
-import BundleConfiguration from '../../components/BundleConfiguration';
 import DiscountDetailsPage from '../../components/DiscountDetailsPage';
+import {
+  default as BundleConfiguration,
+  serializeDiscount,
+  DEFAULT_CONFIGURATION,
+  configurationsAreEqual,
+} from '../../components/function-configuration/BundleConfiguration';
 
 export default function BundleDiscountPage() {
   const { id } = useParams();

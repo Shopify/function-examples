@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { gql } from 'graphql-request';
 
-import { Discount } from '../types';
 import { idToGid } from '../utilities/gid';
 import { useShopifyQuery } from './useShopifyQuery';
 
@@ -20,14 +19,14 @@ const QUERY = gql`
   }
 `;
 
-export function useSavedDiscount<Configuration>(id: string) {
+export function useSavedDiscount(id) {
   const { data, isLoading, isError } = useShopifyQuery({
     key: 'GetBundleDiscount',
     query: QUERY,
     variables: { id: idToGid('DiscountAutomaticApp', id) },
   });
 
-  const discount: Discount<Configuration> | undefined = useMemo(() => {
+  const discount = useMemo(() => {
     if (!data) {
       return;
     }

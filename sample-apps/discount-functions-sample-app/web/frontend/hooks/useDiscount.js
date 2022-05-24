@@ -1,19 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
 
-import { Discount } from '../types';
 import { usePrevious } from './usePrevious';
 
-export function useDiscount<Configuration>({
+export function useDiscount({
   savedDiscount,
   defaultConfiguration,
   configurationsAreEqual,
-}: {
-  savedDiscount?: Discount<Configuration>;
-  defaultConfiguration: Configuration;
-  configurationsAreEqual: (
-    left: Configuration,
-    right: Configuration,
-  ) => boolean;
 }) {
   const previousSavedDiscount = usePrevious(savedDiscount);
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
@@ -76,14 +68,7 @@ export function useDiscount<Configuration>({
   };
 }
 
-function discountsAreEqual<Configuration>(
-  left: Discount<Configuration>,
-  right: Discount<Configuration>,
-  configurationsAreEqual: (
-    left: Configuration,
-    right: Configuration,
-  ) => boolean,
-): boolean {
+function discountsAreEqual(left, right, configurationsAreEqual) {
   return (
     left.title === right.title &&
     left.startsAt === right.startsAt &&

@@ -1,28 +1,15 @@
 import { Card, Page, PageActions, TextField } from '@shopify/polaris';
-import { useCreateDiscount } from '../../hooks/useCreateDiscount';
-import { useDiscount } from '../../hooks/useDiscount';
-import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
-import { Discount } from '../../types';
 
-interface Props<Configuration> {
-  defaultConfiguration: Configuration;
-  configurationsAreEqual: (
-    left: Configuration,
-    right: Configuration,
-  ) => boolean;
-  serializeDiscount: (discount: Discount<Configuration>) => Discount<string>;
-  renderConfigurationForm(
-    configuration: Configuration,
-    onConfigurationChange: (configuration: Configuration) => void,
-  );
-}
+import { useCreateDiscount } from '../hooks/useCreateDiscount';
+import { useDiscount } from '../hooks/useDiscount';
+import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
 
-export default function DiscountCreatePage<Configuration>({
+export default function DiscountCreatePage({
   defaultConfiguration,
   serializeDiscount,
   configurationsAreEqual,
   renderConfigurationForm,
-}: Props<Configuration>) {
+}) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const { discount, title, configuration, setTitle, setConfiguration } =
     useDiscount({

@@ -1,8 +1,10 @@
 import DiscountCreatePage from '../../components/DiscountCreatePage';
-import BundleConfiguration from '../../components/BundleConfiguration';
-import { DEFAULT_CONFIGURATION } from '../../components/BundleConfiguration/consts';
-import { configurationsAreEqual } from '../../components/BundleConfiguration/configurationsAreEqual';
-import { serializeDiscount } from '../../components/BundleConfiguration/serializeDiscount';
+import {
+  default as BundleConfiguration,
+  serializeDiscount,
+  DEFAULT_CONFIGURATION,
+  configurationsAreEqual,
+} from '../../components/function-configuration/BundleConfiguration';
 
 export default function NewBundleDiscount() {
   return (
