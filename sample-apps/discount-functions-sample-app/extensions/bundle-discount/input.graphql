@@ -1,9 +1,0 @@
-query Input {
-  merchandiseLines {
-    id
-    quantity
-    variant {
-      id
-    }
-  }
-}

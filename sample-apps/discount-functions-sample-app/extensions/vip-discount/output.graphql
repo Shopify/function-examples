@@ -1,3 +1,0 @@
-mutation HandleResult($result: FunctionResult!) {
-  handleResult(result: $result)
-}

@@ -1,9 +1,0 @@
-# XXX THIS IS HERE TEMPORARILY FOR USE WITH CLI 2.0. REMOVE BEFORE SHIPPING!
----
-project_type: :script
-organization_id: 0
-title: Bundle Discount
-extension_point_type: product_discounts
-language: wasm
-app_bridge_create_path: /bundle/new
-app_bridge_details_path: /bundle/:id
