@@ -21,7 +21,7 @@ export function useCreateDiscount(): [
 ] {
   const [triggerMutation, { isLoading }] = useShopifyMutation({
     query: CREATE_MUTATION,
-  }) as any;
+  });
 
   const createDiscount = async (
     scriptUuid: string,

@@ -25,7 +25,7 @@ export function useUpdateDiscount(): [
 ] {
   const [triggerMutation, { isLoading }] = useShopifyMutation({
     query: UPDATE_MUTATION,
-  }) as any;
+  });
 
   const updateDiscount = async (
     id: string,
