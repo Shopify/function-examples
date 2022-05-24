@@ -23,15 +23,24 @@ export function useUpdateDiscount() {
     query: UPDATE_MUTATION,
   });
 
-  const updateDiscount = async (id, discount) => {
-    try {
-      await triggerMutation({
-        id: idToGid('DiscountAutomaticApp', id),
-        discount,
+  const updateDiscount = (id, discount) => {
+    return triggerMutation({
+      id: idToGid('DiscountAutomaticApp', id),
+      discount,
+    })
+      .then((response) => {
+        if (response.data.discountAutomaticAppUpdate.userErrors.length) {
+          return Promise.reject(
+            response.data.discountAutomaticAppUpdate.userErrors,
+          );
+        }
+
+        return response;
+      })
+      .catch((error) => {
+        console.error('Failed to update discount', error);
+        return Promise.reject(error);
       });
-    } catch (error) {
-      console.error('Something went wrong while updating the discount', error);
-    }
   };
 
   return [updateDiscount, { isLoading }];

@@ -10,8 +10,8 @@ export default defineConfig({
   root,
   define: {
     'process.env.SHOPIFY_API_KEY': JSON.stringify(process.env.SHOPIFY_API_KEY),
-    'process.env.BUNDLE_DISCOUNT_ID': JSON.stringify(
-      '99429149-fd13-4d3f-8ea6-cb982e63e291',
+    'process.env.ORDER_DISCOUNTS_ID': JSON.stringify(
+      '9e05f536-4c13-44da-9ff6-962e0807ef46',
     ),
   },
   esbuild: {

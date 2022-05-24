@@ -1,12 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
+import { isEqual } from 'lodash';
 
 import { usePrevious } from './usePrevious';
 
-export function useDiscount({
-  savedDiscount,
-  defaultConfiguration,
-  configurationsAreEqual,
-}) {
+export function useDiscount({ savedDiscount, defaultConfiguration }) {
   const previousSavedDiscount = usePrevious(savedDiscount);
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
   const [startsAt, setStartsAt] = useState(
@@ -29,8 +26,8 @@ export function useDiscount({
       return true;
     }
 
-    return !discountsAreEqual(discount, savedDiscount, configurationsAreEqual);
-  }, [savedDiscount, discount, configurationsAreEqual]);
+    return !isEqual(discount, savedDiscount);
+  }, [savedDiscount, discount]);
 
   useEffect(() => {
     if (!savedDiscount) {
@@ -39,11 +36,7 @@ export function useDiscount({
 
     if (
       previousSavedDiscount &&
-      discountsAreEqual(
-        savedDiscount,
-        previousSavedDiscount,
-        configurationsAreEqual,
-      )
+      isEqual(savedDiscount, previousSavedDiscount)
     ) {
       return;
     }
@@ -66,13 +59,4 @@ export function useDiscount({
     setConfiguration,
     isDirty,
   };
-}
-
-function discountsAreEqual(left, right, configurationsAreEqual) {
-  return (
-    left.title === right.title &&
-    left.startsAt === right.startsAt &&
-    left.endsAt === right.endsAt &&
-    configurationsAreEqual(left.configuration, right.configuration)
-  );
 }

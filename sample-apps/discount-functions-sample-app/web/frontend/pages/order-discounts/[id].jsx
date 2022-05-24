@@ -1,23 +1,20 @@
 import { useParams } from 'react-router-dom';
-
 import DiscountDetailsPage from '../../components/DiscountDetailsPage';
 import {
-  default as BundleConfiguration,
-  serializeDiscount,
+  default as OrderDiscount,
   DEFAULT_CONFIGURATION,
-  configurationsAreEqual,
-} from '../../components/function-configuration/BundleConfiguration';
+  serializeDiscount,
+} from '../../components/function-configuration/OrderDiscount';
 
-export default function BundleDiscountPage() {
+export default function CreateOrderDiscountsPage() {
   const { id } = useParams();
 
   return (
     <DiscountDetailsPage
       id={id}
-      configurationsAreEqual={configurationsAreEqual}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <BundleConfiguration
+        <OrderDiscount
           configuration={configuration}
           onConfigurationChange={onConfigurationChange}
         />

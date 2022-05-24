@@ -110,12 +110,3 @@ export const DEFAULT_CONFIGURATION = {
   minimumQuantity: 0,
   variantId: '',
 };
-
-export function configurationsAreEqual(left, right) {
-  return (
-    left.message === right.message &&
-    left.discountPercentage === right.discountPercentage &&
-    left.minimumQuantity === right.minimumQuantity &&
-    left.variantId === right.variantId
-  );
-}

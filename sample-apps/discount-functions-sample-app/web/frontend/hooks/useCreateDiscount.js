@@ -20,16 +20,25 @@ export function useCreateDiscount() {
   });
 
   const createDiscount = async (scriptUuid, discount) => {
-    try {
-      await triggerMutation({
-        discount: {
-          ...discount,
-          scriptUuid,
-        },
+    return triggerMutation({
+      discount: {
+        ...discount,
+        scriptUuid,
+      },
+    })
+      .then((response) => {
+        if (response.data.discountAutomaticAppCreate.userErrors.length) {
+          return Promise.reject(
+            response.data.discountAutomaticAppCreate.userErrors,
+          );
+        }
+
+        return response;
+      })
+      .catch((error) => {
+        console.error('Failed to create discount', error);
+        return Promise.reject(error);
       });
-    } catch (error) {
-      console.error('Something went wrong while creating the discount', error);
-    }
   };
 
   return [createDiscount, { isLoading }];

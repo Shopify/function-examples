@@ -1,18 +1,17 @@
 import DiscountCreatePage from '../../components/DiscountCreatePage';
 import {
-  default as BundleConfiguration,
-  serializeDiscount,
+  default as OrderDiscount,
   DEFAULT_CONFIGURATION,
-  configurationsAreEqual,
-} from '../../components/function-configuration/BundleConfiguration';
+  serializeDiscount,
+} from '../../components/function-configuration/OrderDiscount';
 
-export default function NewBundleDiscount() {
+export default function CreateOrderDiscountsPage() {
   return (
     <DiscountCreatePage
-      configurationsAreEqual={configurationsAreEqual}
+      scriptUuid={process.env.ORDER_DISCOUNTS_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <BundleConfiguration
+        <OrderDiscount
           configuration={configuration}
           onConfigurationChange={onConfigurationChange}
         />
