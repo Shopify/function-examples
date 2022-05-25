@@ -11,7 +11,7 @@ import {
 
 import { gidToId } from '../../utilities/gid';
 
-export default function OrderDiscount({
+export default function ProductDiscount({
   configuration,
   onConfigurationChange,
 }) {
