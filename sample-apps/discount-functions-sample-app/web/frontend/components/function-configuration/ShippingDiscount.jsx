@@ -11,7 +11,6 @@ export default function ShippingDiscount({
     });
   };
 
-  // TODO: show inline error for invalid values
   return (
     <TextField
       label="Percentage off"

@@ -1,26 +1,25 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import 'dotenv/config';
 
 // prettier-ignore
 const INDEX_ROUTE = "^/(\\?.*)?$";
 const API_ROUTE = '^/api/';
+const ENV_KEYS = [
+  'SHOPIFY_API_KEY',
+  'ORDER_DISCOUNT_ID',
+  'PRODUCT_DISCOUNT_ID',
+  'SHIPPING_DISCOUNT_ID',
+];
 
 const root = new URL('.', import.meta.url).pathname;
+
 export default defineConfig({
   root,
-  define: {
-    'process.env.SHOPIFY_API_KEY': JSON.stringify(process.env.SHOPIFY_API_KEY),
-    // TODO: read these from env
-    'process.env.ORDER_DISCOUNT_ID': JSON.stringify(
-      '9e05f536-4c13-44da-9ff6-962e0807ef46',
-    ),
-    'process.env.PRODUCT_DISCOUNT_ID': JSON.stringify(
-      'ac1ffd0f-959e-484d-9a4c-bf96e127331a',
-    ),
-    'process.env.SHIPPING_DISCOUNT_ID': JSON.stringify(
-      '2319d4aa-b326-4cd5-a400-befbe79bc4fb',
-    ),
-  },
+  define: ENV_KEYS.reduce((env, key) => {
+    env[`process.env.${key}`] = JSON.stringify(process.env[key]);
+    return env;
+  }, {}),
   esbuild: {
     jsxInject: `import React from 'react'`,
   },
