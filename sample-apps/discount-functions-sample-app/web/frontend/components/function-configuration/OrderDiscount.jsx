@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ResourcePicker } from '@shopify/app-bridge-react';
 import {
   Stack,
@@ -35,38 +35,52 @@ export default function OrderDiscount({
     setShowVariantPicker(false);
   };
 
-  // TODO: query for product IDs since the resource picker requires it :/
-  const excludedVariantIds = configuration.excludedVariantIds.map((id) => ({
-    id,
-  }));
+  const { excludedVariantIds, excludedVariantIdsMarkup } = useMemo(() => {
+    if (!configuration.excludedVariantIds.length) {
+      return {
+        excludedVariantIds: [],
+        excludedVariantIdsMarkup: (
+          <TextStyle variation="subdued">None</TextStyle>
+        ),
+      };
+    }
 
-  const excludedVariantIdsMarkup = configuration.excludedVariantIds.length ? (
-    <List>
-      {configuration.excludedVariantIds.map((id) => (
-        <List.Item key={id}>{gidToId(id)}</List.Item>
-      ))}
-    </List>
-  ) : (
-    <TextStyle variation="subdued">None</TextStyle>
+    const excludedVariantIds = configuration.excludedVariantIds.map((id) => ({
+      id,
+    }));
+    const excludedVariantIdsMarkup = (
+      <List>
+        {configuration.excludedVariantIds.map((id) => (
+          <List.Item key={id}>{gidToId(id)}</List.Item>
+        ))}
+      </List>
+    );
+
+    return { excludedVariantIds, excludedVariantIdsMarkup };
+  }, [configuration.excludedVariantIds]);
+
+  const resourcePickerMarkup = showVariantPicker && (
+    <ResourcePicker
+      resourceType="ProductVariant"
+      initialSelectionIds={excludedVariantIds}
+      onSelection={handleVariantPickerSelection}
+      onCancel={() => setShowVariantPicker(false)}
+      allowMultiple
+      open
+    />
   );
 
-  // TODO: show inline error for invalid values
   return (
     <>
-      <ResourcePicker
-        open={showVariantPicker}
-        resourceType="ProductVariant"
-        // initialSelectionIds={excludedVariantIds}
-        onSelection={handleVariantPickerSelection}
-        onCancel={() => setShowVariantPicker(false)}
-        allowMultiple
-      />
+      {resourcePickerMarkup}
       <Stack vertical>
         <TextField
           label="Percentage off"
           value={configuration.value}
           onChange={handleValueChange}
           type="number"
+          min={0}
+          max={100}
         />
         <Stack spacing="tight" vertical>
           <TextContainer>Excluded variant IDs:</TextContainer>
