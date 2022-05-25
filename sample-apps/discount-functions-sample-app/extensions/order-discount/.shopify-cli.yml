@@ -5,5 +5,5 @@ organization_id: 0
 title: Order Discount
 extension_point_type: order_discounts
 language: wasm
-app_bridge_create_path: /order-discounts/new
-app_bridge_details_path: /order-discounts/:id
+app_bridge_create_path: /order-discount/new
+app_bridge_details_path: /order-discount/:id
