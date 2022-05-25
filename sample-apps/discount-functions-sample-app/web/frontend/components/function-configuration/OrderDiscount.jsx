@@ -5,11 +5,10 @@ import {
   TextField,
   TextContainer,
   Button,
-  List,
   TextStyle,
 } from '@shopify/polaris';
 
-import { gidToId } from '../../utilities/gid';
+import VariantList from '../VariantList';
 
 export default function OrderDiscount({
   configuration,
@@ -49,11 +48,7 @@ export default function OrderDiscount({
       id,
     }));
     const excludedVariantIdsMarkup = (
-      <List>
-        {configuration.excludedVariantIds.map((id) => (
-          <List.Item key={id}>{gidToId(id)}</List.Item>
-        ))}
-      </List>
+      <VariantList ids={configuration.excludedVariantIds} />
     );
 
     return { excludedVariantIds, excludedVariantIdsMarkup };
