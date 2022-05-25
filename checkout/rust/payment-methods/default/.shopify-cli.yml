@@ -5,3 +5,5 @@ extension_point_type: payment_methods
 title: Default Payment Methods Script
 description: Template script that does nothing
 language: rust
+app_bridge_create_path: /
+app_bridge_details_path: /
