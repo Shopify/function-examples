@@ -1,17 +1,17 @@
 import DiscountCreatePage from '../../components/DiscountCreatePage';
 import {
-  default as OrderDiscount,
+  default as ProductDiscount,
   DEFAULT_CONFIGURATION,
   serializeDiscount,
-} from '../../components/function-configuration/OrderDiscount';
+} from '../../components/function-configuration/ProductDiscount';
 
-export default function CreateOrderDiscountsPage() {
+export default function CreateProductDiscountPage() {
   return (
     <DiscountCreatePage
-      scriptUuid={process.env.ORDER_DISCOUNTS_ID}
+      scriptUuid={process.env.PRODUCT_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <OrderDiscount
+        <ProductDiscount
           configuration={configuration}
           onConfigurationChange={onConfigurationChange}
         />

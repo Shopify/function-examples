@@ -1,0 +1,9 @@
+# XXX THIS IS HERE TEMPORARILY FOR USE WITH CLI 2.0. REMOVE BEFORE SHIPPING!
+---
+project_type: :script
+organization_id: 0
+title: Shipping Discount
+extension_point_type: shipping_discounts
+language: wasm
+app_bridge_create_path: /shipping-discount/new
+app_bridge_details_path: /shipping-discount/:id

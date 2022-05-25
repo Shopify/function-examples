@@ -1,12 +1,12 @@
 import { useParams } from 'react-router-dom';
 import DiscountDetailsPage from '../../components/DiscountDetailsPage';
 import {
-  default as OrderDiscount,
+  default as ShippingDiscount,
   DEFAULT_CONFIGURATION,
   serializeDiscount,
-} from '../../components/function-configuration/OrderDiscount';
+} from '../../components/function-configuration/ShippingDiscount';
 
-export default function OrderDiscountDetailsPage() {
+export default function ShippingDiscountDetailsPage() {
   const { id } = useParams();
 
   return (
@@ -14,7 +14,7 @@ export default function OrderDiscountDetailsPage() {
       id={id}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <OrderDiscount
+        <ShippingDiscount
           configuration={configuration}
           onConfigurationChange={onConfigurationChange}
         />
