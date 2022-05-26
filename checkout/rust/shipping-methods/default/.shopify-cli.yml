@@ -5,3 +5,5 @@ extension_point_type: shipping_methods
 title: Default Shipping Methods Script
 description: Template script that renames first shipping method
 language: wasm
+app_bridge_create_path: /
+app_bridge_details_path: /
