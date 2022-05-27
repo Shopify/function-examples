@@ -5,7 +5,7 @@ import { idToGid } from '../utilities/gid';
 import { useShopifyQuery } from './useShopifyQuery';
 
 const QUERY = gql`
-  query GetBundleDiscount($id: ID!) {
+  query GetDiscount($id: ID!) {
     automaticDiscountNode(id: $id) {
       automaticDiscount {
         ... on DiscountAutomaticApp {
@@ -21,7 +21,7 @@ const QUERY = gql`
 
 export function useSavedDiscount(id) {
   const { data, isLoading, isError } = useShopifyQuery({
-    key: 'GetBundleDiscount',
+    key: 'GetDiscount',
     query: QUERY,
     variables: { id: idToGid('DiscountAutomaticApp', id) },
   });

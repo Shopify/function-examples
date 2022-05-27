@@ -2,11 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 
-This is a sample app to help developers bootstrap their Shopify app development.
+This is a sample app to help developers bootstrap a Shopify app that provides discount functions.
 
 It leverages the [Shopify API Library](https://github.com/Shopify/shopify-node-api) on the backend to create [an embedded app](https://shopify.dev/apps/tools/app-bridge/getting-started#embed-your-app-in-the-shopify-admin), and [Polaris](https://github.com/Shopify/polaris-react) and [App Bridge React](https://shopify.dev/tools/app-bridge/react-components) on the frontend.
 
-This is the repository used when you create a new Node app with the [Shopify CLI](https://shopify.dev/apps/tools/cli).
+It also provides [Shopify Functions](#) that allow merchants to set up discounts using the custom logic provided in this app.
 
 ## Requirements
 
@@ -16,20 +16,10 @@ This is the repository used when you create a new Node app with the [Shopify CLI
 
 ## Installation
 
-Using the [Shopify CLI](https://github.com/Shopify/shopify-cli) run:
-
-```sh
-shopify app create node -n APP_NAME
-```
-
-Or, you can run `npx degit shopify/starter-node-app` and create a `.env` file containing the following values:
-
-```yaml
-SHOPIFY_API_KEY={api key}           # Your API key
-SHOPIFY_API_SECRET={api secret key} # Your API secret key
-SCOPES={scopes}                     # Your app's required scopes, comma-separated
-HOST={your app's host}              # Your app's host, without the protocol prefix
-```
+1. Using the [Shopify CLI](#), connect this code with an app on your partner account.
+2. For each function in `extensions`, push it to your app: `shopify script push`
+3. Rename the `.env.sample` file in `web/frontend` to `.env` and fill in the function UUIDs for each of your functions
+4. Run `yarn dev` to start the server
 
 ## Developer resources
 
