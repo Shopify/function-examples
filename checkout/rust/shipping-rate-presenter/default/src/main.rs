@@ -2,7 +2,7 @@ use serde::Serialize;
 
 /*
  * This script provides a basic example of logging, deserialize input and
- * conguration values, and deserializing output. 
+ * configuration values, and deserializing output. 
  *
  * It'll rename every shipping rate to match the email address of the customer. 
  */
