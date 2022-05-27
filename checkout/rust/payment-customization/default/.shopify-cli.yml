@@ -1,0 +1,9 @@
+---
+project_type: :script
+organization_id: 0
+extension_point_type: payment_customization
+title: Default Payment Customization Script
+description: Template script hides the first payment method
+language: rust
+app_bridge_create_path: /
+app_bridge_details_path: /
