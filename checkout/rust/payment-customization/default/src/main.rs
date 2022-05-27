@@ -2,7 +2,7 @@ use serde::Serialize;
 
 /*
  * This script provides a basic example of logging, deserialize input and
- * conguration values, and deserialize output (that leaves payment methods unchanged).
+ * configuration values, and deserialize output (that leaves payment methods unchanged).
  */
 
 mod api;
