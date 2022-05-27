@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+pub type ID = String;
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct Payload {
     pub input: Input,
@@ -7,8 +9,7 @@ pub struct Payload {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct Config {
-}
+pub struct Config {}
 
 #[derive(Clone, Debug, Deserialize)]
 // Use the following container attribute if fields need to be camel cased.
@@ -19,48 +20,39 @@ pub struct Input {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct PurchaseProposal {
-    pub delivery_lines: Vec<DeliveryLine>,
-}
+pub struct PurchaseProposal {}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PaymentMethod {
-    pub id: u64,
+    pub id: ID,
     pub name: String,
-    pub cards: Vec<String>,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct DeliveryLine {
-    pub strategy: Option<Strategy>,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct Strategy {
-    pub carrier_identifier: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
-pub struct Output {
-    pub sort_response: SortResponse,
-    pub filter_response: FilterResponse,
-    pub rename_response: RenameResponse,
+pub struct FunctionResult {
+    pub operations: Vec<Operation>,
 }
+
 #[derive(Clone, Debug, Serialize)]
-pub struct SortResponse {
-    pub proposed_order: Vec<PaymentMethod>,
+pub struct Operation {
+    pub hide: Option<HideOperation>,
+    pub r#move: Option<MoveOperation>,
+    pub rename: Option<RenameOperation>,
 }
+
 #[derive(Clone, Debug, Serialize)]
-pub struct RenameProposal {
-    pub payment_method: PaymentMethod,
+pub struct HideOperation {
+    pub payment_method_id: ID,
+}
+
+#[derive(Clone, Debug, Serialize, PartialEq)]
+pub struct MoveOperation {
+    pub payment_method_id: ID,
+    pub index: u64,
+}
+
+#[derive(Clone, Debug, Serialize, PartialEq)]
+pub struct RenameOperation {
+    pub payment_method_id: ID,
     pub name: String,
-    pub renamed: bool,
-}
-#[derive(Clone, Debug, Serialize)]
-pub struct RenameResponse {
-    pub rename_proposals: Vec<RenameProposal>,
-}
-#[derive(Clone, Debug, Serialize)]
-pub struct FilterResponse {
-    pub hidden_methods: Vec<PaymentMethod>,
 }

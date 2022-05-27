@@ -20,22 +20,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn script(payload: Payload) -> Result<Output, Box<dyn std::error::Error>> {
-    let (_input, _config) = (payload.input, payload.configuration);
-    return Ok(build_result(vec![]));
+fn script(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
+    let (input, _config) = (payload.input, payload.configuration);
+    return Ok(build_result(input.payment_methods[0].id.clone()));
 }
 
-fn build_result(payment_methods_to_remove: Vec<PaymentMethod>) -> Output {
-    Output {
-        sort_response: SortResponse {
-            proposed_order: vec![],
-        },
-        filter_response: FilterResponse {
-            hidden_methods: payment_methods_to_remove,
-        },
-        rename_response: RenameResponse {
-            rename_proposals: vec![],
-        },
+fn build_result(payment_method_to_remove: ID) -> FunctionResult {
+    FunctionResult {
+        operations: vec![Operation {
+            hide: Some(HideOperation {
+                payment_method_id: payment_method_to_remove,
+            }),
+            r#move: None,
+            rename: None,
+        }],
     }
 }
 
@@ -45,43 +43,37 @@ mod tests {
     fn default_payload() -> Payload {
         Payload {
             input: Input {
-                purchase_proposal: PurchaseProposal {
-                    delivery_lines: vec![],
-                },
+                purchase_proposal: PurchaseProposal {},
                 payment_methods: vec![
                     PaymentMethod {
-                        id: 123456789,
+                        id: "123456789".to_string(),
                         name: "Shopify payments".to_string(),
-                        cards: vec![
-                            "Visa".to_string(),
-                            "Mastercard".to_string(),
-                            "Discover".to_string(),
-                        ],
                     },
                     PaymentMethod {
-                        id: 987654321,
+                        id: "987654321".to_string(),
                         name: "Auth.net".to_string(),
-                        cards: vec!["Visa".to_string(), "Amex".to_string()],
                     },
                     PaymentMethod {
-                        id: 523414132,
+                        id: "523414132".to_string(),
                         name: "Cash on Delivery".to_string(),
-                        cards: vec![],
                     },
                 ],
             },
-            configuration: Config {
-            },
+            configuration: Config {},
         }
     }
 
     #[test]
-    fn test_returns_empty_output() {
+    fn test_result_contains_hide_operation() {
         let payload = default_payload();
-        let output = script(payload).unwrap();
+        let operations = script(payload).unwrap().operations;
 
-        assert_eq!(output.filter_response.hidden_methods.len(), 0);
-        assert_eq!(output.filter_response.hidden_methods.len(), 0);
-        assert_eq!(output.sort_response.proposed_order.len(), 0);
+        assert_eq!(operations.len(), 1);
+        assert_eq!(
+            operations[0].hide.as_ref().unwrap().payment_method_id,
+            "123456789"
+        );
+        assert_eq!(operations[0].rename, None);
+        assert_eq!(operations[0].r#move, None);
     }
 }
