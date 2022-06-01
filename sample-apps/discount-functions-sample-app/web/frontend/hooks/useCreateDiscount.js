@@ -3,7 +3,7 @@ import { gql } from 'graphql-request';
 import { useShopifyMutation } from './useShopifyMutation';
 
 const CREATE_MUTATION = gql`
-  mutation CreateBundleDiscount($discount: DiscountAutomaticAppInput!) {
+  mutation CreateDiscount($discount: DiscountAutomaticAppInput!) {
     discountAutomaticAppCreate(automaticAppDiscount: $discount) {
       userErrors {
         code

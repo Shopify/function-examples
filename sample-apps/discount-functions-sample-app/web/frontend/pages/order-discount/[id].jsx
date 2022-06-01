@@ -1,10 +1,11 @@
 import { useParams } from 'react-router-dom';
+
 import DiscountDetailsPage from '../../components/DiscountDetailsPage';
 import {
   default as OrderDiscount,
   DEFAULT_CONFIGURATION,
-  serializeDiscount,
 } from '../../components/function-configuration/OrderDiscount';
+import { DISCOUNT_CLASS } from '../../consts';
 
 export default function OrderDiscountDetailsPage() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ export default function OrderDiscountDetailsPage() {
           onConfigurationChange={onConfigurationChange}
         />
       )}
-      serializeDiscount={serializeDiscount}
+      discountClass={DISCOUNT_CLASS.Order}
     />
   );
 }

@@ -24,11 +24,3 @@ export default function ShippingDiscount({
 export const DEFAULT_CONFIGURATION = {
   value: 0,
 };
-
-export function serializeDiscount(discount) {
-  return {
-    title: discount.title,
-    configuration: JSON.stringify(discount.configuration),
-    startsAt: new Date(),
-  };
-}

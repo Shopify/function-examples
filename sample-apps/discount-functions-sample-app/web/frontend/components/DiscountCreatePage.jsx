@@ -11,18 +11,20 @@ import {
 import { useCreateDiscount } from '../hooks/useCreateDiscount';
 import { useDiscount } from '../hooks/useDiscount';
 import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
+import { serializeDiscount } from '../utilities/serializeDiscount';
 
 export default function DiscountCreatePage({
   scriptUuid,
   defaultConfiguration,
-  serializeDiscount,
   renderConfigurationForm,
+  discountClass,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isError, setIsError] = useState(false);
   const { discount, title, configuration, setTitle, setConfiguration } =
     useDiscount({
       defaultConfiguration,
+      discountClass,
     });
 
   const [createDiscount, { isLoading }] = useCreateDiscount();

@@ -4,7 +4,7 @@ import { idToGid } from '../utilities/gid';
 import { useShopifyMutation } from './useShopifyMutation';
 
 const UPDATE_MUTATION = gql`
-  mutation UpdateBundleDiscount(
+  mutation UpdateDiscount(
     $id: ID!
     $discount: DiscountAutomaticAppInput!
   ) {

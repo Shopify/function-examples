@@ -2,8 +2,8 @@ import DiscountCreatePage from '../../components/DiscountCreatePage';
 import {
   default as ProductDiscount,
   DEFAULT_CONFIGURATION,
-  serializeDiscount,
 } from '../../components/function-configuration/ProductDiscount';
+import { DISCOUNT_CLASS } from '../../consts';
 
 export default function CreateProductDiscountPage() {
   return (
@@ -16,7 +16,7 @@ export default function CreateProductDiscountPage() {
           onConfigurationChange={onConfigurationChange}
         />
       )}
-      serializeDiscount={serializeDiscount}
+      discountClass={DISCOUNT_CLASS.Product}
     />
   );
 }

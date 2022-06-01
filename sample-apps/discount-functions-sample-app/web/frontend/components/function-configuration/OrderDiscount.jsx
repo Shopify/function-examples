@@ -93,11 +93,3 @@ export const DEFAULT_CONFIGURATION = {
   value: 0,
   excludedVariantIds: [],
 };
-
-export function serializeDiscount(discount) {
-  return {
-    title: discount.title,
-    configuration: JSON.stringify(discount.configuration),
-    startsAt: new Date(),
-  };
-}

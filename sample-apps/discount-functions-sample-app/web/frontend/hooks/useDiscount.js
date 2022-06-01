@@ -3,7 +3,11 @@ import { isEqual } from 'lodash';
 
 import { usePrevious } from './usePrevious';
 
-export function useDiscount({ savedDiscount, defaultConfiguration }) {
+export function useDiscount({
+  savedDiscount,
+  defaultConfiguration,
+  discountClass,
+}) {
   const previousSavedDiscount = usePrevious(savedDiscount);
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
   const [startsAt, setStartsAt] = useState(
@@ -19,6 +23,7 @@ export function useDiscount({ savedDiscount, defaultConfiguration }) {
     startsAt,
     endsAt,
     configuration,
+    discountClass,
   };
 
   const isDirty = useMemo(() => {

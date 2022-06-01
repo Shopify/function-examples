@@ -15,12 +15,13 @@ import { useDiscount } from '../hooks/useDiscount';
 import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
 import { useSavedDiscount } from '../hooks/useSavedDiscount';
 import { useUpdateDiscount } from '../hooks/useUpdateDiscount';
+import { serializeDiscount } from '../utilities/serializeDiscount';
 
 export default function DiscountDetailsPage({
   id,
   defaultConfiguration,
   renderConfigurationForm,
-  serializeDiscount,
+  discountClass,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isMutationError, setIsMutationError] = useState(false);
@@ -35,6 +36,7 @@ export default function DiscountDetailsPage({
   } = useDiscount({
     savedDiscount,
     defaultConfiguration,
+    discountClass,
   });
 
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();
