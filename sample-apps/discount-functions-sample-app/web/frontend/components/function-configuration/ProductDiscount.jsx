@@ -5,11 +5,9 @@ import {
   TextField,
   TextContainer,
   Button,
-  List,
   TextStyle,
 } from '@shopify/polaris';
 
-import { gidToId } from '../../utilities/gid';
 import VariantList from '../VariantList';
 
 export default function ProductDiscount({
