@@ -9,7 +9,7 @@ pub struct Payload {
     pub configuration: Configuration,
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Configuration {
     pub value: Option<String>,
 }
@@ -29,12 +29,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let payload: Payload = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
     let mut out = std::io::stdout();
     let mut serializer = serde_json::Serializer::new(&mut out);
-    function(payload)?.serialize(&mut serializer)?;
+    function(payload.input)?.serialize(&mut serializer)?;
     Ok(())
 }
 
-fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let (input, config) = (payload.input, payload.configuration);
+fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
+    let config: Configuration = serde_json::from_str(&input.configuration.unwrap_or_default().value.unwrap_or_default())?;
     let value = config.get_value();
     let delivery_lines = input.delivery_lines.unwrap_or_default();
     Ok(build_result(value, targets(&delivery_lines)))
@@ -72,31 +72,30 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn payload(configuration: Configuration) -> Payload {
+    fn input(configuration: Configuration) -> input::Input {
         let input = r#"
         {
-            "input": {
-                "deliveryLines": [
-                    { "id": "gid://shopify/DeliveryLine/0" },
-                    { "id": "gid://shopify/DeliveryLine/1" }
-                ]
-            },
-            "configuration": {
-                "value": null
-            }
+            "deliveryLines": [
+                { "id": "gid://shopify/DeliveryLine/0" },
+                { "id": "gid://shopify/DeliveryLine/1" }
+            ]
         }
         "#;
-        let default_payload: Payload = serde_json::from_str(&input).unwrap();
-        Payload {
-            configuration,
-            ..default_payload
+        let default_input: input::Input = serde_json::from_str(input).unwrap();
+        let configuration = input::Metafield {
+            id: "gid://shopify/Metafield/0".to_string(),
+            value: Some(serde_json::to_string(&configuration).unwrap()),
+        };
+        input::Input {
+            configuration: Some(configuration),
+            ..default_input
         }
     }
 
     #[test]
     fn test_discount_with_default_value() {
-        let payload = payload(Configuration { value: None });
-        let result = serde_json::json!(function(payload).unwrap());
+        let input = input(Configuration { value: None });
+        let result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
@@ -118,10 +117,10 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let payload = payload(Configuration {
+        let input = input(Configuration {
             value: Some("10".to_string()),
         });
-        let result = serde_json::json!(function(payload).unwrap());
+        let result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
@@ -143,16 +142,20 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_delivery_lines() {
-        let payload = Payload {
-            input: input::Input {
-                delivery_lines: None,
-                merchandise_lines: None,
-                customer: None,
-                locale: None,
-            },
-            configuration: Configuration { value: None },
+        let config = Configuration {
+            value: None,
         };
-        let handle_result = serde_json::json!(function(payload).unwrap());
+        let input = input::Input {
+            delivery_lines: None,
+            merchandise_lines: None,
+            customer: None,
+            locale: None,
+            configuration: Some(input::Metafield {
+                id: "".to_string(),
+                value: Some(serde_json::to_string(&config).unwrap()),
+            }),
+        };
+        let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
@@ -171,22 +174,26 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_delivery_line_ids() {
-        let payload = Payload {
-            input: input::Input {
-                delivery_lines: Some(vec![input::DeliveryLineWithStrategy {
-                    id: None,
-                    destination: None,
-                    price: None,
-                    strategy: None,
-                    subscription: None,
-                }]),
-                merchandise_lines: None,
-                customer: None,
-                locale: None,
-            },
-            configuration: Configuration { value: None },
+        let config = Configuration {
+            value: None,
         };
-        let handle_result = serde_json::json!(function(payload).unwrap());
+        let input = input::Input {
+            delivery_lines: Some(vec![input::DeliveryLineWithStrategy {
+                id: None,
+                destination: None,
+                price: None,
+                strategy: None,
+                subscription: None,
+            }]),
+            merchandise_lines: None,
+            customer: None,
+            locale: None,
+            configuration: Some(input::Metafield {
+                id: "".to_string(),
+                value: Some(serde_json::to_string(&config).unwrap()),
+            }),
+        };
+        let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {

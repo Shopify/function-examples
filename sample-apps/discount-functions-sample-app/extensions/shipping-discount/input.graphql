@@ -2,4 +2,10 @@ query Input {
   deliveryLines {
     id
   }
+  # type: HasMetafields
+  functionContext {
+    configuration: metafield(namespace: 'function', key: 'configuration') {
+      value
+    }
+  }
 }
