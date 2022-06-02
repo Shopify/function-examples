@@ -1,6 +1,5 @@
 query Input {
-  # type: HasMetafields
-  functionContext {
+  priceRule {
     configuration: metafield(namespace: 'function', key: 'configuration') {
       value
     }
