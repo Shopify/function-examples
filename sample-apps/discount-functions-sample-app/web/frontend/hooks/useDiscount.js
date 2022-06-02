@@ -17,12 +17,14 @@ export function useDiscount({
   const [configuration, setConfiguration] = useState(
     savedDiscount?.configuration ?? defaultConfiguration,
   );
+  const configurationId = savedDiscount?.configurationId;
 
   const discount = {
     title,
     startsAt,
     endsAt,
     configuration,
+    configurationId,
     discountClass,
   };
 

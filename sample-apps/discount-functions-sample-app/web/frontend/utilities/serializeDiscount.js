@@ -1,8 +1,23 @@
 export function serializeDiscount(discount) {
-  return {
+  const serialized = {
     title: discount.title,
-    configuration: JSON.stringify(discount.configuration),
     startsAt: new Date(),
     discountClass: discount.discountClass,
+    metafields: [
+      // store configuration in standard metafield
+      {
+        namespace: 'function',
+        key: 'configuration',
+        type: 'json',
+        value: JSON.stringify(discount.configuration)
+      }
+    ]
   };
+
+  // metafield id is required for update
+  if (discount.configurationId) {
+    serialized.metafields[0].id = discount.configurationId;
+  }
+
+  return serialized;
 }
