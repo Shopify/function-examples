@@ -1,0 +1,12 @@
+name = "Filter payment method on threshold"
+type = "payment_methods"
+version = "2"
+description = "Payment methods base script"
+
+[meta_object]
+type = "object"
+
+[meta_object.fields]
+
+[commands]
+build = "echo 'build the wasm'"
