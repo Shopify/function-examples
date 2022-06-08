@@ -21,7 +21,6 @@ export default function DiscountDetailsPage({
   id,
   defaultConfiguration,
   renderConfigurationForm,
-  discountClass,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isMutationError, setIsMutationError] = useState(false);
@@ -36,7 +35,6 @@ export default function DiscountDetailsPage({
   } = useDiscount({
     savedDiscount,
     defaultConfiguration,
-    discountClass,
   });
 
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();

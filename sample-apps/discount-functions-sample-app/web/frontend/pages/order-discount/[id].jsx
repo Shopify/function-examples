@@ -5,7 +5,6 @@ import {
   default as OrderDiscount,
   DEFAULT_CONFIGURATION,
 } from '../../components/function-configuration/OrderDiscount';
-import { DISCOUNT_CLASS } from '../../consts';
 
 export default function OrderDiscountDetailsPage() {
   const { id } = useParams();
@@ -20,7 +19,6 @@ export default function OrderDiscountDetailsPage() {
           onConfigurationChange={onConfigurationChange}
         />
       )}
-      discountClass={DISCOUNT_CLASS.Order}
     />
   );
 }

@@ -17,14 +17,12 @@ export default function DiscountCreatePage({
   scriptUuid,
   defaultConfiguration,
   renderConfigurationForm,
-  discountClass,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isError, setIsError] = useState(false);
   const { discount, title, configuration, setTitle, setConfiguration } =
     useDiscount({
       defaultConfiguration,
-      discountClass,
     });
 
   const [createDiscount, { isLoading }] = useCreateDiscount();
