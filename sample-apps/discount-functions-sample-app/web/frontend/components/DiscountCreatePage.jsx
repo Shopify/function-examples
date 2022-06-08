@@ -14,7 +14,7 @@ import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
 import { serializeDiscount } from '../utilities/serializeDiscount';
 
 export default function DiscountCreatePage({
-  scriptUuid,
+  functionId,
   defaultConfiguration,
   renderConfigurationForm,
 }) {
@@ -30,7 +30,7 @@ export default function DiscountCreatePage({
   const handleCreateDiscount = async () => {
     setIsError(false);
     try {
-      await createDiscount(scriptUuid, serializeDiscount(discount));
+      await createDiscount(functionId, serializeDiscount(discount));
     } catch {
       setIsError(true);
       return;
