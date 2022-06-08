@@ -3,6 +3,5 @@ export function serializeDiscount(discount) {
     title: discount.title,
     configuration: JSON.stringify(discount.configuration),
     startsAt: new Date(),
-    discountClass: discount.discountClass,
   };
 }

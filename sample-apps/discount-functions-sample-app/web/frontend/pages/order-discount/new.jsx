@@ -3,7 +3,6 @@ import {
   default as OrderDiscount,
   DEFAULT_CONFIGURATION,
 } from '../../components/function-configuration/OrderDiscount';
-import { DISCOUNT_CLASS } from '../../consts';
 
 export default function CreateOrderDiscountPage() {
   return (
@@ -16,7 +15,6 @@ export default function CreateOrderDiscountPage() {
           onConfigurationChange={onConfigurationChange}
         />
       )}
-      discountClass={DISCOUNT_CLASS.Order}
     />
   );
 }

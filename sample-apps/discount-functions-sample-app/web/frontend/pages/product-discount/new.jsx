@@ -3,7 +3,6 @@ import {
   default as ProductDiscount,
   DEFAULT_CONFIGURATION,
 } from '../../components/function-configuration/ProductDiscount';
-import { DISCOUNT_CLASS } from '../../consts';
 
 export default function CreateProductDiscountPage() {
   return (
@@ -16,7 +15,6 @@ export default function CreateProductDiscountPage() {
           onConfigurationChange={onConfigurationChange}
         />
       )}
-      discountClass={DISCOUNT_CLASS.Product}
     />
   );
 }

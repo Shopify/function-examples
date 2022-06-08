@@ -3,7 +3,6 @@ import {
   default as ShippingDiscount,
   DEFAULT_CONFIGURATION,
 } from '../../components/function-configuration/ShippingDiscount';
-import { DISCOUNT_CLASS } from '../../consts';
 
 export default function CreateShippingDiscountPage() {
   return (
@@ -16,7 +15,6 @@ export default function CreateShippingDiscountPage() {
           onConfigurationChange={onConfigurationChange}
         />
       )}
-      discountClass={DISCOUNT_CLASS.Shipping}
     />
   );
 }

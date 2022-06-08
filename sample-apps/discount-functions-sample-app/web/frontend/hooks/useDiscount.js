@@ -6,7 +6,6 @@ import { usePrevious } from './usePrevious';
 export function useDiscount({
   savedDiscount,
   defaultConfiguration,
-  discountClass,
 }) {
   const previousSavedDiscount = usePrevious(savedDiscount);
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
@@ -23,7 +22,6 @@ export function useDiscount({
     startsAt,
     endsAt,
     configuration,
-    discountClass,
   };
 
   const isDirty = useMemo(() => {
