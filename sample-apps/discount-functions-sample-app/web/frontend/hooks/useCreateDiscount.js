@@ -19,11 +19,11 @@ export function useCreateDiscount() {
     query: CREATE_MUTATION,
   });
 
-  const createDiscount = async (scriptUuid, discount) => {
+  const createDiscount = async (functionId, discount) => {
     return triggerMutation({
       discount: {
         ...discount,
-        scriptUuid,
+        functionId,
       },
     })
       .then((response) => {
