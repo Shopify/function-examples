@@ -10,7 +10,7 @@ const QUERY = gql`
       automaticDiscount {
         ... on DiscountAutomaticApp {
           title
-          configurationField: metafield(namespace: "function", key: "configuration") {
+          configurationField: metafield(namespace: 'discount-functions-sample-app', key: 'function-configuration') {
             id
             value
           }
