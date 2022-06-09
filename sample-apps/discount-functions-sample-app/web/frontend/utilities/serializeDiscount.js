@@ -4,10 +4,10 @@ export function serializeDiscount(discount) {
     startsAt: new Date(),
     discountClass: discount.discountClass,
     metafields: [
-      // store configuration in standard metafield
+      // store configuration in app metafield
       {
-        namespace: 'function',
-        key: 'configuration',
+        namespace: 'discount-functions-sample-app',
+        key: 'function-configuration',
         type: 'json',
         value: JSON.stringify(discount.configuration)
       }

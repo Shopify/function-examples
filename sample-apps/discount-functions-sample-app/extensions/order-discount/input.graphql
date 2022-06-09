@@ -1,6 +1,6 @@
 query Input {
   priceRule {
-    configuration: metafield(namespace: 'function', key: 'configuration') {
+    configuration: metafield(namespace: 'discount-functions-sample-app', key: 'function-configuration') {
       value
     }
   }
