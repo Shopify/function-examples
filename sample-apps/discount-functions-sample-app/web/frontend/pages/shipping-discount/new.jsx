@@ -7,7 +7,7 @@ import {
 export default function CreateShippingDiscountPage() {
   return (
     <DiscountCreatePage
-      scriptUuid={process.env.SHIPPING_DISCOUNT_ID}
+      functionId={process.env.SHIPPING_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
         <ShippingDiscount

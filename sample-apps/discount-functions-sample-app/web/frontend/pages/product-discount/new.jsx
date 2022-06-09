@@ -7,7 +7,7 @@ import {
 export default function CreateProductDiscountPage() {
   return (
     <DiscountCreatePage
-      scriptUuid={process.env.PRODUCT_DISCOUNT_ID}
+      functionId={process.env.PRODUCT_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
         <ProductDiscount
