@@ -4,18 +4,18 @@ on:
   push:
     branches: [ master ]
     paths:
-      - "checkout/rust/shipping-rate-presenter/default/**"
+      - "checkout/rust/delivery-option-presenter/default/**"
   pull_request:
     branches: [ master ]
     paths:
-      - "checkout/rust/shipping-rate-presenter/default/**"
+      - "checkout/rust/delivery-option-presenter/default/**"
 
 env:
   CARGO_TERM_COLOR: always
   
 defaults:
   run:
-    working-directory: "checkout/rust/shipping-rate-presenter/default"
+    working-directory: "checkout/rust/delivery-option-presenter/default"
 
 jobs:
   build:
