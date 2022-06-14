@@ -6,7 +6,7 @@ export function serializeDiscount(discount) {
     metafields: [
       // store configuration in app metafield
       {
-        namespace: 'discount-functions-sample-app',
+        namespace: process.env.METAFIELD_NAMESPACE,
         key: 'function-configuration',
         type: 'json',
         value: JSON.stringify(discount.configuration)

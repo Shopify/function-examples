@@ -1,0 +1,10 @@
+query Input {
+  deliveryLines {
+    id
+  }
+  priceRule {
+    configuration: metafield(namespace: '{{ app_name | replace: " ", "-" | downcase }}', key: 'function-configuration') {
+      value
+    }
+  }
+}
