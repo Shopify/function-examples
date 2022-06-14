@@ -10,7 +10,6 @@ const QUERY = gql`
       automaticDiscount {
         ... on DiscountAutomaticApp {
           title
-          configuration
           startsAt
           endsAt
         }
@@ -35,14 +34,13 @@ export function useSavedDiscount(id) {
       title,
       startsAt,
       endsAt,
-      configuration: unparsedConfiguration,
     } = data.data.automaticDiscountNode.automaticDiscount;
 
     return {
       title,
       startsAt,
       endsAt,
-      configuration: JSON.parse(unparsedConfiguration),
+      configuration: JSON.parse("{}"),
     };
   }, [data]);
 
