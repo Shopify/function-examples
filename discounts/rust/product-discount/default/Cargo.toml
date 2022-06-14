@@ -1,12 +1,15 @@
 [package]
-name = "default_shipping_rate_presenter_script"
+name = ""
 version = "1.0.0"
 edition = "2021"
+include = ["*.graphql"]
 
 [dependencies]
-serde_json = "1.0"
 serde = { version = "1.0.13", features = ["derive"] }
+serde_with = "1.13.0"
+serde_json = "1.0"
 
 [profile.release]
 lto = true
 opt-level = 's'
+strip = true

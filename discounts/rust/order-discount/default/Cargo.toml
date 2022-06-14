@@ -1,5 +1,5 @@
 [package]
-name = "product_discounts"
+name = "order_discount"
 version = "1.0.0"
 edition = "2021"
 include = ["*.graphql"]

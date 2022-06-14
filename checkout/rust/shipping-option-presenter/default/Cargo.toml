@@ -1,15 +1,12 @@
 [package]
-name = ""
+name = "default_delivery_option_presenter_script"
 version = "1.0.0"
 edition = "2021"
-include = ["*.graphql"]
 
 [dependencies]
-serde = { version = "1.0.13", features = ["derive"] }
-serde_with = "1.13.0"
 serde_json = "1.0"
+serde = { version = "1.0.13", features = ["derive"] }
 
 [profile.release]
 lto = true
 opt-level = 's'
-strip = true
