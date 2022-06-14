@@ -1,54 +1,22 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 mod api;
 use api::*;
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct Payload {
-    pub input: input::Input,
-    pub configuration: Configuration,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase"))]
-pub struct Configuration {
-    pub value: Option<String>,
-    pub excluded_variant_ids: Option<Vec<ID>>,
-}
-
-impl Configuration {
-    const DEFAULT_VALUE: f64 = 50.0;
-
-    fn get_value(&self) -> f64 {
-        match &self.value {
-            Some(value) => value.parse().unwrap(),
-            _ => Self::DEFAULT_VALUE,
-        }
-    }
-
-    fn excluded_variant_ids(&self) -> Vec<ID> {
-        self.excluded_variant_ids
-            .as_ref()
-            .unwrap_or(&vec![])
-            .to_vec()
-    }
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let payload: Payload = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
+    let input: input::Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
     let mut out = std::io::stdout();
     let mut serializer = serde_json::Serializer::new(&mut out);
-    function(payload)?.serialize(&mut serializer)?;
+    function(input)?.serialize(&mut serializer)?;
     Ok(())
 }
 
-fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let (input, config) = (payload.input, payload.configuration);
-    let value: f64 = config.get_value();
+fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
+    const DEFAULT_VALUE: f64 = 50.0;
     let merchandise_lines = &input.merchandise_lines.unwrap_or_default();
-    let excluded_variant_ids = config.excluded_variant_ids();
+    let excluded_variant_ids = vec![];
     let targets = targets(merchandise_lines, &excluded_variant_ids);
-    Ok(build_result(value, targets))
+    Ok(build_result(DEFAULT_VALUE, targets))
 }
 
 fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
@@ -99,35 +67,22 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn payload(configuration: Configuration) -> Payload {
+    fn input() -> input::Input {
         let input = r#"
         {
-            "input": {
-                "merchandiseLines": [
-                    { "variant": { "id": "gid://shopify/ProductVariant/0" } },
-                    { "variant": { "id": "gid://shopify/ProductVariant/1" } }
-                ]
-            },
-            "configuration": {
-                "value": null,
-                "excludedVariantIds": null
-            }
+            "merchandiseLines": [
+                { "variant": { "id": "gid://shopify/ProductVariant/0" } },
+                { "variant": { "id": "gid://shopify/ProductVariant/1" } }
+            ]
         }
         "#;
-        let default_payload: Payload = serde_json::from_str(input).unwrap();
-        Payload {
-            configuration,
-            ..default_payload
-        }
+        serde_json::from_str(input).unwrap()
     }
 
     #[test]
     fn test_discount_with_default_value() {
-        let payload = payload(Configuration {
-            value: None,
-            excluded_variant_ids: None,
-        });
-        let handle_result = serde_json::json!(function(payload).unwrap());
+        let input = input();
+        let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
@@ -152,79 +107,14 @@ mod tests {
     }
 
     #[test]
-    fn test_discount_with_value() {
-        let payload = payload(Configuration {
-            value: Some("10".to_string()),
-            excluded_variant_ids: None,
-        });
-        let handle_result = serde_json::json!(function(payload).unwrap());
-
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "message": "10% off",
-                    "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
-                    ],
-                    "value": { "percentage": { "value": 10.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
-    }
-
-    #[test]
-    fn test_discount_with_excluded_variant_gids() {
-        let payload = payload(Configuration {
-            value: None,
-            excluded_variant_ids: Some(vec!["gid://shopify/ProductVariant/0".to_string()]),
-        });
-        let handle_result = serde_json::json!(function(payload).unwrap());
-
-        let expected_json = r#"
-        {
-            "discounts": [{
-                "message": "50% off",
-                "targets": [
-                    { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
-                ],
-                "value": { "percentage": { "value": 50.0 } }
-            }],
-            "discountApplicationStrategy": "FIRST"
-        }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
-    }
-
-    #[test]
     fn test_discount_with_no_merchandise_lines() {
-        let payload = Payload {
-            input: input::Input {
-                delivery_lines: None,
-                merchandise_lines: None,
-                customer: None,
-                locale: None,
-            },
-            configuration: Configuration {
-                value: None,
-                excluded_variant_ids: None,
-            },
+        let input = input::Input {
+            delivery_lines: None,
+            merchandise_lines: None,
+            customer: None,
+            locale: None,
         };
-        let handle_result = serde_json::json!(function(payload).unwrap());
+        let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
@@ -243,33 +133,27 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_variant_ids() {
-        let payload = Payload {
-            input: input::Input {
-                delivery_lines: None,
-                merchandise_lines: Some(vec![input::MerchandiseLine {
+        let input = input::Input {
+            delivery_lines: None,
+            merchandise_lines: Some(vec![input::MerchandiseLine {
+                id: None,
+                variant: Some(input::Variant {
                     id: None,
-                    variant: Some(input::Variant {
-                        id: None,
-                        compare_at_price: None,
-                        product: None,
-                        sku: None,
-                        title: None,
-                    }),
-                    price: None,
-                    properties: None,
-                    quantity: None,
-                    selling_plan: None,
-                    weight: None,
-                }]),
-                customer: None,
-                locale: None,
-            },
-            configuration: Configuration {
-                value: None,
-                excluded_variant_ids: None,
-            },
+                    compare_at_price: None,
+                    product: None,
+                    sku: None,
+                    title: None,
+                }),
+                price: None,
+                properties: None,
+                quantity: None,
+                selling_plan: None,
+                weight: None,
+            }]),
+            customer: None,
+            locale: None,
         };
-        let handle_result = serde_json::json!(function(payload).unwrap());
+        let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
