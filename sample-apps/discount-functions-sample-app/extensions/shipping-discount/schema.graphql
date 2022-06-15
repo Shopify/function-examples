@@ -17,12 +17,6 @@ type Address {
   zip: String
 }
 
-input Condition @oneOf {
-  orderMinimumSubtotal: OrderMinimumSubtotal
-  productMinimumQuantity: ProductMinimumQuantity
-  productMinimumSubtotal: ProductMinimumSubtotal
-}
-
 type Customer implements HasMetafields {
   acceptsMarketing: Boolean
   email: String
@@ -55,7 +49,6 @@ type DeliveryLine {
 }
 
 input Discount {
-  conditions: [Condition!]
   message: String
   targets: [Target!]!
   value: Value!

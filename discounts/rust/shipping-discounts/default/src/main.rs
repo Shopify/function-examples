@@ -34,7 +34,6 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
     } else {
         vec![Discount {
             message: Some(format!("{}% off", value)),
-            conditions: None,
             targets,
             value: Value::Percentage(Percentage { value }),
         }]

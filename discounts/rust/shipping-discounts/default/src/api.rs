@@ -134,7 +134,6 @@ pub struct Discount {
     pub value: Value,
     pub targets: Vec<Target>,
     pub message: Option<String>,
-    pub conditions: Option<Vec<Condition>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
