@@ -1,20 +1,7 @@
-import DiscountCreatePage from '../../components/DiscountCreatePage';
-import {
-  default as ShippingDiscount,
-  DEFAULT_CONFIGURATION,
-} from '../../components/function-configuration/ShippingDiscount';
+import ShippingDiscountCreatePage from '../../components/ShippingDiscountCreatePage';
 
 export default function CreateShippingDiscountPage() {
   return (
-    <DiscountCreatePage
-      functionId={process.env.SHIPPING_DISCOUNT_ID}
-      defaultConfiguration={DEFAULT_CONFIGURATION}
-      renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <ShippingDiscount
-          configuration={configuration}
-          onConfigurationChange={onConfigurationChange}
-        />
-      )}
-    />
+    <ShippingDiscountCreatePage functionId={process.env.SHIPPING_DISCOUNT_ID} />
   );
 }

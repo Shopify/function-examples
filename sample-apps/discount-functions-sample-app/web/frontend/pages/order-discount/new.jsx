@@ -1,20 +1,7 @@
-import DiscountCreatePage from '../../components/DiscountCreatePage';
-import {
-  default as OrderDiscount,
-  DEFAULT_CONFIGURATION,
-} from '../../components/function-configuration/OrderDiscount';
+import OrderDiscountCreatePage from '../../components/OrderDiscountCreatePage';
 
 export default function CreateOrderDiscountPage() {
   return (
-    <DiscountCreatePage
-      functionId={process.env.ORDER_DISCOUNT_ID}
-      defaultConfiguration={DEFAULT_CONFIGURATION}
-      renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <OrderDiscount
-          configuration={configuration}
-          onConfigurationChange={onConfigurationChange}
-        />
-      )}
-    />
+    <OrderDiscountCreatePage functionId={process.env.SHIPPING_DISCOUNT_ID} />
   );
 }
