@@ -1,6 +1,6 @@
 name = "{{name}}"
 type = "{{extensionType}}"
-buildWasmPath = "target/wasm32-wasi/release/{{name}}.wasm"
+buildWasmPath = "target/wasm32-wasi/release/{{name | replace: " ", "-" | downcase}}.wasm"
 version = "2"
 api_version = "2022-07"
 
