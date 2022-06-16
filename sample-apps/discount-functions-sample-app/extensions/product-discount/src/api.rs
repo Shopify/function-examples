@@ -19,6 +19,19 @@ pub mod input {
         pub delivery_lines: Option<Vec<DeliveryLine>>,
         pub locale: Option<String>,
         pub merchandise_lines: Option<Vec<MerchandiseLine>>,
+        pub discount_node: Option<DiscountNode>,
+    }
+
+    #[derive(Clone, Debug, Deserialize, Default)]
+    pub struct DiscountNode {
+        pub metafield: Option<Metafield>,
+    }
+
+    #[derive(Clone, Debug, Deserialize, Default)]
+    #[serde(rename_all(deserialize = "camelCase"))]
+    pub struct Metafield {
+        pub id: String,
+        pub value: Option<String>,
     }
 
     #[derive(Clone, Debug, Deserialize)]

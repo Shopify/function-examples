@@ -1,5 +1,5 @@
 [package]
-name = "product_percentage_with_exclusions"
+name = "product_discounts"
 version = "1.0.0"
 edition = "2021"
 include = ["*.graphql"]
