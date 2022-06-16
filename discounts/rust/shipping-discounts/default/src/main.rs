@@ -3,17 +3,14 @@ use serde::{Deserialize, Serialize};
 mod api;
 use api::*;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ConfigurationValue {}
-
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct Configuration {}
+pub struct Configuration {
+}
 
 impl Configuration {
-    fn from_str(_str: &str) -> Self {
-        Configuration {}
+    fn from_str(str: &str) -> Self {
+        serde_json::from_str(str).unwrap_or_default()
     }
 }
 
@@ -38,7 +35,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let _configuration: Configuration = input.configuration();
+    let _config: Configuration = input.configuration();
     Ok(FunctionResult {
         discounts: vec![],
         discount_application_strategy: DiscountApplicationStrategy::First,
@@ -49,7 +46,7 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    fn input(value: ConfigurationValue) -> input::Input {
+    fn input(configuration: Option<Configuration>) -> input::Input {
         let input = r#"
         {
         }
@@ -58,7 +55,7 @@ mod tests {
         let discount_node = Some(input::DiscountNode {
             metafield: Some(input::Metafield {
                 id: "gid://shopify/Metafield/0".to_string(),
-                value: Some(serde_json::to_string(&value).unwrap()),
+                value: serde_json::to_string(&configuration).ok(),
             }),
         });
 
@@ -69,8 +66,28 @@ mod tests {
     }
 
     #[test]
-    fn test_returns_no_discounts() {
-        let input = input(ConfigurationValue {});
+    fn test_discount_with_no_configuration() {
+        let input = input(None);
+        let handle_result = serde_json::json!(function(input).unwrap());
+
+        let expected_json = r#"
+            {
+                "discounts": [],
+                "discountApplicationStrategy": "FIRST"
+            }
+        "#;
+
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
+    }
+
+    #[test]
+    fn test_discount_with_configuration() {
+        let input = input(Some(Configuration {}));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
