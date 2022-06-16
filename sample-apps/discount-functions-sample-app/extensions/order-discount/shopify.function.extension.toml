@@ -1,4 +1,4 @@
-name = "order-discount"
+name = "Order Discount"
 type = "order_discounts"
 buildWasmPath = "target/wasm32-wasi/release/order-discount.wasm"
 version = "2"
