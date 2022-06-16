@@ -54,7 +54,6 @@ mod tests {
         let default_input: input::Input = serde_json::from_str(input).unwrap();
         let discount_node = Some(input::DiscountNode {
             metafield: Some(input::Metafield {
-                id: "gid://shopify/Metafield/0".to_string(),
                 value: serde_json::to_string(&configuration).ok(),
             }),
         });

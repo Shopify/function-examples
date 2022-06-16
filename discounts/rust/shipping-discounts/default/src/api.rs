@@ -30,7 +30,6 @@ pub mod input {
     #[derive(Clone, Debug, Deserialize, Default)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Metafield {
-        pub id: String,
         pub value: Option<String>,
     }
 
