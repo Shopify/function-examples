@@ -1,5 +1,5 @@
 [package]
-name = "product_discounts"
+name = "product-discount"
 version = "1.0.0"
 edition = "2021"
 include = ["*.graphql"]
@@ -11,5 +11,5 @@ serde_json = "1.0"
 
 [profile.release]
 lto = true
-opt-level = 's'
+opt-level = 'z'
 strip = true

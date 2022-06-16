@@ -1,0 +1,17 @@
+name = "Shipping Discount"
+type = "shipping_discounts"
+buildWasmPath = "target/wasm32-wasi/release/shipping-discount.wasm"
+version = "2"
+api_version = "2022-07"
+
+[meta_object]
+type = "object"
+
+[meta_object.fields]
+
+[ui.paths]
+create = "/shipping-discount/new"
+details = "/shipping-discount/:id"
+
+[commands]
+build = "cargo wasi build --release"

@@ -1,0 +1,17 @@
+name = "order-discount"
+type = "order_discounts"
+buildWasmPath = "target/wasm32-wasi/release/order-discount.wasm"
+version = "2"
+api_version = "2022-07"
+
+[meta_object]
+type = "object"
+
+[meta_object.fields]
+
+[ui.paths]
+create = "/order-discount/new"
+details = "/order-discount/:id"
+
+[commands]
+build = "cargo wasi build --release"

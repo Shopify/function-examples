@@ -12,14 +12,17 @@ It also provides [Shopify Functions](#) that allow merchants to set up discounts
 
 - If you don’t have one, [create a Shopify partner account](https://partners.shopify.com/signup).
 - If you don’t have one, [create a Development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) where you can install and test your app.
-- **If you are not using the Shopify CLI**, in the Partner dashboard, [create a new app](https://help.shopify.com/en/api/tools/partner-dashboard/your-apps#create-a-new-app). You’ll need this app’s API credentials during the setup process.
+- [Install Rust](https://www.rust-lang.org/tools/install) and `cargo-wasi`
+  - `cargo install cargo-wasi`
+- On M1 Macs, you'll also need to install the Binaryen toolchain separately and set the `WASM_OPT` environment variable. ([related issue](https://github.com/bytecodealliance/cargo-wasi/issues/112))
+  - `brew install binaryen`
+  - `export WASM_OPT=/opt/homebrew/bin/wasm-opt`
 
 ## Installation
 
-1. Using the [Shopify CLI](#), connect this code with an app on your partner account.
-2. For each function in `extensions`, push it to your app: `shopify script push`
-3. Rename the `.env.sample` file in `web/frontend` to `.env` and fill in the function UUIDs for each of your functions
-4. Run `yarn dev` to start the server
+1. `yarn deploy` from the app root. This will allow you to create a new app, if needed.
+2. Rename the `.env.sample` file in `web/frontend` to `.env` and fill in the function UUIDs for each of your functions from the root `.env`
+3. Run `yarn dev` to start the server
 
 ## Developer resources
 
