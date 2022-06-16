@@ -1,9 +1,4 @@
 query Input {
-  merchandiseLines {
-    variant {
-      id
-    }
-  }
   discountNode {
     metafield(namespace: "discount-functions-sample-app", key: "function-configuration") {
       value
