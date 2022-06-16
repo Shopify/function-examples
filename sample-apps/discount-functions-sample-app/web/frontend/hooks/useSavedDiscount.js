@@ -10,7 +10,10 @@ const QUERY = gql`
       automaticDiscount {
         ... on DiscountAutomaticApp {
           title
-          configuration
+          configurationField: metafield(namespace: 'discount-functions-sample-app', key: 'function-configuration') {
+            id
+            value
+          }
           startsAt
           endsAt
         }
@@ -35,14 +38,15 @@ export function useSavedDiscount(id) {
       title,
       startsAt,
       endsAt,
-      configuration: unparsedConfiguration,
+      configurationField,
     } = data.data.automaticDiscountNode.automaticDiscount;
 
     return {
       title,
       startsAt,
       endsAt,
-      configuration: JSON.parse(unparsedConfiguration),
+      configuration: JSON.parse(configurationField?.value ?? '{}'),
+      configurationId: configurationField?.id,
     };
   }, [data]);
 
