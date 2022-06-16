@@ -20,9 +20,9 @@ It also provides [Shopify Functions](#) that allow merchants to set up discounts
 
 ## Installation
 
-1. `yarn deploy` from the app root. This will allow you to create a new app, if needed.
-2. Rename the `.env.sample` file in `web/frontend` to `.env` and fill in the function UUIDs for each of your functions from the root `.env`
-3. Run `yarn dev` to start the server
+1. Run `yarn deploy` from the app root. This will allow you to create a new app, if needed.
+2. Run `yarn dev` to start the local dev server.
+3. Follow the output instructions to install your app.
 
 ## Developer resources
 

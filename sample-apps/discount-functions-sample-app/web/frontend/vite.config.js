@@ -1,18 +1,23 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import path from 'path';
-import 'dotenv/config';
 
 // prettier-ignore
 const INDEX_ROUTE = "^/(\\?.*)?$";
 const API_ROUTE = '^/api/';
 const ENV_KEYS = [
   'SHOPIFY_API_KEY',
-  'ORDER_DISCOUNT_ID',
-  'PRODUCT_DISCOUNT_ID',
-  'SHIPPING_DISCOUNT_ID',
+  'SHOPIFY_ORDER_DISCOUNT_ID',
+  'SHOPIFY_SHIPPING_DISCOUNT_ID',
+  'SHOPIFY_PRODUCT_DISCOUNT_ID',
 ];
 
 const root = new URL('.', import.meta.url).pathname;
+
+// Function IDs are populated in ../../.env by the Shopify CLI after being deployed
+if (process.env.npm_lifecycle_event === 'dev') {
+  const envFile = loadEnv('dev', path.join(process.cwd(), '..', '..'), '');
+  process.env = { ...process.env, ...envFile };
+}
 
 export default defineConfig({
   root,
