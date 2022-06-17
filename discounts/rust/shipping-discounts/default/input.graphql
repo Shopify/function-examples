@@ -1,5 +1,7 @@
 query Input {
-  deliveryLines {
-    id
+  discountNode {
+    metafield(namespace: "default", key: "function-configuration") {
+      value
+    }
   }
 }
