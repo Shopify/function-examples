@@ -7,7 +7,7 @@ export default function ShippingDiscount({
   const handleValueChange = (value) => {
     onConfigurationChange({
       ...configuration,
-      value,
+      value: parseFloat(value),
     });
   };
 

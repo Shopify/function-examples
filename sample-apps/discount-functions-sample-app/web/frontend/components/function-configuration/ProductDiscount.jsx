@@ -19,7 +19,7 @@ export default function ProductDiscount({
   const handleValueChange = (value) => {
     onConfigurationChange({
       ...configuration,
-      value,
+      value: parseFloat(value),
     });
   };
 
