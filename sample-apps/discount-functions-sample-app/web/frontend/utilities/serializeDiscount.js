@@ -1,7 +1,6 @@
-export function serializeDiscount(discount) {
-  const METAFIELD_NAMESPACE = 'discount-functions-sample-app';
-  const METAFIELD_CONFIGURATION_KEY = 'function-configuration';
+import metafields from "../metafields";
 
+export function serializeDiscount(discount) {
   const serialized = {
     title: discount.title,
     startsAt: new Date(),
@@ -9,8 +8,8 @@ export function serializeDiscount(discount) {
     metafields: [
       // store configuration in app metafield
       {
-        namespace: METAFIELD_NAMESPACE,
-        key: METAFIELD_CONFIGURATION_KEY,
+        namespace: metafields.namepace,
+        key: metafields.functionConfiguration,
         type: 'json',
         value: JSON.stringify(discount.configuration)
       }

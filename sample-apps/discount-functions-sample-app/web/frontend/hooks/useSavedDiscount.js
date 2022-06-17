@@ -3,11 +3,12 @@ import { gql } from 'graphql-request';
 
 import { idToGid } from '../utilities/gid';
 import { useShopifyQuery } from './useShopifyQuery';
+import metafields from '../metafields';
 
 const QUERY = gql`
-  query GetDiscount($id: ID!) {
+  query GetDiscount($id: ID!, $metafieldNamespace: String!, $metafieldKey: String!) {
     automaticDiscountNode(id: $id) {
-      configurationField: metafield(namespace: "discount-functions-sample-app", key: "function-configuration") {
+      configurationField: metafield(namespace: $metafieldNamespace, key: $metafieldKey) {
         id
         value
       }
@@ -26,7 +27,11 @@ export function useSavedDiscount(id) {
   const { data, isLoading, isError } = useShopifyQuery({
     key: 'GetDiscount',
     query: QUERY,
-    variables: { id: idToGid('DiscountAutomaticApp', id) },
+    variables: { 
+      id: idToGid('DiscountAutomaticApp', id),
+      metafieldNamespace: metafields.namepace,
+      metafieldKey: metafields.functionConfiguration,
+    },
   });
 
   const discount = useMemo(() => {
