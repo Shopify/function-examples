@@ -1,6 +1,5 @@
 name = "Product Discount"
 type = "product_discounts"
-buildWasmPath = "target/wasm32-wasi/release/product-discount.wasm"
 version = "2"
 api_version = "2022-07"
 
@@ -13,5 +12,6 @@ type = "object"
 create = "/product-discount/new"
 details = "/product-discount/:id"
 
-[commands]
-build = "cargo wasi build --release"
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/product-discount.wasm"
