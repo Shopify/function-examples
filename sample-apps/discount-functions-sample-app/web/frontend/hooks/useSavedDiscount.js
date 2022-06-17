@@ -7,10 +7,13 @@ import { useShopifyQuery } from './useShopifyQuery';
 const QUERY = gql`
   query GetDiscount($id: ID!) {
     automaticDiscountNode(id: $id) {
+      configurationField: metafield(namespace: "discount-functions-sample-app", key: "function-configuration") {
+        id
+        value
+      }
       automaticDiscount {
         ... on DiscountAutomaticApp {
           title
-          configuration
           startsAt
           endsAt
         }
@@ -35,14 +38,15 @@ export function useSavedDiscount(id) {
       title,
       startsAt,
       endsAt,
-      configuration: unparsedConfiguration,
     } = data.data.automaticDiscountNode.automaticDiscount;
+    const {configurationField} = data.data.automaticDiscountNode;
 
     return {
       title,
       startsAt,
       endsAt,
-      configuration: JSON.parse(unparsedConfiguration),
+      configuration: JSON.parse(configurationField?.value ?? '{}'),
+      configurationId: configurationField?.id,
     };
   }, [data]);
 

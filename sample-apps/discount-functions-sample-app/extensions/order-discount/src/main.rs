@@ -3,57 +3,60 @@ use serde::{Deserialize, Serialize};
 mod api;
 use api::*;
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct Payload {
-    pub input: input::Input,
-    pub configuration: Configuration,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase"))]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    pub value: Option<String>,
-    pub excluded_variant_ids: Option<Vec<ID>>,
+    pub value: f64,
+    pub excluded_variant_ids: Vec<ID>,
 }
 
 impl Configuration {
     const DEFAULT_VALUE: f64 = 50.0;
 
-    fn get_value(&self) -> f64 {
-        match &self.value {
-            Some(value) => value.parse().unwrap(),
-            _ => Self::DEFAULT_VALUE,
+    fn from_str(str: &str) -> Self {
+        serde_json::from_str(str).unwrap_or_default()
+    }
+}
+
+impl Default for Configuration {
+    fn default() -> Self {
+        Configuration {
+            value: Self::DEFAULT_VALUE,
+            excluded_variant_ids: vec![],
         }
     }
+}
 
-    fn excluded_variant_ids(&self) -> Vec<ID> {
-        self.excluded_variant_ids
-            .as_ref()
-            .unwrap_or(&vec![])
-            .to_vec()
+impl input::Input {
+    fn configuration(&self) -> Configuration {
+        let value: Option<&str> = self.discount_node.as_ref().and_then(|discount_node| {
+            discount_node
+                .metafield
+                .as_ref()
+                .and_then(|metafield| metafield.value.as_deref())
+        });
+        value.map(Configuration::from_str).unwrap_or_default()
     }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let payload: Payload = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
+    let input: input::Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
     let mut out = std::io::stdout();
     let mut serializer = serde_json::Serializer::new(&mut out);
-    function(payload)?.serialize(&mut serializer)?;
+    function(input)?.serialize(&mut serializer)?;
     Ok(())
 }
 
-fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let config = payload.configuration;
-    let value = config.get_value();
-    let excluded_variant_ids = config.excluded_variant_ids();
+fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
+    let config: Configuration = input.configuration();
     Ok(FunctionResult {
         discounts: vec![Discount {
-            message: Some(format!("{}% off", value)),
+            message: None,
             conditions: None,
             targets: vec![Target::OrderSubtotal {
-                excluded_variant_ids,
+                excluded_variant_ids: config.excluded_variant_ids
             }],
-            value: Value::Percentage(Percentage { value }),
+            value: Value::Percentage(Percentage { value: config.value }),
         }],
         discount_application_strategy: DiscountApplicationStrategy::First,
     })
@@ -63,40 +66,28 @@ fn function(payload: Payload) -> Result<FunctionResult, Box<dyn std::error::Erro
 mod tests {
     use super::*;
 
-    fn payload(configuration: Configuration) -> Payload {
-        let input = r#"
-        {
-            "input": {
-                "merchandiseLines": [
-                    { "variant": { "id": "gid://shopify/ProductVariant/0" } },
-                    { "variant": { "id": "gid://shopify/ProductVariant/1" } }
-                ]
-            },
-            "configuration": {
-                "value": null,
-                "excludedVariantIds": null
-            }
-        }
-        "#;
-        let default_payload: Payload = serde_json::from_str(input).unwrap();
-        Payload {
-            configuration,
-            ..default_payload
+    fn input(configuration: Option<Configuration>) -> input::Input {
+        let default_input: input::Input = serde_json::from_str("{}").unwrap();
+        let discount_node = Some(input::DiscountNode {
+            metafield: Some(input::Metafield {
+                value: serde_json::to_string(&configuration).ok(),
+            }),
+        });
+
+        input::Input {
+            discount_node,
+            ..default_input
         }
     }
 
     #[test]
-    fn test_discount_with_default_value() {
-        let payload = payload(Configuration {
-            value: None,
-            excluded_variant_ids: None,
-        });
-        let result = serde_json::json!(function(payload).unwrap());
+    fn test_discount_with_no_configuration() {
+        let input = input(None);
+        let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
-                    "message": "50% off",
                     "targets": [{ "orderSubtotal": { "excludedVariantIds": [] } }],
                     "value": { "percentage": { "value": 50.0 } }
                 }],
@@ -104,22 +95,25 @@ mod tests {
             }
         "#;
 
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
     }
 
     #[test]
     fn test_discount_with_value() {
-        let payload = payload(Configuration {
-            value: Some("10".to_string()),
-            excluded_variant_ids: None,
-        });
-        let result = serde_json::json!(function(payload).unwrap());
+        let input = input(Some(Configuration {
+            value: 10.0,
+            excluded_variant_ids: vec![],
+        }));
+        let result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
-                    "message": "10% off",
                     "targets": [{ "orderSubtotal": { "excludedVariantIds": [] } }],
                     "value": { "percentage": { "value": 10.0 } }
                 }],
@@ -133,21 +127,16 @@ mod tests {
 
     #[test]
     fn test_discount_with_excluded_variant_ids() {
-        let payload = payload(Configuration {
-            value: None,
-            excluded_variant_ids: Some(vec!["gid://shopify/ProductVariant/1".to_string()]),
-        });
-        let result = serde_json::json!(function(payload).unwrap());
+        let input = input(Some(Configuration {
+            value: Configuration::DEFAULT_VALUE,
+            excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
+        }));
+        let result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
-                    "message": "50% off",
-                    "targets": [{
-                        "orderSubtotal": {
-                            "excludedVariantIds": ["gid://shopify/ProductVariant/1"]
-                        }
-                    }],
+                    "targets": [{ "orderSubtotal": { "excludedVariantIds": ["gid://shopify/ProductVariant/1"] } }],
                     "value": { "percentage": { "value": 50.0 } }
                 }],
                 "discountApplicationStrategy": "FIRST"
