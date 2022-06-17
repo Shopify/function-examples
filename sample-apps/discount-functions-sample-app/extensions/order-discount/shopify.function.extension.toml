@@ -1,12 +1,6 @@
 name = "Order Discount"
 type = "order_discounts"
-version = "2"
 api_version = "2022-07"
-
-[meta_object]
-type = "object"
-
-[meta_object.fields]
 
 [ui.paths]
 create = "/order-discount/new"
