@@ -7,7 +7,7 @@ import {
 export default function CreateOrderDiscountPage() {
   return (
     <DiscountCreatePage
-      functionId={process.env.ORDER_DISCOUNT_ID}
+      functionId={process.env.SHOPIFY_ORDER_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
         <OrderDiscount
