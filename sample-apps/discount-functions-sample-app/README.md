@@ -12,11 +12,13 @@ It also provides [Shopify Functions](#) that allow merchants to set up discounts
 
 - If you don’t have one, [create a Shopify partner account](https://partners.shopify.com/signup).
 - If you don’t have one, [create a Development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) where you can install and test your app.
-- [Install Rust](https://www.rust-lang.org/tools/install) and `cargo-wasi`
+- [Install Rust](https://www.rust-lang.org/tools/install)
+  - On Windows, Rust requires the [Microsoft C++ Build Tools](https://docs.microsoft.com/en-us/windows/dev-environment/rust/setup). Be sure to select the _Desktop development with C++_ workload when installing them.
+- Install [`cargo-wasi`](https://bytecodealliance.github.io/cargo-wasi/)
   - `cargo install cargo-wasi`
 - On M1 Macs, you'll also need to install the Binaryen toolchain separately and set the `WASM_OPT` environment variable. ([related issue](https://github.com/bytecodealliance/cargo-wasi/issues/112))
   - `brew install binaryen`
-  - `export WASM_OPT=/opt/homebrew/bin/wasm-opt`
+  - Add `export WASM_OPT=/opt/homebrew/bin/wasm-opt` to your `.bashrc` or `.zshrc`
 
 ## Installation
 
