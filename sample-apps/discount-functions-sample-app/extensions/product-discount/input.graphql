@@ -1,7 +1,12 @@
 query Input {
-  merchandiseLines {
-    variant {
+  cart {
+    lines {
       id
+      merchandise {
+        ... on ProductVariant {
+          id
+        }
+      }
     }
   }
   discountNode {

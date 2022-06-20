@@ -1,43 +1,7 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 mod api;
 use api::*;
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Configuration {
-    pub value: f64,
-    pub excluded_variant_ids: Vec<ID>,
-}
-
-impl Configuration {
-    const DEFAULT_VALUE: f64 = 50.0;
-
-    fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).unwrap_or_default()
-    }
-}
-
-impl Default for Configuration {
-    fn default() -> Self {
-        Configuration {
-            value: Self::DEFAULT_VALUE,
-            excluded_variant_ids: vec![],
-        }
-    }
-}
-
-impl input::Input {
-    fn configuration(&self) -> Configuration {
-        let value: Option<&str> = self.discount_node.as_ref().and_then(|discount_node| {
-            discount_node
-                .metafield
-                .as_ref()
-                .and_then(|metafield| metafield.value.as_deref())
-        });
-        value.map(Configuration::from_str).unwrap_or_default()
-    }
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input: input::Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
@@ -48,42 +12,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    if input.merchandise_lines.is_none() {
+    if input.cart.lines.is_empty() {
         return Ok(FunctionResult {
             discounts: vec![],
             discount_application_strategy: DiscountApplicationStrategy::First,
         });
     }
 
-    let merchandise_lines = input.merchandise_lines.as_ref().unwrap();
-    let config: Configuration = input.configuration();
-    let targets = targets(merchandise_lines, &config.excluded_variant_ids);
+    let config: input::Configuration = input.configuration();
+    let targets = targets(&input.cart.lines, &config.excluded_variant_ids);
     Ok(build_result(config.value, targets))
 }
 
-fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
-    merchandise_lines
+fn targets(cart_lines: &[input::CartLine], excluded_variant_ids: &[ID]) -> Vec<Target> {
+    cart_lines
         .iter()
-        .filter_map(|line| line.variant.as_ref())
-        .filter_map(|variant| variant.id.as_ref().map(String::from))
-        .collect()
-}
-
-fn targets(
-    merchandise_lines: &[input::MerchandiseLine],
-    excluded_variant_ids: &[ID],
-) -> Vec<Target> {
-    variant_ids(merchandise_lines)
-        .iter()
-        .filter_map(|id| {
-            if !excluded_variant_ids.contains(id) {
-                Some(Target::ProductVariant {
-                    id: id.to_string(),
-                    quantity: None,
-                })
-            } else {
-                None
+        .filter_map(|line| match &line.merchandise.id {
+            Some(id) => {
+                if !excluded_variant_ids.contains(id) {
+                    Some(Target::ProductVariant {
+                        id: id.to_string(),
+                        quantity: None,
+                    })
+                } else {
+                    None
+                }
             }
+            None => None,
         })
         .collect()
 }
@@ -109,21 +64,38 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
+    fn input(configuration: Option<input::Configuration>) -> input::Input {
         let input = r#"
         {
-            "merchandiseLines": [
-                { "variant": { "id": "gid://shopify/ProductVariant/0" } },
-                { "variant": { "id": "gid://shopify/ProductVariant/1" } }
-            ]
+            "cart": {
+                "lines": [
+                    {
+                        "id": "gid://shopify/CartLine/0",
+                        "merchandise": {
+                            "id": "gid://shopify/ProductVariant/0"
+                        }
+                    },
+                    {
+                        "id": "gid://shopify/CartLine/1",
+                        "merchandise": {
+                            "id": "gid://shopify/ProductVariant/1"
+                        }
+                    }
+                ]
+            },
+            "discountNode": {
+                "metafield": {
+                    "value": "{}"
+                }
+            }
         }
         "#;
         let default_input: input::Input = serde_json::from_str(input).unwrap();
-        let discount_node = Some(input::DiscountNode {
-            metafield: Some(input::Metafield {
-                value: serde_json::to_string(&configuration).ok(),
-            }),
-        });
+        let discount_node = input::DiscountNode {
+            metafield: input::Metafield {
+                value: serde_json::to_string(&configuration).ok().unwrap(),
+            },
+        };
 
         input::Input {
             discount_node,
@@ -159,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(Configuration {
+        let input = input(Some(input::Configuration {
             value: 10.0,
             excluded_variant_ids: vec![],
         }));
@@ -184,8 +156,8 @@ mod tests {
 
     #[test]
     fn test_discount_with_excluded_variant_ids() {
-        let input = input(Some(Configuration {
-            value: Configuration::DEFAULT_VALUE,
+        let input = input(Some(input::Configuration {
+            value: input::Configuration::DEFAULT_VALUE,
             excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
         }));
         let result = serde_json::json!(function(input).unwrap());
@@ -207,13 +179,10 @@ mod tests {
     }
 
     #[test]
-    fn test_discount_with_no_merchandise_lines() {
+    fn test_discount_with_no_cart_lines() {
         let input = input::Input {
-            delivery_lines: None,
-            merchandise_lines: None,
-            customer: None,
-            locale: None,
-            discount_node: None,
+            cart: input::Cart { lines: vec![] },
+            ..input(Some(input::Configuration::default()))
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 
@@ -235,25 +204,13 @@ mod tests {
     #[test]
     fn test_discount_with_no_variant_ids() {
         let input = input::Input {
-            delivery_lines: None,
-            merchandise_lines: Some(vec![input::MerchandiseLine {
-                id: None,
-                variant: Some(input::Variant {
-                    id: None,
-                    compare_at_price: None,
-                    product: None,
-                    sku: None,
-                    title: None,
-                }),
-                price: None,
-                properties: None,
-                quantity: None,
-                selling_plan: None,
-                weight: None,
-            }]),
-            customer: None,
-            locale: None,
-            discount_node: None,
+            cart: input::Cart {
+                lines: vec![input::CartLine {
+                    id: "gid://shopify/CartLine/0".to_string(),
+                    merchandise: input::Merchandise { id: None },
+                }],
+            },
+            ..input(Some(input::Configuration::default()))
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 
