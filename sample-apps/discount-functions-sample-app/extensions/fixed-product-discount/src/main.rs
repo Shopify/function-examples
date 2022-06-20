@@ -57,8 +57,32 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 
     let merchandise_lines = input.merchandise_lines.as_ref().unwrap();
     let config: Configuration = input.configuration();
-    let targets = targets(merchandise_lines, &config.excluded_variant_ids);
+
+    let converted_value = convert_to_cart_currency(config.value, input)
+    let targets = targets(merchandise_lines);
     Ok(build_result(config.value, targets))
+}
+
+fn convert_to_cart_currency(value: f64, input: &input::Input) -> f64 {
+    if let Some(rate) = &input.presentment_currency_rate {
+        value * rate.parse::<f64>().expect("presentment_currency_rate is malformed.")
+    } else {
+        panic!("Missing presentment_currency_rate! Cannot convert to cart currency.")
+    }
+}
+
+fn targets(
+    merchandise_lines: &[input::MerchandiseLine]
+) -> Vec<Target> {
+    variant_ids(merchandise_lines)
+        .iter()
+        .map(|id| {
+            Target::ProductVariant {
+                id: id.to_string(),
+                quantity: None,
+            }
+        })
+        .collect()
 }
 
 fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
@@ -69,24 +93,6 @@ fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
         .collect()
 }
 
-fn targets(
-    merchandise_lines: &[input::MerchandiseLine],
-    excluded_variant_ids: &[ID],
-) -> Vec<Target> {
-    variant_ids(merchandise_lines)
-        .iter()
-        .filter_map(|id| {
-            if !excluded_variant_ids.contains(id) {
-                Some(Target::ProductVariant {
-                    id: id.to_string(),
-                    quantity: None,
-                })
-            } else {
-                None
-            }
-        })
-        .collect()
-}
 
 fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
     let discounts = if targets.is_empty() {
@@ -96,7 +102,7 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::Percentage(Percentage { value }),
+            value: Value::FixedAmount(FixedAmount { value }),
         }]
     };
     FunctionResult {

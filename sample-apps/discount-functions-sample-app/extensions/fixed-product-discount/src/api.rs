@@ -6,6 +6,7 @@ pub type Boolean = bool;
 pub type Float = f64;
 pub type Int = i64;
 pub type ID = String;
+pub type Decimal = String;
 
 pub mod input {
     use super::*;
@@ -20,6 +21,7 @@ pub mod input {
         pub locale: Option<String>,
         pub merchandise_lines: Option<Vec<MerchandiseLine>>,
         pub discount_node: Option<DiscountNode>,
+        pub presentment_currency_rate: Option<Decimal>
     }
 
     #[derive(Clone, Debug, Deserialize, Default)]
@@ -151,7 +153,7 @@ pub enum Value {
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct FixedAmount {
     pub applies_to_each_item: Option<Boolean>,
-    pub value: Float,
+    pub Amount: Decimal,
 }
 
 #[derive(Clone, Debug, Serialize)]
