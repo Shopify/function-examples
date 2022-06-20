@@ -1,5 +1,3 @@
-// Types defined in this file conforms to the schema https://github.com/Shopify/shopify/blob/main/db/graphql/shopify_vm/shipping_discounts.graphql
-// All input fields are optional as they may not be included in the input query
 #![allow(dead_code)]
 
 pub type Boolean = bool;
@@ -15,111 +13,62 @@ pub mod input {
     #[derive(Clone, Debug, Deserialize)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
-        pub customer: Option<Customer>,
-        pub delivery_lines: Option<Vec<DeliveryLineWithStrategy>>,
-        pub locale: Option<String>,
-        pub merchandise_lines: Option<Vec<MerchandiseLine>>,
-        pub discount_node: Option<DiscountNode>,
+        pub discount_node: DiscountNode,
+        pub cart: Cart,
     }
 
     #[derive(Clone, Debug, Deserialize, Default)]
     pub struct DiscountNode {
-        pub metafield: Option<Metafield>,
+        pub metafield: Metafield,
     }
 
     #[derive(Clone, Debug, Deserialize, Default)]
-    #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Metafield {
-        pub value: Option<String>,
+        pub value: String,
+    }
+
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    pub struct Configuration {
+        pub value: f64,
+    }
+
+    impl Configuration {
+        pub const DEFAULT_VALUE: f64 = 50.0;
+
+        fn from_str(str: &str) -> Self {
+            serde_json::from_str(str).unwrap_or_default()
+        }
+    }
+
+    impl Default for Configuration {
+        fn default() -> Self {
+            Configuration {
+                value: Self::DEFAULT_VALUE,
+            }
+        }
+    }
+
+    impl input::Input {
+        pub fn configuration(&self) -> Configuration {
+            Configuration::from_str(&self.discount_node.metafield.value)
+        }
     }
 
     #[derive(Clone, Debug, Deserialize)]
-    #[serde(rename_all(deserialize = "camelCase"))]
-    pub struct Customer {
-        pub accepts_marketing: Option<Boolean>,
-        pub email: Option<String>,
-        pub id: Option<ID>,
-        pub order_count: Option<Int>,
-        pub phone: Option<String>,
-        pub tags: Option<Vec<String>>,
-        pub total_spent: Option<Money>,
+    #[serde(rename_all = "camelCase")]
+    pub struct Cart {
+        pub delivery_groups: Vec<CartDeliveryGroup>,
     }
 
     #[derive(Clone, Debug, Deserialize)]
-    pub struct Money {
-        pub currency: String,
-        pub subunits: UnsignedInt64,
+    #[serde(rename_all = "camelCase")]
+    pub struct CartDeliveryGroup {
+        pub selected_delivery_option: CartDeliveryOption,
     }
 
     #[derive(Clone, Debug, Deserialize)]
-    pub struct DeliveryLineWithStrategy {
-        pub destination: Option<Address>,
-        pub id: Option<ID>,
-        pub price: Option<Money>,
-        pub strategy: Option<DeliveryStrategy>,
-        pub subscription: Option<Boolean>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct DeliveryStrategy {
-        code: Option<String>,
-        name: Option<String>,
-        source: Option<String>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    #[serde(rename_all(deserialize = "camelCase"))]
-    pub struct Address {
-        pub city: Option<String>,
-        pub country_code: Option<String>,
-        pub phone: Option<String>,
-        pub po_box: Option<Boolean>,
-        pub province_code: Option<String>,
-        pub zip: Option<String>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    #[serde(rename_all(deserialize = "camelCase"))]
-    pub struct MerchandiseLine {
-        pub id: Option<ID>,
-        pub price: Option<Money>,
-        pub properties: Option<Vec<Properties>>,
-        pub quantity: Option<Int>,
-        pub selling_plan: Option<SellingPlan>,
-        pub variant: Option<Variant>,
-        pub weight: Option<Int>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct Properties {
-        pub key: Option<String>,
-        pub value: Option<String>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct SellingPlan {
-        pub id: Option<ID>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    #[serde(rename_all(deserialize = "camelCase"))]
-    pub struct Variant {
-        pub compare_at_price: Option<Money>,
-        pub id: Option<ID>,
-        pub product: Option<Product>,
-        pub sku: Option<String>,
-        pub title: Option<String>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    #[serde(rename_all(deserialize = "camelCase"))]
-    pub struct Product {
-        pub gift_card: Option<Boolean>,
-        pub id: Option<ID>,
-        pub tags: Option<Vec<String>>,
-        pub title: Option<String>,
-        pub type_: Option<String>,
-        pub vendor: Option<String>,
+    pub struct CartDeliveryOption {
+        pub id: ID,
     }
 }
 

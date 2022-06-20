@@ -1,6 +1,10 @@
 query Input {
-  deliveryLines {
-    id
+  cart {
+    deliveryGroups {
+      selectedDeliveryOption {
+        id
+      }
+    }
   }
   discountNode {
     metafield(namespace: "discount-functions-sample-app", key: "function-configuration") {
