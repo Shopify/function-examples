@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 mod api;
 use api::*;
@@ -6,8 +7,7 @@ use api::*;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    pub value: f64,
-    pub excluded_variant_ids: Vec<ID>,
+    pub value: f64
 }
 
 impl Configuration {
@@ -22,7 +22,6 @@ impl Default for Configuration {
     fn default() -> Self {
         Configuration {
             value: Self::DEFAULT_VALUE,
-            excluded_variant_ids: vec![],
         }
     }
 }
@@ -58,9 +57,9 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
     let merchandise_lines = input.merchandise_lines.as_ref().unwrap();
     let config: Configuration = input.configuration();
 
-    let converted_value = convert_to_cart_currency(config.value, input)
+    let converted_value = convert_to_cart_currency(config.value, &input);
     let targets = targets(merchandise_lines);
-    Ok(build_result(config.value, targets))
+    Ok(build_result(converted_value, targets))
 }
 
 fn convert_to_cart_currency(value: f64, input: &input::Input) -> f64 {
@@ -94,7 +93,7 @@ fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
 }
 
 
-fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
+fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
     let discounts = if targets.is_empty() {
         vec![]
     } else {
@@ -102,7 +101,10 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::FixedAmount(FixedAmount { value }),
+            value: Value::FixedAmount(FixedAmount {
+                amount: format!("{}", amount),
+                applies_to_each_item: None
+            }),
         }]
     };
     FunctionResult {
@@ -115,7 +117,7 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
+    fn input(configuration: Option<Configuration>, presentment_currency_rate: Option<Decimal>) -> input::Input {
         let input = r#"
         {
             "merchandiseLines": [
@@ -133,85 +135,83 @@ mod tests {
 
         input::Input {
             discount_node,
+            presentment_currency_rate: presentment_currency_rate.or(Some("1.00".to_string())),
             ..default_input
         }
     }
 
     #[test]
     fn test_discount_with_no_configuration() {
-        let input = input(None);
+        let input = input(None, None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
+        let expected_json = serde_json::json!(
             {
                 "discounts": [{
                     "targets": [
                         { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                         { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
                     ],
-                    "value": { "percentage": { "value": 50.0 } }
+                    "value": { "fixedAmount": { "amount": "50", "appliesToEachItem": null } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
-        "#;
+        );
 
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
         assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
+            handle_result,
+            expected_json
         );
     }
 
     #[test]
     fn test_discount_with_value() {
         let input = input(Some(Configuration {
-            value: 10.0,
-            excluded_variant_ids: vec![],
-        }));
+            value: 10.0
+        }), None);
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
+        let expected_json = json!(
             {
                 "discounts": [{
                     "targets": [
                         { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                         { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
                     ],
-                    "value": { "percentage": { "value": 10.0 } }
+                    "value": { "fixedAmount": { "appliesToEachItem": null, "amount": "10" } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
-        "#;
+        );
 
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        assert_eq!(result, expected_json);
     }
 
     #[test]
-    fn test_discount_with_excluded_variant_ids() {
-        let input = input(Some(Configuration {
-            value: Configuration::DEFAULT_VALUE,
-            excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
-        }));
+    fn test_discount_with_presentment_rate() {
+        let input = input(
+            Some(Configuration {
+                value: 10.0
+            }),
+            Some("2.00".to_string())
+        );
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
+        let expected_json = json!(
             {
                 "discounts": [{
                     "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } }
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
                     ],
-                    "value": { "percentage": { "value": 50.0 } }
+                    "value": { "fixedAmount": { "amount": "20", "appliesToEachItem": null } }
                 }],
                 "discountApplicationStrategy": "FIRST"
             }
-        "#;
+        );
 
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        assert_eq!(result, expected_json);
     }
-
     #[test]
     fn test_discount_with_no_merchandise_lines() {
         let input = input::Input {
@@ -220,61 +220,20 @@ mod tests {
             customer: None,
             locale: None,
             discount_node: None,
+            presentment_currency_rate: None
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
+        let expected_json = json!(
             {
                 "discounts": [],
                 "discountApplicationStrategy": "FIRST"
             }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
         );
-    }
 
-    #[test]
-    fn test_discount_with_no_variant_ids() {
-        let input = input::Input {
-            delivery_lines: None,
-            merchandise_lines: Some(vec![input::MerchandiseLine {
-                id: None,
-                variant: Some(input::Variant {
-                    id: None,
-                    compare_at_price: None,
-                    product: None,
-                    sku: None,
-                    title: None,
-                }),
-                price: None,
-                properties: None,
-                quantity: None,
-                selling_plan: None,
-                weight: None,
-            }]),
-            customer: None,
-            locale: None,
-            discount_node: None,
-        };
-        let handle_result = serde_json::json!(function(input).unwrap());
-
-        let expected_json = r#"
-            {
-                "discounts": [],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
         assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
+            handle_result,
+            expected_json
         );
     }
 }

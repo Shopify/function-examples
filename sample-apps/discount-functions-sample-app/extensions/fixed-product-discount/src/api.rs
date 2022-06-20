@@ -153,7 +153,7 @@ pub enum Value {
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct FixedAmount {
     pub applies_to_each_item: Option<Boolean>,
-    pub Amount: Decimal,
+    pub amount: Decimal,
 }
 
 #[derive(Clone, Debug, Serialize)]
