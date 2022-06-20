@@ -7,6 +7,18 @@ import {
   PageActions,
   TextField,
 } from '@shopify/polaris';
+import {
+  ActiveDatesCard,
+  CombinationCard,
+  DiscountClass,
+  DiscountMethod,
+  MethodCard,
+  DiscountStatus,
+  RequirementType,
+  SummaryCard,
+  UsageLimitsCard,
+  onBreadcrumbAction,
+} from '@shopify/discount-app-components'
 
 import { useCreateDiscount } from '../hooks/useCreateDiscount';
 import { useDiscount } from '../hooks/useDiscount';
@@ -15,17 +27,18 @@ import { serializeDiscount } from '../utilities/serializeDiscount';
 
 export default function DiscountCreatePage({
   functionId,
+  discountClass,
   defaultConfiguration,
   renderConfigurationForm,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isError, setIsError] = useState(false);
-  const { discount, title, configuration, setTitle, setConfiguration } =
+  const { discount, title, code, method, configuration, setTitle, setConfiguration, setCode, setMethod } =
     useDiscount({
       defaultConfiguration,
     });
 
-  const [createDiscount, { isLoading }] = useCreateDiscount();
+  const [createDiscount, { isLoading }] = useCreateDiscount(method);
 
   const handleCreateDiscount = async () => {
     setIsError(false);
@@ -56,15 +69,23 @@ export default function DiscountCreatePage({
       <Layout>
         {errorMarkup}
         <Layout.Section>
+          <MethodCard
+            title="Create discount"
+            discountClass={discountClass}
+            discountTitle={{
+              value: title,
+              onChange: setTitle,
+            }}
+            discountCode={{
+              value: code,
+              onChange: setCode
+            }}
+            discountMethod={{
+              value: method,
+              onChange: setMethod
+            }}
+          />
           <Card>
-            <Card.Section>
-              <TextField
-                value={title}
-                onChange={setTitle}
-                label="Discount title"
-                autoComplete="on"
-              />
-            </Card.Section>
             <Card.Section>
               {renderConfigurationForm(configuration, setConfiguration)}
             </Card.Section>

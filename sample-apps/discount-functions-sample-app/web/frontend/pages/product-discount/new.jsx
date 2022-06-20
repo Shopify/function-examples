@@ -1,4 +1,5 @@
 import DiscountCreatePage from '../../components/DiscountCreatePage';
+import { DiscountClass } from '@shopify/discount-app-components';
 import {
   default as ProductDiscount,
   DEFAULT_CONFIGURATION,
@@ -8,6 +9,7 @@ export default function CreateProductDiscountPage() {
   return (
     <DiscountCreatePage
       functionId={process.env.SHOPIFY_PRODUCT_DISCOUNT_ID}
+      discountClass={DiscountClass.Product}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
         <ProductDiscount

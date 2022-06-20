@@ -9,6 +9,8 @@ export function useDiscount({
 }) {
   const previousSavedDiscount = usePrevious(savedDiscount);
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
+  const [code, setCode] = useState(savedDiscount?.code ?? '');
+  const [method, setMethod] = useState(savedDiscount?.method ?? '');
   const [startsAt, setStartsAt] = useState(
     savedDiscount?.startsAt ?? new Date(),
   );
@@ -20,6 +22,8 @@ export function useDiscount({
 
   const discount = {
     title,
+    code,
+    method,
     startsAt,
     endsAt,
     configuration,
@@ -47,6 +51,8 @@ export function useDiscount({
     }
 
     setTitle(savedDiscount.title);
+    setCode(savedDiscount.code);
+    setMethod(savedDiscount.method);
     setStartsAt(savedDiscount.startsAt);
     setEndsAt(savedDiscount.endsAt);
     setConfiguration(savedDiscount.configuration);
@@ -55,10 +61,14 @@ export function useDiscount({
   return {
     discount,
     title,
+    code,
+    method,
     startsAt,
     endsAt,
     configuration,
     setTitle,
+    setCode,
+    setMethod,
     setStartsAt,
     setEndsAt,
     setConfiguration,
