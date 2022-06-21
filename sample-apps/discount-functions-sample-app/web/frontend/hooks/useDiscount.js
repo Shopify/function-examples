@@ -11,10 +11,8 @@ export function useDiscount({
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
   const [code, setCode] = useState(savedDiscount?.code ?? '');
   const [method, setMethod] = useState(savedDiscount?.method ?? '');
-  const [startsAt, setStartsAt] = useState(
-    savedDiscount?.startsAt ?? new Date(),
-  );
-  const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt);
+  const [startsAt, setStartsAt] = useState(savedDiscount?.startsAt ?? new Date());
+  const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt ?? null);
   const [usageLimit, setUsageLimit] = useState(savedDiscount?.usageLimit);
   const [appliesOncePerCustomer, setAppliesOncePerCustomer] = useState(savedDiscount?.appliesOncePerCustomer ?? false);
   const [combinesWith, setCombinesWith] = useState(savedDiscount?.combinesWith ?? {});

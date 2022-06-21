@@ -47,6 +47,10 @@ export default function DiscountCreatePage({
     setAppliesOncePerCustomer,
     combinesWith,
     setCombinesWith,
+    startsAt,
+    setStartsAt,
+    endsAt,
+    setEndsAt,
     configuration,
     setConfiguration,
 
@@ -129,6 +133,17 @@ export default function DiscountCreatePage({
                 ? title
                 : code
             }
+          />
+          <ActiveDatesCard
+            startDate={{
+              value: startsAt,
+              onChange: setStartsAt,
+            }}
+            endDate={{
+              value: endsAt,
+              onChange: setEndsAt,
+            }}
+            timezoneAbbreviation="EST"
           />
         </Layout.Section>
         <Layout.Section>

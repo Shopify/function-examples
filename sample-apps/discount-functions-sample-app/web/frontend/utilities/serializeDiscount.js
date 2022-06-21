@@ -6,7 +6,8 @@ export function serializeDiscount(discount) {
 
   const serialized = {
     title: discount.method === DiscountMethod.Automatic ? discount.title : discount.code,
-    startsAt: new Date(),
+    startsAt: discount.startsAt,
+    endsAt: discount.endsAt,
     discountClass: discount.discountClass,
     combinesWith: discount.combinesWith,
     metafields: [
