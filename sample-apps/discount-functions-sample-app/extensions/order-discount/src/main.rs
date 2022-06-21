@@ -11,10 +11,10 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    const DEFAULT_VALUE: f64 = 50.0;
+    pub const DEFAULT_VALUE: f64 = 50.0;
 
     fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).unwrap_or_default()
+        serde_json::from_str(str).unwrap()
     }
 }
 
@@ -28,14 +28,11 @@ impl Default for Configuration {
 }
 
 impl input::Input {
-    fn configuration(&self) -> Configuration {
-        let value: Option<&str> = self.discount_node.as_ref().and_then(|discount_node| {
-            discount_node
-                .metafield
-                .as_ref()
-                .and_then(|metafield| metafield.value.as_deref())
-        });
-        value.map(Configuration::from_str).unwrap_or_default()
+    pub fn configuration(&self) -> Configuration {
+        match &self.discount_node.metafield {
+            Some(input::Metafield { value }) => Configuration::from_str(value),
+            None => Configuration::default(),
+        }
     }
 }
 
@@ -48,15 +45,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let config: Configuration = input.configuration();
+    let config = input.configuration();
     Ok(FunctionResult {
         discounts: vec![Discount {
             message: None,
             conditions: None,
             targets: vec![Target::OrderSubtotal {
-                excluded_variant_ids: config.excluded_variant_ids
+                excluded_variant_ids: config.excluded_variant_ids,
             }],
-            value: Value::Percentage(Percentage { value: config.value }),
+            value: Value::Percentage(Percentage {
+                value: config.value,
+            }),
         }],
         discount_application_strategy: DiscountApplicationStrategy::First,
     })
@@ -67,17 +66,14 @@ mod tests {
     use super::*;
 
     fn input(configuration: Option<Configuration>) -> input::Input {
-        let default_input: input::Input = serde_json::from_str("{}").unwrap();
-        let discount_node = Some(input::DiscountNode {
-            metafield: Some(input::Metafield {
-                value: serde_json::to_string(&configuration).ok(),
+        let discount_node = input::DiscountNode {
+            metafield: configuration.map(|value| {
+                let value = serde_json::to_string(&value).unwrap();
+                input::Metafield { value }
             }),
-        });
+        };
 
-        input::Input {
-            discount_node,
-            ..default_input
-        }
+        input::Input { discount_node }
     }
 
     #[test]
