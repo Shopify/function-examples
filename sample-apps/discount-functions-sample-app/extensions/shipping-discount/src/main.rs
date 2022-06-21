@@ -12,7 +12,7 @@ impl Configuration {
     pub const DEFAULT_VALUE: f64 = 50.0;
 
     fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).unwrap()
+        serde_json::from_str(str).expect("Unable to parse configuration value from metafield")
     }
 }
 
