@@ -1312,11 +1312,11 @@ type ProductVariant implements HasMetafields {
 """
 The target delivery line.
 """
-input ShippingLineTarget {
+input DeliveryOptionTarget {
   """
-  The index of the target delivery line, represented as an ID.
+  The ID of the target delivery option.
 
-  For example, gid://shopify/DeliveryLine/0.
+  For example, gid://shopify/CartDeliveryOption/handle.
   """
   id: ID!
 }
@@ -1326,9 +1326,9 @@ The target of the discount.
 """
 input Target @oneOf {
   """
-  The target delivery line.
+  The target delivery option.
   """
-  shippingLine: ShippingLineTarget
+  shippingLine: DeliveryOptionTarget
 }
 
 """
