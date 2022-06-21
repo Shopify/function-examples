@@ -1,21 +1,46 @@
 import { useMemo } from 'react';
 import { gql } from 'graphql-request';
+import { DiscountMethod } from '@shopify/discount-app-components';
 
 import { idToGid } from '../utilities/gid';
 import { useShopifyQuery } from './useShopifyQuery';
 
 const QUERY = gql`
   query GetDiscount($id: ID!) {
-    automaticDiscountNode(id: $id) {
+    discountNode(id: $id) {
+      id
       configurationField: metafield(namespace: "discount-functions-sample-app", key: "function-configuration") {
         id
         value
       }
-      automaticDiscount {
+      discount {
+        __typename
         ... on DiscountAutomaticApp {
           title
+          discountClass
+          combinesWith {
+            orderDiscounts
+            productDiscounts
+            shippingDiscounts
+          }
           startsAt
           endsAt
+        }
+        ... on DiscountCodeApp {
+          title
+          discountClass
+          combinesWith {
+            orderDiscounts
+            productDiscounts
+            shippingDiscounts
+          }
+          startsAt
+          endsAt
+          codes(first: 1) {
+            nodes {
+              code
+            }
+          }
         }
       }
     }
@@ -23,14 +48,14 @@ const QUERY = gql`
 `;
 
 export function useSavedDiscount(id) {
-  const { data, isLoading, isError } = useShopifyQuery({
+  const { data: result, isLoading, isError } = useShopifyQuery({
     key: 'GetDiscount',
     query: QUERY,
-    variables: { id: idToGid('DiscountAutomaticApp', id) },
+    variables: { id: idToGid('DiscountNode', id) },
   });
 
   const discount = useMemo(() => {
-    if (!data) {
+    if (!result) {
       return;
     }
 
@@ -38,17 +63,27 @@ export function useSavedDiscount(id) {
       title,
       startsAt,
       endsAt,
-    } = data.data.automaticDiscountNode.automaticDiscount;
-    const {configurationField} = data.data.automaticDiscountNode;
+      discountClass,
+      combinesWith,
+      codes,
+      __typename
+    } = result.data.discountNode.discount;
+    const { configurationField } = result.data.discountNode;
+
+    const method = __typename === 'DiscountAutomaticApp' ? DiscountMethod.Automatic : DiscountMethod.Code;
 
     return {
       title,
       startsAt,
       endsAt,
+      discountClass,
+      method,
+      code: codes?.nodes[0]?.code,
+      combinesWith,
       configuration: JSON.parse(configurationField?.value ?? '{}'),
       configurationId: configurationField?.id,
     };
-  }, [data]);
+  }, [result]);
 
   return { discount, isLoading, isError };
 }

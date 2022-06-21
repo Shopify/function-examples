@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Page,
   Card,
@@ -7,8 +7,22 @@ import {
   Spinner,
   Stack,
   Layout,
+  Frame,
   Banner,
+  Toast,
 } from '@shopify/polaris';
+import {
+  ActiveDatesCard,
+  CombinationCard,
+  DiscountClass,
+  DiscountMethod,
+  MethodCard,
+  DiscountStatus,
+  RequirementType,
+  SummaryCard,
+  UsageLimitsCard,
+  onBreadcrumbAction,
+} from '@shopify/discount-app-components'
 
 import { useDeleteDiscount } from '../hooks/useDeleteDiscount';
 import { useDiscount } from '../hooks/useDiscount';
@@ -28,8 +42,11 @@ export default function DiscountDetailsPage({
   const {
     discount,
     isDirty,
+    method,
     title,
     setTitle,
+    code,
+    setCode,
     configuration,
     setConfiguration,
   } = useDiscount({
@@ -37,14 +54,18 @@ export default function DiscountDetailsPage({
     defaultConfiguration,
   });
 
-  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();
+  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
   const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount();
   const mutationInProgress = updateInProgress || deleteInProgress;
+
+  const [successActive, setSuccessActive] = useState(false);
+  const toggleSuccessActive = useCallback(() => setSuccessActive((successActive) => !successActive), []);
 
   const handleUpdateDiscount = async () => {
     setIsMutationError(false);
     try {
       await updateDiscount(id, serializeDiscount(discount));
+      toggleSuccessActive();
     } catch {
       setIsMutationError(true);
       return;
@@ -63,6 +84,10 @@ export default function DiscountDetailsPage({
     return <div>Something went wrong!</div>;
   }
 
+  const successMarkup = successActive ? (
+    <Toast content="Discount saved" onDismiss={toggleSuccessActive} />
+  ) : null;
+
   const errorMarkup = isMutationError ? (
     <Layout.Section>
       <Banner
@@ -74,45 +99,56 @@ export default function DiscountDetailsPage({
 
   return (
     <Page title="Details" breadcrumbs={[{ onAction: redirectToDiscounts }]}>
-      <Layout>
-        {errorMarkup}
-        <Layout.Section>
-          <Card>
-            <Card.Section>
-              <TextField
-                value={title}
-                onChange={setTitle}
-                label="Discount title"
-                autoComplete="on"
-              />
-            </Card.Section>
-            <Card.Section>
-              {renderConfigurationForm(configuration, setConfiguration)}
-            </Card.Section>
-          </Card>
-        </Layout.Section>
-        <Layout.Section>
-          <PageActions
-            primaryAction={{
-              content: 'Save',
-              onAction: handleUpdateDiscount,
-              loading: mutationInProgress,
-              disabled: !isDirty,
-            }}
-            secondaryActions={[
-              {
-                content: 'Delete',
-                destructive: true,
+      <Frame>
+        <Layout>
+          {successMarkup}
+          {errorMarkup}
+          <Layout.Section>
+            <MethodCard
+              title="Update discount"
+              discountClass={savedDiscount.discountClass}
+              discountTitle={{
+                value: title,
+                onChange: setTitle,
+              }}
+              discountCode={{
+                value: code,
+                onChange: setCode
+              }}
+              discountMethod={{
+                value: method
+              }}
+              discountMethodHidden={true}
+            />
+            <Card>
+              <Card.Section>
+                {renderConfigurationForm(configuration, setConfiguration)}
+              </Card.Section>
+            </Card>
+          </Layout.Section>
+          <Layout.Section>
+            <PageActions
+              primaryAction={{
+                content: 'Save',
+                onAction: handleUpdateDiscount,
                 loading: mutationInProgress,
-                onAction: async () => {
-                  await deleteDiscount(id);
-                  redirectToDiscounts();
+                disabled: !isDirty,
+              }}
+              secondaryActions={[
+                {
+                  content: 'Delete',
+                  destructive: true,
+                  loading: mutationInProgress,
+                  onAction: async () => {
+                    await deleteDiscount(id);
+                    redirectToDiscounts();
+                  },
                 },
-              },
-            ]}
-          />
-        </Layout.Section>
-      </Layout>
+              ]}
+            />
+          </Layout.Section>
+        </Layout>
+      </Frame>
     </Page>
   );
 }
