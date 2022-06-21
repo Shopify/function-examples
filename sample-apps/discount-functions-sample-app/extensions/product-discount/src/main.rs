@@ -45,7 +45,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-<<<<<<< HEAD
     let config = input.configuration();
     let targets = targets(&input.cart.lines, &config.excluded_variant_ids);
     Ok(build_result(config.value, targets))
@@ -69,53 +68,6 @@ fn targets(cart_lines: &[input::CartLine], excluded_variant_ids: &[ID]) -> Vec<T
         })
         .collect()
 }
-=======
-    if input.merchandise_lines.is_none() {
-        return Ok(FunctionResult {
-            discounts: vec![],
-            discount_application_strategy: DiscountApplicationStrategy::First,
-        });
-    }
-
-    let merchandise_lines = input.merchandise_lines.as_ref().unwrap();
-    let config: Configuration = input.configuration();
-
-    let converted_value = convert_to_cart_currency(config.value, input)
-    let targets = targets(merchandise_lines);
-    Ok(build_result(config.value, targets))
-}
-
-fn convert_to_input_currency(value: f64, input: &input::Input) -> f64 {
-    if let Some(rate) = &input.presentment_currency_rate {
-        value * rate.parse::<f64>().expect("presentment_currency_rate is malformed.")
-    } else {
-        panic!("Missing presentment_currency_rate! Cannot convert to cart currency.")
-    }
-}
-
-fn targets(
-    merchandise_lines: &[input::MerchandiseLine]
-) -> Vec<Target> {
-    variant_ids(merchandise_lines)
-        .iter()
-        .map(|id| {
-            Target::ProductVariant {
-                id: id.to_string(),
-                quantity: None,
-            }
-        })
-        .collect()
-}
-
-fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
-    merchandise_lines
-        .iter()
-        .filter_map(|line| line.variant.as_ref())
-        .filter_map(|variant| variant.id.as_ref().map(String::from))
-        .collect()
-}
-
->>>>>>> bfb45d2 (update sample to use a converted fixed amount)
 
 fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
     let discounts = if targets.is_empty() {
