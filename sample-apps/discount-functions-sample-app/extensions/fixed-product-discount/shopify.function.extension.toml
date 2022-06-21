@@ -1,10 +1,10 @@
-name = "Product Discount"
-type = "product_discounts"
+name = "Product Fixed Discount"
+type = "product_fixed_discounts"
 api_version = "2022-07"
 
 [ui.paths]
-create = "/product-discount/new"
-details = "/product-discount/:id"
+create = "/product-fixed-discount/new"
+details = "/product-fixed-discount/:id"
 
 [build]
 command = "cargo wasi build --release"

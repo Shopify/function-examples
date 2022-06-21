@@ -1,16 +1,16 @@
 import DiscountCreatePage from '../../components/DiscountCreatePage';
 import {
-  default as ProductFixedDiscount,
+  default as FixedProductDiscount,
   DEFAULT_CONFIGURATION,
-} from '../../components/function-configuration/ProductFixedDiscount';
+} from '../../components/function-configuration/FixedProductDiscount';
 
-export default function CreateProductFixedDiscountPage() {
+export default function CreateFixedProductDiscountPage() {
   return (
     <DiscountCreatePage
       functionId={process.env.SHOPIFY_PRODUCT_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <ProductFixedDiscount
+        <FixedProductDiscount
           configuration={configuration}
           onConfigurationChange={onConfigurationChange}
         />

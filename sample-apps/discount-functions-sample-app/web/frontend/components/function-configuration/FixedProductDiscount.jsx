@@ -8,7 +8,7 @@ import {
   TextStyle,
 } from '@shopify/polaris';
 
-export default function ProductDiscount({
+export default function FixedProductDiscount({
   configuration,
   onConfigurationChange,
 }) {
