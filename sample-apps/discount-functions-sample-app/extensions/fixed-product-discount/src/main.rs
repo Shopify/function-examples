@@ -28,13 +28,10 @@ impl Default for Configuration {
 
 impl input::Input {
     fn configuration(&self) -> Configuration {
-        let value: Option<&str> = self.discount_node.as_ref().and_then(|discount_node| {
-            discount_node
-                .metafield
-                .as_ref()
-                .and_then(|metafield| metafield.value.as_deref())
-        });
-        value.map(Configuration::from_str).unwrap_or_default()
+        match &self.discount_node.metafield {
+            Some(input::Metafield { value }) => Configuration::from_str(value),
+            None => Configuration::default(),
+        }
     }
 }
 
@@ -47,51 +44,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    if input.merchandise_lines.is_none() {
-        return Ok(FunctionResult {
-            discounts: vec![],
-            discount_application_strategy: DiscountApplicationStrategy::First,
-        });
-    }
-
-    let merchandise_lines = input.merchandise_lines.as_ref().unwrap();
+    let cart_lines = &input.cart.lines;
     let config: Configuration = input.configuration();
 
     let converted_value = convert_to_cart_currency(config.value, &input);
-    let targets = targets(merchandise_lines);
+    let targets = targets(&cart_lines);
     Ok(build_result(converted_value, targets))
 }
 
 fn convert_to_cart_currency(value: f64, input: &input::Input) -> f64 {
-    if let Some(rate) = &input.presentment_currency_rate {
-        value * rate.parse::<f64>().expect("presentment_currency_rate is malformed.")
-    } else {
-        panic!("Missing presentment_currency_rate! Cannot convert to cart currency.")
-    }
+    let rate = &input.presentment_currency_rate;
+    value * rate.parse::<f64>().expect("presentment_currency_rate is malformed.")
 }
 
-fn targets(
-    merchandise_lines: &[input::MerchandiseLine]
-) -> Vec<Target> {
-    variant_ids(merchandise_lines)
+fn targets(cart_lines: &[input::CartLine]) -> Vec<Target> {
+    cart_lines
         .iter()
-        .map(|id| {
-            Target::ProductVariant {
-                id: id.to_string(),
-                quantity: None,
+        .filter_map(|line| match &line.merchandise.id {
+            Some(id) => {
+                Some(Target::ProductVariant {
+                    id: id.to_string(),
+                    quantity: None,
+                })
             }
+            None => None
         })
         .collect()
 }
-
-fn variant_ids(merchandise_lines: &[input::MerchandiseLine]) -> Vec<ID> {
-    merchandise_lines
-        .iter()
-        .filter_map(|line| line.variant.as_ref())
-        .filter_map(|variant| variant.id.as_ref().map(String::from))
-        .collect()
-}
-
 
 fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
     let discounts = if targets.is_empty() {
@@ -118,24 +97,38 @@ mod tests {
     use super::*;
 
     fn input(configuration: Option<Configuration>, presentment_currency_rate: Option<Decimal>) -> input::Input {
-        let input = r#"
+        let input = json!(
         {
-            "merchandiseLines": [
-                { "variant": { "id": "gid://shopify/ProductVariant/0" } },
-                { "variant": { "id": "gid://shopify/ProductVariant/1" } }
-            ]
-        }
-        "#;
-        let default_input: input::Input = serde_json::from_str(input).unwrap();
-        let discount_node = Some(input::DiscountNode {
-            metafield: Some(input::Metafield {
-                value: serde_json::to_string(&configuration).ok(),
-            }),
+            "cart": {
+                "lines": [
+                    {
+                        "id": "gid://shopify/CartLine/0",
+                        "merchandise": {
+                            "id": "gid://shopify/ProductVariant/0"
+                        }
+                    },
+                    {
+                        "id": "gid://shopify/CartLine/1",
+                        "merchandise": {
+                            "id": "gid://shopify/ProductVariant/1"
+                        }
+                    }
+                ]
+            },
+            "discountNode": { "metafield": null },
+            "presentmentCurrencyRate": "1.00"
         });
+        let default_input: input::Input = serde_json::from_value(input).unwrap();
+        let discount_node = input::DiscountNode {
+            metafield: configuration.map(|value| {
+                let value = serde_json::to_string(&value).unwrap();
+                input::Metafield { value }
+            }),
+        };
 
         input::Input {
             discount_node,
-            presentment_currency_rate: presentment_currency_rate.or(Some("1.00".to_string())),
+            presentment_currency_rate: presentment_currency_rate.unwrap_or("1.00".to_string()),
             ..default_input
         }
     }
@@ -213,14 +206,11 @@ mod tests {
         assert_eq!(result, expected_json);
     }
     #[test]
-    fn test_discount_with_no_merchandise_lines() {
+    fn test_discount_with_no_cart_lines() {
         let input = input::Input {
-            delivery_lines: None,
-            merchandise_lines: None,
-            customer: None,
-            locale: None,
-            discount_node: None,
-            presentment_currency_rate: None
+            cart: input::Cart { lines: Vec::new() },
+            discount_node: input::DiscountNode { metafield: None },
+            presentment_currency_rate: "1.00".to_string() 
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 
