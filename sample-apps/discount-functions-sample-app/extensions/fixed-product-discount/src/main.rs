@@ -14,7 +14,7 @@ impl Configuration {
     const DEFAULT_VALUE: f64 = 50.0;
 
     fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).unwrap_or_default()
+        serde_json::from_str(str).unwrap()
     }
 }
 

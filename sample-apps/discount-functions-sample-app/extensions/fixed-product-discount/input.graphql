@@ -9,5 +9,5 @@ query Input {
       value
     }
   }
-  presentment_currency_rate
+  presentmentCurrencyRate
 }
