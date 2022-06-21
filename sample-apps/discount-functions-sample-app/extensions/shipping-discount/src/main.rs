@@ -51,9 +51,8 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 fn targets(delivery_groups: &[input::CartDeliveryGroup]) -> Vec<Target> {
     delivery_groups
         .iter()
-        .map(|delivery_group| {
-            let id = delivery_group.selected_delivery_option.id.to_string();
-            Target::ShippingLine { id }
+        .map(|delivery_group| Target::DeliveryGroup {
+            id: delivery_group.id.to_string(),
         })
         .collect()
 }
@@ -88,13 +87,9 @@ mod tests {
         };
         input::Input {
             cart: input::Cart {
-                delivery_groups: vec![
-                    input::CartDeliveryGroup {
-                        selected_delivery_option: input::CartDeliveryOption {
-                            id: String::from("gid://shopify/CartDeliveryOption/not-free"),
-                        },
-                    },
-                ],
+                delivery_groups: vec![input::CartDeliveryGroup {
+                    id: String::from("gid://shopify/CartDeliveryGroup/0"),
+                }],
             },
             discount_node,
         }
@@ -108,7 +103,7 @@ mod tests {
         let expected_handle_result = serde_json::json!({
             "discounts": [{
                 "targets": [
-                    { "shippingLine": { "id": "gid://shopify/CartDeliveryOption/not-free" } },
+                    { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/0" } },
                 ],
                 "value": { "percentage": { "value": 50.0 } },
             }],
@@ -125,7 +120,7 @@ mod tests {
         let expected_result = serde_json::json!({
             "discounts": [{
                 "targets": [
-                    { "shippingLine": { "id": "gid://shopify/CartDeliveryOption/not-free" } },
+                    { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/0" } },
                 ],
                 "value": { "percentage": { "value": 10.0 } },
             }],

@@ -74,7 +74,7 @@ pub struct Percentage {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Target {
-    ShippingLine { id: ID },
+    DeliveryGroup { id: ID },
 }
 
 #[derive(Clone, Debug, Serialize)]

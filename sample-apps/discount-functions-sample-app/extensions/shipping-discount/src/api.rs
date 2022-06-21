@@ -34,13 +34,7 @@ pub mod input {
     }
 
     #[derive(Clone, Debug, Deserialize)]
-    #[serde(rename_all = "camelCase")]
     pub struct CartDeliveryGroup {
-        pub selected_delivery_option: CartDeliveryOption,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct CartDeliveryOption {
         pub id: ID,
     }
 }
@@ -93,7 +87,7 @@ pub struct Percentage {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Target {
-    ShippingLine { id: ID },
+    DeliveryGroup { id: ID },
 }
 
 #[derive(Clone, Debug, Serialize)]
