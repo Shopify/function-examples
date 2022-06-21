@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import {
   Page,
   Card,
-  TextField,
   PageActions,
   Spinner,
   Stack,
@@ -14,14 +13,9 @@ import {
 import {
   ActiveDatesCard,
   CombinationCard,
-  DiscountClass,
   DiscountMethod,
   MethodCard,
-  DiscountStatus,
-  RequirementType,
-  SummaryCard,
   UsageLimitsCard,
-  onBreadcrumbAction,
 } from '@shopify/discount-app-components'
 
 import { useDeleteDiscount } from '../hooks/useDeleteDiscount';

@@ -5,19 +5,13 @@ import {
   Layout,
   Page,
   PageActions,
-  TextField,
 } from '@shopify/polaris';
 import {
   ActiveDatesCard,
   CombinationCard,
-  DiscountClass,
   DiscountMethod,
   MethodCard,
-  DiscountStatus,
-  RequirementType,
-  SummaryCard,
   UsageLimitsCard,
-  onBreadcrumbAction,
 } from '@shopify/discount-app-components'
 
 import { useCreateDiscount } from '../hooks/useCreateDiscount';
