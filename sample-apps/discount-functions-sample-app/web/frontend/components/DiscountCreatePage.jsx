@@ -112,7 +112,7 @@ export default function DiscountCreatePage({
               }}
               oncePerCustomer={{
                 value: appliesOncePerCustomer,
-                onChange: (value) => setAppliesOncePerCustomer(value),
+                onChange: setAppliesOncePerCustomer,
               }}
             />
           )}

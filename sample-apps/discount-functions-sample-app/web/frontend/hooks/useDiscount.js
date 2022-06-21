@@ -13,7 +13,7 @@ export function useDiscount({
   const [method, setMethod] = useState(savedDiscount?.method ?? '');
   const [startsAt, setStartsAt] = useState(savedDiscount?.startsAt ?? new Date());
   const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt ?? null);
-  const [usageLimit, setUsageLimit] = useState(savedDiscount?.usageLimit);
+  const [usageLimit, setUsageLimit] = useState(savedDiscount?.usageLimit ?? null);
   const [appliesOncePerCustomer, setAppliesOncePerCustomer] = useState(savedDiscount?.appliesOncePerCustomer ?? false);
   const [combinesWith, setCombinesWith] = useState(savedDiscount?.combinesWith ?? {});
   const [configuration, setConfiguration] = useState(
