@@ -3,8 +3,8 @@ type = "product_fixed_discounts"
 api_version = "2022-07"
 
 [ui.paths]
-create = "/product-fixed-discount/new"
-details = "/product-fixed-discount/:id"
+create = "/fixed-amount-product-discount/new"
+details = "/fixed-amount-product-discount/:id"
 
 [build]
 command = "cargo wasi build --release"

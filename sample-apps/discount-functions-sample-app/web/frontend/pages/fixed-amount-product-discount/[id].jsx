@@ -2,11 +2,11 @@ import { useParams } from 'react-router-dom';
 
 import DiscountDetailsPage from '../../components/DiscountDetailsPage';
 import {
-  default as FixedProductDiscount,
+  default as FixedAmountProductDiscount,
   DEFAULT_CONFIGURATION,
-} from '../../components/function-configuration/FixedProductDiscount';
+} from '../../components/function-configuration/FixedAmountProductDiscount';
 
-export default function FixedProductDiscountDetailsPage() {
+export default function FixedAmountProductDiscountDetailsPage() {
   const { id } = useParams();
 
   return (
@@ -14,7 +14,7 @@ export default function FixedProductDiscountDetailsPage() {
       id={id}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
-        <FixedProductDiscount
+        <FixedAmountProductDiscount
           configuration={configuration}
           onConfigurationChange={onConfigurationChange}
         />
