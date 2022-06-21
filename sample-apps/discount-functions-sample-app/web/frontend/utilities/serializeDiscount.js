@@ -20,6 +20,8 @@ export function serializeDiscount(discount) {
   };
 
   if (discount.method === DiscountMethod.Code) {
+    serialized.usageLimit = discount.usageLimit;
+    serialized.appliesOncePerCustomer = discount.appliesOncePerCustomer;
     serialized.code = discount.code;
   }
 

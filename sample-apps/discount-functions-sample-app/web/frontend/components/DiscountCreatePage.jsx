@@ -33,10 +33,24 @@ export default function DiscountCreatePage({
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isError, setIsError] = useState(false);
-  const { discount, title, code, method, configuration, setTitle, setConfiguration, setCode, setMethod } =
-    useDiscount({
-      defaultConfiguration,
-    });
+  const {
+    discount,
+    title,
+    setTitle,
+    code,
+    setCode,
+    method,
+    setMethod,
+    usageLimit,
+    setUsageLimit,
+    appliesOncePerCustomer,
+    setAppliesOncePerCustomer,
+    configuration,
+    setConfiguration,
+
+  } = useDiscount({
+    defaultConfiguration,
+  });
 
   const [createDiscount, { isLoading }] = useCreateDiscount(method);
 
@@ -90,6 +104,18 @@ export default function DiscountCreatePage({
               {renderConfigurationForm(configuration, setConfiguration)}
             </Card.Section>
           </Card>
+          {method === DiscountMethod.Code && (
+            <UsageLimitsCard
+              totalUsageLimit={{
+                value: usageLimit,
+                onChange: (value) => setUsageLimit(parseInt(value)),
+              }}
+              oncePerCustomer={{
+                value: appliesOncePerCustomer,
+                onChange: (value) => setAppliesOncePerCustomer(value),
+              }}
+            />
+          )}
         </Layout.Section>
         <Layout.Section>
           <PageActions

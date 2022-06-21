@@ -47,6 +47,10 @@ export default function DiscountDetailsPage({
     setTitle,
     code,
     setCode,
+    usageLimit,
+    setUsageLimit,
+    appliesOncePerCustomer,
+    setAppliesOncePerCustomer,
     configuration,
     setConfiguration,
   } = useDiscount({
@@ -125,6 +129,18 @@ export default function DiscountDetailsPage({
                 {renderConfigurationForm(configuration, setConfiguration)}
               </Card.Section>
             </Card>
+            {method === DiscountMethod.Code && (
+              <UsageLimitsCard
+                totalUsageLimit={{
+                  value: usageLimit,
+                  onChange: (value) => setUsageLimit(parseInt(value)),
+                }}
+                oncePerCustomer={{
+                  value: appliesOncePerCustomer,
+                  onChange: (value) => setAppliesOncePerCustomer(value),
+                }}
+              />
+            )}
           </Layout.Section>
           <Layout.Section>
             <PageActions

@@ -36,6 +36,8 @@ const QUERY = gql`
           }
           startsAt
           endsAt
+          usageLimit
+          appliesOncePerCustomer
           codes(first: 1) {
             nodes {
               code
@@ -65,6 +67,8 @@ export function useSavedDiscount(id) {
       endsAt,
       discountClass,
       combinesWith,
+      usageLimit,
+      appliesOncePerCustomer,
       codes,
       __typename
     } = result.data.discountNode.discount;
@@ -78,6 +82,8 @@ export function useSavedDiscount(id) {
       endsAt,
       discountClass,
       method,
+      usageLimit,
+      appliesOncePerCustomer,
       code: codes?.nodes[0]?.code,
       combinesWith,
       configuration: JSON.parse(configurationField?.value ?? '{}'),
