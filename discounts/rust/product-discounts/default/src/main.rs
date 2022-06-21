@@ -5,24 +5,20 @@ use api::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct Configuration {
-}
+pub struct Configuration {}
 
 impl Configuration {
     fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).unwrap_or_default()
+        serde_json::from_str(str).expect("Unable to parse configuration value from metafield")
     }
 }
 
 impl input::Input {
-    fn configuration(&self) -> Configuration {
-        let value: Option<&str> = self.discount_node.as_ref().and_then(|discount_node| {
-            discount_node
-                .metafield
-                .as_ref()
-                .and_then(|metafield| metafield.value.as_deref())
-        });
-        value.map(Configuration::from_str).unwrap_or_default()
+    pub fn configuration(&self) -> Configuration {
+        match &self.discount_node.metafield {
+            Some(input::Metafield { value }) => Configuration::from_str(value),
+            None => Configuration::default(),
+        }
     }
 }
 
@@ -49,14 +45,18 @@ mod tests {
     fn input(configuration: Option<Configuration>) -> input::Input {
         let input = r#"
         {
+            "discountNode": {
+                "metafield": null
+            }
         }
         "#;
         let default_input: input::Input = serde_json::from_str(input).unwrap();
-        let discount_node = Some(input::DiscountNode {
-            metafield: Some(input::Metafield {
-                value: serde_json::to_string(&configuration).ok(),
+        let discount_node = input::DiscountNode {
+            metafield: configuration.map(|value| {
+                let value = serde_json::to_string(&value).unwrap();
+                input::Metafield { value }
             }),
-        });
+        };
 
         input::Input {
             discount_node,
