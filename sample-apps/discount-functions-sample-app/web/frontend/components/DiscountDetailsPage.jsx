@@ -55,7 +55,7 @@ export default function DiscountDetailsPage({
   });
 
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
-  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount();
+  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(method);
   const mutationInProgress = updateInProgress || deleteInProgress;
 
   const [successActive, setSuccessActive] = useState(false);
