@@ -159,7 +159,6 @@ export default function DiscountDetailsPage({
                   : code
               }
             />
-            <div>Ends At: {endsAt}</div>
             <ActiveDatesCard
               startDate={{
                 value: startsAt,
