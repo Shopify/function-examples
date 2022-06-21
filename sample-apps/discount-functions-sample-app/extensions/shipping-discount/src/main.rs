@@ -1,7 +1,37 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 mod api;
 use api::*;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Configuration {
+    pub value: f64,
+}
+
+impl Configuration {
+    pub const DEFAULT_VALUE: f64 = 50.0;
+
+    fn from_str(str: &str) -> Self {
+        serde_json::from_str(str).unwrap()
+    }
+}
+
+impl Default for Configuration {
+    fn default() -> Self {
+        Configuration {
+            value: Self::DEFAULT_VALUE,
+        }
+    }
+}
+
+impl input::Input {
+    pub fn configuration(&self) -> Configuration {
+        match &self.discount_node.metafield {
+            Some(input::Metafield { value }) => Configuration::from_str(value),
+            None => Configuration::default(),
+        }
+    }
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input: input::Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
@@ -12,15 +42,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    if input.cart.delivery_groups.is_empty() {
-        return Ok(FunctionResult {
-            discounts: vec![],
-            discount_application_strategy: DiscountApplicationStrategy::First,
-        });
-    }
-
     let delivery_groups = &input.cart.delivery_groups;
-    let config: input::Configuration = input.configuration();
+    let config = input.configuration();
     let targets = targets(delivery_groups);
     Ok(build_result(config.value, targets))
 }
@@ -56,7 +79,7 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<input::Configuration>) -> input::Input {
+    fn input(configuration: Option<Configuration>) -> input::Input {
         let input = r#"
         {
             "cart": {
@@ -70,18 +93,15 @@ mod tests {
                   }
                 ]
             },
-            "discountNode": {
-                "metafield": {
-                    "value": "{}"
-                }
-            }
+            "discountNode": { "metafield": null }
         }
         "#;
         let default_input: input::Input = serde_json::from_str(input).unwrap();
         let discount_node = input::DiscountNode {
-            metafield: input::Metafield {
-                value: serde_json::to_string(&configuration).ok().unwrap(),
-            },
+            metafield: configuration.map(|value| {
+                let value = serde_json::to_string(&value).unwrap();
+                input::Metafield { value }
+            }),
         };
 
         input::Input {
@@ -117,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(input::Configuration { value: 10.0 }));
+        let input = input(Some(Configuration { value: 10.0 }));
         let result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
@@ -142,7 +162,7 @@ mod tests {
             cart: input::Cart {
                 delivery_groups: vec![],
             },
-            ..input(Some(input::Configuration::default()))
+            ..input(Some(Configuration::default()))
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 

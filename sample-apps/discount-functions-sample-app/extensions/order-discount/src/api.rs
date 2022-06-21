@@ -6,7 +6,6 @@ pub type Int = i64;
 pub type ID = String;
 
 pub mod input {
-    use super::*;
     use serde::Deserialize;
     pub type UnsignedInt64 = u64;
 
@@ -18,43 +17,13 @@ pub mod input {
 
     #[derive(Clone, Debug, Deserialize, Default)]
     pub struct DiscountNode {
-        pub metafield: Metafield,
+        pub metafield: Option<Metafield>,
     }
 
     #[derive(Clone, Debug, Deserialize, Default)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Metafield {
         pub value: String,
-    }
-
-    #[derive(Clone, Debug, Serialize, Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    pub struct Configuration {
-        pub value: f64,
-        pub excluded_variant_ids: Vec<ID>,
-    }
-
-    impl Configuration {
-        pub const DEFAULT_VALUE: f64 = 50.0;
-
-        fn from_str(str: &str) -> Self {
-            serde_json::from_str(str).unwrap_or_default()
-        }
-    }
-
-    impl Default for Configuration {
-        fn default() -> Self {
-            Configuration {
-                value: Self::DEFAULT_VALUE,
-                excluded_variant_ids: vec![],
-            }
-        }
-    }
-
-    impl input::Input {
-        pub fn configuration(&self) -> Configuration {
-            Configuration::from_str(&self.discount_node.metafield.value)
-        }
     }
 }
 

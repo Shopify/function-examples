@@ -1,7 +1,40 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 mod api;
 use api::*;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Configuration {
+    pub value: f64,
+    pub excluded_variant_ids: Vec<ID>,
+}
+
+impl Configuration {
+    pub const DEFAULT_VALUE: f64 = 50.0;
+
+    fn from_str(str: &str) -> Self {
+        serde_json::from_str(str).unwrap()
+    }
+}
+
+impl Default for Configuration {
+    fn default() -> Self {
+        Configuration {
+            value: Self::DEFAULT_VALUE,
+            excluded_variant_ids: vec![],
+        }
+    }
+}
+
+impl input::Input {
+    pub fn configuration(&self) -> Configuration {
+        match &self.discount_node.metafield {
+            Some(input::Metafield { value }) => Configuration::from_str(value),
+            None => Configuration::default(),
+        }
+    }
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input: input::Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
@@ -12,7 +45,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let config: input::Configuration = input.configuration();
+    let config = input.configuration();
     Ok(FunctionResult {
         discounts: vec![Discount {
             message: None,
@@ -32,11 +65,12 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<input::Configuration>) -> input::Input {
+    fn input(configuration: Option<Configuration>) -> input::Input {
         let discount_node = input::DiscountNode {
-            metafield: input::Metafield {
-                value: serde_json::to_string(&configuration).ok().unwrap(),
-            },
+            metafield: configuration.map(|value| {
+                let value = serde_json::to_string(&value).unwrap();
+                input::Metafield { value }
+            }),
         };
 
         input::Input { discount_node }
@@ -67,7 +101,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(input::Configuration {
+        let input = input(Some(Configuration {
             value: 10.0,
             excluded_variant_ids: vec![],
         }));
@@ -89,8 +123,8 @@ mod tests {
 
     #[test]
     fn test_discount_with_excluded_variant_ids() {
-        let input = input(Some(input::Configuration {
-            value: input::Configuration::DEFAULT_VALUE,
+        let input = input(Some(Configuration {
+            value: Configuration::DEFAULT_VALUE,
             excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
         }));
         let result = serde_json::json!(function(input).unwrap());

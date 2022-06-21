@@ -19,39 +19,12 @@ pub mod input {
 
     #[derive(Clone, Debug, Deserialize, Default)]
     pub struct DiscountNode {
-        pub metafield: Metafield,
+        pub metafield: Option<Metafield>,
     }
 
     #[derive(Clone, Debug, Deserialize, Default)]
     pub struct Metafield {
         pub value: String,
-    }
-
-    #[derive(Clone, Debug, Serialize, Deserialize)]
-    pub struct Configuration {
-        pub value: f64,
-    }
-
-    impl Configuration {
-        pub const DEFAULT_VALUE: f64 = 50.0;
-
-        fn from_str(str: &str) -> Self {
-            serde_json::from_str(str).unwrap_or_default()
-        }
-    }
-
-    impl Default for Configuration {
-        fn default() -> Self {
-            Configuration {
-                value: Self::DEFAULT_VALUE,
-            }
-        }
-    }
-
-    impl input::Input {
-        pub fn configuration(&self) -> Configuration {
-            Configuration::from_str(&self.discount_node.metafield.value)
-        }
     }
 
     #[derive(Clone, Debug, Deserialize)]
