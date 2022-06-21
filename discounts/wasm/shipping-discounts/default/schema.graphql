@@ -8,25 +8,1091 @@ Exactly one field of input must be provided, and all others omitted.
 """
 directive @oneOf on INPUT_OBJECT
 
-type Address {
-  city: String
-  countryCode: String
-  phone: String
-  poBox: Boolean!
-  provinceCode: String
-  zip: String
+"""
+Represents a generic custom attribute.
+"""
+type Attribute {
+  """
+  Key or name of the attribute.
+  """
+  key: String!
+
+  """
+  Value of the attribute.
+  """
+  value: String
 }
 
-input Condition @oneOf {
-  orderMinimumSubtotal: OrderMinimumSubtotal
-  productMinimumQuantity: ProductMinimumQuantity
-  productMinimumSubtotal: ProductMinimumSubtotal
-}
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
+type BuyerIdentity {
+  """
+  The customer associated with the cart.
+  """
+  customer: Customer
 
-type Customer implements HasMetafields {
-  acceptsMarketing: Boolean
+  """
+  The email address of the buyer that is interacting with the cart.
+  """
   email: String
-  id: ID
+
+  """
+  The phone number of the buyer that is interacting with the cart.
+  """
+  phone: String
+}
+
+"""
+A cart represents the merchandise that a buyer intends to purchase, and the cost associated with the cart.
+"""
+type Cart {
+  """
+  The attributes associated with the cart. Attributes are represented as key-value pairs.
+  """
+  attribute(
+    """
+    The key of the attribute to retrieve.
+    """
+    key: String
+  ): Attribute
+
+  """
+  Information about the buyer that is interacting with the cart.
+  """
+  buyerIdentity: BuyerIdentity
+
+  """
+  The costs that the buyer will pay at checkout.
+  """
+  cost: CartCost!
+
+  """
+  The delivery groups available for the cart based on the buyer's shipping address.
+  """
+  deliveryGroups: [CartDeliveryGroup!]!
+
+  """
+  A list of lines containing information about the items the customer intends to purchase.
+  """
+  lines: [CartLine!]!
+}
+
+"""
+The cost that the buyer will pay at checkout.
+"""
+type CartCost {
+  """
+  The amount, before taxes and discounts, for the customer to pay.
+  """
+  subtotalAmount: MoneyV2!
+
+  """
+  The total amount for the customer to pay.
+  """
+  totalAmount: MoneyV2!
+
+  """
+  The duty amount for the customer to pay at checkout.
+  """
+  totalDutyAmount: MoneyV2
+
+  """
+  The tax amount for the customer to pay at checkout.
+  """
+  totalTaxAmount: MoneyV2
+}
+
+"""
+Information about the options available for one or more line items to be delivered to a specific address.
+"""
+type CartDeliveryGroup {
+  """
+  A list of cart lines for the delivery group.
+  """
+  cartLines: [CartLine!]!
+
+  """
+  The destination address for the delivery group.
+  """
+  deliveryAddress: MailingAddress
+
+  """
+  The delivery options available for the delivery group.
+  """
+  deliveryOptions: [CartDeliveryOption!]!
+
+  """
+  Information about the delivery option the buyer has selected.
+  """
+  selectedDeliveryOption: CartDeliveryOption
+}
+
+"""
+Information about a delivery option.
+"""
+type CartDeliveryOption {
+  """
+  The code of the delivery option.
+  """
+  code: String
+
+  """
+  The cost for the delivery option.
+  """
+  cost: MoneyV2!
+
+  """
+  The method for the delivery option.
+  """
+  deliveryMethodType: DeliveryMethod!
+
+  """
+  The description of the delivery option.
+  """
+  description: String
+
+  """
+  Unique identifier for the delivery option.
+  """
+  id: ID!
+
+  """
+  The title of the delivery option.
+  """
+  title: String
+}
+
+"""
+Represents information about the merchandise in the cart.
+"""
+type CartLine {
+  """
+  Retrieve a cart line attribute by key.
+  """
+  attribute(
+    """
+    The key of the attribute to retrieve.
+    """
+    key: String
+  ): Attribute
+
+  """
+  The cost of the merchandise line that the buyer will pay at checkout.
+  """
+  cost: CartLineCost!
+
+  """
+  The ID of the cart line.
+  """
+  id: ID!
+
+  """
+  The merchandise that the buyer intends to purchase.
+  """
+  merchandise: Merchandise!
+
+  """
+  The quantity of the merchandise that the customer intends to purchase.
+  """
+  quantity: Int!
+}
+
+"""
+The estimated cost of the merchandise line that the buyer will pay at checkout.
+"""
+type CartLineCost {
+  """
+  The amount of the merchandise line.
+  """
+  amount: MoneyV2!
+
+  """
+  The compare at amount of the merchandise line.
+  """
+  compareAtAmount: MoneyV2
+
+  """
+  The cost of the merchandise line before discounts.
+  """
+  subtotalAmount: MoneyV2!
+
+  """
+  The total cost of the merchandise line.
+  """
+  totalAmount: MoneyV2!
+}
+
+"""
+The three-letter currency codes that represent the world currencies used in
+stores. These include standard ISO 4217 codes, legacy codes,
+and non-standard codes.
+"""
+enum CurrencyCode {
+  """
+  United Arab Emirates Dirham (AED).
+  """
+  AED
+
+  """
+  Afghan Afghani (AFN).
+  """
+  AFN
+
+  """
+  Albanian Lek (ALL).
+  """
+  ALL
+
+  """
+  Armenian Dram (AMD).
+  """
+  AMD
+
+  """
+  Netherlands Antillean Guilder.
+  """
+  ANG
+
+  """
+  Angolan Kwanza (AOA).
+  """
+  AOA
+
+  """
+  Argentine Pesos (ARS).
+  """
+  ARS
+
+  """
+  Australian Dollars (AUD).
+  """
+  AUD
+
+  """
+  Aruban Florin (AWG).
+  """
+  AWG
+
+  """
+  Azerbaijani Manat (AZN).
+  """
+  AZN
+
+  """
+  Bosnia and Herzegovina Convertible Mark (BAM).
+  """
+  BAM
+
+  """
+  Barbadian Dollar (BBD).
+  """
+  BBD
+
+  """
+  Bangladesh Taka (BDT).
+  """
+  BDT
+
+  """
+  Bulgarian Lev (BGN).
+  """
+  BGN
+
+  """
+  Bahraini Dinar (BHD).
+  """
+  BHD
+
+  """
+  Burundian Franc (BIF).
+  """
+  BIF
+
+  """
+  Bermudian Dollar (BMD).
+  """
+  BMD
+
+  """
+  Brunei Dollar (BND).
+  """
+  BND
+
+  """
+  Bolivian Boliviano (BOB).
+  """
+  BOB
+
+  """
+  Brazilian Real (BRL).
+  """
+  BRL
+
+  """
+  Bahamian Dollar (BSD).
+  """
+  BSD
+
+  """
+  Bhutanese Ngultrum (BTN).
+  """
+  BTN
+
+  """
+  Botswana Pula (BWP).
+  """
+  BWP
+
+  """
+  Belarusian Ruble (BYN).
+  """
+  BYN
+
+  """
+  Belarusian Ruble (BYR).
+  """
+  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+
+  """
+  Belize Dollar (BZD).
+  """
+  BZD
+
+  """
+  Canadian Dollars (CAD).
+  """
+  CAD
+
+  """
+  Congolese franc (CDF).
+  """
+  CDF
+
+  """
+  Swiss Francs (CHF).
+  """
+  CHF
+
+  """
+  Chilean Peso (CLP).
+  """
+  CLP
+
+  """
+  Chinese Yuan Renminbi (CNY).
+  """
+  CNY
+
+  """
+  Colombian Peso (COP).
+  """
+  COP
+
+  """
+  Costa Rican Colones (CRC).
+  """
+  CRC
+
+  """
+  Cape Verdean escudo (CVE).
+  """
+  CVE
+
+  """
+  Czech Koruny (CZK).
+  """
+  CZK
+
+  """
+  Djiboutian Franc (DJF).
+  """
+  DJF
+
+  """
+  Danish Kroner (DKK).
+  """
+  DKK
+
+  """
+  Dominican Peso (DOP).
+  """
+  DOP
+
+  """
+  Algerian Dinar (DZD).
+  """
+  DZD
+
+  """
+  Egyptian Pound (EGP).
+  """
+  EGP
+
+  """
+  Eritrean Nakfa (ERN).
+  """
+  ERN
+
+  """
+  Ethiopian Birr (ETB).
+  """
+  ETB
+
+  """
+  Euro (EUR).
+  """
+  EUR
+
+  """
+  Fijian Dollars (FJD).
+  """
+  FJD
+
+  """
+  Falkland Islands Pounds (FKP).
+  """
+  FKP
+
+  """
+  United Kingdom Pounds (GBP).
+  """
+  GBP
+
+  """
+  Georgian Lari (GEL).
+  """
+  GEL
+
+  """
+  Ghanaian Cedi (GHS).
+  """
+  GHS
+
+  """
+  Gibraltar Pounds (GIP).
+  """
+  GIP
+
+  """
+  Gambian Dalasi (GMD).
+  """
+  GMD
+
+  """
+  Guinean Franc (GNF).
+  """
+  GNF
+
+  """
+  Guatemalan Quetzal (GTQ).
+  """
+  GTQ
+
+  """
+  Guyanese Dollar (GYD).
+  """
+  GYD
+
+  """
+  Hong Kong Dollars (HKD).
+  """
+  HKD
+
+  """
+  Honduran Lempira (HNL).
+  """
+  HNL
+
+  """
+  Croatian Kuna (HRK).
+  """
+  HRK
+
+  """
+  Haitian Gourde (HTG).
+  """
+  HTG
+
+  """
+  Hungarian Forint (HUF).
+  """
+  HUF
+
+  """
+  Indonesian Rupiah (IDR).
+  """
+  IDR
+
+  """
+  Israeli New Shekel (NIS).
+  """
+  ILS
+
+  """
+  Indian Rupees (INR).
+  """
+  INR
+
+  """
+  Iraqi Dinar (IQD).
+  """
+  IQD
+
+  """
+  Iranian Rial (IRR).
+  """
+  IRR
+
+  """
+  Icelandic Kronur (ISK).
+  """
+  ISK
+
+  """
+  Jersey Pound.
+  """
+  JEP
+
+  """
+  Jamaican Dollars (JMD).
+  """
+  JMD
+
+  """
+  Jordanian Dinar (JOD).
+  """
+  JOD
+
+  """
+  Japanese Yen (JPY).
+  """
+  JPY
+
+  """
+  Kenyan Shilling (KES).
+  """
+  KES
+
+  """
+  Kyrgyzstani Som (KGS).
+  """
+  KGS
+
+  """
+  Cambodian Riel.
+  """
+  KHR
+
+  """
+  Kiribati Dollar (KID).
+  """
+  KID
+
+  """
+  Comorian Franc (KMF).
+  """
+  KMF
+
+  """
+  South Korean Won (KRW).
+  """
+  KRW
+
+  """
+  Kuwaiti Dinar (KWD).
+  """
+  KWD
+
+  """
+  Cayman Dollars (KYD).
+  """
+  KYD
+
+  """
+  Kazakhstani Tenge (KZT).
+  """
+  KZT
+
+  """
+  Laotian Kip (LAK).
+  """
+  LAK
+
+  """
+  Lebanese Pounds (LBP).
+  """
+  LBP
+
+  """
+  Sri Lankan Rupees (LKR).
+  """
+  LKR
+
+  """
+  Liberian Dollar (LRD).
+  """
+  LRD
+
+  """
+  Lesotho Loti (LSL).
+  """
+  LSL
+
+  """
+  Lithuanian Litai (LTL).
+  """
+  LTL
+
+  """
+  Latvian Lati (LVL).
+  """
+  LVL
+
+  """
+  Libyan Dinar (LYD).
+  """
+  LYD
+
+  """
+  Moroccan Dirham.
+  """
+  MAD
+
+  """
+  Moldovan Leu (MDL).
+  """
+  MDL
+
+  """
+  Malagasy Ariary (MGA).
+  """
+  MGA
+
+  """
+  Macedonia Denar (MKD).
+  """
+  MKD
+
+  """
+  Burmese Kyat (MMK).
+  """
+  MMK
+
+  """
+  Mongolian Tugrik.
+  """
+  MNT
+
+  """
+  Macanese Pataca (MOP).
+  """
+  MOP
+
+  """
+  Mauritanian Ouguiya (MRU).
+  """
+  MRU
+
+  """
+  Mauritian Rupee (MUR).
+  """
+  MUR
+
+  """
+  Maldivian Rufiyaa (MVR).
+  """
+  MVR
+
+  """
+  Malawian Kwacha (MWK).
+  """
+  MWK
+
+  """
+  Mexican Pesos (MXN).
+  """
+  MXN
+
+  """
+  Malaysian Ringgits (MYR).
+  """
+  MYR
+
+  """
+  Mozambican Metical.
+  """
+  MZN
+
+  """
+  Namibian Dollar.
+  """
+  NAD
+
+  """
+  Nigerian Naira (NGN).
+  """
+  NGN
+
+  """
+  Nicaraguan Córdoba (NIO).
+  """
+  NIO
+
+  """
+  Norwegian Kroner (NOK).
+  """
+  NOK
+
+  """
+  Nepalese Rupee (NPR).
+  """
+  NPR
+
+  """
+  New Zealand Dollars (NZD).
+  """
+  NZD
+
+  """
+  Omani Rial (OMR).
+  """
+  OMR
+
+  """
+  Panamian Balboa (PAB).
+  """
+  PAB
+
+  """
+  Peruvian Nuevo Sol (PEN).
+  """
+  PEN
+
+  """
+  Papua New Guinean Kina (PGK).
+  """
+  PGK
+
+  """
+  Philippine Peso (PHP).
+  """
+  PHP
+
+  """
+  Pakistani Rupee (PKR).
+  """
+  PKR
+
+  """
+  Polish Zlotych (PLN).
+  """
+  PLN
+
+  """
+  Paraguayan Guarani (PYG).
+  """
+  PYG
+
+  """
+  Qatari Rial (QAR).
+  """
+  QAR
+
+  """
+  Romanian Lei (RON).
+  """
+  RON
+
+  """
+  Serbian dinar (RSD).
+  """
+  RSD
+
+  """
+  Russian Rubles (RUB).
+  """
+  RUB
+
+  """
+  Rwandan Franc (RWF).
+  """
+  RWF
+
+  """
+  Saudi Riyal (SAR).
+  """
+  SAR
+
+  """
+  Solomon Islands Dollar (SBD).
+  """
+  SBD
+
+  """
+  Seychellois Rupee (SCR).
+  """
+  SCR
+
+  """
+  Sudanese Pound (SDG).
+  """
+  SDG
+
+  """
+  Swedish Kronor (SEK).
+  """
+  SEK
+
+  """
+  Singapore Dollars (SGD).
+  """
+  SGD
+
+  """
+  Saint Helena Pounds (SHP).
+  """
+  SHP
+
+  """
+  Sierra Leonean Leone (SLL).
+  """
+  SLL
+
+  """
+  Somali Shilling (SOS).
+  """
+  SOS
+
+  """
+  Surinamese Dollar (SRD).
+  """
+  SRD
+
+  """
+  South Sudanese Pound (SSP).
+  """
+  SSP
+
+  """
+  Sao Tome And Principe Dobra (STD).
+  """
+  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+
+  """
+  Sao Tome And Principe Dobra (STN).
+  """
+  STN
+
+  """
+  Syrian Pound (SYP).
+  """
+  SYP
+
+  """
+  Swazi Lilangeni (SZL).
+  """
+  SZL
+
+  """
+  Thai baht (THB).
+  """
+  THB
+
+  """
+  Tajikistani Somoni (TJS).
+  """
+  TJS
+
+  """
+  Turkmenistani Manat (TMT).
+  """
+  TMT
+
+  """
+  Tunisian Dinar (TND).
+  """
+  TND
+
+  """
+  Tongan Pa'anga (TOP).
+  """
+  TOP
+
+  """
+  Turkish Lira (TRY).
+  """
+  TRY
+
+  """
+  Trinidad and Tobago Dollars (TTD).
+  """
+  TTD
+
+  """
+  Taiwan Dollars (TWD).
+  """
+  TWD
+
+  """
+  Tanzanian Shilling (TZS).
+  """
+  TZS
+
+  """
+  Ukrainian Hryvnia (UAH).
+  """
+  UAH
+
+  """
+  Ugandan Shilling (UGX).
+  """
+  UGX
+
+  """
+  United States Dollars (USD).
+  """
+  USD
+
+  """
+  Uruguayan Pesos (UYU).
+  """
+  UYU
+
+  """
+  Uzbekistan som (UZS).
+  """
+  UZS
+
+  """
+  Venezuelan Bolivares (VED).
+  """
+  VED
+
+  """
+  Venezuelan Bolivares (VEF).
+  """
+  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+
+  """
+  Venezuelan Bolivares (VES).
+  """
+  VES
+
+  """
+  Vietnamese đồng (VND).
+  """
+  VND
+
+  """
+  Vanuatu Vatu (VUV).
+  """
+  VUV
+
+  """
+  Samoan Tala (WST).
+  """
+  WST
+
+  """
+  Central African CFA Franc (XAF).
+  """
+  XAF
+
+  """
+  East Caribbean Dollar (XCD).
+  """
+  XCD
+
+  """
+  West African CFA franc (XOF).
+  """
+  XOF
+
+  """
+  CFP Franc (XPF).
+  """
+  XPF
+
+  """
+  Unrecognized currency.
+  """
+  XXX
+
+  """
+  Yemeni Rial (YER).
+  """
+  YER
+
+  """
+  South African Rand (ZAR).
+  """
+  ZAR
+
+  """
+  Zambian Kwacha (ZMW).
+  """
+  ZMW
+}
+
+"""
+A custom product.
+"""
+type CustomProduct {
+  """
+  Whether the merchandise is a gift card.
+  """
+  isGiftCard: Boolean!
+
+  """
+  Whether the merchandise requires shipping.
+  """
+  requiresShipping: Boolean!
+
+  """
+  The weight of the product variant in the unit system specified with `weight_unit`.
+  """
+  weight: Float
+
+  """
+  Unit of measurement for weight.
+  """
+  weightUnit: WeightUnit!
+}
+
+"""
+Represents a customer with the shop.
+"""
+type Customer implements HasMetafields {
+  """
+  The total amount of money spent by the customer.
+  """
+  amountSpent: MoneyV2!
+
+  """
+  The customer’s name, email or phone number.
+  """
+  displayName: String!
+
+  """
+  The customer’s email address.
+  """
+  email: String
+
+  """
+  Whether the customer has any of the given tags.
+  """
+  hasAnyTag(
+    """
+    The tags to search for.
+    """
+    tags: [String!]! = []
+  ): Boolean!
+
+  """
+  A unique identifier for the customer.
+  """
+  id: ID!
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -42,31 +1108,119 @@ type Customer implements HasMetafields {
     """
     namespace: String!
   ): Metafield
-  orderCount: Int
-  phone: String
-  tags: [String!]
-  totalSpent: Money
+
+  """
+  The number of orders made by the customer.
+  """
+  numberOfOrders: Int!
 }
 
-type DeliveryLine {
-  destination: Address
-  id: ID
-  subscription: Boolean
+"""
+A signed decimal number, which supports arbitrary precision and is serialized as a string.
+
+Example values: `"29.99"`, `"29.999"`.
+"""
+scalar Decimal
+
+"""
+List of different delivery method types.
+"""
+enum DeliveryMethod {
+  """
+  Local Delivery.
+  """
+  LOCAL
+
+  """
+  None.
+  """
+  NONE
+
+  """
+  Shipping to a Pickup Point.
+  """
+  PICKUP_POINT
+
+  """
+  Local Pickup.
+  """
+  PICK_UP
+
+  """
+  Retail.
+  """
+  RETAIL
+
+  """
+  Shipping.
+  """
+  SHIPPING
 }
 
+"""
+The discount to be applied.
+"""
 input Discount {
-  conditions: [Condition!]
+  """
+  The discount message.
+  """
   message: String
+
+  """
+  The targets of the discount.
+  """
   targets: [Target!]!
+
+  """
+  The value of the discount.
+  """
   value: Value!
 }
 
+"""
+The strategy that's applied to the list of discounts.
+"""
 enum DiscountApplicationStrategy {
+  """
+  Only apply the first discount with conditions that are satisfied.
+  """
   FIRST
+
+  """
+  Only apply the discount that offers the maximum reduction.
+  """
   MAXIMUM
 }
 
+"""
+A discount wrapper node.
+"""
+type DiscountNode implements HasMetafields {
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+}
+
+"""
+A fixed amount value.
+"""
 input FixedAmount {
+  """
+  A fixed amount value.
+
+  The value is validated against: >= 0.
+  """
   value: Float!
 }
 
@@ -74,10 +1228,20 @@ input FixedAmount {
 The result of the function.
 """
 input FunctionResult {
+  """
+  The strategy to apply the list of discounts.
+  """
   discountApplicationStrategy: DiscountApplicationStrategy!
+
+  """
+  The list of discounts to be applied.
+  """
   discounts: [Discount!]!
 }
 
+"""
+Represents information about the metafields associated to the specified resource.
+"""
 interface HasMetafields {
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -104,48 +1268,130 @@ input value will be accepted as an ID.
 """
 scalar ID
 
+"""
+The input object for the function.
+"""
 type Input {
-  customer: Customer
-  deliveryLines: [DeliveryLine!]
-  locale: String
-  merchandiseLines: [MerchandiseLine!]
+  """
+  The cart to discount.
+  """
+  cart: Cart!
+
+  """
+  The discount node executing the function.
+  """
+  discountNode: DiscountNode!
+
+  """
+  The localization of the function execution context.
+  """
+  localization: Cart!
+
+  """
+  The conversion rate between the shop's currency and the currency of the cart.
+  """
+  presentmentCurrencyRate: Decimal
 }
 
 """
-A [JSON](https://www.json.org/json-en.html) object.
-
-Example value:
-`{
-  "product": {
-    "id": "gid://shopify/Product/1346443542550",
-    "title": "White T-shirt",
-    "options": [{
-      "name": "Size",
-      "values": ["M", "L"]
-    }]
-  }
-}`
+Represents a mailing address.
 """
-scalar JSON
+type MailingAddress {
+  """
+  The first line of the address. Typically the street address or PO Box number.
+  """
+  address1: String
 
-type MerchandiseLine {
-  id: ID
-  price: Money!
-  properties: [Property!]
-  quantity: Int
-  sellingPlan: SellingPlan
-  variant: Variant
-  weight: Int
+  """
+  The second line of the address. Typically the number of the apartment, suite, or unit.
+  """
+  address2: String
+
+  """
+  The name of the city, district, village, or town.
+  """
+  city: String
+
+  """
+  The name of the customer's company or organization.
+  """
+  company: String
+
+  """
+  The two-letter code for the country of the address. For example, US.
+  """
+  countryCode: String
+
+  """
+  The first name of the customer.
+  """
+  firstName: String
+
+  """
+  The last name of the customer.
+  """
+  lastName: String
+
+  """
+  The full name of the customer, based on firstName and lastName.
+  """
+  name: String
+
+  """
+  A unique phone number for the customer. Formatted using E.164 standard. For example, +16135551111.
+  """
+  phone: String
+
+  """
+  The two-letter code for the region. For example, ON.
+  """
+  provinceCode: String
+
+  """
+  The zip or postal code of the address.
+  """
+  zip: String
 }
 
+"""
+The merchandise to be purchased at checkout.
+"""
+union Merchandise = CustomProduct | ProductVariant
+
+"""
+[Metafields](https://shopify.dev/apps/metafields)
+enable you to attach additional information to a
+Shopify resource, such as a [Product](https://shopify.dev/api/admin-graphql/latest/objects/product)
+or a [Collection](https://shopify.dev/api/admin-graphql/latest/objects/collection).
+For more information about the Shopify resources that you can attach metafields to, refer to
+[HasMetafields](https://shopify.dev/api/admin/graphql/reference/common-objects/HasMetafields).
+"""
 type Metafield {
+  """
+  The type of data that the metafield stores in the `value` field.
+  Refer to the list of [supported types](https://shopify.dev/apps/metafields/types).
+  """
   type: String!
-  value: JSON!
+
+  """
+  The data to store in the metafield. The data is always stored as a string, regardless of the metafield's type.
+  """
+  value: String!
 }
 
-type Money {
-  currency: String!
-  subunits: UnsignedInt64!
+"""
+A monetary value with currency.
+"""
+type MoneyV2 {
+  """
+  Decimal money amount.
+  """
+  amount: Decimal!
+
+  """
+  Currency of the money.
+  """
+  currencyCode: CurrencyCode!
 }
 
 """
@@ -153,7 +1399,7 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  The mutation that defines the structure of a valid result for the function.
+  Handles the function result.
   """
   handleResult(
     """
@@ -163,23 +1409,56 @@ type MutationRoot {
   ): Void!
 }
 
-input OrderMinimumSubtotal {
-  excludedVariantIds: [ID!]!
-  minimumAmount: Float!
-  targetType: TargetType!
-}
-
-input OrderSubtotalTarget {
-  excludedVariantIds: [ID!]!
-}
-
+"""
+A percentage value.
+"""
 input Percentage {
+  """
+  The percentage value.
+
+  The value is validated against: >= 0.
+  """
   value: Float!
 }
 
+"""
+Represents a product.
+"""
 type Product implements HasMetafields {
-  giftCard: Boolean
+  """
+  A unique human-friendly string of the product's title.
+  """
+  handle: String!
+
+  """
+  Whether the product has any of the given tags.
+  """
+  hasAnyTag(
+    """
+    The tags to search for.
+    """
+    tags: [String!]! = []
+  ): Boolean!
+
+  """
+  A globally-unique identifier.
+  """
   id: ID!
+
+  """
+  Whether the product has any of the given collection.
+  """
+  inAnyCollection(
+    """
+    The collections to search for.
+    """
+    ids: [ID!]! = []
+  ): Boolean!
+
+  """
+  Whether the product is a gift card.
+  """
+  isGiftCard: Boolean!
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -195,61 +1474,25 @@ type Product implements HasMetafields {
     """
     namespace: String!
   ): Metafield
-  tags: [String!]
-  title: String
-  type: String
+
+  """
+  The product type specified by the merchant.
+  """
+  productType: String
+
+  """
+  The name of the product's vendor.
+  """
   vendor: String
 }
 
-input ProductMinimumQuantity {
-  ids: [ID!]!
-  minimumQuantity: Int!
-  targetType: TargetType!
-}
-
-input ProductMinimumSubtotal {
-  ids: [ID!]!
-  minimumAmount: Float!
-  targetType: TargetType!
-}
-
-input ProductVariantTarget {
-  id: ID!
-  quantity: Int
-}
-
-type Property {
-  key: String!
-  value: String!
-}
-
-type SellingPlan {
-  id: ID!
-}
-
-input Target @oneOf {
-  orderSubtotal: OrderSubtotalTarget
-  productVariant: ProductVariantTarget
-}
-
-enum TargetType {
-  ORDER_SUBTOTAL
-  PRODUCT_VARIANT
-}
-
 """
-Unsigned integer of up to 64 bit, encoded as a number (not a string).
-Example value: `1099511627776`
+Represents a product variant.
 """
-scalar UnsignedInt64
-
-input Value @oneOf {
-  fixedAmount: FixedAmount
-  percentage: Percentage
-}
-
-type Variant implements HasMetafields {
-  compareAtPrice: Money
+type ProductVariant implements HasMetafields {
+  """
+  A globally-unique identifier.
+  """
   id: ID!
 
   """
@@ -266,12 +1509,96 @@ type Variant implements HasMetafields {
     """
     namespace: String!
   ): Metafield
-  product: Product
+
+  """
+  The product that this variant belongs to.
+  """
+  product: Product!
+
+  """
+  Whether the merchandise requires shipping.
+  """
+  requiresShipping: Boolean!
+
+  """
+  An identifier for the product variant in the shop. Required in order to connect to a fulfillment service.
+  """
   sku: String
-  title: String
+
+  """
+  The weight of the product variant in the unit system specified with `weight_unit`.
+  """
+  weight: Float
+
+  """
+  Unit of measurement for weight.
+  """
+  weightUnit: WeightUnit!
+}
+
+"""
+The target delivery line.
+"""
+input ShippingLineTarget {
+  """
+  The index of the target delivery line, represented as an ID.
+
+  For example, gid://shopify/DeliveryLine/0.
+  """
+  id: ID!
+}
+
+"""
+The target of the discount.
+"""
+input Target @oneOf {
+  """
+  The target delivery line.
+  """
+  shippingLine: ShippingLineTarget
+}
+
+"""
+The discount value.
+"""
+input Value @oneOf {
+  """
+  A fixed amount value.
+  """
+  fixedAmount: FixedAmount
+
+  """
+  A percentage value.
+  """
+  percentage: Percentage
 }
 
 """
 A void type that can be used to return a null value from a mutation.
 """
 scalar Void
+
+"""
+Units of measurement for weight.
+"""
+enum WeightUnit {
+  """
+  Metric system unit of mass.
+  """
+  GRAMS
+
+  """
+  1 kilogram equals 1000 grams.
+  """
+  KILOGRAMS
+
+  """
+  Imperial system unit of mass.
+  """
+  OUNCES
+
+  """
+  1 pound equals 16 ounces.
+  """
+  POUNDS
+}
