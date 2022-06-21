@@ -1,5 +1,5 @@
-import DiscountCreatePage from '../../components/DiscountCreatePage';
 import { DiscountClass } from '@shopify/discount-app-components';
+import DiscountCreatePage from '../../components/DiscountCreatePage';
 import {
   default as ProductDiscount,
   DEFAULT_CONFIGURATION,
