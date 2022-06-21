@@ -91,38 +91,30 @@ mod tests {
     use super::*;
 
     fn input(configuration: Option<Configuration>) -> input::Input {
-        let input = r#"
-        {
-            "cart": {
-                "lines": [
-                    {
-                        "id": "gid://shopify/CartLine/0",
-                        "merchandise": {
-                            "id": "gid://shopify/ProductVariant/0"
-                        }
-                    },
-                    {
-                        "id": "gid://shopify/CartLine/1",
-                        "merchandise": {
-                            "id": "gid://shopify/ProductVariant/1"
-                        }
-                    }
-                ]
-            },
-            "discountNode": { "metafield": null }
-        }
-        "#;
-        let default_input: input::Input = serde_json::from_str(input).unwrap();
         let discount_node = input::DiscountNode {
             metafield: configuration.map(|value| {
                 let value = serde_json::to_string(&value).unwrap();
                 input::Metafield { value }
             }),
         };
-
         input::Input {
+            cart: input::Cart {
+                lines: vec![
+                    input::CartLine {
+                        id: String::from("gid://shopify/CartLine/0"),
+                        merchandise: input::Merchandise {
+                            id: Some(String::from("gid://shopify/ProductVariant/0")),
+                        },
+                    },
+                    input::CartLine {
+                        id: String::from("gid://shopify/CartLine/1"),
+                        merchandise: input::Merchandise {
+                            id: Some(String::from("gid://shopify/ProductVariant/1")),
+                        },
+                    },
+                ],
+            },
             discount_node,
-            ..default_input
         }
     }
 
@@ -131,25 +123,17 @@ mod tests {
         let input = input(None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
-                    ],
-                    "value": { "percentage": { "value": 50.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
+        let expected_handle_result = serde_json::json!({
+            "discounts": [{
+                "targets": [
+                    { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
+                    { "productVariant": { "id": "gid://shopify/ProductVariant/1" } },
+                ],
+                "value": { "percentage": { "value": 50.0 } },
+            }],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(handle_result, expected_handle_result);
     }
 
     #[test]
@@ -160,21 +144,17 @@ mod tests {
         }));
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/1" } }
-                    ],
-                    "value": { "percentage": { "value": 10.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        let expected_result = serde_json::json!({
+            "discounts": [{
+                "targets": [
+                    { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
+                    { "productVariant": { "id": "gid://shopify/ProductVariant/1" } },
+                ],
+                "value": { "percentage": { "value": 10.0 } },
+            }],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(result, expected_result);
     }
 
     #[test]
@@ -185,20 +165,16 @@ mod tests {
         }));
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "targets": [
-                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } }
-                    ],
-                    "value": { "percentage": { "value": 50.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        let expected_result = serde_json::json!(            {
+            "discounts": [{
+                "targets": [
+                    { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
+                ],
+                "value": { "percentage": { "value": 50.0 } },
+            }],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(result, expected_result);
     }
 
     #[test]
@@ -209,19 +185,11 @@ mod tests {
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
+        let expected_handle_result = serde_json::json!({
+            "discounts": [],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(handle_result, expected_handle_result);
     }
 
     #[test]
@@ -237,18 +205,10 @@ mod tests {
         };
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
+        let expected_handle_result = serde_json::json!({
+            "discounts": [],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(handle_result, expected_handle_result);
     }
 }
