@@ -81,22 +81,14 @@ mod tests {
         let input = input(None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "targets": [{ "orderSubtotal": { "excludedVariantIds": [] } }],
-                    "value": { "percentage": { "value": 50.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
+        let expected_handle_result = serde_json::json!({
+            "discounts": [{
+                "targets": [{ "orderSubtotal": { "excludedVariantIds": [] } }],
+                "value": { "percentage": { "value": 50.0 } },
+            }],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(handle_result, expected_handle_result);
     }
 
     #[test]
@@ -107,18 +99,14 @@ mod tests {
         }));
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "targets": [{ "orderSubtotal": { "excludedVariantIds": [] } }],
-                    "value": { "percentage": { "value": 10.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        let expected_result = serde_json::json!({
+            "discounts": [{
+                "targets": [{ "orderSubtotal": { "excludedVariantIds": [] } }],
+                "value": { "percentage": { "value": 10.0 } },
+            }],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(result, expected_result);
     }
 
     #[test]
@@ -129,17 +117,13 @@ mod tests {
         }));
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [{
-                    "targets": [{ "orderSubtotal": { "excludedVariantIds": ["gid://shopify/ProductVariant/1"] } }],
-                    "value": { "percentage": { "value": 50.0 } }
-                }],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_result: serde_json::Value = serde_json::from_str(expected_json).unwrap();
-        assert_eq!(result.to_string(), expected_result.to_string());
+        let expected_result = serde_json::json!({
+            "discounts": [{
+                "targets": [{ "orderSubtotal": { "excludedVariantIds": ["gid://shopify/ProductVariant/1"] } }],
+                "value": { "percentage": { "value": 50.0 } },
+            }],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(result, expected_result);
     }
 }

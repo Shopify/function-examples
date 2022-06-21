@@ -43,25 +43,13 @@ mod tests {
     use super::*;
 
     fn input(configuration: Option<Configuration>) -> input::Input {
-        let input = r#"
-        {
-            "discountNode": {
-                "metafield": null
-            }
-        }
-        "#;
-        let default_input: input::Input = serde_json::from_str(input).unwrap();
         let discount_node = input::DiscountNode {
             metafield: configuration.map(|value| {
                 let value = serde_json::to_string(&value).unwrap();
                 input::Metafield { value }
             }),
         };
-
-        input::Input {
-            discount_node,
-            ..default_input
-        }
+        input::Input { discount_node }
     }
 
     #[test]
@@ -69,19 +57,11 @@ mod tests {
         let input = input(None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
+        let expected_handle_result = serde_json::json!({
+            "discounts": [],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(handle_result, expected_handle_result);
     }
 
     #[test]
@@ -89,18 +69,10 @@ mod tests {
         let input = input(Some(Configuration {}));
         let handle_result = serde_json::json!(function(input).unwrap());
 
-        let expected_json = r#"
-            {
-                "discounts": [],
-                "discountApplicationStrategy": "FIRST"
-            }
-        "#;
-
-        let expected_handle_result: serde_json::Value =
-            serde_json::from_str(expected_json).unwrap();
-        assert_eq!(
-            handle_result.to_string(),
-            expected_handle_result.to_string()
-        );
+        let expected_handle_result = serde_json::json!({
+            "discounts": [],
+            "discountApplicationStrategy": "FIRST",
+        });
+        assert_eq!(handle_result, expected_handle_result);
     }
 }
