@@ -53,7 +53,7 @@ fn targets(delivery_groups: &[input::CartDeliveryGroup]) -> Vec<Target> {
         .iter()
         .map(|delivery_group| {
             let id = delivery_group.selected_delivery_option.id.to_string();
-            Target::ShippingLine { id }
+            Target::DeliveryOption { id }
         })
         .collect()
 }
@@ -119,7 +119,7 @@ mod tests {
             {
                 "discounts": [{
                     "targets": [
-                        { "shippingLine": { "id": "gid://shopify/CartDeliveryOption/not-free" } }
+                        { "deliveryOption": { "id": "gid://shopify/CartDeliveryOption/not-free" } }
                     ],
                     "value": { "percentage": { "value": 50.0 } }
                 }],
@@ -144,7 +144,7 @@ mod tests {
             {
                 "discounts": [{
                     "targets": [
-                        { "shippingLine": { "id": "gid://shopify/CartDeliveryOption/not-free" } }
+                        { "deliveryOption": { "id": "gid://shopify/CartDeliveryOption/not-free" } }
                     ],
                     "value": { "percentage": { "value": 10.0 } }
                 }],
