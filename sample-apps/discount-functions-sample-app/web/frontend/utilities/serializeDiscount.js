@@ -8,6 +8,7 @@ export function serializeDiscount(discount) {
     title: discount.method === DiscountMethod.Automatic ? discount.title : discount.code,
     startsAt: new Date(),
     discountClass: discount.discountClass,
+    combinesWith: discount.combinesWith,
     metafields: [
       // store configuration in app metafield
       {

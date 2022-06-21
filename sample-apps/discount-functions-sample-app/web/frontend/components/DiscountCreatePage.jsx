@@ -45,6 +45,8 @@ export default function DiscountCreatePage({
     setUsageLimit,
     appliesOncePerCustomer,
     setAppliesOncePerCustomer,
+    combinesWith,
+    setCombinesWith,
     configuration,
     setConfiguration,
 
@@ -116,6 +118,18 @@ export default function DiscountCreatePage({
               }}
             />
           )}
+          <CombinationCard
+            combinableDiscountTypes={{
+              value: combinesWith,
+              onChange: setCombinesWith,
+            }}
+            discountClass={discountClass}
+            discountDescriptor={
+              method === DiscountMethod.Automatic
+                ? title
+                : code
+            }
+          />
         </Layout.Section>
         <Layout.Section>
           <PageActions

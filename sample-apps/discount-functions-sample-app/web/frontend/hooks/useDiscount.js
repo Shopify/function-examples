@@ -17,6 +17,7 @@ export function useDiscount({
   const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt);
   const [usageLimit, setUsageLimit] = useState(savedDiscount?.usageLimit);
   const [appliesOncePerCustomer, setAppliesOncePerCustomer] = useState(savedDiscount?.appliesOncePerCustomer ?? false);
+  const [combinesWith, setCombinesWith] = useState(savedDiscount?.combinesWith ?? {});
   const [configuration, setConfiguration] = useState(
     savedDiscount?.configuration ?? defaultConfiguration,
   );
@@ -30,6 +31,7 @@ export function useDiscount({
     endsAt,
     usageLimit,
     appliesOncePerCustomer,
+    combinesWith,
     configuration,
     configurationId,
   };
@@ -61,6 +63,7 @@ export function useDiscount({
     setEndsAt(savedDiscount.endsAt);
     setUsageLimit(savedDiscount.usageLimit);
     setAppliesOncePerCustomer(savedDiscount.appliesOncePerCustomer);
+    setCombinesWith(savedDiscount.combinesWith);
     setConfiguration(savedDiscount.configuration);
   }, [savedDiscount]);
 
@@ -73,6 +76,7 @@ export function useDiscount({
     endsAt,
     usageLimit,
     appliesOncePerCustomer,
+    combinesWith,
     configuration,
     setTitle,
     setCode,
@@ -81,6 +85,7 @@ export function useDiscount({
     setEndsAt,
     setUsageLimit,
     setAppliesOncePerCustomer,
+    setCombinesWith,
     setConfiguration,
     isDirty,
   };
