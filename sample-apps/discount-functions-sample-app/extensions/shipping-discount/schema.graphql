@@ -23,43 +23,149 @@ type Attribute {
   value: String
 }
 
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
 type BuyerIdentity {
+  """
+  The customer associated with the cart.
+  """
   customer: Customer
+
+  """
+  The email address of the buyer that is interacting with the cart.
+  """
   email: String
+
+  """
+  The phone number of the buyer that is interacting with the cart.
+  """
   phone: String
 }
 
+"""
+A cart represents the merchandise that a buyer intends to purchase, and the cost associated with the cart.
+"""
 type Cart {
-  attribute(key: String): Attribute
+  """
+  The attributes associated with the cart. Attributes are represented as key-value pairs.
+  """
+  attribute(
+    """
+    The key of the attribute to retrieve.
+    """
+    key: String
+  ): Attribute
+
+  """
+  Information about the buyer that is interacting with the cart.
+  """
   buyerIdentity: BuyerIdentity
+
+  """
+  The costs that the buyer will pay at checkout.
+  """
   cost: CartCost!
+
+  """
+  The delivery groups available for the cart based on the buyer's shipping address.
+  """
   deliveryGroups: [CartDeliveryGroup!]!
+
+  """
+  A list of lines containing information about the items the customer intends to purchase.
+  """
   lines: [CartLine!]!
 }
 
+"""
+The cost that the buyer will pay at checkout.
+"""
 type CartCost {
+  """
+  The amount, before taxes and discounts, for the customer to pay.
+  """
   subtotalAmount: MoneyV2!
+
+  """
+  The total amount for the customer to pay.
+  """
   totalAmount: MoneyV2!
+
+  """
+  The duty amount for the customer to pay at checkout.
+  """
   totalDutyAmount: MoneyV2
+
+  """
+  The tax amount for the customer to pay at checkout.
+  """
   totalTaxAmount: MoneyV2
 }
 
+"""
+Information about the options available for one or more line items to be delivered to a specific address.
+"""
 type CartDeliveryGroup {
+  """
+  A list of cart lines for the delivery group.
+  """
   cartLines: [CartLine!]!
+
+  """
+  The destination address for the delivery group.
+  """
   deliveryAddress: MailingAddress
+
+  """
+  The delivery options available for the delivery group.
+  """
   deliveryOptions: [CartDeliveryOption!]!
+
+  """
+  Unique identifier for the delivery group.
+  """
+  id: ID!
+
+  """
+  Information about the delivery option the buyer has selected.
+  """
   selectedDeliveryOption: CartDeliveryOption
 }
 
+"""
+Information about a delivery option.
+"""
 type CartDeliveryOption {
+  """
+  The code of the delivery option.
+  """
   code: String
+
+  """
+  The cost for the delivery option.
+  """
   cost: MoneyV2!
+
+  """
+  The method for the delivery option.
+  """
   deliveryMethodType: DeliveryMethod!
+
+  """
+  The description of the delivery option.
+  """
   description: String
-  id: ID!
+
+  """
+  The title of the delivery option.
+  """
   title: String
 }
 
+"""
+Represents information about the merchandise in the cart.
+"""
 type CartLine {
   """
   Retrieve a cart line attribute by key.
@@ -72,6 +178,7 @@ type CartLine {
   ): Attribute
 
   """
+  The cost of the merchandise line that the buyer will pay at checkout.
   """
   cost: CartLineCost!
 
@@ -81,14 +188,19 @@ type CartLine {
   id: ID!
 
   """
+  The merchandise that the buyer intends to purchase.
   """
   merchandise: Merchandise!
 
   """
+  The quantity of the merchandise that the customer intends to purchase.
   """
   quantity: Int!
 }
 
+"""
+The estimated cost of the merchandise line that the buyer will pay at checkout.
+"""
 type CartLineCost {
   """
   The amount of the merchandise line.
@@ -109,6 +221,1239 @@ type CartLineCost {
   The total cost of the merchandise line.
   """
   totalAmount: MoneyV2!
+}
+
+"""
+The code designating a country/region, which generally follows ISO 3166-1 alpha-2 guidelines.
+If a territory doesn't have a country code value in the `CountryCode` enum, it might be considered a subdivision
+of another country. For example, the territories associated with Spain are represented by the country code `ES`,
+and the territories associated with the United States of America are represented by the country code `US`.
+"""
+enum CountryCode {
+  """
+  Ascension Island.
+  """
+  AC
+
+  """
+  Andorra.
+  """
+  AD
+
+  """
+  United Arab Emirates.
+  """
+  AE
+
+  """
+  Afghanistan.
+  """
+  AF
+
+  """
+  Antigua & Barbuda.
+  """
+  AG
+
+  """
+  Anguilla.
+  """
+  AI
+
+  """
+  Albania.
+  """
+  AL
+
+  """
+  Armenia.
+  """
+  AM
+
+  """
+  Netherlands Antilles.
+  """
+  AN
+
+  """
+  Angola.
+  """
+  AO
+
+  """
+  Argentina.
+  """
+  AR
+
+  """
+  Austria.
+  """
+  AT
+
+  """
+  Australia.
+  """
+  AU
+
+  """
+  Aruba.
+  """
+  AW
+
+  """
+  Åland Islands.
+  """
+  AX
+
+  """
+  Azerbaijan.
+  """
+  AZ
+
+  """
+  Bosnia & Herzegovina.
+  """
+  BA
+
+  """
+  Barbados.
+  """
+  BB
+
+  """
+  Bangladesh.
+  """
+  BD
+
+  """
+  Belgium.
+  """
+  BE
+
+  """
+  Burkina Faso.
+  """
+  BF
+
+  """
+  Bulgaria.
+  """
+  BG
+
+  """
+  Bahrain.
+  """
+  BH
+
+  """
+  Burundi.
+  """
+  BI
+
+  """
+  Benin.
+  """
+  BJ
+
+  """
+  St. Barthélemy.
+  """
+  BL
+
+  """
+  Bermuda.
+  """
+  BM
+
+  """
+  Brunei.
+  """
+  BN
+
+  """
+  Bolivia.
+  """
+  BO
+
+  """
+  Caribbean Netherlands.
+  """
+  BQ
+
+  """
+  Brazil.
+  """
+  BR
+
+  """
+  Bahamas.
+  """
+  BS
+
+  """
+  Bhutan.
+  """
+  BT
+
+  """
+  Bouvet Island.
+  """
+  BV
+
+  """
+  Botswana.
+  """
+  BW
+
+  """
+  Belarus.
+  """
+  BY
+
+  """
+  Belize.
+  """
+  BZ
+
+  """
+  Canada.
+  """
+  CA
+
+  """
+  Cocos (Keeling) Islands.
+  """
+  CC
+
+  """
+  Congo - Kinshasa.
+  """
+  CD
+
+  """
+  Central African Republic.
+  """
+  CF
+
+  """
+  Congo - Brazzaville.
+  """
+  CG
+
+  """
+  Switzerland.
+  """
+  CH
+
+  """
+  Côte d’Ivoire.
+  """
+  CI
+
+  """
+  Cook Islands.
+  """
+  CK
+
+  """
+  Chile.
+  """
+  CL
+
+  """
+  Cameroon.
+  """
+  CM
+
+  """
+  China.
+  """
+  CN
+
+  """
+  Colombia.
+  """
+  CO
+
+  """
+  Costa Rica.
+  """
+  CR
+
+  """
+  Cuba.
+  """
+  CU
+
+  """
+  Cape Verde.
+  """
+  CV
+
+  """
+  Curaçao.
+  """
+  CW
+
+  """
+  Christmas Island.
+  """
+  CX
+
+  """
+  Cyprus.
+  """
+  CY
+
+  """
+  Czechia.
+  """
+  CZ
+
+  """
+  Germany.
+  """
+  DE
+
+  """
+  Djibouti.
+  """
+  DJ
+
+  """
+  Denmark.
+  """
+  DK
+
+  """
+  Dominica.
+  """
+  DM
+
+  """
+  Dominican Republic.
+  """
+  DO
+
+  """
+  Algeria.
+  """
+  DZ
+
+  """
+  Ecuador.
+  """
+  EC
+
+  """
+  Estonia.
+  """
+  EE
+
+  """
+  Egypt.
+  """
+  EG
+
+  """
+  Western Sahara.
+  """
+  EH
+
+  """
+  Eritrea.
+  """
+  ER
+
+  """
+  Spain.
+  """
+  ES
+
+  """
+  Ethiopia.
+  """
+  ET
+
+  """
+  Finland.
+  """
+  FI
+
+  """
+  Fiji.
+  """
+  FJ
+
+  """
+  Falkland Islands.
+  """
+  FK
+
+  """
+  Faroe Islands.
+  """
+  FO
+
+  """
+  France.
+  """
+  FR
+
+  """
+  Gabon.
+  """
+  GA
+
+  """
+  United Kingdom.
+  """
+  GB
+
+  """
+  Grenada.
+  """
+  GD
+
+  """
+  Georgia.
+  """
+  GE
+
+  """
+  French Guiana.
+  """
+  GF
+
+  """
+  Guernsey.
+  """
+  GG
+
+  """
+  Ghana.
+  """
+  GH
+
+  """
+  Gibraltar.
+  """
+  GI
+
+  """
+  Greenland.
+  """
+  GL
+
+  """
+  Gambia.
+  """
+  GM
+
+  """
+  Guinea.
+  """
+  GN
+
+  """
+  Guadeloupe.
+  """
+  GP
+
+  """
+  Equatorial Guinea.
+  """
+  GQ
+
+  """
+  Greece.
+  """
+  GR
+
+  """
+  South Georgia & South Sandwich Islands.
+  """
+  GS
+
+  """
+  Guatemala.
+  """
+  GT
+
+  """
+  Guinea-Bissau.
+  """
+  GW
+
+  """
+  Guyana.
+  """
+  GY
+
+  """
+  Hong Kong SAR.
+  """
+  HK
+
+  """
+  Heard & McDonald Islands.
+  """
+  HM
+
+  """
+  Honduras.
+  """
+  HN
+
+  """
+  Croatia.
+  """
+  HR
+
+  """
+  Haiti.
+  """
+  HT
+
+  """
+  Hungary.
+  """
+  HU
+
+  """
+  Indonesia.
+  """
+  ID
+
+  """
+  Ireland.
+  """
+  IE
+
+  """
+  Israel.
+  """
+  IL
+
+  """
+  Isle of Man.
+  """
+  IM
+
+  """
+  India.
+  """
+  IN
+
+  """
+  British Indian Ocean Territory.
+  """
+  IO
+
+  """
+  Iraq.
+  """
+  IQ
+
+  """
+  Iran.
+  """
+  IR
+
+  """
+  Iceland.
+  """
+  IS
+
+  """
+  Italy.
+  """
+  IT
+
+  """
+  Jersey.
+  """
+  JE
+
+  """
+  Jamaica.
+  """
+  JM
+
+  """
+  Jordan.
+  """
+  JO
+
+  """
+  Japan.
+  """
+  JP
+
+  """
+  Kenya.
+  """
+  KE
+
+  """
+  Kyrgyzstan.
+  """
+  KG
+
+  """
+  Cambodia.
+  """
+  KH
+
+  """
+  Kiribati.
+  """
+  KI
+
+  """
+  Comoros.
+  """
+  KM
+
+  """
+  St. Kitts & Nevis.
+  """
+  KN
+
+  """
+  North Korea.
+  """
+  KP
+
+  """
+  South Korea.
+  """
+  KR
+
+  """
+  Kuwait.
+  """
+  KW
+
+  """
+  Cayman Islands.
+  """
+  KY
+
+  """
+  Kazakhstan.
+  """
+  KZ
+
+  """
+  Laos.
+  """
+  LA
+
+  """
+  Lebanon.
+  """
+  LB
+
+  """
+  St. Lucia.
+  """
+  LC
+
+  """
+  Liechtenstein.
+  """
+  LI
+
+  """
+  Sri Lanka.
+  """
+  LK
+
+  """
+  Liberia.
+  """
+  LR
+
+  """
+  Lesotho.
+  """
+  LS
+
+  """
+  Lithuania.
+  """
+  LT
+
+  """
+  Luxembourg.
+  """
+  LU
+
+  """
+  Latvia.
+  """
+  LV
+
+  """
+  Libya.
+  """
+  LY
+
+  """
+  Morocco.
+  """
+  MA
+
+  """
+  Monaco.
+  """
+  MC
+
+  """
+  Moldova.
+  """
+  MD
+
+  """
+  Montenegro.
+  """
+  ME
+
+  """
+  St. Martin.
+  """
+  MF
+
+  """
+  Madagascar.
+  """
+  MG
+
+  """
+  North Macedonia.
+  """
+  MK
+
+  """
+  Mali.
+  """
+  ML
+
+  """
+  Myanmar (Burma).
+  """
+  MM
+
+  """
+  Mongolia.
+  """
+  MN
+
+  """
+  Macao SAR.
+  """
+  MO
+
+  """
+  Martinique.
+  """
+  MQ
+
+  """
+  Mauritania.
+  """
+  MR
+
+  """
+  Montserrat.
+  """
+  MS
+
+  """
+  Malta.
+  """
+  MT
+
+  """
+  Mauritius.
+  """
+  MU
+
+  """
+  Maldives.
+  """
+  MV
+
+  """
+  Malawi.
+  """
+  MW
+
+  """
+  Mexico.
+  """
+  MX
+
+  """
+  Malaysia.
+  """
+  MY
+
+  """
+  Mozambique.
+  """
+  MZ
+
+  """
+  Namibia.
+  """
+  NA
+
+  """
+  New Caledonia.
+  """
+  NC
+
+  """
+  Niger.
+  """
+  NE
+
+  """
+  Norfolk Island.
+  """
+  NF
+
+  """
+  Nigeria.
+  """
+  NG
+
+  """
+  Nicaragua.
+  """
+  NI
+
+  """
+  Netherlands.
+  """
+  NL
+
+  """
+  Norway.
+  """
+  NO
+
+  """
+  Nepal.
+  """
+  NP
+
+  """
+  Nauru.
+  """
+  NR
+
+  """
+  Niue.
+  """
+  NU
+
+  """
+  New Zealand.
+  """
+  NZ
+
+  """
+  Oman.
+  """
+  OM
+
+  """
+  Panama.
+  """
+  PA
+
+  """
+  Peru.
+  """
+  PE
+
+  """
+  French Polynesia.
+  """
+  PF
+
+  """
+  Papua New Guinea.
+  """
+  PG
+
+  """
+  Philippines.
+  """
+  PH
+
+  """
+  Pakistan.
+  """
+  PK
+
+  """
+  Poland.
+  """
+  PL
+
+  """
+  St. Pierre & Miquelon.
+  """
+  PM
+
+  """
+  Pitcairn Islands.
+  """
+  PN
+
+  """
+  Palestinian Territories.
+  """
+  PS
+
+  """
+  Portugal.
+  """
+  PT
+
+  """
+  Paraguay.
+  """
+  PY
+
+  """
+  Qatar.
+  """
+  QA
+
+  """
+  Réunion.
+  """
+  RE
+
+  """
+  Romania.
+  """
+  RO
+
+  """
+  Serbia.
+  """
+  RS
+
+  """
+  Russia.
+  """
+  RU
+
+  """
+  Rwanda.
+  """
+  RW
+
+  """
+  Saudi Arabia.
+  """
+  SA
+
+  """
+  Solomon Islands.
+  """
+  SB
+
+  """
+  Seychelles.
+  """
+  SC
+
+  """
+  Sudan.
+  """
+  SD
+
+  """
+  Sweden.
+  """
+  SE
+
+  """
+  Singapore.
+  """
+  SG
+
+  """
+  St. Helena.
+  """
+  SH
+
+  """
+  Slovenia.
+  """
+  SI
+
+  """
+  Svalbard & Jan Mayen.
+  """
+  SJ
+
+  """
+  Slovakia.
+  """
+  SK
+
+  """
+  Sierra Leone.
+  """
+  SL
+
+  """
+  San Marino.
+  """
+  SM
+
+  """
+  Senegal.
+  """
+  SN
+
+  """
+  Somalia.
+  """
+  SO
+
+  """
+  Suriname.
+  """
+  SR
+
+  """
+  South Sudan.
+  """
+  SS
+
+  """
+  São Tomé & Príncipe.
+  """
+  ST
+
+  """
+  El Salvador.
+  """
+  SV
+
+  """
+  Sint Maarten.
+  """
+  SX
+
+  """
+  Syria.
+  """
+  SY
+
+  """
+  Eswatini.
+  """
+  SZ
+
+  """
+  Tristan da Cunha.
+  """
+  TA
+
+  """
+  Turks & Caicos Islands.
+  """
+  TC
+
+  """
+  Chad.
+  """
+  TD
+
+  """
+  French Southern Territories.
+  """
+  TF
+
+  """
+  Togo.
+  """
+  TG
+
+  """
+  Thailand.
+  """
+  TH
+
+  """
+  Tajikistan.
+  """
+  TJ
+
+  """
+  Tokelau.
+  """
+  TK
+
+  """
+  Timor-Leste.
+  """
+  TL
+
+  """
+  Turkmenistan.
+  """
+  TM
+
+  """
+  Tunisia.
+  """
+  TN
+
+  """
+  Tonga.
+  """
+  TO
+
+  """
+  Turkey.
+  """
+  TR
+
+  """
+  Trinidad & Tobago.
+  """
+  TT
+
+  """
+  Tuvalu.
+  """
+  TV
+
+  """
+  Taiwan.
+  """
+  TW
+
+  """
+  Tanzania.
+  """
+  TZ
+
+  """
+  Ukraine.
+  """
+  UA
+
+  """
+  Uganda.
+  """
+  UG
+
+  """
+  U.S. Outlying Islands.
+  """
+  UM
+
+  """
+  United States.
+  """
+  US
+
+  """
+  Uruguay.
+  """
+  UY
+
+  """
+  Uzbekistan.
+  """
+  UZ
+
+  """
+  Vatican City.
+  """
+  VA
+
+  """
+  St. Vincent & Grenadines.
+  """
+  VC
+
+  """
+  Venezuela.
+  """
+  VE
+
+  """
+  British Virgin Islands.
+  """
+  VG
+
+  """
+  Vietnam.
+  """
+  VN
+
+  """
+  Vanuatu.
+  """
+  VU
+
+  """
+  Wallis & Futuna.
+  """
+  WF
+
+  """
+  Samoa.
+  """
+  WS
+
+  """
+  Kosovo.
+  """
+  XK
+
+  """
+  Yemen.
+  """
+  YE
+
+  """
+  Mayotte.
+  """
+  YT
+
+  """
+  South Africa.
+  """
+  ZA
+
+  """
+  Zambia.
+  """
+  ZM
+
+  """
+  Zimbabwe.
+  """
+  ZW
+
+  """
+  Unknown Region.
+  """
+  ZZ
 }
 
 """
@@ -923,6 +2268,9 @@ enum CurrencyCode {
   ZMW
 }
 
+"""
+A custom product.
+"""
 type CustomProduct {
   """
   Whether the merchandise is a gift card.
@@ -945,9 +2293,23 @@ type CustomProduct {
   weightUnit: WeightUnit!
 }
 
+"""
+Represents a customer with the shop.
+"""
 type Customer implements HasMetafields {
+  """
+  The total amount of money spent by the customer.
+  """
   amountSpent: MoneyV2!
+
+  """
+  The customer’s name, email or phone number.
+  """
   displayName: String!
+
+  """
+  The customer’s email address.
+  """
   email: String
 
   """
@@ -959,6 +2321,10 @@ type Customer implements HasMetafields {
     """
     tags: [String!]! = []
   ): Boolean!
+
+  """
+  A unique identifier for the customer.
+  """
   id: ID!
 
   """
@@ -975,6 +2341,10 @@ type Customer implements HasMetafields {
     """
     namespace: String!
   ): Metafield
+
+  """
+  The number of orders made by the customer.
+  """
   numberOfOrders: Int!
 }
 
@@ -984,6 +2354,16 @@ A signed decimal number, which supports arbitrary precision and is serialized as
 Example values: `"29.99"`, `"29.999"`.
 """
 scalar Decimal
+
+"""
+The target delivery group.
+"""
+input DeliveryGroupTarget {
+  """
+  The ID of the target delivery group.
+  """
+  id: ID!
+}
 
 """
 List of different delivery method types.
@@ -1080,11 +2460,11 @@ A fixed amount value.
 """
 input FixedAmount {
   """
-  A fixed amount value.
+  The fixed amount value of the discount, in the currency of the cart.
 
-  The value is validated against: >= 0.
+  The amount must be greater than or equal to 0.
   """
-  value: Float!
+  amount: Decimal!
 }
 
 """
@@ -1149,22 +2529,76 @@ type Input {
   The localization of the function execution context.
   """
   localization: Cart!
+
+  """
+  The conversion rate between the shop's currency and the currency of the cart.
+  """
+  presentmentCurrencyRate: Decimal
 }
 
+"""
+Represents a mailing address.
+"""
 type MailingAddress {
+  """
+  The first line of the address. Typically the street address or PO Box number.
+  """
   address1: String
+
+  """
+  The second line of the address. Typically the number of the apartment, suite, or unit.
+  """
   address2: String
+
+  """
+  The name of the city, district, village, or town.
+  """
   city: String
+
+  """
+  The name of the customer's company or organization.
+  """
   company: String
-  countryCode: String
+
+  """
+  The two-letter code for the country of the address. For example, US.
+  """
+  countryCode: CountryCode
+
+  """
+  The first name of the customer.
+  """
   firstName: String
+
+  """
+  The last name of the customer.
+  """
   lastName: String
+
+  """
+  The full name of the customer, based on firstName and lastName.
+  """
   name: String
+
+  """
+  A unique phone number for the customer. Formatted using E.164 standard. For example, +16135551111.
+  """
   phone: String
+
+  """
+  The two-letter code for the region. For example, ON.
+  """
   provinceCode: String
+
+  """
+  The zip or postal code of the address.
+  """
   zip: String
 }
 
+"""
+The merchandise to be purchased at checkout.
+"""
 union Merchandise = CustomProduct | ProductVariant
 
 """
@@ -1230,7 +2664,13 @@ input Percentage {
   value: Float!
 }
 
+"""
+Represents a product.
+"""
 type Product implements HasMetafields {
+  """
+  A unique human-friendly string of the product's title.
+  """
   handle: String!
 
   """
@@ -1242,6 +2682,10 @@ type Product implements HasMetafields {
     """
     tags: [String!]! = []
   ): Boolean!
+
+  """
+  A globally-unique identifier.
+  """
   id: ID!
 
   """
@@ -1253,6 +2697,10 @@ type Product implements HasMetafields {
     """
     ids: [ID!]! = []
   ): Boolean!
+
+  """
+  Whether the product is a gift card.
+  """
   isGiftCard: Boolean!
 
   """
@@ -1269,11 +2717,25 @@ type Product implements HasMetafields {
     """
     namespace: String!
   ): Metafield
+
+  """
+  The product type specified by the merchant.
+  """
   productType: String
+
+  """
+  The name of the product's vendor.
+  """
   vendor: String
 }
 
+"""
+Represents a product variant.
+"""
 type ProductVariant implements HasMetafields {
+  """
+  A globally-unique identifier.
+  """
   id: ID!
 
   """
@@ -1290,12 +2752,20 @@ type ProductVariant implements HasMetafields {
     """
     namespace: String!
   ): Metafield
+
+  """
+  The product that this variant belongs to.
+  """
   product: Product!
 
   """
   Whether the merchandise requires shipping.
   """
   requiresShipping: Boolean!
+
+  """
+  An identifier for the product variant in the shop. Required in order to connect to a fulfillment service.
+  """
   sku: String
 
   """
@@ -1310,25 +2780,13 @@ type ProductVariant implements HasMetafields {
 }
 
 """
-The target delivery line.
-"""
-input DeliveryOptionTarget {
-  """
-  The ID of the target delivery option.
-
-  For example, gid://shopify/CartDeliveryOption/handle.
-  """
-  id: ID!
-}
-
-"""
 The target of the discount.
 """
 input Target @oneOf {
   """
-  The target delivery option.
+  The target delivery group.
   """
-  shippingLine: DeliveryOptionTarget
+  deliveryGroup: DeliveryGroupTarget
 }
 
 """

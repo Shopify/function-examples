@@ -2361,8 +2361,6 @@ The target delivery group.
 input DeliveryGroupTarget {
   """
   The ID of the target delivery group.
-
-  For example, gid://shopify/CartDeliveryGroup/0.
   """
   id: ID!
 }
