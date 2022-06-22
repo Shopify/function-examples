@@ -2,13 +2,12 @@
 
 pub type Boolean = bool;
 pub type Float = f64;
-pub type Int = i64;
+pub type Int = i32;
 pub type ID = String;
 
 pub mod input {
     use super::*;
     use serde::Deserialize;
-    pub type UnsignedInt64 = u64;
 
     #[derive(Clone, Debug, Deserialize)]
     #[serde(rename_all(deserialize = "camelCase"))]
