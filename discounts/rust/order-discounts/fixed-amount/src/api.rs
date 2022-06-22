@@ -13,7 +13,6 @@ pub mod input {
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub discount_node: DiscountNode,
-        pub cart: Cart,
         pub presentment_currency_rate: Decimal,
     }
 
@@ -25,22 +24,6 @@ pub mod input {
     #[derive(Clone, Debug, Deserialize, Default)]
     pub struct Metafield {
         pub value: String,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct Cart {
-        pub lines: Vec<CartLine>,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct CartLine {
-        pub id: ID,
-        pub merchandise: Merchandise,
-    }
-
-    #[derive(Clone, Debug, Deserialize)]
-    pub struct Merchandise {
-        pub id: Option<ID>,
     }
 }
 
