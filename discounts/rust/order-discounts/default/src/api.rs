@@ -1,11 +1,12 @@
 #![allow(dead_code)]
 
 pub type Boolean = bool;
-pub type Float = f64;
+pub type Decimal = String;
 pub type Int = i32;
 pub type ID = String;
 
 pub mod input {
+    use super::*;
     use serde::Deserialize;
 
     #[derive(Clone, Debug, Deserialize)]
@@ -60,14 +61,13 @@ pub enum Value {
 }
 
 #[derive(Clone, Debug, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
 pub struct FixedAmount {
-    pub value: Float,
+    pub amount: Decimal,
 }
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Percentage {
-    pub value: Float,
+    pub value: Decimal,
 }
 
 #[skip_serializing_none]
@@ -90,7 +90,7 @@ pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     OrderMinimumSubtotal {
         excluded_variant_ids: Vec<ID>,
-        minimum_amount: Float,
+        minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },
     #[serde(rename_all(serialize = "camelCase"))]
@@ -102,7 +102,7 @@ pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     ProductMinimumSubtotal {
         ids: Vec<ID>,
-        minimum_amount: Float,
+        minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },
 }

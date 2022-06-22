@@ -77,7 +77,9 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::Percentage(Percentage { value }),
+            value: Value::Percentage(Percentage {
+                value: format!("{}", value),
+            }),
         }]
     };
     FunctionResult {
@@ -129,7 +131,7 @@ mod tests {
                     { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                     { "productVariant": { "id": "gid://shopify/ProductVariant/1" } },
                 ],
-                "value": { "percentage": { "value": 50.0 } },
+                "value": { "percentage": { "value": "50" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
@@ -139,7 +141,7 @@ mod tests {
     #[test]
     fn test_discount_with_value() {
         let input = input(Some(Configuration {
-            value: 10.0,
+            value: 12.34,
             excluded_variant_ids: vec![],
         }));
         let result = serde_json::json!(function(input).unwrap());
@@ -150,7 +152,7 @@ mod tests {
                     { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                     { "productVariant": { "id": "gid://shopify/ProductVariant/1" } },
                 ],
-                "value": { "percentage": { "value": 10.0 } },
+                "value": { "percentage": { "value": "12.34" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
@@ -165,12 +167,12 @@ mod tests {
         }));
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_result = serde_json::json!(            {
+        let expected_result = serde_json::json!({
             "discounts": [{
                 "targets": [
                     { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                 ],
-                "value": { "percentage": { "value": 50.0 } },
+                "value": { "percentage": { "value": "50" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });

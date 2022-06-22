@@ -65,7 +65,9 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::Percentage(Percentage { value }),
+            value: Value::Percentage(Percentage {
+                value: format!("{}", value),
+            }),
         }]
     };
     FunctionResult {
@@ -105,7 +107,7 @@ mod tests {
                 "targets": [
                     { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/0" } },
                 ],
-                "value": { "percentage": { "value": 50.0 } },
+                "value": { "percentage": { "value": "50" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
@@ -114,7 +116,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(Configuration { value: 10.0 }));
+        let input = input(Some(Configuration { value: 12.34 }));
         let result = serde_json::json!(function(input).unwrap());
 
         let expected_result = serde_json::json!({
@@ -122,7 +124,7 @@ mod tests {
                 "targets": [
                     { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/0" } },
                 ],
-                "value": { "percentage": { "value": 10.0 } },
+                "value": { "percentage": { "value": "12.34" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
