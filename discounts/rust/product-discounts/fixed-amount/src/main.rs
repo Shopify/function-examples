@@ -12,8 +12,8 @@ pub struct Configuration {
 impl Configuration {
     const DEFAULT_VALUE: f64 = 50.00;
 
-    fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).expect("Unable to parse configuration value from metafield")
+    fn from_str(value: &str) -> Self {
+        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
     }
 }
 

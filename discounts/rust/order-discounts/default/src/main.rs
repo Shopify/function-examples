@@ -8,8 +8,8 @@ use api::*;
 pub struct Configuration {}
 
 impl Configuration {
-    fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).expect("Unable to parse configuration value from metafield")
+    fn from_str(value: &str) -> Self {
+        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
     }
 }
 
