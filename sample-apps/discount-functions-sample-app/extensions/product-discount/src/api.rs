@@ -78,7 +78,7 @@ pub enum Value {
     FixedAmount {
         #[serde_as(as = "DisplayFromStr")]
         amount: Decimal,
-        applies_to_each_item: Option<Boolean>,
+        applies_to_each_item: Boolean,
     },
     Percentage {
         #[serde_as(as = "DisplayFromStr")]
@@ -93,6 +93,7 @@ pub enum Target {
     ProductVariant { id: ID, quantity: Option<Int> },
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Condition {
@@ -105,6 +106,7 @@ pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     ProductMinimumSubtotal {
         ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },

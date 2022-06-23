@@ -10,7 +10,7 @@ pub mod input {
     use serde::Deserialize;
 
     #[serde_as]
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub discount_node: DiscountNode,
@@ -19,23 +19,23 @@ pub mod input {
         pub presentment_currency_rate: Decimal,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct DiscountNode {
         pub metafield: Option<Metafield>,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct Metafield {
         pub value: String,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     #[serde(rename_all = "camelCase")]
     pub struct Cart {
         pub delivery_groups: Vec<CartDeliveryGroup>,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct CartDeliveryGroup {
         pub id: ID,
     }
@@ -89,12 +89,14 @@ pub enum Target {
     DeliveryGroup { id: ID },
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     OrderMinimumSubtotal {
         excluded_variant_ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },
@@ -107,6 +109,7 @@ pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     ProductMinimumSubtotal {
         ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },

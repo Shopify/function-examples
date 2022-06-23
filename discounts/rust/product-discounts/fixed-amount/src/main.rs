@@ -91,43 +91,32 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    impl Default for input::Input {
-        fn default() -> Self {
-            let json = r#"
-            {
-                "cart": {
-                    "lines": [
-                        { "id": "gid://shopify/CartLine/0", "merchandise": { "id": "gid://shopify/ProductVariant/0" } },
-                        { "id": "gid://shopify/CartLine/1", "merchandise": { "id": "gid://shopify/ProductVariant/1" } }
-                    ]
-                },
-                "discountNode": { "metafield": null },
-                "presentmentCurrencyRate": "1.00"
-            }
-            "#;
-            serde_json::from_str(json).unwrap()
-        }
-    }
 
     fn input(
         config: Option<Configuration>,
         presentment_currency_rate: Option<Decimal>,
         cart_lines: Option<Vec<input::CartLine>>,
     ) -> input::Input {
-        let default_input = input::Input::default();
-        let discount_node = config.map(|value| {
-            let value = serde_json::to_string(&value).unwrap();
-            input::DiscountNode {
-                metafield: Some(input::Metafield { value }),
-            }
-        });
+        let lines = cart_lines.unwrap_or_else(||
+            vec![
+                input::CartLine {
+                    id: "gid://shopify/CartLine/0".to_string(),
+                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
+                },
+                input::CartLine {
+                    id: "gid://shopify/CartLine/1".to_string(),
+                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/1".to_string()) }
+                },
+            ]
+        );
         input::Input {
-            discount_node: discount_node.unwrap_or(default_input.discount_node),
-            presentment_currency_rate: presentment_currency_rate
-                .unwrap_or(default_input.presentment_currency_rate),
-            cart: input::Cart {
-                lines: cart_lines.unwrap_or(default_input.cart.lines),
+            discount_node: input::DiscountNode {
+                metafield: Some(input::Metafield {
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                }),
             },
+            presentment_currency_rate: presentment_currency_rate.unwrap_or(1.00),
+            cart: input::Cart { lines },
         }
     }
 
@@ -201,5 +190,35 @@ mod tests {
             "discountApplicationStrategy": "FIRST",
         });
         assert_eq!(handle_result, expected_handle_result);
+    }
+
+    #[test]
+    fn test_input_deserialization() {
+        let input_json = r#"
+        {
+            "cart": {
+                "lines": [
+                    {
+                        "id": "gid://shopify/CartLine/0",
+                        "merchandise": { "id": "gid://shopify/ProductVariant/0" }
+                    }
+                ]
+            },
+            "discountNode": { "metafield": { "value": "{\"value\":10.0}" } },
+            "presentmentCurrencyRate": "2.00"
+        }
+        "#;
+
+        let expected_input = input(
+            Some(Configuration { value: 10.00}),
+            Some(2.00),
+            Some(vec![
+                input::CartLine {
+                    id: "gid://shopify/CartLine/0".to_string(),
+                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
+                }
+            ])
+        );
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }

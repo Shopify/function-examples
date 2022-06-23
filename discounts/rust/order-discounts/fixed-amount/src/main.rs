@@ -156,4 +156,15 @@ mod tests {
         });
         assert_eq!(handle_result, expected_handle_result);
     }
+
+    #[test]
+    fn test_input_deserialization() {
+        let input = r#"
+        {
+            "discountNode": { "metafield": null },
+            "presentmentCurrencyRate": "1.00"
+        }
+        "#;
+        assert!(serde_json::from_str::<input::Input>(input).is_ok());
+    }
 }

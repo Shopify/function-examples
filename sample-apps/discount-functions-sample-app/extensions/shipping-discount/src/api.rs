@@ -86,12 +86,14 @@ pub enum Target {
     DeliveryGroup { id: ID },
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     OrderMinimumSubtotal {
         excluded_variant_ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },
@@ -104,6 +106,7 @@ pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     ProductMinimumSubtotal {
         ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },

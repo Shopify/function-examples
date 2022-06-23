@@ -42,27 +42,13 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    impl Default for input::Input {
-        fn default() -> Self {
-            let json = r#"
-            {
-                "discountNode": { "metafield": null }
-            }
-            "#;
-            serde_json::from_str(json).unwrap()
-        }
-    }
-
     fn input(config: Option<Configuration>) -> input::Input {
-        let default_input = input::Input::default();
-        let discount_node = config.map(|value| {
-            let value = serde_json::to_string(&value).unwrap();
-            input::DiscountNode {
-                metafield: Some(input::Metafield { value }),
-            }
-        });
         input::Input {
-            discount_node: discount_node.unwrap_or(default_input.discount_node),
+            discount_node: input::DiscountNode {
+                metafield: Some(input::Metafield {
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                }),
+            },
         }
     }
 
@@ -88,5 +74,17 @@ mod tests {
             "discountApplicationStrategy": "FIRST",
         });
         assert_eq!(handle_result, expected_handle_result);
+    }
+
+    #[test]
+    fn test_input_deserialization() {
+        let input_json = r#"
+        {
+            "discountNode": { "metafield": { "value": "{}" } }
+        }
+        "#;
+
+        let expected_input = input(Some(Configuration {}));
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }

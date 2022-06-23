@@ -78,42 +78,26 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    impl Default for input::Input {
-        fn default() -> Self {
-            serde_json::from_str(
-                r#"
-            {
-                "cart": {
-                    "deliveryGroups": [
-                        { "id": "gid://shopify/CartDeliveryGroup/0" },
-                        { "id": "gid://shopify/CartDeliveryGroup/1" }
-                    ]
-                },
-                "discountNode": { "metafield": null },
-                "presentmentCurrencyRate": "1.00"
-            }
-            "#,
-            )
-            .unwrap()
-        }
-    }
-
     fn input(
         config: Option<Configuration>,
-        cart_delivery_groups: Option<Vec<input::CartDeliveryGroup>>,
+        cart: Option<input::Cart>,
     ) -> input::Input {
-        let default_input = input::Input::default();
-        let discount_node = config.map(|value| {
-            let value = serde_json::to_string(&value).unwrap();
-            input::DiscountNode {
-                metafield: Some(input::Metafield { value }),
-            }
-        });
         input::Input {
-            cart: input::Cart {
-                delivery_groups: cart_delivery_groups.unwrap_or(default_input.cart.delivery_groups),
+            discount_node: input::DiscountNode {
+                metafield: Some(input::Metafield {
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                })
             },
-            discount_node: discount_node.unwrap_or(default_input.discount_node),
+            cart: cart.unwrap_or_else(|| input::Cart {
+                delivery_groups: vec![
+                    input::CartDeliveryGroup {
+                        id: "gid://shopify/CartDeliveryGroup/0".to_string(),
+                    },
+                    input::CartDeliveryGroup {
+                        id: "gid://shopify/CartDeliveryGroup/1".to_string(),
+                    }
+                ]
+            }),
         }
     }
 
@@ -155,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_delivery_groups() {
-        let input = input(None, Some(vec![]));
+        let input = input(None, Some(input::Cart { delivery_groups: vec![] }));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -163,5 +147,21 @@ mod tests {
             "discountApplicationStrategy": "FIRST",
         });
         assert_eq!(handle_result, expected_handle_result);
+    }
+
+    #[test]
+    fn test_input_deserialization() {
+        let input = r#"
+        {
+            "cart": {
+                "deliveryGroups": [
+                    { "id": "gid://shopify/CartDeliveryGroup/0" },
+                    { "id": "gid://shopify/CartDeliveryGroup/1" }
+                ]
+            },
+            "discountNode": { "metafield": null }
+        }
+        "#;
+        assert!(serde_json::from_str::<input::Input>(input).is_ok());
     }
 }
