@@ -1,4 +1,7 @@
-{
-  # select fields on MerchandiseDiscountRoot
-  # or delete this file if the script requires no input
+query Input {
+  discountNode {
+    metafield(namespace: "default", key: "function-configuration") {
+      value
+    }
+  }
 }
