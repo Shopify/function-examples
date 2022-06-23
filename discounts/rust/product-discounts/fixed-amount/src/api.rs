@@ -81,7 +81,7 @@ pub enum Value {
     FixedAmount {
         #[serde_as(as = "DisplayFromStr")]
         amount: Decimal,
-        applies_to_each_item: Option<Boolean>,
+        applies_to_each_item: Boolean,
     },
     Percentage {
         #[serde_as(as = "DisplayFromStr")]
