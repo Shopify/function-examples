@@ -14,4 +14,5 @@ query Input {
       value
     }
   }
+  presentmentCurrencyRate
 }

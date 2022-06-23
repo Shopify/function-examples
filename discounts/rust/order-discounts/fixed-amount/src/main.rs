@@ -76,33 +76,17 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    impl Default for input::Input {
-        fn default() -> Self {
-            let json = r#"
-            {
-                "discountNode": { "metafield": null },
-                "presentmentCurrencyRate": "1.00"
-            }
-            "#;
-            serde_json::from_str(json).unwrap()
-        }
-    }
-
     fn input(
         config: Option<Configuration>,
         presentment_currency_rate: Option<Decimal>,
     ) -> input::Input {
-        let default_input = input::Input::default();
-        let discount_node = config.map(|value| {
-            let value = serde_json::to_string(&value).unwrap();
-            input::DiscountNode {
-                metafield: Some(input::Metafield { value }),
-            }
-        });
         input::Input {
-            discount_node: discount_node.unwrap_or(default_input.discount_node),
-            presentment_currency_rate: presentment_currency_rate
-                .unwrap_or(default_input.presentment_currency_rate),
+            discount_node: input::DiscountNode {
+                metafield: Some(input::Metafield {
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                }),
+            },
+            presentment_currency_rate: presentment_currency_rate.unwrap_or(1.00),
         }
     }
 
@@ -159,12 +143,17 @@ mod tests {
 
     #[test]
     fn test_input_deserialization() {
-        let input = r#"
+        let input_json = r#"
         {
-            "discountNode": { "metafield": null },
-            "presentmentCurrencyRate": "1.00"
+            "discountNode": { "metafield": { "value": "{\"value\":10.0}" }},
+            "presentmentCurrencyRate": "2.00"
         }
         "#;
-        assert!(serde_json::from_str::<input::Input>(input).is_ok());
+
+        let expected_input = input(
+            Some(Configuration { value: 10.00 }),
+            Some(2.00)
+        );
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }

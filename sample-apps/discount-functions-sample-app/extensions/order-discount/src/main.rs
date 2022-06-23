@@ -130,11 +130,34 @@ mod tests {
 
     #[test]
     fn test_input_deserialization() {
-        let input = r#"
+        let input_json = r#"
         {
-            "discountNode": { "metafield": null }
+            "cart": {
+                "lines": [
+                    {
+                        "id": "gid://shopify/CartLine/0",
+                        "merchandise": { "id": "gid://shopify/ProductVariant/0" }
+                    },
+                    {
+                        "id": "gid://shopify/CartLine/1",
+                        "merchandise": {}
+                    }
+                ]
+            },
+            "discountNode": {
+                "metafield": {
+                    "value": "{\"value\":10.0,\"excludedVariantIds\":[\"gid://shopify/ProductVariant/1\"]}"
+                }
+            }
         }
         "#;
-        assert!(serde_json::from_str::<input::Input>(input).is_ok());
+
+        let expected_input = input(
+            Some(Configuration {
+                value: 10.00,
+                excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
+            })
+        );
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }

@@ -10,7 +10,7 @@ pub mod input {
     use serde::Deserialize;
 
     #[serde_as]
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub discount_node: DiscountNode,
@@ -18,12 +18,12 @@ pub mod input {
         pub presentment_currency_rate: Decimal,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct DiscountNode {
         pub metafield: Option<Metafield>,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct Metafield {
         pub value: String,
     }

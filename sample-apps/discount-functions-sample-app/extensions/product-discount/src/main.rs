@@ -92,7 +92,7 @@ mod tests {
 
     fn input(
         config: Option<Configuration>,
-        cart: Option<input::Cart>,
+        cart_lines: Option<Vec<input::CartLine>>,
     ) -> input::Input {
         input::Input {
             discount_node: input::DiscountNode {
@@ -100,8 +100,8 @@ mod tests {
                     value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
                 })
             },
-            cart: cart.unwrap_or_else(|| input::Cart {
-                lines: vec![
+            cart: input::Cart {
+                lines: cart_lines.unwrap_or_else(|| vec![
                     input::CartLine {
                         id: "gid://shopify/CartLine/0".to_string(),
                         merchandise: input::Merchandise {
@@ -114,8 +114,8 @@ mod tests {
                             id: Some("gid://shopify/ProductVariant/1".to_string())
                         }
                     }
-                ]
-            }),
+                ])
+            },
         }
     }
 
@@ -186,7 +186,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_cart_lines() {
-        let input = input(None, Some(input::Cart{ lines: vec![]}));
+        let input = input(None, Some(vec![]));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -200,11 +200,10 @@ mod tests {
     fn test_discount_with_no_variant_ids() {
         let input = input(
             None,
-            Some(input::Cart {
-                lines: vec![input::CartLine {
+            Some(vec![input::CartLine {
                 id: "gid://shopify/CartLine/0".to_string(),
                 merchandise: input::Merchandise { id: None },
-            }]}),
+            }]),
         );
         let handle_result = serde_json::json!(function(input).unwrap());
 
@@ -217,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_input_deserialization() {
-        let input = r#"
+        let input_json = r#"
         {
             "cart": {
                 "lines": [
@@ -227,13 +226,34 @@ mod tests {
                     },
                     {
                         "id": "gid://shopify/CartLine/1",
-                        "merchandise": { "id": "gid://shopify/ProductVariant/1" }
+                        "merchandise": {}
                     }
                 ]
             },
-            "discountNode": { "metafield": null }
+            "discountNode": {
+                "metafield": {
+                    "value": "{\"value\":10.0,\"excludedVariantIds\":[\"gid://shopify/ProductVariant/1\"]}"
+                }
+            }
         }
         "#;
-        assert!(serde_json::from_str::<input::Input>(input).is_ok());
+
+        let expected_input = input(
+            Some(Configuration {
+                value: 10.00,
+                excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
+            }),
+            Some(vec![
+                input::CartLine {
+                    id: "gid://shopify/CartLine/0".to_string(),
+                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
+                },
+                input::CartLine {
+                    id: "gid://shopify/CartLine/1".to_string(),
+                    merchandise: input::Merchandise { id: None }
+                },
+            ])
+        );
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }

@@ -9,35 +9,35 @@ pub mod input {
     use super::*;
     use serde::Deserialize;
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub discount_node: DiscountNode,
         pub cart: Cart,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct DiscountNode {
         pub metafield: Option<Metafield>,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct Metafield {
         pub value: String,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct Cart {
         pub lines: Vec<CartLine>,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct CartLine {
         pub id: ID,
         pub merchandise: Merchandise,
     }
 
-    #[derive(Clone, Debug, Deserialize)]
+    #[derive(Clone, Debug, Deserialize, PartialEq)]
     pub struct Merchandise {
         pub id: Option<ID>,
     }

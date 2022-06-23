@@ -78,7 +78,7 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
             targets,
             value: Value::FixedAmount {
                 amount,
-                applies_to_each_item: Some(false),
+                applies_to_each_item: false,
             },
         }]
     };
@@ -210,7 +210,7 @@ mod tests {
         "#;
 
         let expected_input = input(
-            Some(Configuration { value: 10.00}),
+            Some(Configuration { value: 10.00 }),
             Some(2.00),
             Some(vec![
                 input::CartLine {
