@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let _config: Configuration = input.configuration();
+    let _config = input.configuration();
     Ok(FunctionResult {
         discounts: vec![],
         discount_application_strategy: DiscountApplicationStrategy::First,

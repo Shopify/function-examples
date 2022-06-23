@@ -53,9 +53,9 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
             targets: vec![Target::OrderSubtotal {
                 excluded_variant_ids: config.excluded_variant_ids,
             }],
-            value: Value::Percentage(Percentage {
-                value: format!("{}", config.value),
-            }),
+            value: Value::Percentage {
+                value: config.value,
+            },
         }],
         discount_application_strategy: DiscountApplicationStrategy::First,
     })

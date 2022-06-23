@@ -65,9 +65,7 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::Percentage(Percentage {
-                value: format!("{}", value),
-            }),
+            value: Value::Percentage { value },
         }]
     };
     FunctionResult {

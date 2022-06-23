@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 
+use serde_with::{serde_as, DisplayFromStr};
+
 pub type Boolean = bool;
-pub type Decimal = String;
+pub type Decimal = f64;
 pub type Int = i32;
 pub type ID = String;
 
@@ -9,6 +11,7 @@ pub mod input {
     use super::*;
     use serde::Deserialize;
 
+    #[serde_as]
     #[derive(Clone, Debug, Deserialize)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
@@ -52,21 +55,19 @@ pub struct Discount {
     pub conditions: Option<Vec<Condition>>,
 }
 
+#[skip_serializing_none]
+#[serde_as]
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Value {
-    FixedAmount(FixedAmount),
-    Percentage(Percentage),
-}
-
-#[derive(Clone, Debug, Serialize)]
-pub struct FixedAmount {
-    pub amount: Decimal,
-}
-
-#[derive(Clone, Debug, Serialize)]
-pub struct Percentage {
-    pub value: Decimal,
+    FixedAmount {
+        #[serde_as(as = "DisplayFromStr")]
+        amount: Decimal,
+    },
+    Percentage {
+        #[serde_as(as = "DisplayFromStr")]
+        value: Decimal,
+    },
 }
 
 #[skip_serializing_none]

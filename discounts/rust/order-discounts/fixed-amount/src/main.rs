@@ -43,21 +43,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let config: Configuration = input.configuration();
-
-    let converted_value = convert_to_cart_currency(config.value, &input);
+    let config = input.configuration();
+    let converted_value = convert_to_cart_currency(config.value, input.presentment_currency_rate);
     let targets = vec![Target::OrderSubtotal {
         excluded_variant_ids: vec![],
     }];
     Ok(build_result(converted_value, targets))
 }
 
-fn convert_to_cart_currency(value: f64, input: &input::Input) -> f64 {
-    let rate = &input.presentment_currency_rate;
-    value
-        * rate
-            .parse::<f64>()
-            .expect("presentment_currency_rate is malformed.")
+fn convert_to_cart_currency(value: f64, presentment_currency_rate: f64) -> f64 {
+    value * presentment_currency_rate
 }
 
 fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
@@ -68,9 +63,7 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::FixedAmount(FixedAmount {
-                amount: format!("{}", amount),
-            }),
+            value: Value::FixedAmount { amount },
         }]
     };
     FunctionResult {
@@ -84,17 +77,16 @@ mod tests {
     use super::*;
 
     fn input(
-        configuration: Option<Configuration>,
+        config: Option<Configuration>,
         presentment_currency_rate: Option<Decimal>,
     ) -> input::Input {
         let discount_node = input::DiscountNode {
-            metafield: configuration.map(|value| {
+            metafield: config.map(|value| {
                 let value = serde_json::to_string(&value).unwrap();
                 input::Metafield { value }
             }),
         };
-        let presentment_currency_rate =
-            presentment_currency_rate.unwrap_or_else(|| "1.00".to_string());
+        let presentment_currency_rate = presentment_currency_rate.unwrap_or(1.00);
         input::Input {
             discount_node,
             presentment_currency_rate,
@@ -137,10 +129,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_presentment_currency_rate() {
-        let input = input(
-            Some(Configuration { value: 10.0 }),
-            Some("2.00".to_string()),
-        );
+        let input = input(Some(Configuration { value: 10.00 }), Some(2.00));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({

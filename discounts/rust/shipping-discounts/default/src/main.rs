@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let _config: Configuration = input.configuration();
+    let _config = input.configuration();
     Ok(FunctionResult {
         discounts: vec![],
         discount_application_strategy: DiscountApplicationStrategy::First,
@@ -42,9 +42,9 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
+    fn input(config: Option<Configuration>) -> input::Input {
         let discount_node = input::DiscountNode {
-            metafield: configuration.map(|value| {
+            metafield: config.map(|value| {
                 let value = serde_json::to_string(&value).unwrap();
                 input::Metafield { value }
             }),
