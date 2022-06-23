@@ -3404,7 +3404,7 @@ input Percentage {
 
   The value is validated against: >= 0.
   """
-  value: Float!
+  value: Decimal!
 }
 
 """
@@ -3506,7 +3506,7 @@ input ProductMinimumSubtotal {
   """
   The minimum subtotal amount of the product.
   """
-  minimumAmount: Float!
+  minimumAmount: Decimal!
 
   """
   The target type of the condition.

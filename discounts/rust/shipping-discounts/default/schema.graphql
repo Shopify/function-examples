@@ -3386,7 +3386,7 @@ input Percentage {
 
   The value is validated against: >= 0.
   """
-  value: Float!
+  value: Decimal!
 }
 
 """
