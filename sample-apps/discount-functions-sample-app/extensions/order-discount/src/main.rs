@@ -65,15 +65,28 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
-        let discount_node = input::DiscountNode {
-            metafield: configuration.map(|value| {
-                let value = serde_json::to_string(&value).unwrap();
-                input::Metafield { value }
-            }),
-        };
+    impl Default for input::Input {
+        fn default() -> Self {
+            let json = r#"
+            {
+                "discountNode": { "metafield": null }
+            }
+            "#;
+            serde_json::from_str(json).unwrap()
+        }
+    }
 
-        input::Input { discount_node }
+    fn input(config: Option<Configuration>) -> input::Input {
+        let default_input = input::Input::default();
+        let discount_node = config.map(|value| {
+            let value = serde_json::to_string(&value).unwrap();
+            input::DiscountNode {
+                metafield: Some(input::Metafield { value }),
+            }
+        });
+        input::Input {
+            discount_node: discount_node.unwrap_or(default_input.discount_node),
+        }
     }
 
     #[test]

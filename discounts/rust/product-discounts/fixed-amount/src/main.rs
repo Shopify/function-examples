@@ -91,44 +91,49 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    impl Default for input::Input {
+        fn default() -> Self {
+            let json = r#"
+            {
+                "cart": {
+                    "lines": [
+                        { "id": "gid://shopify/CartLine/0", "merchandise": { "id": "gid://shopify/ProductVariant/0" } },
+                        { "id": "gid://shopify/CartLine/1", "merchandise": { "id": "gid://shopify/ProductVariant/1" } }
+                    ]
+                },
+                "discountNode": { "metafield": null },
+                "presentmentCurrencyRate": "1.00"
+            }
+            "#;
+            serde_json::from_str(json).unwrap()
+        }
+    }
 
     fn input(
         config: Option<Configuration>,
         presentment_currency_rate: Option<Decimal>,
+        cart_lines: Option<Vec<input::CartLine>>,
     ) -> input::Input {
-        let cart = input::Cart {
-            lines: vec![
-                input::CartLine {
-                    id: "gid://shopify/CartLine/0".to_string(),
-                    merchandise: input::Merchandise {
-                        id: Some("gid://shopify/ProductVariant/0".to_string()),
-                    },
-                },
-                input::CartLine {
-                    id: "gid://shopify/CartLine/1".to_string(),
-                    merchandise: input::Merchandise {
-                        id: Some("gid://shopify/ProductVariant/1".to_string()),
-                    },
-                },
-            ],
-        };
-        let discount_node = input::DiscountNode {
-            metafield: config.map(|value| {
-                let value = serde_json::to_string(&value).unwrap();
-                input::Metafield { value }
-            }),
-        };
-        let presentment_currency_rate = presentment_currency_rate.unwrap_or(1.00);
+        let default_input = input::Input::default();
+        let discount_node = config.map(|value| {
+            let value = serde_json::to_string(&value).unwrap();
+            input::DiscountNode {
+                metafield: Some(input::Metafield { value }),
+            }
+        });
         input::Input {
-            cart,
-            discount_node,
-            presentment_currency_rate,
+            discount_node: discount_node.unwrap_or(default_input.discount_node),
+            presentment_currency_rate: presentment_currency_rate
+                .unwrap_or(default_input.presentment_currency_rate),
+            cart: input::Cart {
+                lines: cart_lines.unwrap_or(default_input.cart.lines),
+            },
         }
     }
 
     #[test]
     fn test_discount_with_no_configuration() {
-        let input = input(None, None);
+        let input = input(None, None, None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -148,7 +153,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(Configuration { value: 12.34 }), None);
+        let input = input(Some(Configuration { value: 12.34 }), None, None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -168,7 +173,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_presentment_currency_rate() {
-        let input = input(Some(Configuration { value: 10.00 }), Some(2.00));
+        let input = input(Some(Configuration { value: 10.00 }), Some(2.00), None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -188,11 +193,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_empty_cart_lines() {
-        let input = input::Input {
-            cart: input::Cart { lines: vec![] },
-            discount_node: input::DiscountNode { metafield: None },
-            presentment_currency_rate: 1.00,
-        };
+        let input = input(None, None, Some(vec![]));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({

@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use serde_with::{serde_as, DisplayFromStr};
-
 pub type Boolean = bool;
 pub type Decimal = f64;
 pub type Int = i32;
@@ -16,22 +14,23 @@ pub mod input {
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub discount_node: DiscountNode,
+        #[serde_as(as = "DisplayFromStr")]
         pub presentment_currency_rate: Decimal,
     }
 
-    #[derive(Clone, Debug, Deserialize, Default)]
+    #[derive(Clone, Debug, Deserialize)]
     pub struct DiscountNode {
         pub metafield: Option<Metafield>,
     }
 
-    #[derive(Clone, Debug, Deserialize, Default)]
+    #[derive(Clone, Debug, Deserialize)]
     pub struct Metafield {
         pub value: String,
     }
 }
 
 use serde::Serialize;
-use serde_with::skip_serializing_none;
+use serde_with::{serde_as, skip_serializing_none, DisplayFromStr};
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
@@ -85,12 +84,14 @@ pub enum Target {
     },
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     OrderMinimumSubtotal {
         excluded_variant_ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },
@@ -103,6 +104,7 @@ pub enum Condition {
     #[serde(rename_all(serialize = "camelCase"))]
     ProductMinimumSubtotal {
         ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
         minimum_amount: Decimal,
         target_type: ConditionTargetType,
     },

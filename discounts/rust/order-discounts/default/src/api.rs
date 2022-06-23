@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use serde_with::{serde_as, DisplayFromStr};
-
 pub type Boolean = bool;
 pub type Decimal = f64;
 pub type Int = i32;
@@ -17,12 +15,12 @@ pub mod input {
         pub discount_node: DiscountNode,
     }
 
-    #[derive(Clone, Debug, Deserialize, Default)]
+    #[derive(Clone, Debug, Deserialize)]
     pub struct DiscountNode {
         pub metafield: Option<Metafield>,
     }
 
-    #[derive(Clone, Debug, Deserialize, Default)]
+    #[derive(Clone, Debug, Deserialize)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Metafield {
         pub value: String,
@@ -30,7 +28,7 @@ pub mod input {
 }
 
 use serde::Serialize;
-use serde_with::skip_serializing_none;
+use serde_with::{serde_as, skip_serializing_none, DisplayFromStr};
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]

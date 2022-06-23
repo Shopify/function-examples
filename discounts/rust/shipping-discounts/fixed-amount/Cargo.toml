@@ -2,7 +2,7 @@
 name = "fixed-amount"
 version = "1.0.0"
 edition = "2021"
-include = ["*.graphql"]
+include = []
 
 [dependencies]
 serde = { version = "1.0.13", features = ["derive"] }

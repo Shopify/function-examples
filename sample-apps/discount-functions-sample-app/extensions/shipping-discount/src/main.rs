@@ -78,32 +78,55 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
-        let discount_node = input::DiscountNode {
-            metafield: configuration.map(|value| {
-                let value = serde_json::to_string(&value).unwrap();
-                input::Metafield { value }
-            }),
-        };
+    impl Default for input::Input {
+        fn default() -> Self {
+            serde_json::from_str(
+                r#"
+            {
+                "cart": {
+                    "deliveryGroups": [
+                        { "id": "gid://shopify/CartDeliveryGroup/0" },
+                        { "id": "gid://shopify/CartDeliveryGroup/1" }
+                    ]
+                },
+                "discountNode": { "metafield": null },
+                "presentmentCurrencyRate": "1.00"
+            }
+            "#,
+            )
+            .unwrap()
+        }
+    }
+
+    fn input(
+        config: Option<Configuration>,
+        cart_delivery_groups: Option<Vec<input::CartDeliveryGroup>>,
+    ) -> input::Input {
+        let default_input = input::Input::default();
+        let discount_node = config.map(|value| {
+            let value = serde_json::to_string(&value).unwrap();
+            input::DiscountNode {
+                metafield: Some(input::Metafield { value }),
+            }
+        });
         input::Input {
             cart: input::Cart {
-                delivery_groups: vec![input::CartDeliveryGroup {
-                    id: String::from("gid://shopify/CartDeliveryGroup/0"),
-                }],
+                delivery_groups: cart_delivery_groups.unwrap_or(default_input.cart.delivery_groups),
             },
-            discount_node,
+            discount_node: discount_node.unwrap_or(default_input.discount_node),
         }
     }
 
     #[test]
     fn test_discount_with_no_configuration() {
-        let input = input(None);
+        let input = input(None, None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
             "discounts": [{
                 "targets": [
                     { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/0" } },
+                    { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/1" } },
                 ],
                 "value": { "percentage": { "value": "50" } },
             }],
@@ -114,13 +137,14 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(Configuration { value: 12.34 }));
+        let input = input(Some(Configuration { value: 12.34 }), None);
         let result = serde_json::json!(function(input).unwrap());
 
         let expected_result = serde_json::json!({
             "discounts": [{
                 "targets": [
                     { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/0" } },
+                    { "deliveryGroup": { "id": "gid://shopify/CartDeliveryGroup/1" } },
                 ],
                 "value": { "percentage": { "value": "12.34" } },
             }],
@@ -131,12 +155,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_delivery_groups() {
-        let input = input::Input {
-            cart: input::Cart {
-                delivery_groups: vec![],
-            },
-            ..input(Some(Configuration::default()))
-        };
+        let input = input(None, Some(vec![]));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({

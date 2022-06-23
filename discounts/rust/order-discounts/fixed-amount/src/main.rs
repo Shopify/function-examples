@@ -76,20 +76,33 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
+    impl Default for input::Input {
+        fn default() -> Self {
+            let json = r#"
+            {
+                "discountNode": { "metafield": null },
+                "presentmentCurrencyRate": "1.00"
+            }
+            "#;
+            serde_json::from_str(json).unwrap()
+        }
+    }
+
     fn input(
         config: Option<Configuration>,
         presentment_currency_rate: Option<Decimal>,
     ) -> input::Input {
-        let discount_node = input::DiscountNode {
-            metafield: config.map(|value| {
-                let value = serde_json::to_string(&value).unwrap();
-                input::Metafield { value }
-            }),
-        };
-        let presentment_currency_rate = presentment_currency_rate.unwrap_or(1.00);
+        let default_input = input::Input::default();
+        let discount_node = config.map(|value| {
+            let value = serde_json::to_string(&value).unwrap();
+            input::DiscountNode {
+                metafield: Some(input::Metafield { value }),
+            }
+        });
         input::Input {
-            discount_node,
-            presentment_currency_rate,
+            discount_node: discount_node.unwrap_or(default_input.discount_node),
+            presentment_currency_rate: presentment_currency_rate
+                .unwrap_or(default_input.presentment_currency_rate),
         }
     }
 
