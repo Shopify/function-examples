@@ -9,11 +9,14 @@ pub mod input {
     use super::*;
     use serde::Deserialize;
 
+    #[serde_as]
     #[derive(Clone, Debug, Deserialize, PartialEq)]
     #[serde(rename_all(deserialize = "camelCase"))]
     pub struct Input {
         pub discount_node: DiscountNode,
         pub cart: Cart,
+        #[serde_as(as = "DisplayFromStr")]
+        pub presentment_currency_rate: Decimal,
     }
 
     #[derive(Clone, Debug, Deserialize, PartialEq)]
@@ -27,19 +30,14 @@ pub mod input {
     }
 
     #[derive(Clone, Debug, Deserialize, PartialEq)]
+    #[serde(rename_all = "camelCase")]
     pub struct Cart {
-        pub lines: Vec<CartLine>,
+        pub delivery_groups: Vec<CartDeliveryGroup>,
     }
 
     #[derive(Clone, Debug, Deserialize, PartialEq)]
-    pub struct CartLine {
+    pub struct CartDeliveryGroup {
         pub id: ID,
-        pub merchandise: Merchandise,
-    }
-
-    #[derive(Clone, Debug, Deserialize, PartialEq)]
-    pub struct Merchandise {
-        pub id: Option<ID>,
     }
 }
 
@@ -74,11 +72,9 @@ pub struct Discount {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Value {
-    #[serde(rename_all(serialize = "camelCase"))]
     FixedAmount {
         #[serde_as(as = "DisplayFromStr")]
         amount: Decimal,
-        applies_to_each_item: Boolean,
     },
     Percentage {
         #[serde_as(as = "DisplayFromStr")]
@@ -90,13 +86,20 @@ pub enum Value {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Target {
-    ProductVariant { id: ID, quantity: Option<Int> },
+    DeliveryGroup { id: ID },
 }
 
 #[serde_as]
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Condition {
+    #[serde(rename_all(serialize = "camelCase"))]
+    OrderMinimumSubtotal {
+        excluded_variant_ids: Vec<ID>,
+        #[serde_as(as = "DisplayFromStr")]
+        minimum_amount: Decimal,
+        target_type: ConditionTargetType,
+    },
     #[serde(rename_all(serialize = "camelCase"))]
     ProductMinimumQuantity {
         ids: Vec<ID>,
@@ -115,5 +118,6 @@ pub enum Condition {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all(serialize = "SCREAMING_SNAKE_CASE"))]
 pub enum ConditionTargetType {
+    OrderSubtotal,
     ProductVariant,
 }

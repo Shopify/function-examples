@@ -8,8 +8,8 @@ use api::*;
 pub struct Configuration {}
 
 impl Configuration {
-    fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).expect("Unable to parse configuration value from metafield")
+    fn from_str(value: &str) -> Self {
+        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
     }
 }
 
@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let _config: Configuration = input.configuration();
+    let _config = input.configuration();
     Ok(FunctionResult {
         discounts: vec![],
         discount_application_strategy: DiscountApplicationStrategy::First,
@@ -42,14 +42,14 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
-        let discount_node = input::DiscountNode {
-            metafield: configuration.map(|value| {
-                let value = serde_json::to_string(&value).unwrap();
-                input::Metafield { value }
-            }),
-        };
-        input::Input { discount_node }
+    fn input(config: Option<Configuration>) -> input::Input {
+        input::Input {
+            discount_node: input::DiscountNode {
+                metafield: Some(input::Metafield {
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                }),
+            },
+        }
     }
 
     #[test]
@@ -74,5 +74,17 @@ mod tests {
             "discountApplicationStrategy": "FIRST",
         });
         assert_eq!(handle_result, expected_handle_result);
+    }
+
+    #[test]
+    fn test_input_deserialization() {
+        let input_json = r#"
+        {
+            "discountNode": { "metafield": { "value": "{}" } }
+        }
+        "#;
+
+        let expected_input = input(Some(Configuration {}));
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }

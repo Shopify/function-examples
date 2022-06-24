@@ -244,6 +244,7 @@ input Condition @oneOf {
 }
 
 """
+<<<<<<< HEAD
 A country.
 """
 type Country {
@@ -254,6 +255,8 @@ type Country {
 }
 
 """
+=======
+>>>>>>> c03791f (Update schemas)
 The code designating a country/region, which generally follows ISO 3166-1 alpha-2 guidelines.
 If a territory doesn't have a country code value in the `CountryCode` enum, it might be considered a subdivision
 of another country. For example, the territories associated with Spain are represented by the country code `ES`,
@@ -3407,7 +3410,7 @@ input OrderMinimumSubtotal {
   """
   The minimum subtotal amount of the order.
   """
-  minimumAmount: Float!
+  minimumAmount: Decimal!
 
   """
   The target type of the condition.
@@ -3436,7 +3439,7 @@ input Percentage {
 
   The value is validated against: >= 0.
   """
-  value: Float!
+  value: Decimal!
 }
 
 """
@@ -3538,7 +3541,7 @@ input ProductMinimumSubtotal {
   """
   The minimum subtotal amount of the product.
   """
-  minimumAmount: Float!
+  minimumAmount: Decimal!
 
   """
   The target type of the condition.

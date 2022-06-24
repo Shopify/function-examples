@@ -1,0 +1,8 @@
+query Input {
+  discountNode {
+    metafield(namespace: "fixed-amount", key: "function-configuration") {
+      value
+    }
+  }
+  presentmentCurrencyRate
+}

@@ -13,8 +13,8 @@ pub struct Configuration {
 impl Configuration {
     pub const DEFAULT_VALUE: f64 = 50.0;
 
-    fn from_str(str: &str) -> Self {
-        serde_json::from_str(str).expect("Unable to parse configuration value from metafield")
+    fn from_str(value: &str) -> Self {
+        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
     }
 }
 
@@ -77,7 +77,7 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
             message: None,
             conditions: None,
             targets,
-            value: Value::Percentage(Percentage { value }),
+            value: Value::Percentage { value },
         }]
     };
     FunctionResult {
@@ -90,37 +90,38 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<Configuration>) -> input::Input {
-        let discount_node = input::DiscountNode {
-            metafield: configuration.map(|value| {
-                let value = serde_json::to_string(&value).unwrap();
-                input::Metafield { value }
-            }),
-        };
+    fn input(
+        config: Option<Configuration>,
+        cart_lines: Option<Vec<input::CartLine>>,
+    ) -> input::Input {
         input::Input {
-            cart: input::Cart {
-                lines: vec![
-                    input::CartLine {
-                        id: String::from("gid://shopify/CartLine/0"),
-                        merchandise: input::Merchandise {
-                            id: Some(String::from("gid://shopify/ProductVariant/0")),
-                        },
-                    },
-                    input::CartLine {
-                        id: String::from("gid://shopify/CartLine/1"),
-                        merchandise: input::Merchandise {
-                            id: Some(String::from("gid://shopify/ProductVariant/1")),
-                        },
-                    },
-                ],
+            discount_node: input::DiscountNode {
+                metafield: Some(input::Metafield {
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                })
             },
-            discount_node,
+            cart: input::Cart {
+                lines: cart_lines.unwrap_or_else(|| vec![
+                    input::CartLine {
+                        id: "gid://shopify/CartLine/0".to_string(),
+                        merchandise: input::Merchandise {
+                            id: Some("gid://shopify/ProductVariant/0".to_string())
+                        }
+                    },
+                    input::CartLine {
+                        id: "gid://shopify/CartLine/1".to_string(),
+                        merchandise: input::Merchandise {
+                            id: Some("gid://shopify/ProductVariant/1".to_string())
+                        }
+                    }
+                ])
+            },
         }
     }
 
     #[test]
     fn test_discount_with_no_configuration() {
-        let input = input(None);
+        let input = input(None, None);
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -129,7 +130,7 @@ mod tests {
                     { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                     { "productVariant": { "id": "gid://shopify/ProductVariant/1" } },
                 ],
-                "value": { "percentage": { "value": 50.0 } },
+                "value": { "percentage": { "value": "50" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
@@ -138,10 +139,13 @@ mod tests {
 
     #[test]
     fn test_discount_with_value() {
-        let input = input(Some(Configuration {
-            value: 10.0,
-            excluded_variant_ids: vec![],
-        }));
+        let input = input(
+            Some(Configuration {
+                value: 12.34,
+                excluded_variant_ids: vec![],
+            }),
+            None,
+        );
         let result = serde_json::json!(function(input).unwrap());
 
         let expected_result = serde_json::json!({
@@ -150,7 +154,7 @@ mod tests {
                     { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                     { "productVariant": { "id": "gid://shopify/ProductVariant/1" } },
                 ],
-                "value": { "percentage": { "value": 10.0 } },
+                "value": { "percentage": { "value": "12.34" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
@@ -159,18 +163,21 @@ mod tests {
 
     #[test]
     fn test_discount_with_excluded_variant_ids() {
-        let input = input(Some(Configuration {
-            value: Configuration::DEFAULT_VALUE,
-            excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
-        }));
+        let input = input(
+            Some(Configuration {
+                value: Configuration::DEFAULT_VALUE,
+                excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
+            }),
+            None,
+        );
         let result = serde_json::json!(function(input).unwrap());
 
-        let expected_result = serde_json::json!(            {
+        let expected_result = serde_json::json!({
             "discounts": [{
                 "targets": [
                     { "productVariant": { "id": "gid://shopify/ProductVariant/0" } },
                 ],
-                "value": { "percentage": { "value": 50.0 } },
+                "value": { "percentage": { "value": "50" } },
             }],
             "discountApplicationStrategy": "FIRST",
         });
@@ -179,10 +186,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_cart_lines() {
-        let input = input::Input {
-            cart: input::Cart { lines: vec![] },
-            ..input(Some(Configuration::default()))
-        };
+        let input = input(None, Some(vec![]));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -194,15 +198,13 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_variant_ids() {
-        let input = input::Input {
-            cart: input::Cart {
-                lines: vec![input::CartLine {
-                    id: "gid://shopify/CartLine/0".to_string(),
-                    merchandise: input::Merchandise { id: None },
-                }],
-            },
-            ..input(Some(Configuration::default()))
-        };
+        let input = input(
+            None,
+            Some(vec![input::CartLine {
+                id: "gid://shopify/CartLine/0".to_string(),
+                merchandise: input::Merchandise { id: None },
+            }]),
+        );
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -210,5 +212,48 @@ mod tests {
             "discountApplicationStrategy": "FIRST",
         });
         assert_eq!(handle_result, expected_handle_result);
+    }
+
+    #[test]
+    fn test_input_deserialization() {
+        let input_json = r#"
+        {
+            "cart": {
+                "lines": [
+                    {
+                        "id": "gid://shopify/CartLine/0",
+                        "merchandise": { "id": "gid://shopify/ProductVariant/0" }
+                    },
+                    {
+                        "id": "gid://shopify/CartLine/1",
+                        "merchandise": {}
+                    }
+                ]
+            },
+            "discountNode": {
+                "metafield": {
+                    "value": "{\"value\":10.0,\"excludedVariantIds\":[\"gid://shopify/ProductVariant/1\"]}"
+                }
+            }
+        }
+        "#;
+
+        let expected_input = input(
+            Some(Configuration {
+                value: 10.00,
+                excluded_variant_ids: vec!["gid://shopify/ProductVariant/1".to_string()],
+            }),
+            Some(vec![
+                input::CartLine {
+                    id: "gid://shopify/CartLine/0".to_string(),
+                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
+                },
+                input::CartLine {
+                    id: "gid://shopify/CartLine/1".to_string(),
+                    merchandise: input::Merchandise { id: None }
+                },
+            ])
+        );
+        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
     }
 }
