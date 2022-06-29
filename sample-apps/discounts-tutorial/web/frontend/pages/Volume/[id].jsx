@@ -1,20 +1,17 @@
 import { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { CurrencyCode } from '@shopify/react-i18n'
-import { Redirect } from '@shopify/app-bridge/actions'
 import { useAppBridge } from '@shopify/app-bridge-react'
 
 import {
   ActiveDatesCard,
   CombinationCard,
-  DiscountClass,
   DiscountMethod,
   MethodCard,
   DiscountStatus,
   RequirementType,
   SummaryCard,
   UsageLimitsCard,
-  onBreadcrumbAction,
 } from '@shopify/discount-app-components'
 
 import {
@@ -44,7 +41,6 @@ const DEFAULT_CONFIGURATION = {
 
 export default function VolumeDetails() {
   const { id } = useParams();
-  const app = useAppBridge()
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isMutationError, setIsMutationError] = useState(false);
   const { discount: savedDiscount, isLoading, isError } = useSavedDiscount(id);
@@ -212,6 +208,39 @@ export default function VolumeDetails() {
               timezoneAbbreviation="EST"
             />
           </Layout.Section>
+          {method && (
+            <Layout.Section secondary>
+              <SummaryCard
+                header={{
+                  discountMethod: method,
+                  discountDescriptor:
+                    method === DiscountMethod.Automatic
+                      ? title
+                      : code,
+                  appDiscountType: 'Volume',
+                  isEditing: false,
+                }}
+                performance={{
+                  status: DiscountStatus.Scheduled,
+                  usageCount: 0,
+                }}
+                minimumRequirements={{
+                  requirementType: RequirementType.None,
+                  subtotal: '0',
+                  quantity: '0',
+                  currencyCode: CurrencyCode.Cad
+                }}
+                usageLimits={{
+                  oncePerCustomer: appliesOncePerCustomer,
+                  totalUsageLimit: usageLimit ?? 0
+                }}
+                activeDates={{
+                  startDate: startsAt,
+                  endDate: endsAt
+                }}
+              />
+            </Layout.Section>
+          )}
           <Layout.Section>
             <PageActions
               primaryAction={{
