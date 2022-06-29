@@ -1,16 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useForm, useField } from '@shopify/react-form'
 import { CurrencyCode } from '@shopify/react-i18n'
 import { Redirect } from '@shopify/app-bridge/actions'
 import { useAppBridge } from '@shopify/app-bridge-react'
-import { gql } from 'graphql-request'
-import { useDiscount } from '../../hooks/useDiscount';
-import { useSavedDiscount } from '../../hooks/useSavedDiscount';
-import { useUpdateDiscount } from '../../hooks/useUpdateDiscount';
-import { useDeleteDiscount } from '../../hooks/useDeleteDiscount';
-import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
-import { useShopifyMutation } from '../../hooks/useShopifyMutation';
 
 import {
   ActiveDatesCard,
@@ -38,10 +30,13 @@ import {
   Toast,
 } from '@shopify/polaris';
 
-const todaysDate = new Date()
-const METAFIELD_NAMESPACE = 'discounts-tutorial'
-const METAFIELD_CONFIGURATION_KEY = 'volume-config'
-const FUNCTION_ID = 'YOUR_FUNCTION_ID'
+import { useDiscount } from '../../hooks/useDiscount';
+import { useSavedDiscount } from '../../hooks/useSavedDiscount';
+import { useUpdateDiscount } from '../../hooks/useUpdateDiscount';
+import { useDeleteDiscount } from '../../hooks/useDeleteDiscount';
+import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
+import { serializeDiscount } from '../../utilities/serializeDiscount';
+
 const DEFAULT_CONFIGURATION = {
   value: 0,
   excludedVariantIds: [],
@@ -52,8 +47,6 @@ export default function VolumeDetails() {
   const app = useAppBridge()
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isMutationError, setIsMutationError] = useState(false);
-  const redirect = Redirect.create(app)
-  const currencyCode = CurrencyCode.Cad
   const { discount: savedDiscount, isLoading, isError } = useSavedDiscount(id);
   const {
     discount,
@@ -79,7 +72,6 @@ export default function VolumeDetails() {
     savedDiscount,
     DEFAULT_CONFIGURATION,
   });
-  console.log(configuration)
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
   const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(method);
   const mutationInProgress = updateInProgress || deleteInProgress;
