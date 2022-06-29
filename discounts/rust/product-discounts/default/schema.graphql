@@ -199,21 +199,21 @@ type CartLine {
 }
 
 """
-The estimated cost of the merchandise line that the buyer will pay at checkout.
+The cost of the merchandise line that the buyer will pay at checkout.
 """
 type CartLineCost {
   """
   The amount of the merchandise line.
   """
-  amount: MoneyV2!
+  amountPerQuantity: MoneyV2!
 
   """
   The compare at amount of the merchandise line.
   """
-  compareAtAmount: MoneyV2
+  compareAtAmountPerQuantity: MoneyV2
 
   """
-  The cost of the merchandise line before discounts.
+  The cost of the merchandise line before line-level discounts.
   """
   subtotalAmount: MoneyV2!
 
