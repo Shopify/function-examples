@@ -34,6 +34,7 @@ import {
   Layout,
   Frame,
   Banner,
+  TextField,
   Toast,
 } from '@shopify/polaris';
 
@@ -78,6 +79,7 @@ export default function VolumeDetails() {
     savedDiscount,
     DEFAULT_CONFIGURATION,
   });
+  console.log(configuration)
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
   const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(method);
   const mutationInProgress = updateInProgress || deleteInProgress;
@@ -94,6 +96,20 @@ export default function VolumeDetails() {
       setIsMutationError(true);
       return;
     }
+  };
+
+  const handleQuantityChange = (value) => {
+    setConfiguration({
+      ...configuration,
+      quantity: parseFloat(value),
+    });
+  };
+  
+  const handlePercentageChange = (value) => {
+    setConfiguration({
+      ...configuration,
+      percentage: parseFloat(value),
+    });
   };
 
   if (isLoading) {
@@ -144,6 +160,30 @@ export default function VolumeDetails() {
               }}
               discountMethodHidden={true}
             />
+            {configuration && (
+              <Card title="Volume">
+                <Card.Section>
+                  <Stack>
+                  <TextField
+                    label="Minimum quantity"
+                    value={configuration.quantity}
+                    onChange={handleQuantityChange}
+                    type="number"
+                    min={0}
+                  />
+                  <TextField
+                    label="Discount percentage"
+                    value={configuration.percentage}
+                    onChange={handlePercentageChange}
+                    type="number"
+                    min={0}
+                    max={100}
+                    suffix="%"
+                  />
+                  </Stack>
+                </Card.Section>
+              </Card>
+            )}
             {method === DiscountMethod.Code && (
               <UsageLimitsCard
                 totalUsageLimit={{

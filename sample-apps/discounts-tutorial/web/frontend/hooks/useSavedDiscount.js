@@ -9,7 +9,7 @@ const QUERY = gql`
   query GetDiscount($id: ID!) {
     discountNode(id: $id) {
       id
-      configurationField: metafield(namespace: "discount-functions-sample-app", key: "function-configuration") {
+      configurationField: metafield(namespace: "discounts-tutorial", key: "volume-config") {
         id
         value
       }
