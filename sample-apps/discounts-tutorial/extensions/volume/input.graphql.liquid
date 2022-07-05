@@ -10,7 +10,7 @@ query Input {
     }
   }
   discountNode {
-    metafield(namespace: "discounts-tutorial", key: "volume-config") {
+    metafield(namespace: "{{ app_name | replace: " ", "-" | downcase }}", key: "function-config") {
       value
     }
   }

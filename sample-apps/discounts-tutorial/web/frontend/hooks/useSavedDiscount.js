@@ -5,11 +5,13 @@ import { DiscountMethod } from '@shopify/discount-app-components';
 import { idToGid } from '../utilities/gid';
 import { useShopifyQuery } from './useShopifyQuery';
 
+import metafields from '../metafields';
+
 const QUERY = gql`
-  query GetDiscount($id: ID!) {
+  query GetDiscount($id: ID!, $metafieldNamespace: String!, $metafieldKey: String!) {
     discountNode(id: $id) {
       id
-      configurationField: metafield(namespace: "discounts-tutorial", key: "volume-config") {
+      configurationField: metafield(namespace: $metafieldNamespace, key: $metafieldKey) {
         id
         value
       }
@@ -53,7 +55,11 @@ export function useSavedDiscount(id) {
   const { data: result, isLoading, isError } = useShopifyQuery({
     key: 'GetDiscount',
     query: QUERY,
-    variables: { id: idToGid('DiscountNode', id) },
+    variables: { 
+      id: idToGid('DiscountNode', id),
+      metafieldNamespace: metafields.namespace,
+      metafieldKey: metafields.key,
+    },
   });
 
   const discount = useMemo(() => {

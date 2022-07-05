@@ -1,0 +1,13 @@
+{
+  "name": "function-examples",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@iarna/toml": "^2.2.5",
+    "fast-glob": "^3.2.11",
+    "liquidjs": "^9.37.0"
+  },
+  "scripts": {
+    "expand-liquid": "node ./util/expand-liquid.js"
+  }
+}

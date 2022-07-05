@@ -4,6 +4,7 @@ import { Redirect } from '@shopify/app-bridge/actions'
 import { useAppBridge } from '@shopify/app-bridge-react'
 import { gql } from 'graphql-request'
 import { useShopifyMutation } from '../../hooks'
+import metafields from '../../metafields'
 
 import {
   ActiveDatesCard,
@@ -29,8 +30,6 @@ import {
 import { data } from '@shopify/app-bridge/actions/Modal'
 
 const todaysDate = new Date()
-const METAFIELD_NAMESPACE = 'discounts-tutorial'
-const METAFIELD_CONFIGURATION_KEY = 'volume-config'
 const FUNCTION_ID = 'YOUR_FUNCTION_ID'
 
 const CREATE_AUTOMATIC_MUTATION = gql`
@@ -119,8 +118,8 @@ export default function VolumeNew() {
         endsAt: form.endDate,
         metafields: [
           {
-            namespace: METAFIELD_NAMESPACE,
-            key: METAFIELD_CONFIGURATION_KEY,
+            namespace: metafields.namespace,
+            key: metafields.key,
             type: 'json',
             value: JSON.stringify({
               quantity: parseInt(form.configuration.quantity),

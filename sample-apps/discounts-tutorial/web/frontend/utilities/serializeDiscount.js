@@ -1,9 +1,7 @@
 import { DiscountMethod } from "@shopify/discount-app-components";
+import metafields from '../metafields';
 
 export function serializeDiscount(discount) {
-  const METAFIELD_NAMESPACE = 'discounts-tutorial';
-  const METAFIELD_CONFIGURATION_KEY = 'volume-config';
-
   const serialized = {
     title: discount.method === DiscountMethod.Automatic ? discount.title : discount.code,
     startsAt: discount.startsAt,
@@ -12,8 +10,8 @@ export function serializeDiscount(discount) {
     metafields: [
       // store configuration in app metafield
       {
-        namespace: METAFIELD_NAMESPACE,
-        key: METAFIELD_CONFIGURATION_KEY,
+        namespace: metafields.namespace,
+        key: metafields.key,
         type: 'json',
         value: JSON.stringify(discount.configuration)
       }
