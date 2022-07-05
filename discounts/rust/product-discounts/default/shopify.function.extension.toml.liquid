@@ -5,3 +5,7 @@ api_version = "2022-07"
 [build]
 command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/{{name | replace: " ", "-" | downcase}}.wasm"
+
+[ui.paths]
+create = "/"
+details = "/"
