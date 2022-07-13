@@ -15,17 +15,12 @@ pub struct Config {}
 // Use the following container attribute if fields need to be camel cased.
 // #[serde(rename_all = "camelCase")]
 pub struct Input {
-    pub purchase_proposal: PurchaseProposal,
     pub payment_methods: Vec<PaymentMethod>,
 }
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct PurchaseProposal {}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PaymentMethod {
     pub id: ID,
-    pub name: String,
 }
 
 #[derive(Clone, Debug, Serialize)]

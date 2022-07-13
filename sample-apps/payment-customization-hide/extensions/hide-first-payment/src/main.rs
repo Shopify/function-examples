@@ -38,19 +38,15 @@ mod tests {
     fn default_payload() -> Payload {
         Payload {
             input: Input {
-                purchase_proposal: PurchaseProposal {},
                 payment_methods: vec![
                     PaymentMethod {
                         id: "123456789".to_string(),
-                        name: "Shopify payments".to_string(),
                     },
                     PaymentMethod {
                         id: "987654321".to_string(),
-                        name: "Auth.net".to_string(),
                     },
                     PaymentMethod {
                         id: "523414132".to_string(),
-                        name: "Cash on Delivery".to_string(),
                     },
                 ],
             },
