@@ -1,38 +1,38 @@
-import { BrowserRouter } from 'react-router-dom'
-import { NavigationMenu } from '@shopify/app-bridge-react'
-import Routes from './Routes'
+import { BrowserRouter } from "react-router-dom";
+import { NavigationMenu } from "@shopify/app-bridge-react";
+import Routes from "./Routes";
 
 import {
   AppBridgeProvider,
   DiscountProvider,
-  GraphQLProvider,
+  QueryProvider,
   PolarisProvider,
-} from './components'
+} from "./components";
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
   // For more information, refer to the <Routes /> documentation
-  const pages = import.meta.globEager('./pages/**/!(*.test.[jt]sx)*.([jt]sx)')
+  const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
   return (
     <PolarisProvider>
       <BrowserRouter>
         <AppBridgeProvider>
           <DiscountProvider>
-            <GraphQLProvider>
+            <QueryProvider>
               <NavigationMenu
                 navigationLinks={[
                   {
-                    label: 'New volume discount',
-                    destination: '/Volume/new'
-                  }
+                    label: "New volume discount",
+                    destination: "/Volume/new",
+                  },
                 ]}
               />
               <Routes pages={pages} />
-            </GraphQLProvider>
+            </QueryProvider>
           </DiscountProvider>
         </AppBridgeProvider>
       </BrowserRouter>
     </PolarisProvider>
-  )
+  );
 }
