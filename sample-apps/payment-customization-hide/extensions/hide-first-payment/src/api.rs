@@ -13,7 +13,7 @@ pub struct Config {}
 
 #[derive(Clone, Debug, Deserialize)]
 // Use the following container attribute if fields need to be camel cased.
-// #[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase")]
 pub struct Input {
     pub payment_methods: Vec<PaymentMethod>,
 }
@@ -31,23 +31,9 @@ pub struct FunctionResult {
 #[derive(Clone, Debug, Serialize)]
 pub struct Operation {
     pub hide: Option<HideOperation>,
-    pub r#move: Option<MoveOperation>,
-    pub rename: Option<RenameOperation>,
 }
 
 #[derive(Clone, Debug, Serialize)]
 pub struct HideOperation {
     pub payment_method_id: ID,
-}
-
-#[derive(Clone, Debug, Serialize, PartialEq)]
-pub struct MoveOperation {
-    pub payment_method_id: ID,
-    pub index: u64,
-}
-
-#[derive(Clone, Debug, Serialize, PartialEq)]
-pub struct RenameOperation {
-    pub payment_method_id: ID,
-    pub name: String,
 }

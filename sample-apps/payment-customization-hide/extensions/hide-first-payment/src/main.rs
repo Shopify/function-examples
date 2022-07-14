@@ -26,8 +26,6 @@ fn build_result(payment_method_to_remove: ID) -> FunctionResult {
             hide: Some(HideOperation {
                 payment_method_id: payment_method_to_remove,
             }),
-            r#move: None,
-            rename: None,
         }],
     }
 }
@@ -64,7 +62,5 @@ mod tests {
             operations[0].hide.as_ref().unwrap().payment_method_id,
             "123456789"
         );
-        assert_eq!(operations[0].rename, None);
-        assert_eq!(operations[0].r#move, None);
     }
 }
