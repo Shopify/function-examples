@@ -1,6 +1,8 @@
 import { DiscountMethod } from '@shopify/discount-app-components';
 import { gql } from 'graphql-request';
+
 import { idToGid } from '../utilities/gid';
+
 import { useShopifyMutation } from './useShopifyMutation';
 
 const DELETE_AUTOMATIC_MUTATION = gql`
@@ -27,17 +29,25 @@ const DELETE_CODE_MUTATION = gql`
   }
 `;
 
-export function useDeleteDiscount(discountMethod) {
-  const [triggerMutation, { isLoading }] = useShopifyMutation({
-    query: discountMethod === DiscountMethod.Automatic ? DELETE_AUTOMATIC_MUTATION : DELETE_CODE_MUTATION,
-  });
+export function useDeleteDiscount(method) {
+  const deleteAutoDiscount = useShopifyMutation({
+    query: DELETE_AUTOMATIC_MUTATION,
+  })
 
-  const deleteDiscount = async (id) => {
-    const resource = discountMethod === DiscountMethod.Automatic ? 'DiscountAutomaticApp' : 'DiscountCodeApp';
+  const deleteCodeDiscount = useShopifyMutation({
+    query: DELETE_CODE_MUTATION,
+  })
+
+  const [triggerMutation, { isError, isLoading }] = method === DiscountMethod.Automatic ? deleteAutoDiscount : deleteCodeDiscount
+
+  const resource = method === DiscountMethod.Automatic ? 'DiscountAutomaticApp' : 'DiscountCodeApp';
+
+  const deleteDiscount = async ({ id }) => {
     try {
       const response = await triggerMutation({
         id: idToGid(resource, id),
       });
+
       if (response.data.discountDelete.userErrors.length) {
         return Promise.reject(
           response.data.discountDelete.userErrors,
@@ -49,5 +59,5 @@ export function useDeleteDiscount(discountMethod) {
     }
   };
 
-  return [deleteDiscount, { isLoading }];
+  return [deleteDiscount, { isLoading, isError }];
 }

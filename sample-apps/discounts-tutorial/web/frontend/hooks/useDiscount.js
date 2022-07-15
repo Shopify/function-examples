@@ -1,90 +1,110 @@
-import { useEffect, useState, useMemo } from 'react';
-import { isEqual } from 'lodash';
+import { useState } from 'react';
 
-import { usePrevious } from './usePrevious';
+const DEFAULT_DISCOUNT_CONFIGURATION = {
+  value: 0,
+  excludedVariantIds: [],
+};
 
-export function useDiscount({
-  savedDiscount,
-  defaultConfiguration,
-}) {
-  const previousSavedDiscount = usePrevious(savedDiscount);
-  const [title, setTitle] = useState(savedDiscount?.title ?? '');
-  const [code, setCode] = useState(savedDiscount?.code ?? '');
-  const [method, setMethod] = useState(savedDiscount?.method ?? '');
-  const [startsAt, setStartsAt] = useState(savedDiscount?.startsAt ?? new Date());
-  const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt ?? null);
-  const [usageLimit, setUsageLimit] = useState(savedDiscount?.usageLimit ?? null);
-  const [appliesOncePerCustomer, setAppliesOncePerCustomer] = useState(savedDiscount?.appliesOncePerCustomer ?? false);
-  const [combinesWith, setCombinesWith] = useState(savedDiscount?.combinesWith ?? {});
-  const [configuration, setConfiguration] = useState(
-    savedDiscount?.configuration ?? defaultConfiguration,
-  );
-  const configurationId = savedDiscount?.configurationId;
+const DEFAULT_DISCOUNT = {
+  title: '',
+  code: '',
+  method: '',
+  startsAt: new Date(),
+  endsAt: null,
+  usageLimit: null,
+  appliesOncePerCustomer: false,
+  combinesWith: {},
+  configuration: DEFAULT_DISCOUNT_CONFIGURATION,
+  configurationId: null,
+}
 
-  const discount = {
-    title,
-    code,
-    method,
-    startsAt,
-    endsAt,
-    usageLimit,
-    appliesOncePerCustomer,
-    combinesWith,
-    configuration,
-    configurationId,
-  };
-
-  const isDirty = useMemo(() => {
-    if (!savedDiscount) {
-      return true;
+const GET_DISCOUNT_QUERY = gql`
+  query GetDiscount($id: ID!) {
+    discountNode(id: $id) {
+      id
+      configurationField: metafield(namespace: "discounts-tutorial", key: "volume-config") {
+        id
+        value
+      }
+      discount {
+        __typename
+        ... on DiscountAutomaticApp {
+          title
+          discountClass
+          combinesWith {
+            orderDiscounts
+            productDiscounts
+            shippingDiscounts
+          }
+          startsAt
+          endsAt
+        }
+        ... on DiscountCodeApp {
+          title
+          discountClass
+          combinesWith {
+            orderDiscounts
+            productDiscounts
+            shippingDiscounts
+          }
+          startsAt
+          endsAt
+          usageLimit
+          appliesOncePerCustomer
+          codes(first: 1) {
+            nodes {
+              code
+            }
+          }
+        }
+      }
     }
+  }
+`;
 
-    return !isEqual(discount, savedDiscount);
-  }, [savedDiscount, discount]);
+export function useDiscount(id) {
+  const [discount, setDiscount] = useState(DEFAULT_DISCOUNT);
 
-  useEffect(() => {
-    if (!savedDiscount) {
-      return;
-    }
+  const { data: result, isLoading, isError } = useShopifyQuery({
+    key: 'GetDiscount',
+    query: GET_DISCOUNT_QUERY,
+    variables: { id: idToGid('DiscountNode', id) },
+  });
 
-    if (
-      previousSavedDiscount &&
-      isEqual(savedDiscount, previousSavedDiscount)
-    ) {
-      return;
-    }
+  const queriedDiscount = result?.data?.discountNode
+  if (!isLoading && !isError && discount.id !== queriedDiscount.discount.id) {
+    const {
+      discount : {
+        title,
+        startsAt,
+        endsAt,
+        discountClass,
+        combinesWith,
+        usageLimit,
+        appliesOncePerCustomer,
+        codes,
+        __typename
+      },
+      configurationField
+    } = queriedDiscount;
 
-    setTitle(savedDiscount.title);
-    setCode(savedDiscount.code);
-    setMethod(savedDiscount.method);
-    setStartsAt(savedDiscount.startsAt);
-    setEndsAt(savedDiscount.endsAt);
-    setUsageLimit(savedDiscount.usageLimit);
-    setAppliesOncePerCustomer(savedDiscount.appliesOncePerCustomer);
-    setCombinesWith(savedDiscount.combinesWith);
-    setConfiguration(savedDiscount.configuration);
-  }, [savedDiscount]);
+    const method = __typename === 'DiscountAutomaticApp' ? DiscountMethod.Automatic : DiscountMethod.Code;
 
-  return {
-    discount,
-    title,
-    code,
-    method,
-    startsAt,
-    endsAt,
-    usageLimit,
-    appliesOncePerCustomer,
-    combinesWith,
-    configuration,
-    setTitle,
-    setCode,
-    setMethod,
-    setStartsAt,
-    setEndsAt,
-    setUsageLimit,
-    setAppliesOncePerCustomer,
-    setCombinesWith,
-    setConfiguration,
-    isDirty,
-  };
+    setDiscount({
+      id,
+      title,
+      startsAt,
+      endsAt,
+      discountClass,
+      combinesWith,
+      usageLimit,
+      appliesOncePerCustomer,
+      code: codes?.nodes[0]?.code,
+      configuration: JSON.parse(configurationField?.value ?? '{}'),
+      configurationId: configurationField?.id,
+      method,
+    });
+  }
+
+  return { discount, setDiscount, isLoading, isError };
 }

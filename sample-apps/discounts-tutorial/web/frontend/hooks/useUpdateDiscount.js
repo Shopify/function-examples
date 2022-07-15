@@ -1,5 +1,6 @@
 import { DiscountMethod } from '@shopify/discount-app-components';
 import { gql } from 'graphql-request';
+
 import { idToGid } from '../utilities/gid';
 
 import { useShopifyMutation } from './useShopifyMutation';
@@ -34,31 +35,36 @@ const UPDATE_CODE_MUTATION = gql`
   }
 `;
 
-export function useUpdateDiscount(discountMethod) {
-  const [triggerMutation, { isLoading }] = useShopifyMutation({
-    query: discountMethod === DiscountMethod.Automatic ? UPDATE_AUTOMATIC_MUTATION : UPDATE_CODE_MUTATION,
-  });
+export function useUpdateDiscount(method) {
+  const updateAutoDiscount = useShopifyMutation({
+    query: UPDATE_AUTOMATIC_MUTATION,
+  })
 
-  const updateDiscount = (id, discount) => {
-    const resource = discountMethod === DiscountMethod.Automatic ? 'DiscountAutomaticApp' : 'DiscountCodeApp';
-    return triggerMutation({
-      id: idToGid(resource, id),
-      discount,
-    })
-      .then((response) => {
-        if (response.data.discountUpdate.userErrors.length) {
-          return Promise.reject(
-            response.data.discountUpdate.userErrors,
-          );
-        }
+  const codeMutationProps = useShopifyMutation({
+    query: UPDATE_CODE_MUTATION,
+  })
 
-        return response;
+  const [triggerMutation, { isError, isLoading }] = method === DiscountMethod.Automatic ? updateAutoDiscount : codeMutationProps
+
+  const resource = method === DiscountMethod.Automatic ? 'DiscountAutomaticApp' : 'DiscountCodeApp';
+
+  const updateDiscount = async (id, serializedDiscount) => {
+    try {
+      const response = await triggerMutation({
+        id: idToGid(resource, id),
+        discount: serializedDiscount,
       })
-      .catch((error) => {
-        console.error('Failed to update discount', error);
-        return Promise.reject(error);
-      });
+
+      if (response.data.discountUpdate.userErrors.length) {
+        return Promise.reject(
+          response.data.discountUpdate.userErrors,
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update discount', error);
+      return Promise.reject(error);
+    }
   };
 
-  return [updateDiscount, { isLoading }];
+  return [updateDiscount, { isLoading, isError }];
 }

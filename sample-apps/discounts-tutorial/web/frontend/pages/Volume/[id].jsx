@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CurrencyCode } from '@shopify/react-i18n'
 import { useAppBridge } from '@shopify/app-bridge-react'
@@ -28,76 +28,62 @@ import {
 } from '@shopify/polaris';
 
 import { useDiscount } from '../../hooks/useDiscount';
-import { useSavedDiscount } from '../../hooks/useSavedDiscount';
 import { useUpdateDiscount } from '../../hooks/useUpdateDiscount';
 import { useDeleteDiscount } from '../../hooks/useDeleteDiscount';
 import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
 import { serializeDiscount } from '../../utilities/serializeDiscount';
 
-const DEFAULT_CONFIGURATION = {
-  value: 0,
-  excludedVariantIds: [],
-};
 
 export default function VolumeDetails() {
   const { id } = useParams();
   const redirectToDiscounts = useRedirectToDiscounts();
-  const [isMutationError, setIsMutationError] = useState(false);
-  const { discount: savedDiscount, isLoading, isError } = useSavedDiscount(id);
-  const {
-    discount,
-    isDirty,
-    method,
-    title,
-    setTitle,
-    code,
-    setCode,
-    usageLimit,
-    setUsageLimit,
-    appliesOncePerCustomer,
-    setAppliesOncePerCustomer,
-    combinesWith,
-    setCombinesWith,
-    startsAt,
-    setStartsAt,
-    endsAt,
-    setEndsAt,
-    configuration,
-    setConfiguration,
-  } = useDiscount({
-    savedDiscount,
-    DEFAULT_CONFIGURATION,
-  });
+  const { discount, setDiscount, isLoading, isError } = useDiscount(id);
   const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
   const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(method);
-  const mutationInProgress = updateInProgress || deleteInProgress;
-
+  const [isMutationError, setIsMutationError] = useState(false);
   const [successActive, setSuccessActive] = useState(false);
-  const toggleSuccessActive = useCallback(() => setSuccessActive((successActive) => !successActive), []);
+
+  const toggleSuccessActive = () => setSuccessActive((successActive) => !successActive)
 
   const handleUpdateDiscount = async () => {
     setIsMutationError(false);
+
     try {
       await updateDiscount(id, serializeDiscount(discount));
+
       toggleSuccessActive();
     } catch {
       setIsMutationError(true);
-      return;
     }
   };
 
-  const handleQuantityChange = (value) => {
-    setConfiguration({
-      ...configuration,
-      quantity: parseFloat(value),
-    });
-  };
-  
-  const handlePercentageChange = (value) => {
-    setConfiguration({
-      ...configuration,
-      percentage: parseFloat(value),
-    });
+  const handleDeleteDiscount = async () => {
+    setIsMutationError(false);
+
+    try {
+      await deleteDiscount(id);
+
+      redirectToDiscounts();
+    } catch {
+      setIsMutationError(true);
+    }
+  }
+
+  const handleDiscountChange = (prop, value) => {
+    setDiscount(cur => ({
+      ...cur,
+      [prop]: value,
+    }));
+  }
+
+  const handleConfigurationChange = (prop, value) => {
+    setDiscount(cur => ({
+      ...cur,
+      configuration: {
+        ...cur.configuration,
+        [prop]: parseFloat(value),
+      }
+    }));
   };
 
   if (isLoading) {
@@ -125,6 +111,20 @@ export default function VolumeDetails() {
     </Layout.Section>
   ) : null;
 
+  const isMutationInProgress = updateInProgress || deleteInProgress;
+
+  const {
+    title,
+    code,
+    method,
+    configuration,
+    usageLimit,
+    appliesOncePerCustomer,
+    combinesWith,
+    startsAt,
+    endsAt
+  } = discount;
+
   return (
     <Page title="Volume discount details" breadcrumbs={[{ onAction: redirectToDiscounts }]}>
       <Frame>
@@ -137,17 +137,18 @@ export default function VolumeDetails() {
               discountClass={savedDiscount.discountClass}
               discountTitle={{
                 value: title,
-                onChange: setTitle,
+                onChange: (value) => handleDiscountChange('title', value),
               }}
               discountCode={{
                 value: code,
-                onChange: setCode
+                onChange: (value) => handleDiscountChange('code', value)
               }}
               discountMethod={{
                 value: method
               }}
               discountMethodHidden={true}
             />
+
             {configuration && (
               <Card title="Volume">
                 <Card.Section>
@@ -155,14 +156,14 @@ export default function VolumeDetails() {
                   <TextField
                     label="Minimum quantity"
                     value={configuration.quantity}
-                    onChange={handleQuantityChange}
+                    onChange={(value) => handleConfigurationChange('quantity', value)}
                     type="number"
                     min={0}
                   />
                   <TextField
                     label="Discount percentage"
                     value={configuration.percentage}
-                    onChange={handlePercentageChange}
+                    onChange={(value) => handleConfigurationChange('percentage', value)}
                     type="number"
                     min={0}
                     max={100}
@@ -172,24 +173,26 @@ export default function VolumeDetails() {
                 </Card.Section>
               </Card>
             )}
+
             {method === DiscountMethod.Code && (
               <UsageLimitsCard
                 totalUsageLimit={{
                   value: usageLimit,
-                  onChange: (value) => setUsageLimit(parseInt(value)),
+                  onChange: (value) => handleDiscountChange('usageLimit', parseInt(value)),
                 }}
                 oncePerCustomer={{
                   value: appliesOncePerCustomer,
-                  onChange: setAppliesOncePerCustomer,
+                  onChange: (value) => handleDiscountChange('appliesOncePerCustomer', value),
                 }}
               />
             )}
+
             <CombinationCard
               combinableDiscountTypes={{
                 value: combinesWith,
-                onChange: setCombinesWith,
+                onChange: (value) => handleDiscountChange('combinesWith', value),
               }}
-              discountClass={savedDiscount.discountClass}
+              discountClass={discount.discountClass}
               discountDescriptor={
                 method === DiscountMethod.Automatic
                   ? title
@@ -199,11 +202,11 @@ export default function VolumeDetails() {
             <ActiveDatesCard
               startDate={{
                 value: startsAt,
-                onChange: setStartsAt,
+                onChange: (value) => handleDiscountChange('startsAt', value),
               }}
               endDate={{
                 value: endsAt,
-                onChange: setEndsAt,
+                onChange: (value) => handleDiscountChange('endsAt', value),
               }}
               timezoneAbbreviation="EST"
             />
@@ -246,18 +249,15 @@ export default function VolumeDetails() {
               primaryAction={{
                 content: 'Save',
                 onAction: handleUpdateDiscount,
-                loading: mutationInProgress,
+                loading: isMutationInProgress,
                 disabled: !isDirty,
               }}
               secondaryActions={[
                 {
                   content: 'Delete',
                   destructive: true,
-                  loading: mutationInProgress,
-                  onAction: async () => {
-                    await deleteDiscount(id);
-                    redirectToDiscounts();
-                  },
+                  loading: isMutationInProgress,
+                  onAction: handleDeleteDiscount,
                 },
               ]}
             />
