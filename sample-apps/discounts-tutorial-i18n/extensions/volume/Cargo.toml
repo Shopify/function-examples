@@ -14,3 +14,8 @@ rust-i18n = "0"
 lto = true
 opt-level = 'z'
 strip = true
+
+[profile.test]
+lto = true
+opt-level = 'z'
+strip = true

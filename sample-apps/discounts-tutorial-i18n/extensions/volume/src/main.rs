@@ -59,30 +59,32 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
 mod tests {
     use super::*;
 
-    fn input(configuration: Option<input::Configuration>) -> input::Input {
-        let input = r#"
-        {
-            "cart": {
+    fn input(configuration: Option<input::Configuration>, locale: &str) -> input::Input {
+        let input = format!(
+            r#"{{
+            "cart": {{
                 "lines": [
-                    {
+                    {{
                         "quantity": 5,
-                        "merchandise": {
+                        "merchandise": {{
                             "id": "gid://shopify/ProductVariant/0"
-                        }
-                    },
-                    {
+                        }}
+                    }},
+                    {{
                         "quantity": 1,
-                        "merchandise": {
+                        "merchandise": {{
                             "id": "gid://shopify/ProductVariant/1"
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            },
-            "discountNode": { "metafield": null },
-            "localization": { "language": { "isoCode": "EN" } }
-        }
-        "#;
-        let default_input: input::Input = serde_json::from_str(input).unwrap();
+            }},
+            "discountNode": {{ "metafield": null }},
+            "localization": {{ "language": {{ "isoCode": "{}" }} }}
+        }}
+        "#,
+            locale
+        );
+        let default_input: input::Input = serde_json::from_str(&input).unwrap();
         let value = configuration.map(|x| serde_json::to_string(&x).unwrap());
 
         let discount_node = input::DiscountNode {
@@ -97,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_no_configuration() {
-        let input = input(None);
+        let input = input(None, "EN");
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
@@ -117,16 +119,52 @@ mod tests {
 
     #[test]
     fn test_discount_with_configuration() {
-        let input = input(Some(input::Configuration {
-            quantity: 5,
-            percentage: 10.0,
-        }));
+        let input = input(
+            Some(input::Configuration {
+                quantity: 5,
+                percentage: 10.0,
+            }),
+            "EN",
+        );
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_json = r#"
             {
                 "discounts": [{
                     "message": "Wholesale discount",
+                    "targets": [
+                        { "productVariant": { "id": "gid://shopify/ProductVariant/0" } }
+                    ],
+                    "value": { "percentage": { "value": 10.0 } }
+                }],
+                "discountApplicationStrategy": "FIRST"
+            }
+        "#;
+
+        let expected_handle_result: serde_json::Value =
+            serde_json::from_str(expected_json).unwrap();
+        assert_eq!(
+            handle_result.to_string(),
+            expected_handle_result.to_string()
+        );
+    }
+
+    #[test]
+    fn test_discount_i18n_french() {
+        let input = input(
+            Some(input::Configuration {
+                quantity: 5,
+                percentage: 10.0,
+            }),
+            "FR",
+        );
+
+        let handle_result = serde_json::json!(function(input).unwrap());
+
+        let expected_json = r#"
+            {
+                "discounts": [{
+                    "message": "Rabais d'achat en gros",
                     "targets": [
                         { "productVariant": { "id": "gid://shopify/ProductVariant/0" } }
                     ],
