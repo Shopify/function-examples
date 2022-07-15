@@ -78,7 +78,8 @@ mod tests {
                     }
                 ]
             },
-            "discountNode": { "metafield": null }
+            "discountNode": { "metafield": null },
+            "localization": { "language": { "isoCode": "EN" } }
         }
         "#;
         let default_input: input::Input = serde_json::from_str(input).unwrap();
@@ -125,6 +126,7 @@ mod tests {
         let expected_json = r#"
             {
                 "discounts": [{
+                    "message": "Wholesale discount",
                     "targets": [
                         { "productVariant": { "id": "gid://shopify/ProductVariant/0" } }
                     ],
