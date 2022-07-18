@@ -1,0 +1,22 @@
+query Input {
+  cart {
+    lines {
+      quantity
+      merchandise {
+        ... on ProductVariant {
+          id
+        }
+      }
+    }
+  }
+  discountNode {
+    metafield(namespace: "discounts-tutorial", key: "volume-config") {
+      value
+    }
+  }
+  localization {
+    language {
+      isoCode
+    }
+  }
+}
