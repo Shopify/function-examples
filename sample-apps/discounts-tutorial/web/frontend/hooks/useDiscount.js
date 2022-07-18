@@ -1,28 +1,19 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { gql } from "graphql-request";
+import { DiscountMethod } from "@shopify/discount-app-components";
 
-const DEFAULT_DISCOUNT_CONFIGURATION = {
-  value: 0,
-  excludedVariantIds: [],
-};
+import { idToGid } from "../utilities/gid";
 
-const DEFAULT_DISCOUNT = {
-  title: '',
-  code: '',
-  method: '',
-  startsAt: new Date(),
-  endsAt: null,
-  usageLimit: null,
-  appliesOncePerCustomer: false,
-  combinesWith: {},
-  configuration: DEFAULT_DISCOUNT_CONFIGURATION,
-  configurationId: null,
-}
+import { useShopifyQuery } from "./useShopifyQuery";
 
 const GET_DISCOUNT_QUERY = gql`
   query GetDiscount($id: ID!) {
     discountNode(id: $id) {
       id
-      configurationField: metafield(namespace: "discounts-tutorial", key: "volume-config") {
+      configurationField: metafield(
+        namespace: "discount-type-tutorial"
+        key: "volume-config"
+      ) {
         id
         value
       }
@@ -63,48 +54,68 @@ const GET_DISCOUNT_QUERY = gql`
 `;
 
 export function useDiscount(id) {
-  const [discount, setDiscount] = useState(DEFAULT_DISCOUNT);
-
-  const { data: result, isLoading, isError } = useShopifyQuery({
-    key: 'GetDiscount',
+  const { data: result, ...queryProps } = useShopifyQuery({
+    key: "GetDiscount",
     query: GET_DISCOUNT_QUERY,
-    variables: { id: idToGid('DiscountNode', id) },
+    variables: { id: idToGid("DiscountNode", id) },
   });
 
-  const queriedDiscount = result?.data?.discountNode
-  if (!isLoading && !isError && discount.id !== queriedDiscount.discount.id) {
+  let discount = {
+    title: "",
+    code: "",
+    method: "",
+    startsAt: new Date(),
+    endsAt: null,
+    usageLimit: null,
+    appliesOncePerCustomer: false,
+    combinesWith: {},
+    configuration: {
+      quantity: 1,
+      percentage: 0,
+    },
+    configurationId: null,
+  };
+
+  const queriedDiscount = result?.data?.discountNode;
+
+  console.log({ queriedDiscount });
+
+  if (queriedDiscount) {
     const {
-      discount : {
-        title,
-        startsAt,
-        endsAt,
-        discountClass,
-        combinesWith,
-        usageLimit,
+      configurationField,
+      discount: {
+        __typename,
         appliesOncePerCustomer,
         codes,
-        __typename
+        combinesWith,
+        discountClass,
+        endsAt,
+        startsAt,
+        title,
+        usageLimit,
       },
-      configurationField
     } = queriedDiscount;
 
-    const method = __typename === 'DiscountAutomaticApp' ? DiscountMethod.Automatic : DiscountMethod.Code;
+    const method =
+      __typename === "DiscountAutomaticApp"
+        ? DiscountMethod.Automatic
+        : DiscountMethod.Code;
 
-    setDiscount({
-      id,
-      title,
-      startsAt,
-      endsAt,
-      discountClass,
-      combinesWith,
-      usageLimit,
+    discount = {
       appliesOncePerCustomer,
       code: codes?.nodes[0]?.code,
-      configuration: JSON.parse(configurationField?.value ?? '{}'),
+      combinesWith,
+      configuration: JSON.parse(configurationField?.value ?? "{}"),
       configurationId: configurationField?.id,
+      discountClass,
+      endsAt,
+      id,
       method,
-    });
+      startsAt,
+      title,
+      usageLimit,
+    };
   }
 
-  return { discount, setDiscount, isLoading, isError };
+  return { discount, ...queryProps };
 }

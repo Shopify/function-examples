@@ -1,9 +1,9 @@
-import { DiscountMethod } from '@shopify/discount-app-components';
-import { gql } from 'graphql-request';
+import { DiscountMethod } from "@shopify/discount-app-components";
+import { gql } from "graphql-request";
 
-import { idToGid } from '../utilities/gid';
+import { idToGid } from "../utilities/gid";
 
-import { useShopifyMutation } from './useShopifyMutation';
+import { useShopifyMutation } from "./useShopifyMutation";
 
 const DELETE_AUTOMATIC_MUTATION = gql`
   mutation DeleteDiscount($id: ID!) {
@@ -32,15 +32,21 @@ const DELETE_CODE_MUTATION = gql`
 export function useDeleteDiscount(method) {
   const deleteAutoDiscount = useShopifyMutation({
     query: DELETE_AUTOMATIC_MUTATION,
-  })
+  });
 
   const deleteCodeDiscount = useShopifyMutation({
     query: DELETE_CODE_MUTATION,
-  })
+  });
 
-  const [triggerMutation, { isError, isLoading }] = method === DiscountMethod.Automatic ? deleteAutoDiscount : deleteCodeDiscount
+  const [triggerMutation, { isError, isLoading }] =
+    method === DiscountMethod.Automatic
+      ? deleteAutoDiscount
+      : deleteCodeDiscount;
 
-  const resource = method === DiscountMethod.Automatic ? 'DiscountAutomaticApp' : 'DiscountCodeApp';
+  const resource =
+    method === DiscountMethod.Automatic
+      ? "DiscountAutomaticApp"
+      : "DiscountCodeApp";
 
   const deleteDiscount = async ({ id }) => {
     try {
@@ -48,13 +54,13 @@ export function useDeleteDiscount(method) {
         id: idToGid(resource, id),
       });
 
-      if (response.data.discountDelete.userErrors.length) {
-        return Promise.reject(
-          response.data.discountDelete.userErrors,
-        );
-      }
+      if (response.data.discountDelete.userErrors.length)
+        return Promise.reject(response.data.discountDelete.userErrors);
+
+      return response.data.discountDelete;
     } catch (error) {
-      console.error('Something went wrong while deleting the discount', error);
+      console.error("Something went wrong while deleting the discount", error);
+
       return Promise.reject(error);
     }
   };

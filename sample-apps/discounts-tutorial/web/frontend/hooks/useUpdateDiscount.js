@@ -1,16 +1,16 @@
-import { DiscountMethod } from '@shopify/discount-app-components';
-import { gql } from 'graphql-request';
+import { DiscountMethod } from "@shopify/discount-app-components";
+import { gql } from "graphql-request";
 
-import { idToGid } from '../utilities/gid';
+import { idToGid } from "../utilities/gid";
 
-import { useShopifyMutation } from './useShopifyMutation';
+import { useShopifyMutation } from "./useShopifyMutation";
 
 const UPDATE_AUTOMATIC_MUTATION = gql`
-  mutation UpdateDiscount(
-    $id: ID!
-    $discount: DiscountAutomaticAppInput!
-  ) {
-    discountUpdate: discountAutomaticAppUpdate(id: $id, automaticAppDiscount: $discount) {
+  mutation UpdateDiscount($id: ID!, $discount: DiscountAutomaticAppInput!) {
+    discountUpdate: discountAutomaticAppUpdate(
+      id: $id
+      automaticAppDiscount: $discount
+    ) {
       userErrors {
         code
         message
@@ -21,10 +21,7 @@ const UPDATE_AUTOMATIC_MUTATION = gql`
 `;
 
 const UPDATE_CODE_MUTATION = gql`
-  mutation UpdateDiscount(
-    $id: ID!
-    $discount: DiscountCodeAppInput!
-  ) {
+  mutation UpdateDiscount($id: ID!, $discount: DiscountCodeAppInput!) {
     discountUpdate: discountCodeAppUpdate(id: $id, codeAppDiscount: $discount) {
       userErrors {
         code
@@ -38,30 +35,35 @@ const UPDATE_CODE_MUTATION = gql`
 export function useUpdateDiscount(method) {
   const updateAutoDiscount = useShopifyMutation({
     query: UPDATE_AUTOMATIC_MUTATION,
-  })
+  });
 
   const codeMutationProps = useShopifyMutation({
     query: UPDATE_CODE_MUTATION,
-  })
+  });
 
-  const [triggerMutation, { isError, isLoading }] = method === DiscountMethod.Automatic ? updateAutoDiscount : codeMutationProps
+  const [triggerMutation, { isError, isLoading }] =
+    method === DiscountMethod.Automatic
+      ? updateAutoDiscount
+      : codeMutationProps;
 
-  const resource = method === DiscountMethod.Automatic ? 'DiscountAutomaticApp' : 'DiscountCodeApp';
+  const resource =
+    method === DiscountMethod.Automatic
+      ? "DiscountAutomaticApp"
+      : "DiscountCodeApp";
 
-  const updateDiscount = async (id, serializedDiscount) => {
+  const updateDiscount = async ({ id, discount }) => {
     try {
       const response = await triggerMutation({
         id: idToGid(resource, id),
-        discount: serializedDiscount,
-      })
+        discount,
+      });
 
-      if (response.data.discountUpdate.userErrors.length) {
-        return Promise.reject(
-          response.data.discountUpdate.userErrors,
-        );
-      }
+      if (response.data.discountUpdate.userErrors.length)
+        return Promise.reject(response.data.discountUpdate.userErrors);
+
+      return response.data.discountUpdate;
     } catch (error) {
-      console.error('Failed to update discount', error);
+      console.error("Failed to update discount", error);
       return Promise.reject(error);
     }
   };

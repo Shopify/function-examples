@@ -1,269 +1,305 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { CurrencyCode } from '@shopify/react-i18n'
-import { useAppBridge } from '@shopify/app-bridge-react'
-
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useForm, useField } from "@shopify/react-form";
+import { Redirect } from "@shopify/app-bridge/actions";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import {
   ActiveDatesCard,
   CombinationCard,
+  DiscountClass,
   DiscountMethod,
   MethodCard,
-  DiscountStatus,
-  RequirementType,
-  SummaryCard,
   UsageLimitsCard,
-} from '@shopify/discount-app-components'
+  onBreadcrumbAction,
+} from "@shopify/discount-app-components";
+import {
+  Banner,
+  Card,
+  Layout,
+  Modal,
+  Page,
+  PageActions,
+  Stack,
+  Spinner,
+  TextField,
+  TextContainer,
+} from "@shopify/polaris";
 
 import {
-  Page,
-  Card,
-  PageActions,
-  Spinner,
-  Stack,
-  Layout,
-  Frame,
-  Banner,
-  TextField,
-  Toast,
-} from '@shopify/polaris';
+  useUpdateDiscount,
+  useDeleteDiscount,
+  useDiscount,
+} from "../../hooks/";
 
-import { useDiscount } from '../../hooks/useDiscount';
-import { useUpdateDiscount } from '../../hooks/useUpdateDiscount';
-import { useDeleteDiscount } from '../../hooks/useDeleteDiscount';
-import { useRedirectToDiscounts } from '../../hooks/useRedirectToDiscounts';
-import { serializeDiscount } from '../../utilities/serializeDiscount';
+const METAFIELD_NAMESPACE = "discounts-tutorial";
+const METAFIELD_CONFIGURATION_KEY = "volume-config";
 
-
-export default function VolumeDetails() {
+export default function VolumeNew() {
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
   const { id } = useParams();
-  const redirectToDiscounts = useRedirectToDiscounts();
-  const { discount, setDiscount, isLoading, isError } = useDiscount(id);
-  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
-  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(method);
-  const [isMutationError, setIsMutationError] = useState(false);
+  const { discount, isLoading } = useDiscount(id);
+  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(
+    discount?.method
+  );
+  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(
+    discount?.method
+  );
+  const [deleteModalActive, setDeleteModalActive] = useState(false);
   const [successActive, setSuccessActive] = useState(false);
+  const [errors, setErrors] = useState([]);
 
-  const toggleSuccessActive = () => setSuccessActive((successActive) => !successActive)
+  const {
+    fields: {
+      discountTitle,
+      discountCode,
+      discountMethod,
+      combinesWith,
+      usageLimit,
+      appliesOncePerCustomer,
+      startsAt,
+      endsAt,
+      configuration,
+    },
+    submit,
+    submitting,
+    dirty,
+  } = useForm({
+    fields: {
+      discountTitle: useField(discount.title || ""),
+      discountMethod: useField(
+        discount.method === "Automatic"
+          ? DiscountMethod.Automatic
+          : DiscountMethod.Code
+      ),
+      discountCode: useField(discount.code || ""),
+      combinesWith: useField(discount.combinesWith || {}),
+      usageLimit: useField(discount.usageLimit),
+      appliesOncePerCustomer: useField(discount.appliesOncePerCustomer),
+      startsAt: useField(discount.startsAt || null),
+      endsAt: useField(discount.endsAt || null),
+      configuration: {
+        quantity: useField(discount.configuration?.quantity || 1),
+        percentage: useField(discount.configuration?.percentage || 0),
+      },
+    },
+    onSubmit: async (form) => {
+      const newDiscount = {
+        combinesWith: form.combinesWith,
+        startsAt: form.startsAt,
+        endsAt: form.endsAt,
+        metafields: [
+          {
+            id: discount.configurationId, // metafield id is required for update
+            namespace: METAFIELD_NAMESPACE,
+            key: METAFIELD_CONFIGURATION_KEY,
+            type: "json",
+            value: JSON.stringify({
+              quantity: parseInt(form.configuration.quantity),
+              percentage: parseFloat(form.configuration.percentage),
+            }),
+          },
+        ],
+      };
 
-  const handleUpdateDiscount = async () => {
-    setIsMutationError(false);
+      if (form.discountMethod === DiscountMethod.Code) {
+        newDiscount.usageLimit = parseInt(form.usageLimit);
+        newDiscount.appliesOncePerCustomer = form.appliesOncePerCustomer;
+        newDiscount.code = form.code;
+        newDiscount.title = form.discountCode;
+        newDiscount.code = form.discountCode;
+      } else newDiscount.title = form.discountTitle;
 
-    try {
-      await updateDiscount(id, serializeDiscount(discount));
+      try {
+        await updateDiscount({ id, discount: newDiscount });
 
-      toggleSuccessActive();
-    } catch {
-      setIsMutationError(true);
-    }
-  };
+        setSuccessActive(true);
+
+        return { status: "success" };
+      } catch (err) {
+        setErrors(err);
+
+        return { status: "fail" };
+      }
+    },
+  });
+
+  const isUpdateInProgress =
+    isLoading || submitting || updateInProgress || deleteInProgress;
+
+  const isSaveDisabled = isUpdateInProgress || !dirty;
 
   const handleDeleteDiscount = async () => {
-    setIsMutationError(false);
+    if (isUpdateInProgress) return;
 
     try {
-      await deleteDiscount(id);
+      await deleteDiscount({ id });
 
-      redirectToDiscounts();
-    } catch {
-      setIsMutationError(true);
+      onBreadcrumbAction(redirect, true);
+    } catch (err) {
+      setErrors(err);
     }
-  }
-
-  const handleDiscountChange = (prop, value) => {
-    setDiscount(cur => ({
-      ...cur,
-      [prop]: value,
-    }));
-  }
-
-  const handleConfigurationChange = (prop, value) => {
-    setDiscount(cur => ({
-      ...cur,
-      configuration: {
-        ...cur.configuration,
-        [prop]: parseFloat(value),
-      }
-    }));
   };
 
-  if (isLoading) {
-    return (
-      <Stack distribution="center">
-        <Spinner size="large" />
-      </Stack>
-    );
-  }
+  const toggleSuccessActive = () =>
+    setSuccessActive((successActive) => !successActive);
 
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
+  const toggleDeleteModalActive = () =>
+    setDeleteModalActive((deleteModalActive) => !deleteModalActive);
 
-  const successMarkup = successActive ? (
-    <Toast content="Discount saved" onDismiss={toggleSuccessActive} />
-  ) : null;
-
-  const errorMarkup = isMutationError ? (
+  const successBanner = successActive ? (
     <Layout.Section>
       <Banner
-        status="critical"
-        title="There was an error updating the discount."
+        title="Discount saved"
+        status="success"
+        onDismiss={toggleSuccessActive}
       />
     </Layout.Section>
   ) : null;
 
-  const isMutationInProgress = updateInProgress || deleteInProgress;
-
-  const {
-    title,
-    code,
-    method,
-    configuration,
-    usageLimit,
-    appliesOncePerCustomer,
-    combinesWith,
-    startsAt,
-    endsAt
-  } = discount;
+  const errorBanner =
+    errors.length > 0 ? (
+      <Layout.Section>
+        <Banner status="critical">
+          <p>There were some issues with your form submission:</p>
+          <ul>
+            {errors.map(({ message, field }, index) => {
+              return (
+                <li key={`${message}${index}`}>
+                  {field.join(".")} {message}
+                </li>
+              );
+            })}
+          </ul>
+        </Banner>
+      </Layout.Section>
+    ) : null;
 
   return (
-    <Page title="Volume discount details" breadcrumbs={[{ onAction: redirectToDiscounts }]}>
-      <Frame>
+    <Page
+      title="Edit volume discount"
+      breadcrumbs={[
+        {
+          content: "Discounts",
+          onAction: () => onBreadcrumbAction(redirect, true),
+        },
+      ]}
+      primaryAction={{
+        content: "Save",
+        onAction: submit,
+        loading: isUpdateInProgress,
+        disabled: isSaveDisabled,
+      }}
+    >
+      {isLoading && (
         <Layout>
-          {successMarkup}
-          {errorMarkup}
-          <Layout.Section>
-            <MethodCard
-              title="Update discount"
-              discountClass={savedDiscount.discountClass}
-              discountTitle={{
-                value: title,
-                onChange: (value) => handleDiscountChange('title', value),
-              }}
-              discountCode={{
-                value: code,
-                onChange: (value) => handleDiscountChange('code', value)
-              }}
-              discountMethod={{
-                value: method
-              }}
-              discountMethodHidden={true}
-            />
+          <Stack distribution="center">
+            <Spinner size="large" />
+          </Stack>
+        </Layout>
+      )}
 
-            {configuration && (
-              <Card title="Volume">
-                <Card.Section>
-                  <Stack>
-                  <TextField
-                    label="Minimum quantity"
-                    value={configuration.quantity}
-                    onChange={(value) => handleConfigurationChange('quantity', value)}
-                    type="number"
-                    min={0}
+      {!isLoading && (
+        <>
+          <Layout>
+            {errorBanner}
+            {successBanner}
+
+            <Layout.Section>
+              <form onSubmit={submit}>
+                <MethodCard
+                  title="Volume"
+                  discountTitle={discountTitle}
+                  discountClass={DiscountClass.Product}
+                  discountCode={discountCode}
+                  discountMethod={discountMethod}
+                />
+                <Card title="Volume">
+                  <Card.Section>
+                    <Stack>
+                      <TextField
+                        label="Minimum quantity"
+                        {...configuration.quantity}
+                      />
+                      <TextField
+                        label="Discount percentage"
+                        {...configuration.percentage}
+                        suffix="%"
+                      />
+                    </Stack>
+                  </Card.Section>
+                </Card>
+
+                {discountMethod.value === DiscountMethod.Code && (
+                  <UsageLimitsCard
+                    totalUsageLimit={usageLimit}
+                    oncePerCustomer={appliesOncePerCustomer}
                   />
-                  <TextField
-                    label="Discount percentage"
-                    value={configuration.percentage}
-                    onChange={(value) => handleConfigurationChange('percentage', value)}
-                    type="number"
-                    min={0}
-                    max={100}
-                    suffix="%"
-                  />
-                  </Stack>
-                </Card.Section>
-              </Card>
-            )}
+                )}
 
-            {method === DiscountMethod.Code && (
-              <UsageLimitsCard
-                totalUsageLimit={{
-                  value: usageLimit,
-                  onChange: (value) => handleDiscountChange('usageLimit', parseInt(value)),
-                }}
-                oncePerCustomer={{
-                  value: appliesOncePerCustomer,
-                  onChange: (value) => handleDiscountChange('appliesOncePerCustomer', value),
-                }}
-              />
-            )}
+                <CombinationCard
+                  combinableDiscountTypes={combinesWith}
+                  discountClass={DiscountClass.Product}
+                  discountDescriptor={
+                    discountMethod.value === DiscountMethod.Automatic
+                      ? discountTitle.value
+                      : discountCode.value
+                  }
+                />
 
-            <CombinationCard
-              combinableDiscountTypes={{
-                value: combinesWith,
-                onChange: (value) => handleDiscountChange('combinesWith', value),
-              }}
-              discountClass={discount.discountClass}
-              discountDescriptor={
-                method === DiscountMethod.Automatic
-                  ? title
-                  : code
-              }
-            />
-            <ActiveDatesCard
-              startDate={{
-                value: startsAt,
-                onChange: (value) => handleDiscountChange('startsAt', value),
-              }}
-              endDate={{
-                value: endsAt,
-                onChange: (value) => handleDiscountChange('endsAt', value),
-              }}
-              timezoneAbbreviation="EST"
-            />
-          </Layout.Section>
-          {method && (
-            <Layout.Section secondary>
-              <SummaryCard
-                header={{
-                  discountMethod: method,
-                  discountDescriptor:
-                    method === DiscountMethod.Automatic
-                      ? title
-                      : code,
-                  appDiscountType: 'Volume',
-                  isEditing: false,
+                <ActiveDatesCard
+                  startDate={startsAt}
+                  endDate={endsAt}
+                  timezoneAbbreviation="EST"
+                />
+              </form>
+            </Layout.Section>
+
+            <Layout.Section>
+              <PageActions
+                primaryAction={{
+                  content: "Save discount",
+                  onAction: submit,
+                  disabled: isSaveDisabled,
+                  loading: submitting,
                 }}
-                performance={{
-                  status: DiscountStatus.Scheduled,
-                  usageCount: 0,
-                }}
-                minimumRequirements={{
-                  requirementType: RequirementType.None,
-                  subtotal: '0',
-                  quantity: '0',
-                  currencyCode: CurrencyCode.Cad
-                }}
-                usageLimits={{
-                  oncePerCustomer: appliesOncePerCustomer,
-                  totalUsageLimit: usageLimit ?? 0
-                }}
-                activeDates={{
-                  startDate: startsAt,
-                  endDate: endsAt
-                }}
+                secondaryActions={[
+                  {
+                    content: "Delete",
+                    destructive: true,
+                    onAction: toggleDeleteModalActive,
+                  },
+                ]}
               />
             </Layout.Section>
-          )}
-          <Layout.Section>
-            <PageActions
-              primaryAction={{
-                content: 'Save',
-                onAction: handleUpdateDiscount,
-                loading: isMutationInProgress,
-                disabled: !isDirty,
-              }}
-              secondaryActions={[
-                {
-                  content: 'Delete',
-                  destructive: true,
-                  loading: isMutationInProgress,
-                  onAction: handleDeleteDiscount,
-                },
-              ]}
-            />
-          </Layout.Section>
-        </Layout>
-      </Frame>
+          </Layout>
+
+          <Modal
+            small
+            open={deleteModalActive}
+            onClose={toggleDeleteModalActive}
+            title="Delete discount"
+            primaryAction={{
+              content: "Delete",
+              destructive: true,
+              onAction: handleDeleteDiscount,
+              loding: isUpdateInProgress,
+            }}
+            secondaryActions={[
+              {
+                content: "Cancel",
+                onAction: toggleDeleteModalActive,
+              },
+            ]}
+          >
+            <Modal.Section>
+              <TextContainer>
+                <p>Are you sure you want to delete this discount?</p>
+              </TextContainer>
+            </Modal.Section>
+          </Modal>
+        </>
+      )}
     </Page>
-  )
+  );
 }
