@@ -7,24 +7,13 @@ import {
   TextStyle,
 } from "@shopify/polaris";
 import { Toast } from "@shopify/app-bridge-react";
-import { gql } from "graphql-request";
-import { useAppQuery, useShopifyMutation } from "../hooks";
+import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
-const PRODUCTS_QUERY = gql`
-  mutation populateProduct($input: ProductInput!) {
-    productCreate(input: $input) {
-      product {
-        id
-      }
-    }
-  }
-`;
 export function ProductsCard() {
+  const emptyToastProps = { content: null };
   const [isLoading, setIsLoading] = useState(true);
-  const [showToast, setShowToast] = useState(false);
-  const [populateProduct] = useShopifyMutation({
-    query: PRODUCTS_QUERY,
-  });
+  const [toastProps, setToastProps] = useState(emptyToastProps);
+  const fetch = useAuthenticatedFetch();
 
   const {
     data,
@@ -32,7 +21,7 @@ export function ProductsCard() {
     isLoading: isLoadingCount,
     isRefetching: isRefetchingCount,
   } = useAppQuery({
-    url: "/api/products-count",
+    url: "/api/products/count",
     reactQueryOptions: {
       onSuccess: () => {
         setIsLoading(false);
@@ -40,29 +29,24 @@ export function ProductsCard() {
     },
   });
 
-  const toastMarkup = showToast && !isRefetchingCount && (
-    <Toast
-      content="5 products created!"
-      onDismiss={() => setShowToast(false)}
-    />
+  const toastMarkup = toastProps.content && !isRefetchingCount && (
+    <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
   );
 
-  const handlePopulate = () => {
+  const handlePopulate = async () => {
     setIsLoading(true);
+    const response = await fetch("/api/products/create");
 
-    Promise.all(
-      Array.from({ length: 5 }).map(() =>
-        populateProduct({
-          input: {
-            title: randomTitle(),
-            variants: [{ price: randomPrice() }],
-          },
-        })
-      )
-    ).then(async () => {
+    if (response.ok) {
       await refetchProductCount();
-      setShowToast(true);
-    });
+      setToastProps({ content: "5 products created!" });
+    } else {
+      setIsLoading(false);
+      setToastProps({
+        content: "There was an error creating products",
+        error: true,
+      });
+    }
   };
 
   return (
@@ -95,81 +79,3 @@ export function ProductsCard() {
     </>
   );
 }
-
-function randomTitle() {
-  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
-  return `${adjective} ${noun}`;
-}
-
-function randomPrice() {
-  return Math.round((Math.random() * 10 + Number.EPSILON) * 100) / 100;
-}
-
-const ADJECTIVES = [
-  "autumn",
-  "hidden",
-  "bitter",
-  "misty",
-  "silent",
-  "empty",
-  "dry",
-  "dark",
-  "summer",
-  "icy",
-  "delicate",
-  "quiet",
-  "white",
-  "cool",
-  "spring",
-  "winter",
-  "patient",
-  "twilight",
-  "dawn",
-  "crimson",
-  "wispy",
-  "weathered",
-  "blue",
-  "billowing",
-  "broken",
-  "cold",
-  "damp",
-  "falling",
-  "frosty",
-  "green",
-  "long",
-];
-
-const NOUNS = [
-  "waterfall",
-  "river",
-  "breeze",
-  "moon",
-  "rain",
-  "wind",
-  "sea",
-  "morning",
-  "snow",
-  "lake",
-  "sunset",
-  "pine",
-  "shadow",
-  "leaf",
-  "dawn",
-  "glitter",
-  "forest",
-  "hill",
-  "cloud",
-  "meadow",
-  "sun",
-  "glade",
-  "bird",
-  "brook",
-  "butterfly",
-  "bush",
-  "dew",
-  "dust",
-  "field",
-  "fire",
-  "flower",
-];
