@@ -24,7 +24,6 @@ import {
   Stack,
   PageActions,
 } from "@shopify/polaris";
-import { data } from "@shopify/app-bridge/actions/Modal";
 import { useAuthenticatedFetch } from "../../hooks";
 
 const todaysDate = new Date();
@@ -106,29 +105,44 @@ export default function VolumeNew() {
         response = await authenticatedFetch("/api/discounts/automatic", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...discount, title: form.discountTitle }),
+          body: JSON.stringify({
+            discount: {
+              ...discount,
+              title: form.discountTitle,
+            },
+          }),
         });
       } else {
         response = await authenticatedFetch("/api/discounts/code", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...discount,
-            title: form.discountCode,
-            code: form.discountCode,
+            discount: {
+              ...discount,
+              title: form.discountCode,
+              code: form.discountCode,
+            },
           }),
         });
       }
 
-      const data = (await response.json()).data;
-      const remoteErrors = data.discountCreate.userErrors;
-      if (remoteErrors.length > 0) {
+      const {
+        errors, // errors like missing scope access
+        data: {
+          userErrors, // errors like invalid data type
+        },
+      } = await response.json();
+
+      const remoteErrors = errors || userErrors;
+
+      if (remoteErrors?.length > 0) {
         return { status: "fail", errors: remoteErrors };
       }
 
       redirect.dispatch(Redirect.Action.ADMIN_SECTION, {
         name: Redirect.ResourceType.Discount,
       });
+
       return { status: "success" };
     },
   });
@@ -139,12 +153,8 @@ export default function VolumeNew() {
         <Banner status="critical">
           <p>There were some issues with your form submission:</p>
           <ul>
-            {submitErrors.map(({ message, field }, index) => {
-              return (
-                <li key={`${message}${index}`}>
-                  {field.join(".")} {message}
-                </li>
-              );
+            {submitErrors.map(({ message }, index) => {
+              return <li key={`${message}${index}`}>{message}</li>;
             })}
           </ul>
         </Banner>

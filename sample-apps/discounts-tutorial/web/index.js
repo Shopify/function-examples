@@ -17,12 +17,6 @@ const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 const isTest = process.env.NODE_ENV === "test" || !!process.env.VITE_TEST_BUILD;
 
-const versionFilePath = "./version.txt";
-let templateVersion = "unknown";
-if (fs.existsSync(versionFilePath)) {
-  templateVersion = fs.readFileSync(versionFilePath, "utf8").trim();
-}
-
 // TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
 const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
@@ -39,7 +33,6 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
-  USER_AGENT_PREFIX: `Node App Template/${templateVersion}`,
 });
 
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
@@ -81,12 +74,108 @@ const CREATE_CODE_MUTATION = `
     }
   }
 `;
-
 const CREATE_AUTOMATIC_MUTATION = `
   mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
     discountCreate: discountAutomaticAppCreate(
       automaticAppDiscount: $discount
     ) {
+      userErrors {
+        code
+        message
+        field
+      }
+    }
+  }
+`;
+const GET_DISCOUNT_QUERY = `
+  query GetDiscount($id: ID!) {
+    discountNode(id: $id) {
+      id
+      configurationField: metafield(
+        namespace: "discounts-tutorial"
+        key: "volume-config"
+      ) {
+        id
+        value
+      }
+      discount {
+        __typename
+        ... on DiscountAutomaticApp {
+          title
+          discountClass
+          combinesWith {
+            orderDiscounts
+            productDiscounts
+            shippingDiscounts
+          }
+          startsAt
+          endsAt
+        }
+        ... on DiscountCodeApp {
+          title
+          discountClass
+          combinesWith {
+            orderDiscounts
+            productDiscounts
+            shippingDiscounts
+          }
+          startsAt
+          endsAt
+          usageLimit
+          appliesOncePerCustomer
+          codes(first: 1) {
+            nodes {
+              code
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const UPDATE_AUTOMATIC_MUTATION = `
+  mutation UpdateDiscount($id: ID!, $discount: DiscountAutomaticAppInput!) {
+    discountUpdate: discountAutomaticAppUpdate(
+      id: $id
+      automaticAppDiscount: $discount
+    ) {
+      userErrors {
+        code
+        message
+        field
+      }
+    }
+  }
+`;
+
+const UPDATE_CODE_MUTATION = `
+  mutation UpdateDiscount($id: ID!, $discount: DiscountCodeAppInput!) {
+    discountUpdate: discountCodeAppUpdate(id: $id, codeAppDiscount: $discount) {
+      userErrors {
+        code
+        message
+        field
+      }
+    }
+  }
+`;
+
+const DELETE_AUTOMATIC_MUTATION = `
+  mutation DeleteDiscount($id: ID!) {
+    discountDelete: discountAutomaticDelete(id: $id) {
+      userErrors {
+        code
+        message
+        field
+      }
+    }
+  }
+`;
+
+const DELETE_CODE_MUTATION = `
+  mutation DeleteDiscount($id: ID!) {
+    discountDelete: discountCodeDelete(id: $id) {
       userErrors {
         code
         message
@@ -117,10 +206,10 @@ export async function createServer(
     try {
       await Shopify.Webhooks.Registry.process(req, res);
       console.log(`Webhook processed, returned status code 200`);
-    } catch (error) {
-      console.log(`Failed to process webhook: ${error}`);
+    } catch (e) {
+      console.log(`Failed to process webhook: ${e.message}`);
       if (!res.headersSent) {
-        res.status(500).send(error.message);
+        res.status(500).send(e.message);
       }
     }
   });
@@ -159,6 +248,7 @@ export async function createServer(
     try {
       await productCreator(session);
     } catch (e) {
+      console.log(`Failed to process products/create: ${e.message}`);
       status = 500;
       error = e.message;
     }
@@ -179,10 +269,11 @@ export async function createServer(
       session?.accessToken
     );
 
+    console.log(req.body);
     const data = await client.query({
       data: {
         query: mutation,
-        variables: { discount: req.body },
+        variables: req.body,
       },
     });
 
@@ -195,6 +286,42 @@ export async function createServer(
 
   app.post("/api/discounts/automatic", async (req, res) => {
     await runDiscountMutation(req, res, CREATE_AUTOMATIC_MUTATION);
+  });
+
+  function idToGid(resource, id) {
+    return `gid://shopify/${resource}/${id}`;
+  }
+
+  app.get("/api/discounts/:discountId", async (req, res) => {
+    req.body = {
+      id: idToGid("DiscountNode", req.params.discountId),
+    };
+
+    await runDiscountMutation(req, res, GET_DISCOUNT_QUERY);
+  });
+
+  app.post("/api/discounts/automatic/:discountId", async (req, res) => {
+    req.body.id = idToGid("DiscountAutomaticApp", req.params.discountId);
+
+    await runDiscountMutation(req, res, UPDATE_AUTOMATIC_MUTATION);
+  });
+
+  app.post("/api/discounts/code/:discountId", async (req, res) => {
+    req.body.id = idToGid("DiscountCodeApp", req.params.discountId);
+
+    await runDiscountMutation(req, res, UPDATE_CODE_MUTATION);
+  });
+
+  app.delete("/api/discounts/automatic/:discountId", async (req, res) => {
+    req.body.id = idToGid("DiscountAutomaticApp", req.params.discountId);
+
+    await runDiscountMutation(req, res, DELETE_AUTOMATIC_MUTATION);
+  });
+
+  app.delete("/api/discounts/code/:discountId", async (req, res) => {
+    req.body.id = idToGid("DiscountCodeApp", req.params.discountId);
+
+    await runDiscountMutation(req, res, DELETE_CODE_MUTATION);
   });
 
   app.use((req, res, next) => {
@@ -218,7 +345,7 @@ export async function createServer(
       ({ default: fn }) => fn
     );
     app.use(compression());
-    app.use(serveStatic(PROD_INDEX_PATH));
+    app.use(serveStatic(PROD_INDEX_PATH, { index: false }));
   }
 
   app.use("/*", async (req, res, next) => {

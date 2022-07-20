@@ -1,121 +1,87 @@
-import { useState } from "react";
-import { gql } from "graphql-request";
+import { useEffect, useState } from "react";
 import { DiscountMethod } from "@shopify/discount-app-components";
 
-import { idToGid } from "../utilities/gid";
-
-import { useShopifyQuery } from "./useShopifyQuery";
-
-const GET_DISCOUNT_QUERY = gql`
-  query GetDiscount($id: ID!) {
-    discountNode(id: $id) {
-      id
-      configurationField: metafield(
-        namespace: "discount-type-tutorial"
-        key: "volume-config"
-      ) {
-        id
-        value
-      }
-      discount {
-        __typename
-        ... on DiscountAutomaticApp {
-          title
-          discountClass
-          combinesWith {
-            orderDiscounts
-            productDiscounts
-            shippingDiscounts
-          }
-          startsAt
-          endsAt
-        }
-        ... on DiscountCodeApp {
-          title
-          discountClass
-          combinesWith {
-            orderDiscounts
-            productDiscounts
-            shippingDiscounts
-          }
-          startsAt
-          endsAt
-          usageLimit
-          appliesOncePerCustomer
-          codes(first: 1) {
-            nodes {
-              code
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+import { useAuthenticatedFetch } from "./";
 
 export function useDiscount(id) {
-  const { data: result, ...queryProps } = useShopifyQuery({
-    key: "GetDiscount",
-    query: GET_DISCOUNT_QUERY,
-    variables: { id: idToGid("DiscountNode", id) },
-  });
+  const authenticatedFetch = useAuthenticatedFetch();
+  const [discount, setDiscount] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  let discount = {
-    title: "",
-    code: "",
-    method: "",
-    startsAt: new Date(),
-    endsAt: null,
-    usageLimit: null,
-    appliesOncePerCustomer: false,
-    combinesWith: {},
-    configuration: {
-      quantity: 1,
-      percentage: 0,
-    },
-    configurationId: null,
-  };
+  useEffect(() => {
+    let isCancelled = false;
 
-  const queriedDiscount = result?.data?.discountNode;
+    setIsLoading(true);
+    setError(null);
 
-  console.log({ queriedDiscount });
+    authenticatedFetch(`/api/discounts/${id}`)
+      .then((response) => response.json())
+      .then(({ errors, data }) => {
+        if (isCancelled) return;
 
-  if (queriedDiscount) {
-    const {
-      configurationField,
-      discount: {
-        __typename,
-        appliesOncePerCustomer,
-        codes,
-        combinesWith,
-        discountClass,
-        endsAt,
-        startsAt,
-        title,
-        usageLimit,
-      },
-    } = queriedDiscount;
+        const remoteErrors = errors || data?.discountNode?.userErrors;
 
-    const method =
-      __typename === "DiscountAutomaticApp"
-        ? DiscountMethod.Automatic
-        : DiscountMethod.Code;
+        if (remoteErrors?.length > 0) {
+          setError(errors);
+          return;
+        }
 
-    discount = {
-      appliesOncePerCustomer,
-      code: codes?.nodes[0]?.code,
-      combinesWith,
-      configuration: JSON.parse(configurationField?.value ?? "{}"),
-      configurationId: configurationField?.id,
-      discountClass,
-      endsAt,
-      id,
-      method,
-      startsAt,
-      title,
-      usageLimit,
+        const { discountNode } = data;
+
+        if (!discountNode) {
+          setError([{ message: "Discount not found" }]);
+          return;
+        }
+
+        const {
+          configurationField,
+          discount: {
+            __typename,
+            appliesOncePerCustomer,
+            codes,
+            combinesWith,
+            endsAt,
+            startsAt,
+            title,
+            usageLimit,
+          },
+        } = discountNode;
+
+        const method =
+          __typename === "DiscountAutomaticApp"
+            ? DiscountMethod.Automatic
+            : DiscountMethod.Code;
+
+        setDiscount({
+          appliesOncePerCustomer,
+          code: codes?.nodes[0]?.code,
+          combinesWith,
+          configuration: JSON.parse(configurationField?.value ?? "{}"),
+          configurationId: configurationField?.id,
+          endsAt,
+          id,
+          method,
+          startsAt,
+          title,
+          usageLimit,
+        });
+
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setIsLoading(false);
+      });
+
+    return () => {
+      isCancelled = true;
     };
-  }
+  }, [id]);
 
-  return { discount, ...queryProps };
+  return {
+    discount,
+    isLoading,
+    error,
+  };
 }
