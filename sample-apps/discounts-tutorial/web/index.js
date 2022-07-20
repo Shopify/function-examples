@@ -17,6 +17,12 @@ const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 const isTest = process.env.NODE_ENV === "test" || !!process.env.VITE_TEST_BUILD;
 
+const versionFilePath = "./version.txt";
+let templateVersion = "unknown";
+if (fs.existsSync(versionFilePath)) {
+  templateVersion = fs.readFileSync(versionFilePath, "utf8").trim();
+}
+
 // TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
 const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
@@ -33,6 +39,7 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
+  USER_AGENT_PREFIX: `Node App Template/${templateVersion}`,
 });
 
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
@@ -206,10 +213,10 @@ export async function createServer(
     try {
       await Shopify.Webhooks.Registry.process(req, res);
       console.log(`Webhook processed, returned status code 200`);
-    } catch (e) {
-      console.log(`Failed to process webhook: ${e.message}`);
+    } catch (error) {
+      console.log(`Failed to process webhook: ${error.message}`);
       if (!res.headersSent) {
-        res.status(500).send(e.message);
+        res.status(500).send(error.message);
       }
     }
   });
@@ -248,7 +255,6 @@ export async function createServer(
     try {
       await productCreator(session);
     } catch (e) {
-      console.log(`Failed to process products/create: ${e.message}`);
       status = 500;
       error = e.message;
     }
@@ -269,7 +275,6 @@ export async function createServer(
       session?.accessToken
     );
 
-    console.log(req.body);
     const data = await client.query({
       data: {
         query: mutation,
@@ -345,7 +350,7 @@ export async function createServer(
       ({ default: fn }) => fn
     );
     app.use(compression());
-    app.use(serveStatic(PROD_INDEX_PATH, { index: false }));
+    app.use(serveStatic(PROD_INDEX_PATH));
   }
 
   app.use("/*", async (req, res, next) => {
