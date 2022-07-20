@@ -128,12 +128,10 @@ export default function VolumeNew() {
 
       const {
         errors, // errors like missing scope access
-        data: {
-          userErrors, // errors like invalid data type
-        },
+        data
       } = await response.json();
 
-      const remoteErrors = errors || userErrors;
+      const remoteErrors = errors || data?.discountCreate?.userErrors;
 
       if (remoteErrors?.length > 0) {
         return { status: "fail", errors: remoteErrors };
