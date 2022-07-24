@@ -1,0 +1,21 @@
+query Input {
+  cart {
+    attribute(key: "loyalty_code") {
+      key
+      value
+    }
+    lines {
+      quantity
+      merchandise {
+        ...on ProductVariant {
+          id
+        }
+      }
+    }
+  }
+  discountNode {
+    metafield(namespace: "discounts-plus", key: "volume-config") {
+      value
+    }
+  }
+}

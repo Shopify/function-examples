@@ -1,0 +1,28 @@
+{
+    "cart": {
+        "attribute": {
+            "id": "2",
+            "key": "loyalty_code",
+            "value": "ELADKING"
+        },
+        "lines": [
+            {
+                "quantity": 5,
+                "merchandise": {
+                    "id": "gid://shopify/ProductVariant/0"
+                }
+            },
+            {
+                "quantity": 1,
+                "merchandise": {
+                    "id": "gid://shopify/ProductVariant/1"
+                }
+            }
+        ]
+    },
+    "discountNode": {
+        "metafield": {
+            "value": "{\"quantity\":100}"
+        }
+    }
+}
