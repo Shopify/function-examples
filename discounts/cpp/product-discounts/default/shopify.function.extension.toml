@@ -1,12 +1,12 @@
-name = "c-discount"
-type = "product_discounts"
+name = "{{name}}"
+type = "{{extensionType}}"
 api_version = "2022-07"
 
 [build]
 command = "/usr/local/wasi-sdk-16.0/bin/clang++ -Oz -fno-exceptions -std=c++17 src/main.cpp -o build/main.wasm"
-path = 'build/main.wasm'
+path = "build/main.wasm"
 
 [ui.paths]
-create = "/volume/new"
-details = "/volume/:id" # Note that this isn't implemented in this tutorial
+create = ""
+details = ""
 
