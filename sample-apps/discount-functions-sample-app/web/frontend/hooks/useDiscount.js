@@ -9,10 +9,13 @@ export function useDiscount({
 }) {
   const previousSavedDiscount = usePrevious(savedDiscount);
   const [title, setTitle] = useState(savedDiscount?.title ?? '');
-  const [startsAt, setStartsAt] = useState(
-    savedDiscount?.startsAt ?? new Date(),
-  );
-  const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt);
+  const [code, setCode] = useState(savedDiscount?.code ?? '');
+  const [method, setMethod] = useState(savedDiscount?.method ?? '');
+  const [startsAt, setStartsAt] = useState(savedDiscount?.startsAt ?? new Date());
+  const [endsAt, setEndsAt] = useState(savedDiscount?.endsAt ?? null);
+  const [usageLimit, setUsageLimit] = useState(savedDiscount?.usageLimit ?? null);
+  const [appliesOncePerCustomer, setAppliesOncePerCustomer] = useState(savedDiscount?.appliesOncePerCustomer ?? false);
+  const [combinesWith, setCombinesWith] = useState(savedDiscount?.combinesWith ?? {});
   const [configuration, setConfiguration] = useState(
     savedDiscount?.configuration ?? defaultConfiguration,
   );
@@ -20,8 +23,13 @@ export function useDiscount({
 
   const discount = {
     title,
+    code,
+    method,
     startsAt,
     endsAt,
+    usageLimit,
+    appliesOncePerCustomer,
+    combinesWith,
     configuration,
     configurationId,
   };
@@ -47,20 +55,35 @@ export function useDiscount({
     }
 
     setTitle(savedDiscount.title);
+    setCode(savedDiscount.code);
+    setMethod(savedDiscount.method);
     setStartsAt(savedDiscount.startsAt);
     setEndsAt(savedDiscount.endsAt);
+    setUsageLimit(savedDiscount.usageLimit);
+    setAppliesOncePerCustomer(savedDiscount.appliesOncePerCustomer);
+    setCombinesWith(savedDiscount.combinesWith);
     setConfiguration(savedDiscount.configuration);
   }, [savedDiscount]);
 
   return {
     discount,
     title,
+    code,
+    method,
     startsAt,
     endsAt,
+    usageLimit,
+    appliesOncePerCustomer,
+    combinesWith,
     configuration,
     setTitle,
+    setCode,
+    setMethod,
     setStartsAt,
     setEndsAt,
+    setUsageLimit,
+    setAppliesOncePerCustomer,
+    setCombinesWith,
     setConfiguration,
     isDirty,
   };

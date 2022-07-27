@@ -5,8 +5,14 @@ import {
   Layout,
   Page,
   PageActions,
-  TextField,
 } from '@shopify/polaris';
+import {
+  ActiveDatesCard,
+  CombinationCard,
+  DiscountMethod,
+  MethodCard,
+  UsageLimitsCard,
+} from '@shopify/discount-app-components'
 
 import { useCreateDiscount } from '../hooks/useCreateDiscount';
 import { useDiscount } from '../hooks/useDiscount';
@@ -15,17 +21,38 @@ import { serializeDiscount } from '../utilities/serializeDiscount';
 
 export default function DiscountCreatePage({
   functionId,
+  discountClass,
   defaultConfiguration,
   renderConfigurationForm,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isError, setIsError] = useState(false);
-  const { discount, title, configuration, setTitle, setConfiguration } =
-    useDiscount({
-      defaultConfiguration,
-    });
+  const {
+    discount,
+    title,
+    setTitle,
+    code,
+    setCode,
+    method,
+    setMethod,
+    usageLimit,
+    setUsageLimit,
+    appliesOncePerCustomer,
+    setAppliesOncePerCustomer,
+    combinesWith,
+    setCombinesWith,
+    startsAt,
+    setStartsAt,
+    endsAt,
+    setEndsAt,
+    configuration,
+    setConfiguration,
 
-  const [createDiscount, { isLoading }] = useCreateDiscount();
+  } = useDiscount({
+    defaultConfiguration,
+  });
+
+  const [createDiscount, { isLoading }] = useCreateDiscount(method);
 
   const handleCreateDiscount = async () => {
     setIsError(false);
@@ -56,19 +83,62 @@ export default function DiscountCreatePage({
       <Layout>
         {errorMarkup}
         <Layout.Section>
+          <MethodCard
+            title="Create discount"
+            discountClass={discountClass}
+            discountTitle={{
+              value: title,
+              onChange: setTitle,
+            }}
+            discountCode={{
+              value: code,
+              onChange: setCode
+            }}
+            discountMethod={{
+              value: method,
+              onChange: setMethod
+            }}
+          />
           <Card>
-            <Card.Section>
-              <TextField
-                value={title}
-                onChange={setTitle}
-                label="Discount title"
-                autoComplete="on"
-              />
-            </Card.Section>
             <Card.Section>
               {renderConfigurationForm(configuration, setConfiguration)}
             </Card.Section>
           </Card>
+          {method === DiscountMethod.Code && (
+            <UsageLimitsCard
+              totalUsageLimit={{
+                value: usageLimit,
+                onChange: (value) => setUsageLimit(parseInt(value)),
+              }}
+              oncePerCustomer={{
+                value: appliesOncePerCustomer,
+                onChange: setAppliesOncePerCustomer,
+              }}
+            />
+          )}
+          <CombinationCard
+            combinableDiscountTypes={{
+              value: combinesWith,
+              onChange: setCombinesWith,
+            }}
+            discountClass={discountClass}
+            discountDescriptor={
+              method === DiscountMethod.Automatic
+                ? title
+                : code
+            }
+          />
+          <ActiveDatesCard
+            startDate={{
+              value: startsAt,
+              onChange: setStartsAt,
+            }}
+            endDate={{
+              value: endsAt,
+              onChange: setEndsAt,
+            }}
+            timezoneAbbreviation="EST"
+          />
         </Layout.Section>
         <Layout.Section>
           <PageActions

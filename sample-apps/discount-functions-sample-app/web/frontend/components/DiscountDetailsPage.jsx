@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Page,
   Card,
-  TextField,
   PageActions,
   Spinner,
   Stack,
   Layout,
+  Frame,
   Banner,
+  Toast,
 } from '@shopify/polaris';
+import {
+  ActiveDatesCard,
+  CombinationCard,
+  DiscountMethod,
+  MethodCard,
+  UsageLimitsCard,
+} from '@shopify/discount-app-components'
 
 import { useDeleteDiscount } from '../hooks/useDeleteDiscount';
 import { useDiscount } from '../hooks/useDiscount';
@@ -28,8 +36,21 @@ export default function DiscountDetailsPage({
   const {
     discount,
     isDirty,
+    method,
     title,
     setTitle,
+    code,
+    setCode,
+    usageLimit,
+    setUsageLimit,
+    appliesOncePerCustomer,
+    setAppliesOncePerCustomer,
+    combinesWith,
+    setCombinesWith,
+    startsAt,
+    setStartsAt,
+    endsAt,
+    setEndsAt,
     configuration,
     setConfiguration,
   } = useDiscount({
@@ -37,14 +58,18 @@ export default function DiscountDetailsPage({
     defaultConfiguration,
   });
 
-  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();
-  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount();
+  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount(method);
+  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount(method);
   const mutationInProgress = updateInProgress || deleteInProgress;
+
+  const [successActive, setSuccessActive] = useState(false);
+  const toggleSuccessActive = useCallback(() => setSuccessActive((successActive) => !successActive), []);
 
   const handleUpdateDiscount = async () => {
     setIsMutationError(false);
     try {
       await updateDiscount(id, serializeDiscount(discount));
+      toggleSuccessActive();
     } catch {
       setIsMutationError(true);
       return;
@@ -63,6 +88,10 @@ export default function DiscountDetailsPage({
     return <div>Something went wrong!</div>;
   }
 
+  const successMarkup = successActive ? (
+    <Toast content="Discount saved" onDismiss={toggleSuccessActive} />
+  ) : null;
+
   const errorMarkup = isMutationError ? (
     <Layout.Section>
       <Banner
@@ -74,45 +103,91 @@ export default function DiscountDetailsPage({
 
   return (
     <Page title="Details" breadcrumbs={[{ onAction: redirectToDiscounts }]}>
-      <Layout>
-        {errorMarkup}
-        <Layout.Section>
-          <Card>
-            <Card.Section>
-              <TextField
-                value={title}
-                onChange={setTitle}
-                label="Discount title"
-                autoComplete="on"
+      <Frame>
+        <Layout>
+          {successMarkup}
+          {errorMarkup}
+          <Layout.Section>
+            <MethodCard
+              title="Update discount"
+              discountClass={savedDiscount.discountClass}
+              discountTitle={{
+                value: title,
+                onChange: setTitle,
+              }}
+              discountCode={{
+                value: code,
+                onChange: setCode
+              }}
+              discountMethod={{
+                value: method
+              }}
+              discountMethodHidden={true}
+            />
+            <Card>
+              <Card.Section>
+                {renderConfigurationForm(configuration, setConfiguration)}
+              </Card.Section>
+            </Card>
+            {method === DiscountMethod.Code && (
+              <UsageLimitsCard
+                totalUsageLimit={{
+                  value: usageLimit,
+                  onChange: (value) => setUsageLimit(parseInt(value)),
+                }}
+                oncePerCustomer={{
+                  value: appliesOncePerCustomer,
+                  onChange: setAppliesOncePerCustomer,
+                }}
               />
-            </Card.Section>
-            <Card.Section>
-              {renderConfigurationForm(configuration, setConfiguration)}
-            </Card.Section>
-          </Card>
-        </Layout.Section>
-        <Layout.Section>
-          <PageActions
-            primaryAction={{
-              content: 'Save',
-              onAction: handleUpdateDiscount,
-              loading: mutationInProgress,
-              disabled: !isDirty,
-            }}
-            secondaryActions={[
-              {
-                content: 'Delete',
-                destructive: true,
+            )}
+            <CombinationCard
+              combinableDiscountTypes={{
+                value: combinesWith,
+                onChange: setCombinesWith,
+              }}
+              discountClass={savedDiscount.discountClass}
+              discountDescriptor={
+                method === DiscountMethod.Automatic
+                  ? title
+                  : code
+              }
+            />
+            <ActiveDatesCard
+              startDate={{
+                value: startsAt,
+                onChange: setStartsAt,
+              }}
+              endDate={{
+                value: endsAt,
+                onChange: setEndsAt,
+              }}
+              timezoneAbbreviation="EST"
+            />
+          </Layout.Section>
+          <Layout.Section>
+            <PageActions
+              primaryAction={{
+                content: 'Save',
+                onAction: handleUpdateDiscount,
                 loading: mutationInProgress,
-                onAction: async () => {
-                  await deleteDiscount(id);
-                  redirectToDiscounts();
+                disabled: !isDirty,
+              }}
+              secondaryActions={[
+                {
+                  content: 'Delete',
+                  destructive: true,
+                  loading: mutationInProgress,
+                  onAction: async () => {
+                    await deleteDiscount(id);
+                    redirectToDiscounts();
+                  },
                 },
-              },
-            ]}
-          />
-        </Layout.Section>
-      </Layout>
+              ]}
+            />
+          </Layout.Section>
+        </Layout>
+      </Frame>
     </Page>
   );
 }

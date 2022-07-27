@@ -5,6 +5,7 @@ import '@shopify/polaris/build/esm/styles.css';
 
 import { AppBridgeProvider } from './components/providers/AppBridgeProvider';
 import { GraphQLProvider } from './components/providers/GraphQLProvider';
+import { DiscountProvider } from './components/providers/DiscountProvider';
 import Routes from './Routes';
 
 export default function App() {
@@ -18,9 +19,11 @@ export default function App() {
     <PolarisProvider i18n={translations}>
       <BrowserRouter>
         <AppBridgeProvider>
-          <GraphQLProvider>
-            <Routes pages={pages} />
-          </GraphQLProvider>
+          <DiscountProvider>
+            <GraphQLProvider>
+              <Routes pages={pages} />
+            </GraphQLProvider>
+          </DiscountProvider>
         </AppBridgeProvider>
       </BrowserRouter>
     </PolarisProvider>
