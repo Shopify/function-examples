@@ -9,7 +9,8 @@ import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
 import productCreator from "./helpers/product-creator.js";
-import { BillingInterval } from "./helpers/ensure-billing.js";
+
+import metafields from "./frontend/metafields.js";
 
 const USE_ONLINE_TOKENS = false;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
@@ -99,8 +100,8 @@ const GET_DISCOUNT_QUERY = `
     discountNode(id: $id) {
       id
       configurationField: metafield(
-        namespace: "discounts-tutorial"
-        key: "volume-config"
+        namespace: "${metafields.namespace}"
+        key: "${metafields.key}"
       ) {
         id
         value

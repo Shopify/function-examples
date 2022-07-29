@@ -30,11 +30,10 @@ import {
   TextContainer,
 } from "@shopify/polaris";
 
+import metafields from '../../metafields'
 import { useAuthenticatedFetch, useDiscount } from "../../hooks";
 
 const todaysDate = new Date();
-const METAFIELD_NAMESPACE = "discounts-tutorial";
-const METAFIELD_CONFIGURATION_KEY = "volume-config";
 
 export default function VolumeNew() {
   const app = useAppBridge();
@@ -99,8 +98,8 @@ export default function VolumeNew() {
         metafields: [
           {
             id: discount.configurationId, // metafield id is required for update
-            namespace: METAFIELD_NAMESPACE,
-            key: METAFIELD_CONFIGURATION_KEY,
+            namespace: metafields.namespace,
+            key: metafields.key,
             type: "json",
             value: JSON.stringify({
               quantity: parseInt(form.configuration.quantity),

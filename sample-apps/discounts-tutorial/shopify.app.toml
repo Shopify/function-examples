@@ -1,3 +1,4 @@
 # This file stores configurations for your Shopify app.
 
+name = "Discounts Tutorial"
 scopes = "write_products, write_discounts"

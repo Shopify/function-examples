@@ -2,7 +2,6 @@ import { useForm, useField } from "@shopify/react-form";
 import { CurrencyCode } from "@shopify/react-i18n";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "@shopify/app-bridge-react";
-
 import {
   ActiveDatesCard,
   CombinationCard,
@@ -24,11 +23,11 @@ import {
   Stack,
   PageActions,
 } from "@shopify/polaris";
+
+import metafields from '../../metafields'
 import { useAuthenticatedFetch } from "../../hooks";
 
 const todaysDate = new Date();
-const METAFIELD_NAMESPACE = "discounts-tutorial";
-const METAFIELD_CONFIGURATION_KEY = "volume-config";
 const FUNCTION_ID = "YOUR_FUNCTION_ID";
 
 export default function VolumeNew() {
@@ -89,9 +88,9 @@ export default function VolumeNew() {
         endsAt: form.endDate,
         metafields: [
           {
-            namespace: METAFIELD_NAMESPACE,
-            key: METAFIELD_CONFIGURATION_KEY,
-            type: "json",
+            namespace: metafields.namespace,
+            key: metafields.key,
+            type: 'json',
             value: JSON.stringify({
               quantity: parseInt(form.configuration.quantity),
               percentage: parseFloat(form.configuration.percentage),
