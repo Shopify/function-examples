@@ -1,11 +1,7 @@
-import { useForm, useField } from '@shopify/react-form'
-import { CurrencyCode } from '@shopify/react-i18n'
-import { Redirect } from '@shopify/app-bridge/actions'
-import { useAppBridge } from '@shopify/app-bridge-react'
-import { gql } from 'graphql-request'
-import { useShopifyMutation } from '../../hooks'
-import metafields from '../../metafields'
-
+import { useForm, useField } from "@shopify/react-form";
+import { CurrencyCode } from "@shopify/react-i18n";
+import { Redirect } from "@shopify/app-bridge/actions";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import {
   ActiveDatesCard,
   CombinationCard,
@@ -17,7 +13,7 @@ import {
   SummaryCard,
   UsageLimitsCard,
   onBreadcrumbAction,
-} from '@shopify/discount-app-components'
+} from "@shopify/discount-app-components";
 import {
   Banner,
   Card,
@@ -26,46 +22,19 @@ import {
   TextField,
   Stack,
   PageActions,
-} from '@shopify/polaris'
-import { data } from '@shopify/app-bridge/actions/Modal'
+} from "@shopify/polaris";
 
-const todaysDate = new Date()
-const FUNCTION_ID = 'YOUR_FUNCTION_ID'
+import metafields from '../../metafields'
+import { useAuthenticatedFetch } from "../../hooks";
 
-const CREATE_AUTOMATIC_MUTATION = gql`
-  mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
-    discountCreate: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
-      userErrors {
-        code
-        message
-        field
-      }
-    }
-  }
-`
-
-const CREATE_CODE_MUTATION = gql`
-  mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
-    discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
-      userErrors {
-        code
-        message
-        field
-      }
-    }
-  }
-`
+const todaysDate = new Date();
+const FUNCTION_ID = "YOUR_FUNCTION_ID";
 
 export default function VolumeNew() {
-  const app = useAppBridge()
-  const redirect = Redirect.create(app)
-  const currencyCode = CurrencyCode.Cad
-  const [createAutoDiscount] = useShopifyMutation({
-    query: CREATE_AUTOMATIC_MUTATION,
-  })
-  const [createCodeDiscount] = useShopifyMutation({
-    query: CREATE_CODE_MUTATION,
-  })
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
+  const currencyCode = CurrencyCode.Cad;
+  const authenticatedFetch = useAuthenticatedFetch();
 
   const {
     fields: {
@@ -90,25 +59,26 @@ export default function VolumeNew() {
     makeClean,
   } = useForm({
     fields: {
-      discountTitle: useField(''),
+      discountTitle: useField(""),
       discountMethod: useField(DiscountMethod.Code),
-      discountCode: useField(''),
+      discountCode: useField(""),
       combinesWith: useField({
         orderDiscounts: false,
         productDiscounts: false,
         shippingDiscounts: false,
       }),
       requirementType: useField(RequirementType.None),
-      requirementSubtotal: useField('0'),
-      requirementQuantity: useField('0'),
+      requirementSubtotal: useField("0"),
+      requirementQuantity: useField("0"),
       usageTotalLimit: useField(null),
       usageOncePerCustomer: useField(false),
       startDate: useField(todaysDate),
       endDate: useField(null),
-      configuration: { // Add quantity and percentage configuration
-        quantity: useField('1'),
-        percentage: useField('0'),
-      }
+      configuration: {
+        // Add quantity and percentage configuration
+        quantity: useField("1"),
+        percentage: useField("0"),
+      },
     },
     onSubmit: async (form) => {
       const discount = {
@@ -127,26 +97,39 @@ export default function VolumeNew() {
             }),
           },
         ],
-      }
-      const { data } = form.discountMethod === DiscountMethod.Automatic ?
-        await createAutoDiscount({
-          discount: { ...discount, title: form.discountTitle },
-        })
-        : await createCodeDiscount({
-          discount: { ...discount, title: form.discountCode, code: form.discountCode },
-        })
+      };
 
-      const remoteErrors = data.discountCreate.userErrors
+      let response;
+      if (form.discountMethod === DiscountMethod.Automatic) {
+        response = await authenticatedFetch("/api/discounts/automatic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...discount, title: form.discountTitle }),
+        });
+      } else {
+        response = await authenticatedFetch("/api/discounts/code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...discount,
+            title: form.discountCode,
+            code: form.discountCode,
+          }),
+        });
+      }
+
+      const data = (await response.json()).data;
+      const remoteErrors = data.discountCreate.userErrors;
       if (remoteErrors.length > 0) {
-        return { status: 'fail', errors: remoteErrors }
+        return { status: "fail", errors: remoteErrors };
       }
 
       redirect.dispatch(Redirect.Action.ADMIN_SECTION, {
         name: Redirect.ResourceType.Discount,
-      })
-      return { status: 'success' }
+      });
+      return { status: "success" };
     },
-  })
+  });
 
   const errorBanner =
     submitErrors.length > 0 ? (
@@ -157,26 +140,26 @@ export default function VolumeNew() {
             {submitErrors.map(({ message, field }, index) => {
               return (
                 <li key={`${message}${index}`}>
-                  {field.join('.')} {message}
+                  {field.join(".")} {message}
                 </li>
-              )
+              );
             })}
           </ul>
         </Banner>
       </Layout.Section>
-    ) : null
+    ) : null;
 
   return (
     <Page
       title="Create volume discount"
       breadcrumbs={[
         {
-          content: 'Discounts',
+          content: "Discounts",
           onAction: () => onBreadcrumbAction(redirect, true),
         },
       ]}
       primaryAction={{
-        content: 'Save',
+        content: "Save",
         onAction: submit,
         disabled: !dirty,
         loading: submitting,
@@ -196,8 +179,15 @@ export default function VolumeNew() {
             <Card title="Volume">
               <Card.Section>
                 <Stack>
-                <TextField label="Minimum quantity" {...configuration.quantity} />
-                <TextField label="Discount percentage" {...configuration.percentage} suffix="%" />
+                  <TextField
+                    label="Minimum quantity"
+                    {...configuration.quantity}
+                  />
+                  <TextField
+                    label="Discount percentage"
+                    {...configuration.percentage}
+                    suffix="%"
+                  />
                 </Stack>
               </Card.Section>
             </Card>
@@ -231,7 +221,7 @@ export default function VolumeNew() {
                 discountMethod.value === DiscountMethod.Automatic
                   ? discountTitle.value
                   : discountCode.value,
-              appDiscountType: 'Volume',
+              appDiscountType: "Volume",
               isEditing: false,
             }}
             performance={{
@@ -257,14 +247,14 @@ export default function VolumeNew() {
         <Layout.Section>
           <PageActions
             primaryAction={{
-              content: 'Save discount',
+              content: "Save discount",
               onAction: submit,
               disabled: !dirty,
               loading: submitting,
             }}
             secondaryActions={[
               {
-                content: 'Discard',
+                content: "Discard",
                 onAction: () => onBreadcrumbAction(redirect, true),
               },
             ]}
@@ -272,5 +262,5 @@ export default function VolumeNew() {
         </Layout.Section>
       </Layout>
     </Page>
-  )
+  );
 }

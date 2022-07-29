@@ -4,7 +4,7 @@ import { PolarisTestProvider } from "@shopify/polaris";
 import { AppBridgeContext } from "@shopify/app-bridge-react/context";
 import { BrowserRouter } from "react-router-dom";
 import { createBrowserHistory } from "history";
-import { GraphQLProvider } from "../components";
+import { QueryProvider } from "../components";
 
 function createMockApp() {
   const localOrigin = "https://example.com";
@@ -37,7 +37,7 @@ export const mount = createMount({
       <PolarisTestProvider>
         <BrowserRouter>
           <AppBridgeContext.Provider value={createMockApp()}>
-            <GraphQLProvider>{element}</GraphQLProvider>
+            <QueryProvider>{element}</QueryProvider>
           </AppBridgeContext.Provider>
         </BrowserRouter>
       </PolarisTestProvider>

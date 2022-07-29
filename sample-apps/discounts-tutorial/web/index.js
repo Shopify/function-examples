@@ -3,14 +3,15 @@ import { join } from "path";
 import fs from "fs";
 import express from "express";
 import cookieParser from "cookie-parser";
-import { Shopify, ApiVersion } from "@shopify/shopify-api";
+import { Shopify, LATEST_API_VERSION } from "@shopify/shopify-api";
 
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
+import productCreator from "./helpers/product-creator.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 
-const USE_ONLINE_TOKENS = true;
+const USE_ONLINE_TOKENS = false;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
@@ -34,7 +35,7 @@ Shopify.Context.initialize({
   SCOPES: process.env.SCOPES.split(","),
   HOST_NAME: process.env.HOST.replace(/https?:\/\//, ""),
   HOST_SCHEME: process.env.HOST.split("://")[0],
-  API_VERSION: ApiVersion.Unstable,
+  API_VERSION: LATEST_API_VERSION,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
@@ -68,6 +69,32 @@ const BILLING_SETTINGS = {
 // More details can be found on shopify.dev:
 // https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
 setupGDPRWebHooks("/api/webhooks");
+
+const CREATE_CODE_MUTATION = `
+  mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
+    discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
+      userErrors {
+        code
+        message
+        field
+      }
+    }
+  }
+`;
+
+const CREATE_AUTOMATIC_MUTATION = `
+  mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
+    discountCreate: discountAutomaticAppCreate(
+      automaticAppDiscount: $discount
+    ) {
+      userErrors {
+        code
+        message
+        field
+      }
+    }
+  }
+`;
 
 // export for test use only
 export async function createServer(
@@ -106,20 +133,69 @@ export async function createServer(
     })
   );
 
-  app.get("/api/products-count", async (req, res) => {
-    res.status(200).send({ count: 0 })
+  app.get("/api/products/count", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+    const { Product } = await import(
+      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+    );
+
+    const countData = await Product.count({ session });
+    res.status(200).send(countData);
   });
 
-  app.post("/api/graphql", async (req, res) => {
+  app.get("/api/products/create", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+    let status = 200;
+    let error = null;
+
     try {
-      const response = await Shopify.Utils.graphqlProxy(req, res);
-      res.status(200).send(response.body);
-    } catch (error) {
-      res.status(500).send(error.message);
+      await productCreator(session);
+    } catch (e) {
+      status = 500;
+      error = e.message;
     }
+    res.status(status).send({ success: status === 200, error });
   });
 
   app.use(express.json());
+
+  const runDiscountMutation = async (req, res, mutation) => {
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+
+    const client = new Shopify.Clients.Graphql(
+      session?.shop,
+      session?.accessToken
+    );
+
+    const data = await client.query({
+      data: {
+        query: mutation,
+        variables: { discount: req.body },
+      },
+    });
+
+    res.send(data.body);
+  };
+
+  app.post("/api/discounts/code", async (req, res) => {
+    await runDiscountMutation(req, res, CREATE_CODE_MUTATION);
+  });
+
+  app.post("/api/discounts/automatic", async (req, res) => {
+    await runDiscountMutation(req, res, CREATE_AUTOMATIC_MUTATION);
+  });
 
   app.use((req, res, next) => {
     const shop = req.query.shop;
