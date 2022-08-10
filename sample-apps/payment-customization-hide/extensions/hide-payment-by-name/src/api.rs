@@ -23,6 +23,7 @@ pub struct Metafield {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PaymentMethod {
     pub id: ID,
+    pub name: String,
 }
 
 #[derive(Clone, Debug, Serialize)]

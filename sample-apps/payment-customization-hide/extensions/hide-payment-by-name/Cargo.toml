@@ -1,0 +1,12 @@
+[package]
+name = "payment_customization_hide_by_name"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0.13", features = ["derive"] }
+
+[profile.release]
+lto = true
+opt-level = 's'

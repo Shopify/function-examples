@@ -1,6 +1,7 @@
 query Input {
   paymentMethods {
     id
+    name
   }
   paymentCustomization {
     metafield(namespace: "payment-customization-hide", key: "function-configuration") {

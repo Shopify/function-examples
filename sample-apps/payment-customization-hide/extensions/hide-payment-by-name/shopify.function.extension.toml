@@ -1,0 +1,8 @@
+name = "hide payment by name"
+type = "payment_customization"
+title = "hide payment by name"
+api_version = "2022-07"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/payment_customization_hide_by_name.wasm"
