@@ -3,21 +3,9 @@ use serde::{Deserialize, Serialize};
 pub type ID = String;
 
 #[derive(Clone, Debug, Deserialize)]
-// Use the following container attribute if fields need to be camel-cased.
 #[serde(rename_all = "camelCase")]
 pub struct Input {
     pub payment_methods: Vec<PaymentMethod>,
-    pub payment_customization: PaymentCustomization,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct PaymentCustomization {
-    pub metafield: Option<Metafield>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Metafield {
-    pub value: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

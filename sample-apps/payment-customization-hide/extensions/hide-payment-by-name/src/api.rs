@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 pub type ID = String;
 
 #[derive(Clone, Debug, Deserialize)]
-// Use the following container attribute if fields need to be camel-cased.
 #[serde(rename_all = "camelCase")]
 pub struct Input {
     pub payment_methods: Vec<PaymentMethod>,
