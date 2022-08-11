@@ -33,10 +33,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    Ok(build_result(input))
-}
-
-fn build_result(input: Input) -> FunctionResult {
     let payment_methods = &input.payment_methods;
     let names_to_hide = input.configuration().names_to_hide;
     let operations = payment_methods
@@ -54,7 +50,7 @@ fn build_result(input: Input) -> FunctionResult {
         )
         .collect();
 
-    FunctionResult { operations }
+    Ok(FunctionResult { operations })
 }
 
 #[cfg(test)]

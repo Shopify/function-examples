@@ -12,17 +12,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    Ok(build_result(input.payment_methods[0].id.clone()))
-}
+    let payment_method_id = input.payment_methods[0].id.clone();
 
-fn build_result(payment_method_to_remove: ID) -> FunctionResult {
-    FunctionResult {
+    Ok(FunctionResult {
         operations: vec![Operation {
             hide: Some(HideOperation {
-                payment_method_id: payment_method_to_remove,
+                payment_method_id,
             }),
         }],
-    }
+    })
 }
 
 #[cfg(test)]
