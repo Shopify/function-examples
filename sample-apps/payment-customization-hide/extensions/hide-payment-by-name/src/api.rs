@@ -6,11 +6,23 @@ pub type ID = String;
 #[serde(rename_all = "camelCase")]
 pub struct Input {
     pub payment_methods: Vec<PaymentMethod>,
+    pub payment_customization: PaymentCustomization,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PaymentCustomization {
+    pub metafield: Option<Metafield>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Metafield {
+    pub value: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PaymentMethod {
     pub id: ID,
+    pub name: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
