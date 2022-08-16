@@ -1,0 +1,11 @@
+name = "order-routing-extension"
+type = "shipping_discounts"
+api_version = "2022-07"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/order-routing-extension.wasm"
+
+[ui.paths]
+create = "/"
+details = "/"
