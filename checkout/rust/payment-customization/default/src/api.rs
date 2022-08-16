@@ -14,7 +14,6 @@ pub struct PaymentCustomization {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase"))]
 pub struct Metafield {
     pub value: String,
 }
@@ -32,17 +31,20 @@ pub struct Operation {
 }
 
 #[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct HideOperation {
     pub payment_method_id: ID,
 }
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct MoveOperation {
     pub payment_method_id: ID,
     pub index: u64,
 }
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct RenameOperation {
     pub payment_method_id: ID,
     pub name: String,
