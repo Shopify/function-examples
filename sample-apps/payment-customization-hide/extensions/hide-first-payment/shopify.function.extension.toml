@@ -1,7 +1,7 @@
 name = "hide first payment"
 type = "payment_customization"
 title = "hide first payment"
-api_version = "2022-07"
+api_version = "unstable"
 
 [build]
 command = "cargo wasi build --release"
