@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 mod api;
 use api::*;
@@ -37,17 +37,17 @@ fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> 
     let names_to_hide = input.configuration().names_to_hide;
     let operations = payment_methods
         .iter()
-        .filter_map(|payment_method|
+        .filter_map(|payment_method| {
             if names_to_hide.contains(&payment_method.name) {
                 Some(Operation {
                     hide: Some(HideOperation {
-                        payment_method_id: payment_method.id.clone()
-                    })
+                        payment_method_id: payment_method.id.clone(),
+                    }),
                 })
             } else {
                 None
             }
-        )
+        })
         .collect();
 
     Ok(FunctionResult { operations })
@@ -61,15 +61,15 @@ mod tests {
         {
             "paymentMethods": [
                 {
-                    "id": "123456789",
+                    "id": "gid://shopify/PaymentCustomizationPaymentMethod/0",
                     "name": "Method A"
                 },
                 {
-                    "id": "987654321",
+                    "id": "gid://shopify/PaymentCustomizationPaymentMethod/1",
                     "name": "Method B"
                 },
                 {
-                    "id": "523414132",
+                    "id": "gid://shopify/PaymentCustomizationPaymentMethod/2",
                     "name": "Method C"
                 }
             ],
@@ -81,9 +81,7 @@ mod tests {
 
         Input {
             payment_customization: PaymentCustomization {
-                metafield: Some(Metafield {
-                    value
-                })
+                metafield: Some(Metafield { value }),
             },
             ..default_input
         }
@@ -100,21 +98,18 @@ mod tests {
     #[test]
     fn test_hide_operations_with_configuration() {
         let input = input(Some(Configuration {
-            names_to_hide: vec![
-                "Method A".to_string(),
-                "Method C".to_string(),
-            ]
+            names_to_hide: vec!["Method A".to_string(), "Method C".to_string()],
         }));
         let operations = function(input).unwrap().operations;
 
         assert_eq!(operations.len(), 2);
         assert_eq!(
             operations[0].hide.as_ref().unwrap().payment_method_id,
-            "123456789"
+            "gid://shopify/PaymentCustomizationPaymentMethod/0"
         );
         assert_eq!(
             operations[1].hide.as_ref().unwrap().payment_method_id,
-            "523414132"
+            "gid://shopify/PaymentCustomizationPaymentMethod/2"
         );
     }
 }
