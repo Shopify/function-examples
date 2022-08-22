@@ -1,0 +1,8 @@
+name = "hide first payment"
+type = "function_prototype"
+title = "hide first payment"
+api_version = "2022-07"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/payment_customization_hide.wasm"
