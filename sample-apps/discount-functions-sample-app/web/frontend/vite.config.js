@@ -23,6 +23,7 @@ const host = process.env.HOST
   ? process.env.HOST.replace(/https:\/\//, "")
   : "localhost";
 let hmrConfig
+
 if (host === "localhost") {
   hmrConfig = {
     protocol: "ws",
@@ -59,6 +60,7 @@ export default defineConfig({
     port: process.env.FRONTEND_PORT,
     middlewareMode: 'html',
     hmr: hmrConfig,
+    host: "localhost",
     proxy: {
       [INDEX_ROUTE]: {
         target: `http://127.0.0.1:${process.env.BACKEND_PORT}`,
