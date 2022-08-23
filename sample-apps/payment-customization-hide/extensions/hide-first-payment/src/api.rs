@@ -24,6 +24,7 @@ pub struct Operation {
 }
 
 #[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct HideOperation {
     pub payment_method_id: ID,
 }

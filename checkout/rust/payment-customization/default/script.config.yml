@@ -1,7 +1,0 @@
----
-version: '2'
-title: Payment customization script
-description: Payment customization default script
-configuration:
-  type: object
-  fields: {}
