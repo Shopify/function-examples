@@ -8,4 +8,4 @@ path = "target/wasm32-wasi/release/volume.wasm"
 
 [ui.paths]
 create = "/volume/new"
-details = "/volume/:id" # Note that this isn't implemented in this tutorial
+details = "/volume/:id"
