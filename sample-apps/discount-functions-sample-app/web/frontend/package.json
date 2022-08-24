@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "vite build",
-    "dev": "cross-env NODE_ENV=development node vite-server.js",
+    "dev": "vite",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
