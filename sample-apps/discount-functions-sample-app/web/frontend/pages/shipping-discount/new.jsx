@@ -7,7 +7,7 @@ import {
 export default function CreateShippingDiscountPage() {
   return (
     <DiscountCreatePage
-      functionId={process.env.SHOPIFY_SHIPPING_DISCOUNT_ID}
+      functionId={import.meta.env.SHOPIFY_SHIPPING_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
         <ShippingDiscount

@@ -5,9 +5,10 @@ import {
 } from '../../components/function-configuration/OrderDiscount';
 
 export default function CreateOrderDiscountPage() {
+  console.log(import.meta.env);
   return (
     <DiscountCreatePage
-      functionId={process.env.SHOPIFY_ORDER_DISCOUNT_ID}
+      functionId={import.meta.env.SHOPIFY_ORDER_DISCOUNT_ID}
       defaultConfiguration={DEFAULT_CONFIGURATION}
       renderConfigurationForm={(configuration, onConfigurationChange) => (
         <OrderDiscount
