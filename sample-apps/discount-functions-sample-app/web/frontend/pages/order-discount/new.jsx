@@ -5,7 +5,6 @@ import {
 } from '../../components/function-configuration/OrderDiscount';
 
 export default function CreateOrderDiscountPage() {
-  console.log(import.meta.env);
   return (
     <DiscountCreatePage
       functionId={process.env.SHOPIFY_ORDER_DISCOUNT_ID}
