@@ -26,7 +26,7 @@ export function AppBridgeProvider({ children }) {
   return (
     <Provider
       config={{
-        apiKey: import.meta.env.SHOPIFY_API_KEY,
+        apiKey: process.env.SHOPIFY_API_KEY,
         host,
         forceRedirect: true,
       }}

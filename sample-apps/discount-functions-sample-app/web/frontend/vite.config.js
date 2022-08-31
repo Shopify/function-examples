@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
@@ -42,22 +42,33 @@ if (host === 'localhost') {
     clientPort: 443,
   };
 }
+
 const root = new URL('.', import.meta.url).pathname;
 
-// Function IDs are populated in ../../.env by the Shopify CLI after being deployed
-const envDir =
-  process.env.npm_lifecycle_event === 'dev'
-    ? path.join(process.cwd(), '..', '..')
-    : root;
+const ENV_KEYS = [
+  'SHOPIFY_API_KEY',
+  'SHOPIFY_ORDER_DISCOUNT_ID',
+  'SHOPIFY_SHIPPING_DISCOUNT_ID',
+  'SHOPIFY_PRODUCT_DISCOUNT_ID',
+];
 
-// Note that this will expose all keys prefixed with `SHOPIFY_` to the frontend ap including SHOPIFY_API_SECRET
-const envPrefix = ['VITE_', 'SHOPIFY_'];
+// Function IDs are populated in ../../.env by the Shopify CLI after being deployed
+if (process.env.npm_lifecycle_event === 'dev') {
+  const envFile = loadEnv(
+    'dev',
+    path.join(process.cwd(), '..', '..'),
+    'SHOPIFY_',
+  );
+  process.env = { ...process.env, ...envFile };
+}
 
 export default defineConfig({
   root,
   plugins: [react()],
-  envDir,
-  envPrefix,
+  define: ENV_KEYS.reduce((env, key) => {
+    env[`process.env.${key}`] = JSON.stringify(process.env[key]);
+    return env;
+  }, {}),
   resolve: {
     alias: {
       assets: path.resolve(root, './assets'),
