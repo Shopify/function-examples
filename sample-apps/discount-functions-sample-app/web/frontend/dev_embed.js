@@ -1,4 +1,4 @@
-import RefreshRuntime from "/@react-refresh";
+import RefreshRuntime from '/@react-refresh';
 
 RefreshRuntime.injectIntoGlobalHook(window);
 window.$RefreshReg$ = () => {};
