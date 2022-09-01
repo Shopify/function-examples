@@ -7,8 +7,8 @@
         // Because the base HTML is rendered in the server side, we need to manually embed the code to enable HMR in our
         // code, so that the vite server is properly enabled to run HMR
         const script = document.createElement('script');
-        script.setAttribute('type', "module");
-        script.setAttribute('src', "./dev_embed.js");
+        script.setAttribute('type', 'module');
+        script.setAttribute('src', './dev_embed.js');
         document.getElementsByTagName('head')[0].append(script);
       }
     </script>

@@ -12,9 +12,9 @@ export function serializeDiscount(discount) {
         namespace: METAFIELD_NAMESPACE,
         key: METAFIELD_CONFIGURATION_KEY,
         type: 'json',
-        value: JSON.stringify(discount.configuration)
-      }
-    ]
+        value: JSON.stringify(discount.configuration),
+      },
+    ],
   };
 
   // metafield id is required for update

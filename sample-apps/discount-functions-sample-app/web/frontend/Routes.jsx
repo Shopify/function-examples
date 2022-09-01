@@ -1,15 +1,12 @@
-import {
-  Routes as ReactRouterRoutes,
-  Route,
-} from "react-router-dom";
+import { Routes as ReactRouterRoutes, Route } from 'react-router-dom';
 
 export default function Routes({ pages }) {
   const routes = useRoutes(pages);
   const routeComponents = routes.map(({ path, component: Component }) => (
     <Route key={path} path={path} element={<Component />} />
-  ))
+  ));
 
-  return <ReactRouterRoutes>{routeComponents}</ReactRouterRoutes>
+  return <ReactRouterRoutes>{routeComponents}</ReactRouterRoutes>;
 }
 
 function useRoutes(pages) {
@@ -30,22 +27,22 @@ function useRoutes(pages) {
         /**
          * Convert /[handle].jsx and /[...handle].jsx to /:handle.jsx for react-router-dom
          */
-        .replace(/\[(?:[.]{3})?(\w+?)\]/g, (_match, param) => `:${param}`)
+        .replace(/\[(?:[.]{3})?(\w+?)\]/g, (_match, param) => `:${param}`);
 
       if (path.endsWith('/') && path !== '/') {
-        path = path.substring(0, path.length - 1)
+        path = path.substring(0, path.length - 1);
       }
 
       if (!pages[key].default) {
-        console.warn(`${key} doesn't export a default React component`)
+        console.warn(`${key} doesn't export a default React component`);
       }
 
       return {
         path,
         component: pages[key].default,
-      }
+      };
     })
-    .filter((route) => route.component)
+    .filter((route) => route.component);
 
-  return routes
+  return routes;
 }

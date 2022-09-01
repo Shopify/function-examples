@@ -1,13 +1,13 @@
-import { vi } from "vitest";
-import { createMount } from "@shopify/react-testing";
-import { PolarisTestProvider } from "@shopify/polaris";
-import { AppBridgeContext } from "@shopify/app-bridge-react/context";
-import { GraphQLProvider } from "components/providers/GraphQLProvider";
-import { BrowserRouter } from "react-router-dom";
-import { createBrowserHistory } from "history";
+import { vi } from 'vitest';
+import { createMount } from '@shopify/react-testing';
+import { PolarisTestProvider } from '@shopify/polaris';
+import { AppBridgeContext } from '@shopify/app-bridge-react/context';
+import { GraphQLProvider } from 'components/providers/GraphQLProvider';
+import { BrowserRouter } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
 
 function createMockApp() {
-  const localOrigin = "https://example.com";
+  const localOrigin = 'https://example.com';
   return {
     dispatch: vi.fn().mockImplementation((action) => {
       return action;
@@ -16,7 +16,7 @@ function createMockApp() {
     getState: vi.fn().mockReturnValue(Promise.resolve({})),
     subscribe: vi.fn().mockImplementation(() => vi.fn()),
     error: vi.fn().mockImplementation(() => vi.fn()),
-    localOrigin: "https://example.com",
+    localOrigin: 'https://example.com',
   };
 }
 
@@ -29,10 +29,10 @@ export const mount = createMount({
     }
 
     return {
-      history
-    }
+      history,
+    };
   },
-  render(element, {history}) {
+  render(element, { history }) {
     return (
       <PolarisTestProvider>
         <BrowserRouter>

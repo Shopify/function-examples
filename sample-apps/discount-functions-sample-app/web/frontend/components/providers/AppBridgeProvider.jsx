@@ -1,27 +1,27 @@
-import { useMemo, useRef } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Provider } from '@shopify/app-bridge-react'
+import { useMemo, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Provider } from '@shopify/app-bridge-react';
 
 export function AppBridgeProvider({ children }) {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const location = useLocation();
+  const navigate = useNavigate();
   const history = useMemo(
     () => ({
       replace: (path) => {
-        navigate(path, { replace: true })
+        navigate(path, { replace: true });
       },
     }),
-    [navigate]
-  )
+    [navigate],
+  );
 
   const routerConfig = useMemo(
     () => ({ history, location }),
-    [history, location]
-  )
+    [history, location],
+  );
 
   const { current: host } = useRef(
-    new URL(window.location).searchParams.get('host')
-  )
+    new URL(window.location).searchParams.get('host'),
+  );
 
   return (
     <Provider
@@ -34,5 +34,5 @@ export function AppBridgeProvider({ children }) {
     >
       {children}
     </Provider>
-  )
+  );
 }
