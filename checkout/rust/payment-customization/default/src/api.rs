@@ -26,7 +26,7 @@ pub struct FunctionResult {
 #[derive(Clone, Debug, Serialize)]
 pub struct Operation {
     pub hide: Option<HideOperation>,
-    pub r#move: Option<MoveOperation>,
+    pub remove: Option<MoveOperation>,
     pub rename: Option<RenameOperation>,
 }
 
