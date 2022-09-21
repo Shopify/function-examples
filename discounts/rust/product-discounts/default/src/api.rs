@@ -49,7 +49,6 @@ pub struct Discount {
     pub value: Value,
     pub targets: Vec<Target>,
     pub message: Option<String>,
-    pub conditions: Option<Vec<Condition>>,
 }
 
 #[skip_serializing_none]
@@ -74,29 +73,4 @@ pub enum Value {
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Target {
     ProductVariant { id: ID, quantity: Option<Int> },
-}
-
-#[serde_as]
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
-pub enum Condition {
-    #[serde(rename_all(serialize = "camelCase"))]
-    ProductMinimumQuantity {
-        ids: Vec<ID>,
-        minimum_quantity: Int,
-        target_type: ConditionTargetType,
-    },
-    #[serde(rename_all(serialize = "camelCase"))]
-    ProductMinimumSubtotal {
-        ids: Vec<ID>,
-        #[serde_as(as = "DisplayFromStr")]
-        minimum_amount: Decimal,
-        target_type: ConditionTargetType,
-    },
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all(serialize = "SCREAMING_SNAKE_CASE"))]
-pub enum ConditionTargetType {
-    ProductVariant,
 }
