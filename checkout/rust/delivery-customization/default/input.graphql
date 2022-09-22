@@ -1,5 +1,5 @@
 query Input {
-  deliveryCustomization {
+  deliveryOptions {
     id
     name
   }
