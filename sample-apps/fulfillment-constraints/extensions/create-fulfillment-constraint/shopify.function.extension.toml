@@ -1,0 +1,8 @@
+name = "create fulfillment constraint"
+type = "fulfillment_constraints"
+title = "create fulfillment constraint"
+api_version = "unstable"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/create_fulfillment_constraints.wasm"

@@ -1,0 +1,24 @@
+{
+  "cart": {
+    "lines": [
+      {
+        "id": "gid://shopify/CartLine/0",
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/0",
+          "metafield": {
+            "value": "IDENTIFIER_1"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/1",
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/1",
+          "metafield": {
+            "value": "IDENTIFIER_1"
+          }
+        }
+      }
+    ]
+  }
+}
