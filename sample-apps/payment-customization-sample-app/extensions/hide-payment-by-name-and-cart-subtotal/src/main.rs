@@ -6,7 +6,10 @@ use api::*;
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    pub names_to_hide: Vec<String>,
+    // should this be just a pub value?
+    pub payment_method: Vec<String>,
+    // add cart_subtotal
+    // pub cart_subtotal: f64, << is this correct?
 }
 
 impl Configuration {
@@ -34,11 +37,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let payment_methods = &input.payment_methods;
-    let names_to_hide = input.configuration().names_to_hide;
+
+    // get the subtotal from the cart
+    // if subtotal is >= cart_subtotal, then hide the payment method
+
+    let payment_method = input.configuration().payment_method;
     let operations = payment_methods
         .iter()
         .filter_map(|payment_method| {
-            if names_to_hide.contains(&payment_method.name) {
+            if payment_method.contains(&payment_method.name) {
                 Some(Operation {
                     hide: Some(HideOperation {
                         payment_method_id: payment_method.id.clone(),
@@ -98,7 +105,7 @@ mod tests {
     #[test]
     fn test_hide_operations_with_configuration() {
         let input = input(Some(Configuration {
-            names_to_hide: vec!["Method A".to_string(), "Method C".to_string()],
+            payment_method: vec!["Method A".to_string(), "Method C".to_string()],
         }));
         let operations = function(input).unwrap().operations;
 
