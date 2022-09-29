@@ -13,6 +13,8 @@ function AppBridgeLink({ url, children, external, ...rest }) {
 
   const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/;
 
+  console.log({provider: url, external, a: IS_EXTERNAL_LINK_REGEX.test(url)});
+
   if (external || IS_EXTERNAL_LINK_REGEX.test(url)) {
     return (
       <a target="_blank" rel="noopener noreferrer" href={url} {...rest}>
@@ -22,7 +24,7 @@ function AppBridgeLink({ url, children, external, ...rest }) {
   }
 
   return (
-    <a className="sadasd" onClick={handleClick} {...rest}>
+    <a className="testing-this-link" onClick={handleClick} {...rest}>
       {children}
     </a>
   );

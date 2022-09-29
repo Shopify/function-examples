@@ -122,7 +122,6 @@ export async function createServer(
 
     // Use client.query and pass your query as `data`.
     let all = [];
-
     try {
       const result = await client.query({
         data: `{
@@ -131,6 +130,10 @@ export async function createServer(
               node {
                 id
                 title
+                metafield(namespace: "${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                  type
+                  value
+                }
               }
             }
           }
@@ -138,17 +141,15 @@ export async function createServer(
       });
 
       all = result.body.data.paymentCustomizations.edges.map(
-        (edge) => edge.node
+        ({ node: { metafield, ...customization } }) => Object.assign({}, customization, JSON.parse(metafield?.value || '{}'))
       );
     } catch (error) {
       if (error instanceof Shopify.Errors.GraphqlQueryError)
-        res.status(500).send({ error: error.response });
-      else res.status(500).send({ error: error.message });
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
     }
 
-    console.log(all);
-
-    res.status(200).send(all);
+    return res.status(200).send(all);
   });
 
   app.post("/api/payment-customization", async (req, res) => {
@@ -158,7 +159,6 @@ export async function createServer(
       app.get("use-online-tokens")
     );
 
-    // GraphQLClient takes in the shop url and the accessToken for that shop.
     const client = new Shopify.Clients.Graphql(
       session.shop,
       session.accessToken
@@ -166,9 +166,6 @@ export async function createServer(
 
     const payload = req.body;
 
-    console.log({payload})
-
-    // Use client.query and pass your query as `data`.
     let customization = {};
     try {
       const result = await client.query({
@@ -202,7 +199,6 @@ export async function createServer(
       else return res.status(500).send({ error: error.message });
     }
 
-    // Use client.query and pass your query as `data`.
     let metafield = {};
     try {
       const result = await client.query({

@@ -1,9 +1,11 @@
 import {
   Page,
-  ResourceList,
+  Card,
   TextStyle,
-  ResourceItem,
   EmptyState,
+  IndexTable,
+  useIndexResourceState,
+  Link,
 } from "@shopify/polaris";
 import { PlusMinor } from "@shopify/polaris-icons";
 
@@ -18,58 +20,96 @@ export default function HomePage() {
     url: "/api/payment-customizations",
   });
 
-  console.log({ data, isLoading, error });
+  const {selectedResources, allResourcesSelected, handleSelectionChange} =
+    useIndexResourceState(data);
+
+  const primaryAction = {
+    content: "Create customization",
+    icon: PlusMinor,
+    url: "/new",
+  }
+
+  const resourceName = {
+    singular: "customization",
+    plural: "customizations",
+  }
+
+  const tableHeadings = [
+    {title: 'Payment Method'},
+    {title: 'Cart Subtotal'},
+  ]
+
+  const tableActions = [
+    {
+      content: 'Delete customizations',
+      onAction: () => console.log('Todo: implement bulk delete'),
+    },
+  ]
+
+  const selectedCount = allResourcesSelected ? 'All' : selectedResources.length
 
   return (
     <Page
       title="Customizations"
-      primaryAction={{
-        content: "Create customization",
-        icon: PlusMinor,
-        url: "/new",
-      }}
+      primaryAction={primaryAction}
     >
-      <ResourceList
-        resourceName={{
-          singular: "customization",
-          plural: "customizations",
-        }}
-        items={data}
-        renderItem={renderItem}
-        loading={isLoading}
-        emptyState={
-          <EmptyState
-            heading="Hello world! 🎉"
-            action={{ content: "Create customization", url: "/new" }}
-          >
-            <p>
-              Welcome to the <b>Payment Customizations Functions Sample App</b>!
-              To get started, create a new customization.
-            </p>
-          </EmptyState>
-        }
-        // selectedItems={selectedItems}
-        // onSelectionChange={setSelectedItems}
-        // promotedBulkActions={promotedBulkActions}
-        // bulkActions={bulkActions}
-      />
+      <Card>
+        <IndexTable
+          resourceName={resourceName}
+          itemCount={data.length}
+          headings={tableHeadings}
+          promotedBulkActions={tableActions}
+          loading={isLoading}
+          emptyState={<EmptyTable action={primaryAction} />}
+          selectedItemsCount={selectedCount}
+          onSelectionChange={handleSelectionChange}
+        >
+          {
+            data.map((customization, index) =>
+              <TableRow
+                {...customization}
+                key={customization.id}
+                selected={selectedResources.includes(customization.id)}
+                index={index}
+              />
+            )
+          }
+        </IndexTable>
+      </Card>
     </Page>
   );
 }
 
-function renderItem(item) {
-  const { id, url, name, location } = item;
-
+function TableRow({ id, cartSubtotal, paymentMethod, selected, index }) {
   return (
-    <ResourceItem
+    <IndexTable.Row
       id={id}
-      url={url}
-      accessibilityLabel={`View details for ${name}`}
+      selected={selected}
+      position={index}
     >
-      <h3>
-        <TextStyle variation="strong">{name}</TextStyle>
-      </h3>
-      <div>{location}</div>
-    </ResourceItem>
-  );
+      <IndexTable.Cell>
+        <Link
+          dataPrimaryLink
+          url={`/${id}`}
+        >
+          <TextStyle variation="strong">{paymentMethod}</TextStyle>
+        </Link>
+      </IndexTable.Cell>
+      <IndexTable.Cell>{cartSubtotal}</IndexTable.Cell>
+    </IndexTable.Row>
+  )
+}
+
+function EmptyTable(props) {
+  return (
+    <EmptyState
+      heading="Hello world! 🎉"
+      {...props}
+    >
+      <p>
+        Welcome to the <b>Payment Customizations Functions Sample App</b>!
+        To get started, create a new customization.
+      </p>
+    </EmptyState>
+  )
 }
