@@ -1,16 +1,14 @@
-// @ts-check
 import { join } from "path";
 import { readFileSync } from "fs";
 import express from "express";
 import cookieParser from "cookie-parser";
-import { Shopify, LATEST_API_VERSION } from "@shopify/shopify-api";
+import { Shopify } from "@shopify/shopify-api";
+import dotenv from 'dotenv'
 
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
-import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
-import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 
 const USE_ONLINE_TOKENS = false;
@@ -22,6 +20,13 @@ const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
 const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
+
+const {SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID} = dotenv.parse(readFileSync(join(process.cwd(), '../', '.env'), "utf8"));
+
+const METAFIELD = {
+  namespace: "payment-customization-hide",
+  key: "function-configuration"
+}
 
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
@@ -159,9 +164,9 @@ export async function createServer(
       session.accessToken
     );
 
-    const data = req.body;
+    const payload = req.body;
 
-    console.log({data})
+    console.log({payload})
 
     // Use client.query and pass your query as `data`.
     let customization = {};
@@ -175,29 +180,19 @@ export async function createServer(
                   id
                   title
                   enabled
-                  metafield(namespace: "payment-customization-hide", key: "function-configuration") {
-                    value
-                  }
-                }
-                userErrors {
-                  code
-                  field
-                  message
                 }
               }
             }
           `,
           variables: {
             input: {
-              functionId: "1",
-              title: "test",
+              functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
+              title: `Hide ${payload.paymentMethod} if cart subtotal is bigger than ${payload.cartSubtotal}`,
               enabled: true,
             },
           },
         }
       });
-
-      console.log(result.body.data.paymentCustomizationCreate)
 
       customization =
         result.body.data.paymentCustomizationCreate.paymentCustomization;
@@ -207,7 +202,44 @@ export async function createServer(
       else return res.status(500).send({ error: error.message });
     }
 
-    return res.status(200).send(customization);
+    // Use client.query and pass your query as `data`.
+    let metafield = {};
+    try {
+      const result = await client.query({
+        data: {
+          query: `
+            mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
+              metafieldsSet(metafields: $metafields) {
+                metafields {
+                  id
+                  key
+                  namespace
+                  value
+                  createdAt
+                  updatedAt
+                }
+              }
+            }
+          `,
+          variables: {
+            metafields: [{
+              ...METAFIELD,
+              ownerId: customization.id,
+              type: 'json',
+              value: JSON.stringify(payload)
+            }],
+          },
+        }
+      });
+
+      metafield = result.body.data.metafieldsSet.metafields[0];
+    } catch (error) {
+      if (error instanceof Shopify.Errors.GraphqlQueryError)
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(200).send({ customization, metafield });
   });
 
   app.put("/api/payment-customizations/:id", () => {
