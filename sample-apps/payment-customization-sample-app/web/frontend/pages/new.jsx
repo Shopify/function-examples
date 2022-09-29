@@ -4,7 +4,7 @@ import { useAppMutation, useCustomizationForm } from "../hooks";
 export default function NewCustomizationPage() {
   const { handleInputChange, hasChanged, ...data } = useCustomizationForm();
   const { mutate: createCustomization } = useAppMutation({
-    url: "/api/payment-customizations",
+    url: "/api/payment-customization",
   });
 
   const handleSubmit = () => {

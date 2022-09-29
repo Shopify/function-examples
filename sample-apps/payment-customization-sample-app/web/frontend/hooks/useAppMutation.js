@@ -16,7 +16,7 @@ import { useMutation } from "react-query";
  */
 export const useAppMutation = ({
   url,
-  fetchInit = { method: "POST" },
+  fetchInit = {},
   reactQueryOptions,
 }) => {
   const authenticatedFetch = useAuthenticatedFetch();
@@ -25,6 +25,11 @@ export const useAppMutation = ({
     return async (variables) => {
       const response = await authenticatedFetch(url, {
         ...fetchInit,
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(variables),
       });
 

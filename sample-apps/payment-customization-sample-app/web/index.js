@@ -93,28 +93,14 @@ export async function createServer(
   });
 
   // All endpoints after this point will require an active session
+  app.use(express.json());
+
   app.use(
     "/api/*",
     verifyRequest(app, {
       billing: billingSettings,
     })
   );
-
-  app.get("/api/products/count", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-
-    const { Product } = await import(
-      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-    );
-
-    const countData = await Product.count({ session });
-
-    res.status(200).send(countData);
-  });
 
   app.get("/api/payment-customizations", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
@@ -160,7 +146,7 @@ export async function createServer(
     res.status(200).send(all);
   });
 
-  app.post("/api/payment-customizations", async (req, res) => {
+  app.post("/api/payment-customization", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
@@ -175,40 +161,53 @@ export async function createServer(
 
     const data = req.body;
 
-    console.log({ data });
+    console.log({data})
 
     // Use client.query and pass your query as `data`.
     let customization = {};
     try {
       const result = await client.query({
-        data: `{
-          mutation PaymentCustomization($input: PaymentCustomizationInput!) {
-            paymentCustomizationCreate(paymentCustomization: $input) {
-              paymentCustomization {
-                id
-                title
+        data: {
+          query: `
+            mutation PaymentCustomization($input: PaymentCustomizationInput!) {
+              paymentCustomizationCreate(paymentCustomization: $input) {
+                paymentCustomization {
+                  id
+                  title
+                  enabled
+                  metafield(namespace: "payment-customization-hide", key: "function-configuration") {
+                    value
+                  }
+                }
+                userErrors {
+                  code
+                  field
+                  message
+                }
               }
             }
-          }
-        }`,
-        variables: {
-          input: {
-            functionId: 1,
-            title: "test",
-            enabled: true,
+          `,
+          variables: {
+            input: {
+              functionId: "1",
+              title: "test",
+              enabled: true,
+            },
           },
-        },
+        }
       });
+
+      console.log(result.body.data.paymentCustomizationCreate)
 
       customization =
         result.body.data.paymentCustomizationCreate.paymentCustomization;
     } catch (error) {
       if (error instanceof Shopify.Errors.GraphqlQueryError)
-        res.status(500).send({ error: error.response });
-      else res.status(500).send({ error: error.message });
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
     }
 
-    res.status(200).send(customization);
+    return res.status(200).send(customization);
   });
 
   app.put("/api/payment-customizations/:id", () => {
@@ -232,28 +231,7 @@ export async function createServer(
   //   res.status(200).send({ tots: 2 });
   // });
 
-  app.get("/api/products/create", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-    let status = 200;
-    let error = null;
 
-    try {
-      await productCreator(session);
-    } catch (e) {
-      console.log(`Failed to process products/create: ${e.message}`);
-      status = 500;
-      error = e.message;
-    }
-    res.status(status).send({ success: status === 200, error });
-  });
-
-  // All endpoints after this point will have access to a request.body
-  // attribute, as a result of the express.json() middleware
-  app.use(express.json());
 
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);
