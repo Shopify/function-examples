@@ -1,6 +1,7 @@
 import { useAuthenticatedFetch } from "./useAuthenticatedFetch";
 import { useMemo } from "react";
 import { useMutation } from "react-query";
+import { useCallback } from "react";
 
 /**
  * A hook for querying your custom app data.
@@ -16,26 +17,27 @@ import { useMutation } from "react-query";
  */
 export const useAppMutation = ({
   url,
-  fetchInit = {},
-  reactQueryOptions,
+  fetchOptions = {},
+  reactQueryOptions = {},
 }) => {
   const authenticatedFetch = useAuthenticatedFetch();
 
-  const fetch = useMemo(() => {
-    return async (variables) => {
-      const response = await authenticatedFetch(url, {
-        ...fetchInit,
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(variables),
-      });
+  const fetch = useCallback(async ({ payload, params }) => {
+    const fetchUrl = params ? url.replace(/:(\w+)/g, (_, key) => params[key]) : url;
 
-      return response.json();
-    };
-  }, [url, JSON.stringify(fetchInit)]);
+    const response = await authenticatedFetch(fetchUrl, {
+      method: "POST",
+      ...fetchOptions,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      ...payload ? { body: JSON.stringify(payload) } : {},
+    });
+
+    return response.json();
+
+  }, [url, JSON.stringify(fetchOptions)]);
 
   return useMutation(fetch, {
     ...reactQueryOptions,

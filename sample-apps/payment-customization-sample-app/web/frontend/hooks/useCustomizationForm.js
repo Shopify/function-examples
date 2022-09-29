@@ -3,8 +3,8 @@ import { useState } from "react";
 export function useCustomizationForm(props) {
   const {
     initialData = {
-      cartSubtotal: 10,
-      paymentMethod: "Credit card",
+      cartSubtotal: 0,
+      paymentMethod: "",
     },
   } = props || {};
 
@@ -14,13 +14,15 @@ export function useCustomizationForm(props) {
     setData((cur) => ({ ...cur, [name]: value }));
   };
 
+  console.log(data)
   const hasChanged = Object.keys(data).some(
     (key) => data[key] !== initialData[key]
   );
 
   return {
-    ...data,
+    data,
     handleInputChange,
     hasChanged,
+    setData
   };
 }

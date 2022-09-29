@@ -1,6 +1,6 @@
-import { Card, Page, Text, PageActions } from "@shopify/polaris";
+import { Card, Page, Loading, Frame } from "@shopify/polaris";
 
-export function CustomizationPageLayout({ actionProps, children, ...props }) {
+export function CustomizationPageLayout({ actionProps, loading, children, ...props }) {
   const defaultActionProps = {
     content: "Save",
     disabled: true,
@@ -12,18 +12,20 @@ export function CustomizationPageLayout({ actionProps, children, ...props }) {
   };
 
   return (
-    <Page
-      title="Hide Payment Method"
-      subtitle="Hide a payment method from the checkout page based on the subtotal of the cart."
-      primaryAction={primaryActionProps}
-      breadcrumbs={[{ content: "Customizations", url: "/" }]}
-      {...props}
-    >
-      <Card title="Customization">
-        <Card.Section>{children}</Card.Section>
-      </Card>
+    <Frame>
+      {loading && <Loading />}
 
-      <PageActions primaryAction={primaryActionProps} />
-    </Page>
+      <Page
+        title="Hide Payment Method"
+        subtitle="Hide a payment method from the checkout page based on the subtotal of the cart."
+        primaryAction={primaryActionProps}
+        breadcrumbs={[{ content: "Customizations", url: "/" }]}
+        {...props}
+      >
+        <Card title="Customization">
+          <Card.Section>{children}</Card.Section>
+        </Card>
+      </Page>
+    </Frame>
   );
 }

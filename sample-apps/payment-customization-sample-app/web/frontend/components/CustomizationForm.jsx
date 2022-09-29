@@ -5,6 +5,8 @@ export function CustomizationForm({
   paymentMethod,
   onSubmit,
   onInputChange,
+  loading,
+  disabled,
   ...props
 }) {
   const handleSubmit = () => {
@@ -25,6 +27,7 @@ export function CustomizationForm({
             autoComplete="off"
             value={paymentMethod}
             onChange={(value) => handleInputChange(value, "paymentMethod")}
+            disabled={disabled}
             requiredIndicator
           />
 
@@ -34,11 +37,12 @@ export function CustomizationForm({
             autoComplete="off"
             value={cartSubtotal}
             onChange={(value) => handleInputChange(value, "cartSubtotal")}
+            disabled={disabled}
             requiredIndicator
           />
         </FormLayout.Group>
 
-        <Button submit>Submit</Button>
+        <Button submit primary loading={loading}>Save Customization</Button>
       </FormLayout>
     </Form>
   );

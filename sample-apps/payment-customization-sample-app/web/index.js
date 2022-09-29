@@ -10,6 +10,7 @@ import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { AppInstallations } from "./app_installations.js";
+import { gidToId, idToGid } from "./helpers/gid.js";
 
 const USE_ONLINE_TOKENS = false;
 
@@ -125,13 +126,13 @@ export async function createServer(
     try {
       const result = await client.query({
         data: `{
-          paymentCustomizations(first: 10) {
+          paymentCustomizations(first: 50) {
             edges {
               node {
                 id
                 title
+                enabled
                 metafield(namespace: "${METAFIELD.namespace}", key:"${METAFIELD.key}") {
-                  type
                   value
                 }
               }
@@ -141,7 +142,7 @@ export async function createServer(
       });
 
       all = result.body.data.paymentCustomizations.edges.map(
-        ({ node: { metafield, ...customization } }) => Object.assign({}, customization, JSON.parse(metafield?.value || '{}'))
+        ({ node: { metafield, id, ...customization } }) => Object.assign(customization, { id: gidToId(id) }, JSON.parse(metafield?.value || '{}'))
       );
     } catch (error) {
       if (error instanceof Shopify.Errors.GraphqlQueryError)
@@ -152,7 +153,7 @@ export async function createServer(
     return res.status(200).send(all);
   });
 
-  app.post("/api/payment-customization", async (req, res) => {
+  app.post("/api/payment-customizations", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
@@ -191,14 +192,14 @@ export async function createServer(
         }
       });
 
-      customization =
-        result.body.data.paymentCustomizationCreate.paymentCustomization;
+      customization = result.body.data.paymentCustomizationCreate.paymentCustomization
     } catch (error) {
       if (error instanceof Shopify.Errors.GraphqlQueryError)
         return res.status(500).send({ error: error.response });
       else return res.status(500).send({ error: error.message });
     }
 
+    // we need the id from the customization to create the metafield
     let metafield = {};
     try {
       const result = await client.query({
@@ -207,12 +208,7 @@ export async function createServer(
             mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
               metafieldsSet(metafields: $metafields) {
                 metafields {
-                  id
-                  key
-                  namespace
                   value
-                  createdAt
-                  updatedAt
                 }
               }
             }
@@ -235,11 +231,213 @@ export async function createServer(
       else return res.status(500).send({ error: error.message });
     }
 
-    return res.status(200).send({ customization, metafield });
+    const { id, ...data } = customization
+    const send = Object.assign({ id: gidToId(id) }, data, JSON.parse(metafield.value));
+
+    return res.status(200).send(send);
   });
 
-  app.put("/api/payment-customizations/:id", () => {
-    // update
+  app.get("/api/payment-customizations/:id", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+
+    // GraphQLClient takes in the shop url and the accessToken for that shop.
+    const client = new Shopify.Clients.Graphql(
+      session.shop,
+      session.accessToken
+    );
+
+    // Use client.query and pass your query as `data`.
+    let customization = {};
+    try {
+      const result = await client.query({
+        data: {
+          query: `
+            query PaymentCustomization($id: ID!) {
+              paymentCustomization(id: $id) {
+                id
+                enabled
+                title
+                metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                  value
+                }
+              }
+            }
+          `,
+          variables: {
+            id: idToGid(req.params.id)
+          }
+        }
+      });
+
+      const { metafield, ...data } = result.body.data.paymentCustomization
+      customization = Object.assign({}, data, JSON.parse(metafield?.value || '{}'))
+    } catch (error) {
+      if (error instanceof Shopify.Errors.GraphqlQueryError)
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(200).send(customization);
+  });
+
+  app.delete("/api/payment-customizations/:id", async (req, res) => {
+    // delete
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+
+    const client = new Shopify.Clients.Graphql(
+      session.shop,
+      session.accessToken
+    );
+
+    // get metafield id
+    let customization = {};
+    try {
+      const result = await client.query({
+        data: {
+          query: `
+            query PaymentCustomization($id: ID!) {
+              paymentCustomization(id: $id) {
+                id
+                metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                  id
+                }
+              }
+            }
+          `,
+          variables: {
+            id: idToGid(req.params.id)
+          }
+        }
+      });
+
+      customization = result.body.data.paymentCustomization
+    } catch (error) {
+      if (error instanceof Shopify.Errors.GraphqlQueryError)
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
+    }
+
+    // delete customization and metafield
+    try {
+      await client.query({
+        data: {
+          query: `
+            mutation PaymentCustomizationDelete($pid: ID!, $mid: ID!) {
+              paymentCustomizationDelete(id: $pid) {
+                deletedId
+              }
+              metafieldDelete(input: { id: $mid }) {
+                deletedId
+              }
+            }
+          `,
+          variables: {
+            pid: customization.id,
+            mid: customization.metafield?.id
+          },
+        }
+      });
+    } catch (error) {
+      if (error instanceof Shopify.Errors.GraphqlQueryError)
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(200).send({ message: 'Deleted with success' });
+  })
+
+  app.put("/api/payment-customizations/:id", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+
+    const client = new Shopify.Clients.Graphql(
+      session.shop,
+      session.accessToken
+    );
+
+    const payload = req.body;
+    const gid = idToGid(req.params.id)
+
+    // update metafield
+    try {
+      await client.query({
+        data: {
+          query: `
+            mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
+              metafieldsSet(metafields: $metafields) {
+                metafields {
+                  value
+                }
+              }
+            }
+          `,
+          variables: {
+            metafields: [{
+              ...METAFIELD,
+              ownerId: gid,
+              type: 'json',
+              value: JSON.stringify(payload)
+            }],
+          },
+        }
+      });
+    } catch (error) {
+      if (error instanceof Shopify.Errors.GraphqlQueryError)
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
+    }
+
+    let customization = {};
+    try {
+      const result = await client.query({
+        data: {
+          query: `
+            mutation PaymentCustomizationUpdate($id: ID!, $input: PaymentCustomizationInput!) {
+              paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
+                paymentCustomization {
+                  id
+                  title
+                  enabled
+                  metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                    value
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            id: gid,
+            input: {
+              functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
+              title: `Hide ${payload.paymentMethod} if cart subtotal is bigger than ${payload.cartSubtotal}`,
+              enabled: true,
+            },
+          },
+        }
+      });
+
+      customization = result.body.data.paymentCustomizationUpdate.paymentCustomization
+    } catch (error) {
+      if (error instanceof Shopify.Errors.GraphqlQueryError)
+        return res.status(500).send({ error: error.response });
+      else return res.status(500).send({ error: error.message });
+    }
+
+    const { id, metafield, ...data } = customization
+    const send = Object.assign({ id: gidToId(id) }, data, JSON.parse(metafield.value));
+
+    return res.status(200).send(send);
   });
 
   // app.get("/api/payment-gateway", async (req, res) => {

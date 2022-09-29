@@ -8,20 +8,46 @@ import {
   Link,
 } from "@shopify/polaris";
 import { PlusMinor } from "@shopify/polaris-icons";
+import { useIsMutating } from 'react-query'
 
-import { useAppQuery } from "../hooks";
+import { useAppQuery, useAppMutation } from "../hooks";
 
 export default function HomePage() {
   const {
     data = [],
-    isLoading,
-    error,
+    isFetching,
+    refetch
   } = useAppQuery({
     url: "/api/payment-customizations",
   });
 
+  const { mutateAsync: deleteCustomization } = useAppMutation({
+    url: "/api/payment-customizations/:id",
+    fetchOptions: {
+      method: "DELETE",
+    },
+    reactQueryOptions: {
+      mutationKey: "deleteCustomization"
+    }
+  });
+
+  const isMutating = useIsMutating(["deleteCustomization"]);
+
   const {selectedResources, allResourcesSelected, handleSelectionChange} =
     useIndexResourceState(data);
+
+  const handleDeleteAction = async () => {
+    if (isMutating) return
+
+    try {
+      const mutations = selectedResources.map(id => deleteCustomization({ params: { id }}))
+      await Promise.all(mutations)
+      refetch()
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
 
   const primaryAction = {
     content: "Create customization",
@@ -35,6 +61,7 @@ export default function HomePage() {
   }
 
   const tableHeadings = [
+    {title: 'ID'},
     {title: 'Payment Method'},
     {title: 'Cart Subtotal'},
   ]
@@ -42,11 +69,12 @@ export default function HomePage() {
   const tableActions = [
     {
       content: 'Delete customizations',
-      onAction: () => console.log('Todo: implement bulk delete'),
+      onAction: handleDeleteAction
     },
   ]
 
   const selectedCount = allResourcesSelected ? 'All' : selectedResources.length
+  const isLoading = isFetching || isMutating
 
   return (
     <Page
@@ -92,9 +120,10 @@ function TableRow({ id, cartSubtotal, paymentMethod, selected, index }) {
           dataPrimaryLink
           url={`/${id}`}
         >
-          <TextStyle variation="strong">{paymentMethod}</TextStyle>
+          <TextStyle variation="strong">{id}</TextStyle>
         </Link>
       </IndexTable.Cell>
+      <IndexTable.Cell>{paymentMethod}</IndexTable.Cell>
       <IndexTable.Cell>{cartSubtotal}</IndexTable.Cell>
     </IndexTable.Row>
   )
