@@ -18,8 +18,10 @@ impl Configuration {
 
 impl Input {
     pub fn configuration(&self) -> Option<Configuration> {
-        self.payment_customization.metafield.as_ref()
-            .map(|metafield| Configuration::from_str(&metafield.value))
+        for customization in self.payment_customizations.iter_mut() {
+            customization.metafield.as_ref()
+                .map(|metafield| Configuration::from_str(&metafield.value))
+        }
     }
 }
 
@@ -116,7 +118,7 @@ mod tests {
                     "name": "Method C"
                 }
             ],
-            "paymentCustomization": { "metafield": null },
+            "paymentCustomizations": [{ "metafield": null }],
             "presentmentCurrencyRate": "2.00"
         }
         "#;
@@ -124,7 +126,7 @@ mod tests {
         let metafield = configuration.map(|config| Metafield { value: serde_json::to_string(&config).unwrap() });
 
         Input {
-            payment_customization: PaymentCustomization { metafield },
+            payment_customizations: PaymentCustomizations { metafield },
             ..default_input
         }
     }

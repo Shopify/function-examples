@@ -11,8 +11,23 @@
     {
       "id": "gid://shopify/PaymentCustomizationPaymentMethod/0",
       "name": "Credit card"
+    },
+    {
+      "id": "gid://shopify/PaymentCustomizationPaymentMethod/1",
+      "name": "Cash on delivery"
     }
   ],
   "presentmentCurrencyRate": "2.00",
-  "paymentCustomization": { "metafield": { "value": "{\"cartSubtotal\":500,\"paymentMethod\":\"Credit card\"}" } }
+  "paymentCustomizations": [
+    {
+      "metafield": {
+        "value": "{\"cartSubtotal\":500,\"paymentMethod\":\"Credit card\"}"
+      }
+    },
+    {
+      "metafield": {
+        "value": "{\"cartSubtotal\":100,\"paymentMethod\":\"Cash on delivery\"}"
+      }
+    }
+  ]
 }
