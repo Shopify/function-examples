@@ -3,13 +3,11 @@ use serde::{Deserialize, Serialize};
 mod api;
 use api::*;
 
-#[derive(Clone, Debug, Serialize, Deserialize, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    // should this be just a pub value?
-    pub payment_method: Vec<String>,
-    // add cart_subtotal
-    // pub cart_subtotal: f64, << is this correct?
+    pub payment_method_name: String,
+    pub cart_subtotal_subunits: u64,
 }
 
 impl Configuration {
@@ -19,11 +17,9 @@ impl Configuration {
 }
 
 impl Input {
-    pub fn configuration(&self) -> Configuration {
-        match &self.payment_customization.metafield {
-            Some(Metafield { value }) => Configuration::from_str(value),
-            None => Configuration::default(),
-        }
+    pub fn configuration(&self) -> Option<Configuration> {
+        self.payment_customization.metafield.as_ref()
+            .map(|metafield| Configuration::from_str(&metafield.value))
     }
 }
 
@@ -36,28 +32,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let payment_methods = &input.payment_methods;
+    let configuration = input.configuration();
+    match configuration {
+        Some(Configuration { payment_method_name, cart_subtotal_subunits }) => {
+            let cart_subtotal = input.cart.cost.subtotal_amount;
+            let cart_subtotal_threshold = convert_to_cart_currency(
+                cart_subtotal_subunits,
+                input.presentment_currency_rate,
+                cart_subtotal.currency,
+            );
 
-    // get the subtotal from the cart
-    // if subtotal is >= cart_subtotal, then hide the payment method
+            println!("Presentment currency rate: {}", input.presentment_currency_rate);
+            println!("Cart subtotal: {}", cart_subtotal.subunits);
+            println!("Threshold: {}", cart_subtotal_threshold.subunits);
 
-    let payment_method = input.configuration().payment_method;
-    let operations = payment_methods
-        .iter()
-        .filter_map(|payment_method| {
-            if payment_method.contains(&payment_method.name) {
-                Some(Operation {
-                    hide: Some(HideOperation {
-                        payment_method_id: payment_method.id.clone(),
-                    }),
-                })
+            if cart_subtotal_subunits > 0 && cart_subtotal.subunits >= cart_subtotal_threshold.subunits {
+                let payment_methods = &input.payment_methods;
+                let payment_method_name = payment_method_name;
+                let operations = payment_methods
+                    .iter()
+                    .filter_map(|payment_method| {
+                        if payment_method.name.contains(&payment_method_name) {
+                            Some(Operation {
+                                hide: Some(HideOperation {
+                                    payment_method_id: payment_method.id.clone(),
+                                }),
+                            })
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
+                Ok(FunctionResult { operations })
             } else {
-                None
+                Ok(FunctionResult { operations: vec![] })
             }
-        })
-        .collect();
+        },
+        None => { Ok(FunctionResult { operations: vec![] }) }
+    }
+}
 
-    Ok(FunctionResult { operations })
+fn convert_to_cart_currency(
+    subunits: u64,
+    presentment_currency_rate: f64,
+    currency: String,
+) -> Money {
+    Money {
+        subunits: (subunits as f64 * presentment_currency_rate) as u64,
+        currency,
+    }
 }
 
 #[cfg(test)]
@@ -66,6 +90,14 @@ mod tests {
     fn input(configuration: Option<Configuration>) -> Input {
         let input = r#"
         {
+            "cart": {
+                "cost": {
+                    "subtotalAmount": {
+                        "subunits": 1000,
+                        "currency": "CAD"
+                    }
+                }
+            },
             "paymentMethods": [
                 {
                     "id": "gid://shopify/PaymentCustomizationPaymentMethod/0",
@@ -80,16 +112,15 @@ mod tests {
                     "name": "Method C"
                 }
             ],
-            "paymentCustomization": { "metafield": null }
+            "paymentCustomization": { "metafield": null },
+            "presentmentCurrencyRate": "2.00"
         }
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
-        let value = serde_json::to_string(&configuration.unwrap_or_default()).unwrap();
+        let metafield = configuration.map(|config| Metafield { value: serde_json::to_string(&config).unwrap() });
 
         Input {
-            payment_customization: PaymentCustomization {
-                metafield: Some(Metafield { value }),
-            },
+            payment_customization: PaymentCustomization { metafield },
             ..default_input
         }
     }
@@ -103,19 +134,27 @@ mod tests {
     }
 
     #[test]
-    fn test_hide_operations_with_configuration() {
+    fn test_does_not_hide_payment_method_when_subtotal_below_configured_cart_subtotal() {
         let input = input(Some(Configuration {
-            payment_method: vec!["Method A".to_string(), "Method C".to_string()],
+            payment_method_name: "Method C".to_string(),
+            cart_subtotal_subunits: 10000,
         }));
         let operations = function(input).unwrap().operations;
 
-        assert_eq!(operations.len(), 2);
+        assert!(operations.is_empty());
+    }
+
+    #[test]
+    fn test_hides_payment_method_when_subtotal_exceeds_configured_cart_subtotal() {
+        let input = input(Some(Configuration {
+            payment_method_name: "Method C".to_string(),
+            cart_subtotal_subunits: 10000,
+        }));
+        let operations = function(input).unwrap().operations;
+
+        assert_eq!(operations.len(), 1);
         assert_eq!(
             operations[0].hide.as_ref().unwrap().payment_method_id,
-            "gid://shopify/PaymentCustomizationPaymentMethod/0"
-        );
-        assert_eq!(
-            operations[1].hide.as_ref().unwrap().payment_method_id,
             "gid://shopify/PaymentCustomizationPaymentMethod/2"
         );
     }

@@ -1,12 +1,35 @@
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 
+pub type Decimal = f64;
 pub type ID = String;
 
+#[serde_as]
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Input {
+    pub cart: Cart,
     pub payment_methods: Vec<PaymentMethod>,
     pub payment_customization: PaymentCustomization,
+    #[serde_as(as = "DisplayFromStr")]
+    pub presentment_currency_rate: Decimal,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Cart {
+    pub cost: CartCost,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CartCost {
+    pub subtotal_amount: Money,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Money {
+    pub subunits: u64,
+    pub currency: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
