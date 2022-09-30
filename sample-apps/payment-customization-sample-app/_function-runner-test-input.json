@@ -1,0 +1,18 @@
+{
+  "cart": {
+    "cost": {
+      "subtotalAmount": {
+        "subunits": 1000,
+        "currency": "CAD"
+      }
+    }
+  },
+  "paymentMethods": [
+    {
+      "id": "gid://shopify/PaymentCustomizationPaymentMethod/0",
+      "name": "Credit card"
+    }
+  ],
+  "presentmentCurrencyRate": "2.00",
+  "paymentCustomization": { "metafield": { "value": "{\"cartSubtotal\":500,\"paymentMethod\":\"Credit card\"}" } }
+}

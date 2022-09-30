@@ -6,8 +6,8 @@ use api::*;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    pub payment_method_name: String,
-    pub cart_subtotal_subunits: u64,
+    pub payment_method: String,
+    pub cart_subtotal: u64,
 }
 
 impl Configuration {
@@ -33,22 +33,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let configuration = input.configuration();
+    // there might be multiple payment customizations
+    // need to convert this to loop through all of them
+    // and if in any of them the cart subtotal is higher than
+    // the one specified in the configuration, then we should hide it
     match configuration {
-        Some(Configuration { payment_method_name, cart_subtotal_subunits }) => {
-            let cart_subtotal = input.cart.cost.subtotal_amount;
+        Some(Configuration { payment_method, cart_subtotal }) => {
+            let subtotal_amount = input.cart.cost.subtotal_amount;
             let cart_subtotal_threshold = convert_to_cart_currency(
-                cart_subtotal_subunits,
+                cart_subtotal,
                 input.presentment_currency_rate,
-                cart_subtotal.currency,
+                subtotal_amount.currency,
             );
 
             println!("Presentment currency rate: {}", input.presentment_currency_rate);
-            println!("Cart subtotal: {}", cart_subtotal.subunits);
+            println!("Cart subtotal: {}", subtotal_amount.subunits);
             println!("Threshold: {}", cart_subtotal_threshold.subunits);
 
-            if cart_subtotal_subunits > 0 && cart_subtotal.subunits >= cart_subtotal_threshold.subunits {
+            if cart_subtotal > 0 && subtotal_amount.subunits >= cart_subtotal_threshold.subunits {
                 let payment_methods = &input.payment_methods;
-                let payment_method_name = payment_method_name;
+                let payment_method_name = payment_method;
                 let operations = payment_methods
                     .iter()
                     .filter_map(|payment_method| {
@@ -136,8 +140,8 @@ mod tests {
     #[test]
     fn test_does_not_hide_payment_method_when_subtotal_below_configured_cart_subtotal() {
         let input = input(Some(Configuration {
-            payment_method_name: "Method C".to_string(),
-            cart_subtotal_subunits: 10000,
+            payment_method: "Method C".to_string(),
+            cart_subtotal: 10000,
         }));
         let operations = function(input).unwrap().operations;
 
@@ -147,8 +151,8 @@ mod tests {
     #[test]
     fn test_hides_payment_method_when_subtotal_exceeds_configured_cart_subtotal() {
         let input = input(Some(Configuration {
-            payment_method_name: "Method C".to_string(),
-            cart_subtotal_subunits: 10000,
+            payment_method: "Method C".to_string(),
+            cart_subtotal: 10000,
         }));
         let operations = function(input).unwrap().operations;
 
