@@ -1,4 +1,4 @@
-use serde::{Serialize};
+use serde::Serialize;
 
 mod api;
 use api::*;
@@ -42,9 +42,10 @@ fn function(input: input::Input) -> Result<FunctionResult, Box<dyn std::error::E
     Ok(FunctionResult {
         discounts: vec![Discount {
             message: None,
-            conditions: None,
             targets,
-            value: Value::Percentage(Percentage { value: config.percentage }),
+            value: Value::Percentage(Percentage {
+                value: config.percentage,
+            }),
         }],
         discount_application_strategy: DiscountApplicationStrategy::First,
     })
@@ -80,9 +81,7 @@ mod tests {
         let value = configuration.map(|x| serde_json::to_string(&x).unwrap());
 
         let discount_node = input::DiscountNode {
-            metafield: Some(input::Metafield {
-                value
-            }),
+            metafield: Some(input::Metafield { value }),
         };
 
         input::Input {

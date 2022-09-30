@@ -46,7 +46,7 @@ mod tests {
         input::Input {
             discount_node: input::DiscountNode {
                 metafield: Some(input::Metafield {
-                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap(),
                 }),
             },
         }
@@ -85,6 +85,9 @@ mod tests {
         "#;
 
         let expected_input = input(Some(Configuration {}));
-        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
+        assert_eq!(
+            expected_input,
+            serde_json::from_str::<input::Input>(input_json).unwrap()
+        );
     }
 }

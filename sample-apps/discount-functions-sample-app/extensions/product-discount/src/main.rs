@@ -75,7 +75,6 @@ fn build_result(value: f64, targets: Vec<Target>) -> FunctionResult {
     } else {
         vec![Discount {
             message: None,
-            conditions: None,
             targets,
             value: Value::Percentage { value },
         }]
@@ -97,24 +96,26 @@ mod tests {
         input::Input {
             discount_node: input::DiscountNode {
                 metafield: Some(input::Metafield {
-                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
-                })
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap(),
+                }),
             },
             cart: input::Cart {
-                lines: cart_lines.unwrap_or_else(|| vec![
-                    input::CartLine {
-                        id: "gid://shopify/CartLine/0".to_string(),
-                        merchandise: input::Merchandise {
-                            id: Some("gid://shopify/ProductVariant/0".to_string())
-                        }
-                    },
-                    input::CartLine {
-                        id: "gid://shopify/CartLine/1".to_string(),
-                        merchandise: input::Merchandise {
-                            id: Some("gid://shopify/ProductVariant/1".to_string())
-                        }
-                    }
-                ])
+                lines: cart_lines.unwrap_or_else(|| {
+                    vec![
+                        input::CartLine {
+                            id: "gid://shopify/CartLine/0".to_string(),
+                            merchandise: input::Merchandise {
+                                id: Some("gid://shopify/ProductVariant/0".to_string()),
+                            },
+                        },
+                        input::CartLine {
+                            id: "gid://shopify/CartLine/1".to_string(),
+                            merchandise: input::Merchandise {
+                                id: Some("gid://shopify/ProductVariant/1".to_string()),
+                            },
+                        },
+                    ]
+                }),
             },
         }
     }
@@ -246,14 +247,19 @@ mod tests {
             Some(vec![
                 input::CartLine {
                     id: "gid://shopify/CartLine/0".to_string(),
-                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
+                    merchandise: input::Merchandise {
+                        id: Some("gid://shopify/ProductVariant/0".to_string()),
+                    },
                 },
                 input::CartLine {
                     id: "gid://shopify/CartLine/1".to_string(),
-                    merchandise: input::Merchandise { id: None }
+                    merchandise: input::Merchandise { id: None },
                 },
-            ])
+            ]),
         );
-        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
+        assert_eq!(
+            expected_input,
+            serde_json::from_str::<input::Input>(input_json).unwrap()
+        );
     }
 }

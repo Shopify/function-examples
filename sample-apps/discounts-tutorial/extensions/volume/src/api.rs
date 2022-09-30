@@ -54,8 +54,11 @@ pub mod input {
 
     impl input::Input {
         pub fn configuration(&self) -> Configuration {
-            let value: Option<&str> = self.discount_node.metafield
-                    .as_ref().and_then(|metafield| metafield.value.as_deref());
+            let value: Option<&str> = self
+                .discount_node
+                .metafield
+                .as_ref()
+                .and_then(|metafield| metafield.value.as_deref());
             value.map(Configuration::from_str).unwrap_or_default()
         }
     }
@@ -100,7 +103,6 @@ pub struct Discount {
     pub value: Value,
     pub targets: Vec<Target>,
     pub message: Option<String>,
-    pub conditions: Option<Vec<Condition>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -127,27 +129,4 @@ pub struct Percentage {
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum Target {
     ProductVariant { id: ID, quantity: Option<Int> },
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
-pub enum Condition {
-    #[serde(rename_all(serialize = "camelCase"))]
-    ProductMinimumQuantity {
-        ids: Vec<ID>,
-        minimum_quantity: Int,
-        target_type: ConditionTargetType,
-    },
-    #[serde(rename_all(serialize = "camelCase"))]
-    ProductMinimumSubtotal {
-        ids: Vec<ID>,
-        minimum_amount: Float,
-        target_type: ConditionTargetType,
-    },
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all(serialize = "SCREAMING_SNAKE_CASE"))]
-pub enum ConditionTargetType {
-    ProductVariant,
 }
