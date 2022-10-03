@@ -74,7 +74,6 @@ fn build_result(amount: f64, targets: Vec<Target>) -> FunctionResult {
     } else {
         vec![Discount {
             message: None,
-            conditions: None,
             targets,
             value: Value::FixedAmount {
                 amount,
@@ -97,22 +96,26 @@ mod tests {
         presentment_currency_rate: Option<Decimal>,
         cart_lines: Option<Vec<input::CartLine>>,
     ) -> input::Input {
-        let lines = cart_lines.unwrap_or_else(||
+        let lines = cart_lines.unwrap_or_else(|| {
             vec![
                 input::CartLine {
                     id: "gid://shopify/CartLine/0".to_string(),
-                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
+                    merchandise: input::Merchandise {
+                        id: Some("gid://shopify/ProductVariant/0".to_string()),
+                    },
                 },
                 input::CartLine {
                     id: "gid://shopify/CartLine/1".to_string(),
-                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/1".to_string()) }
+                    merchandise: input::Merchandise {
+                        id: Some("gid://shopify/ProductVariant/1".to_string()),
+                    },
                 },
             ]
-        );
+        });
         input::Input {
             discount_node: input::DiscountNode {
                 metafield: Some(input::Metafield {
-                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap(),
                 }),
             },
             presentment_currency_rate: presentment_currency_rate.unwrap_or(1.00),
@@ -212,13 +215,16 @@ mod tests {
         let expected_input = input(
             Some(Configuration { value: 10.00 }),
             Some(2.00),
-            Some(vec![
-                input::CartLine {
-                    id: "gid://shopify/CartLine/0".to_string(),
-                    merchandise: input::Merchandise { id: Some("gid://shopify/ProductVariant/0".to_string()) }
-                }
-            ])
+            Some(vec![input::CartLine {
+                id: "gid://shopify/CartLine/0".to_string(),
+                merchandise: input::Merchandise {
+                    id: Some("gid://shopify/ProductVariant/0".to_string()),
+                },
+            }]),
         );
-        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
+        assert_eq!(
+            expected_input,
+            serde_json::from_str::<input::Input>(input_json).unwrap()
+        );
     }
 }

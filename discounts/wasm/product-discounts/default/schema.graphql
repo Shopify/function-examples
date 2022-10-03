@@ -169,6 +169,8 @@ Represents information about the merchandise in the cart.
 type CartLine {
   """
   Retrieve a cart line attribute by key.
+
+  Cart line attributes are also known as line item properties in Liquid.
   """
   attribute(
     """
@@ -224,21 +226,6 @@ type CartLineCost {
 }
 
 """
-The condition for when to apply the discount.
-"""
-input Condition @oneOf {
-  """
-  The condition for checking the minimum quantity of a product.
-  """
-  productMinimumQuantity: ProductMinimumQuantity
-
-  """
-  The condition for checking the minimum subtotal amount of the product.
-  """
-  productMinimumSubtotal: ProductMinimumSubtotal
-}
-
-"""
 A country.
 """
 type Country {
@@ -250,7 +237,7 @@ type Country {
 
 """
 The code designating a country/region, which generally follows ISO 3166-1 alpha-2 guidelines.
-If a territory doesn't have a country code value in the `CountryCode` enum, it might be considered a subdivision
+If a territory doesn't have a country code value in the `CountryCode` enum, then it might be considered a subdivision
 of another country. For example, the territories associated with Spain are represented by the country code `ES`,
 and the territories associated with the United States of America are represented by the country code `US`.
 """
@@ -1610,7 +1597,10 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+  BYR
+    @deprecated(
+      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
+    )
 
   """
   Belize Dollar (BZD).
@@ -2135,7 +2125,10 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+  STD
+    @deprecated(
+      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
+    )
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2230,7 +2223,10 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+  VEF
+    @deprecated(
+      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
+    )
 
   """
   Venezuelan Bolivares (VES).
@@ -2323,7 +2319,8 @@ Represents a customer with the shop.
 """
 type Customer implements HasMetafields {
   """
-  The total amount of money spent by the customer.
+  The total amount of money spent by the customer. Converted from the shop's
+  currency to the currency of the cart using a market rate.
   """
   amountSpent: MoneyV2!
 
@@ -2419,11 +2416,6 @@ enum DeliveryMethod {
 The discount to be applied.
 """
 input Discount {
-  """
-  The condition for when the discount is applied.
-  """
-  conditions: [Condition!]
-
   """
   The discount message.
   """
@@ -2531,11 +2523,10 @@ interface HasMetafields {
 }
 
 """
-Represents a unique identifier that is Base64 obfuscated. It is often used to
-refetch an object or as key for a cache. The ID type appears in a JSON response
-as a String; however, it is not intended to be human-readable. When expected as
-an input type, any string (such as `"VXNlci0xMA=="`) or integer (such as `4`)
-input value will be accepted as an ID.
+Represents a unique identifier, often used to refetch an object.
+The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
+
+Example value: `"gid://shopify/Product/10079785100"`
 """
 scalar ID
 
@@ -2561,7 +2552,7 @@ type Input {
   """
   The conversion rate between the shop's currency and the currency of the cart.
   """
-  presentmentCurrencyRate: Decimal
+  presentmentCurrencyRate: Decimal!
 }
 
 """
@@ -2939,7 +2930,7 @@ enum LanguageCode {
   MG
 
   """
-  Maori.
+  Māori.
   """
   MI
 
@@ -3473,50 +3464,6 @@ type Product implements HasMetafields {
 }
 
 """
-The condition for checking the minimum quantity of a product.
-"""
-input ProductMinimumQuantity {
-  """
-  Variant IDs with a merchandise line price that's included to calculate the minimum quantity of the product.
-  """
-  ids: [ID!]!
-
-  """
-  The minimum quantity of a product.
-  """
-  minimumQuantity: Int!
-
-  """
-  The target type of the condition.
-
-  The value is validated against: = "PRODUCT_VARIANT".
-  """
-  targetType: TargetType!
-}
-
-"""
-The condition for checking the minimum subtotal amount of the product.
-"""
-input ProductMinimumSubtotal {
-  """
-  Variant IDs with a merchandise line price that's included to calculate the minimum subtotal amount of a product.
-  """
-  ids: [ID!]!
-
-  """
-  The minimum subtotal amount of the product.
-  """
-  minimumAmount: Decimal!
-
-  """
-  The target type of the condition.
-
-  The value is validated against: = "PRODUCT_VARIANT".
-  """
-  targetType: TargetType!
-}
-
-"""
 Represents a product variant.
 """
 type ProductVariant implements HasMetafields {
@@ -3592,21 +3539,6 @@ input Target @oneOf {
   The target product variant.
   """
   productVariant: ProductVariantTarget
-}
-
-"""
-The target type of a condition.
-"""
-enum TargetType {
-  """
-  The target is the subtotal of the order.
-  """
-  ORDER_SUBTOTAL
-
-  """
-  The target is a product variant.
-  """
-  PRODUCT_VARIANT
 }
 
 """
