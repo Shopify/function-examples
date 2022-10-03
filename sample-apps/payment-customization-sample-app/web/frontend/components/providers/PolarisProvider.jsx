@@ -17,14 +17,14 @@ function AppBridgeLink({ url, children, external, ...rest }) {
 
   if (external || IS_EXTERNAL_LINK_REGEX.test(url)) {
     return (
-      <a target="_blank" rel="noopener noreferrer" href={url} {...rest}>
+      <a {...rest} href={url} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     );
   }
 
   return (
-    <a className="testing-this-link" onClick={handleClick} {...rest}>
+    <a {...rest} onClick={handleClick}>
       {children}
     </a>
   );
