@@ -15,13 +15,16 @@ Exactly one field of input must be provided, and all others omitted.
 """
 directive @oneOf on INPUT_OBJECT
 
-type DeliveryOption {
+type DeliveryCustomizationDeliveryOption {
+  """
+  Unique identifier for the delivery option.
+  """
   id: ID!
-  name: String!
+  title: String!
 }
 
 """
-The result of a delivery option function.
+The result of a delivery customization function.
 """
 input FunctionResult {
   """
@@ -32,22 +35,21 @@ input FunctionResult {
 
 input HideOperation {
   """
-  The identifier of the delivery option to hide out.
+  The identifier of the delivery option to hide.
   """
   deliveryOptionId: ID!
 }
 
 """
-Represents a unique identifier that is Base64 obfuscated. It is often used to
-refetch an object or as key for a cache. The ID type appears in a JSON response
-as a String; however, it is not intended to be human-readable. When expected as
-an input type, any string (such as `"VXNlci0xMA=="`) or integer (such as `4`)
-input value will be accepted as an ID.
+Represents a unique identifier, often used to refetch an object.
+The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
+
+Example value: `"gid://shopify/Product/10079785100"`
 """
 scalar ID
 
 type Input {
-  deliveryOptions: [DeliveryOption!]!
+  deliveryOptions: [DeliveryCustomizationDeliveryOption!]!
 }
 
 input MoveOperation {
@@ -90,7 +92,7 @@ input RenameOperation {
   deliveryOptionId: ID!
 
   """
-  The new name for the delivery method.
+  The new name for the delivery option.
   """
   title: String!
 }

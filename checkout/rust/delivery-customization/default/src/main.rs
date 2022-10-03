@@ -25,11 +25,11 @@ mod tests {
             delivery_options: vec![
                 DeliveryOption {
                     id: "1".to_string(),
-                    name: "Standard".to_string()
+                    title: "Standard".to_string()
                 },
                 DeliveryOption {
                     id: "2".to_string(),
-                    name: "Express".to_string()
+                    title: "Express".to_string()
                 }
             ],
         };

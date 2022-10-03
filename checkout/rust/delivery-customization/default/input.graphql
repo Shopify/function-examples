@@ -1,6 +1,6 @@
 query Input {
   deliveryOptions {
     id
-    name
+    title
   }
 }
