@@ -1,0 +1,16 @@
+query Input {
+  cart {
+    cost {
+      subtotalAmount
+    }
+  }
+  paymentMethods {
+    id
+    name
+  }
+  paymentCustomization {
+    metafield(namespace: "payment-customization-sample-app", key: "function-configuration") {
+      value
+    }
+  }
+}
