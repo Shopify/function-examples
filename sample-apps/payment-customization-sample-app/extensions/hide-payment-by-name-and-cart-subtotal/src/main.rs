@@ -5,19 +5,22 @@ use api::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+
 pub struct Configuration {
     pub payment_method: String,
     pub cart_subtotal: u64,
 }
 
+impl Configuration {
+    fn from_str(value: &str) -> Self {
+        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
+    }
+}
+
 impl Input {
-    pub fn configurations(&self) -> Vec<Configuration> {
-        match &self.payment_customization.metafield {
-            Some(Metafield { value }) => {
-                serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
-            },
-            None => vec![],
-        }
+    pub fn configuration(&self) -> Option<Configuration> {
+        self.payment_customization.metafield.as_ref()
+            .map(|metafield| Configuration::from_str(&metafield.value))
     }
 }
 
@@ -30,63 +33,63 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    Ok(FunctionResult {
-        operations: ids_to_hide(&input)
-            .iter()
-            .map(|id| Operation { hide: Some(HideOperation { payment_method_id: id.to_string() }) })
-            .collect(),
-    })
+    let configuration = input.configuration();
+
+    match configuration {
+        Some(Configuration { payment_method, cart_subtotal }) => {
+            let subtotal_amount = input.cart.cost.subtotal_amount;
+            let cart_subtotal_threshold = convert_to_cart_currency(
+                cart_subtotal,
+                input.presentment_currency_rate,
+                subtotal_amount.currencyCode,
+            );
+
+            println!("Presentment currency rate: {}", input.presentment_currency_rate);
+            println!("Cart subtotal: {}", subtotal_amount.amount);
+            println!("Threshold: {}", cart_subtotal_threshold.subunits);
+
+            if cart_subtotal > 0 && subtotal_amount.amount >= cart_subtotal_threshold.subunits {
+                let payment_methods = &input.payment_methods;
+                let payment_method_name = payment_method;
+                let operations = payment_methods
+                    .iter()
+                    .filter_map(|payment_method| {
+                        if payment_method.name.contains(&payment_method_name) {
+                            Some(Operation {
+                                hide: Some(HideOperation {
+                                    payment_method_id: payment_method.id.clone(),
+                                }),
+                            })
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
+                Ok(FunctionResult { operations })
+            } else {
+                Ok(FunctionResult { operations: vec![] })
+            }
+        },
+        None => { Ok(FunctionResult { operations: vec![] }) }
+    }
 }
 
 fn convert_to_cart_currency(
     subunits: u64,
     presentment_currency_rate: f64,
-    currency: &str,
+    currency: String,
 ) -> Money {
     Money {
         subunits: (subunits as f64 * presentment_currency_rate) as u64,
-        currency: currency.to_string(),
+        currency,
     }
-}
-
-fn names_to_hide(input: &Input) -> Vec<String> {
-    let configurations = input.configurations();
-    if configurations.is_empty() {
-        return vec![];
-    }
-
-    let cart_subtotal = &input.cart.cost.subtotal_amount;
-    let presentment_currency_rate = input.presentment_currency_rate;
-
-    configurations.iter().filter_map(|configuration| {
-        let threshold = convert_to_cart_currency(
-            configuration.cart_subtotal,
-            presentment_currency_rate,
-            &cart_subtotal.currency,
-        );
-        if cart_subtotal.subunits >= threshold.subunits {
-            Some(configuration.payment_method.clone())
-        } else {
-            None
-        }
-    }).collect()
-}
-
-fn ids_to_hide(input: &Input) -> Vec<String> {
-    let names = names_to_hide(input);
-    (&input.payment_methods).iter().filter_map(|payment_method| {
-        if names.contains(&payment_method.name) {
-            Some(payment_method.id.clone())
-        } else {
-            None
-        }
-    }).collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn input(configurations: Vec<Configuration>) -> Input {
+    fn input(configuration: Option<Configuration>) -> Input {
         let input = r#"
         {
             "cart": {
@@ -116,21 +119,17 @@ mod tests {
         }
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
+        let metafield = configuration.map(|config| Metafield { value: serde_json::to_string(&config).unwrap() });
 
-        if configurations.is_empty() {
-            Input { ..default_input }
-        } else {
-            let value = serde_json::to_string(&configurations).unwrap();
-            Input {
-                payment_customization: PaymentCustomization { metafield: Some(Metafield { value }) },
-                ..default_input
-            }
+        Input {
+            payment_customization: PaymentCustomization { metafield },
+            ..default_input
         }
     }
 
     #[test]
     fn test_with_no_configuration() {
-        let input = input(vec![]);
+        let input = input(None);
         let operations = function(input).unwrap().operations;
 
         assert!(operations.is_empty());
@@ -138,16 +137,10 @@ mod tests {
 
     #[test]
     fn test_does_not_hide_payment_method_when_subtotal_below_configured_cart_subtotal() {
-        let input = input(vec![
-            Configuration {
-                payment_method: "Method A".to_string(),
-                cart_subtotal: 3000,
-            },
-            Configuration {
-                payment_method: "Method C".to_string(),
-                cart_subtotal: 10000,
-            },
-        ]);
+        let input = input(Some(Configuration {
+            payment_method: "Method C".to_string(),
+            cart_subtotal: 10000,
+        }));
         let operations = function(input).unwrap().operations;
 
         assert!(operations.is_empty());
@@ -155,22 +148,16 @@ mod tests {
 
     #[test]
     fn test_hides_payment_method_when_subtotal_exceeds_configured_cart_subtotal() {
-        let input = input(vec![
-            Configuration {
-                payment_method: "Method A".to_string(),
-                cart_subtotal: 500,
-            },
-            Configuration {
-                payment_method: "Method C".to_string(),
-                cart_subtotal: 10000,
-            },
-        ]);
+        let input = input(Some(Configuration {
+            payment_method: "Method C".to_string(),
+            cart_subtotal: 10000,
+        }));
         let operations = function(input).unwrap().operations;
 
         assert_eq!(operations.len(), 1);
         assert_eq!(
             operations[0].hide.as_ref().unwrap().payment_method_id,
-            "gid://shopify/PaymentCustomizationPaymentMethod/0"
+            "gid://shopify/PaymentCustomizationPaymentMethod/2"
         );
     }
 }

@@ -1,7 +1,10 @@
 query Input {
   cart {
     cost {
-      subtotalAmount
+      subtotalAmount {
+        amount
+        currencyCode
+      }
     }
   }
   paymentMethods {
@@ -9,7 +12,10 @@ query Input {
     name
   }
   paymentCustomization {
-    metafield(namespace: "payment-customization-sample-app", key: "function-configuration") {
+    metafield(
+      namespace: "payment-customization-sample-app"
+      key: "function-configuration"
+    ) {
       value
     }
   }
