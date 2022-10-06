@@ -11,6 +11,7 @@ pub struct Input {
     pub cart: Cart,
     pub payment_methods: Vec<PaymentMethod>,
     pub payment_customization: PaymentCustomization,
+    #[serde(default)]
     #[serde_as(as = "DisplayFromStr")]
     pub presentment_currency_rate: Decimal,
 }
@@ -26,10 +27,13 @@ pub struct CartCost {
     pub subtotal_amount: Money,
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Money {
-    pub subunits: u64,
-    pub currency: String,
+    #[serde_as(as = "DisplayFromStr")]
+    pub amount: Decimal,
+    pub currency_code: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

@@ -2,8 +2,8 @@
   "cart": {
     "cost": {
       "subtotalAmount": {
-        "subunits": 1000,
-        "currency": "CAD"
+        "amount": "1000",
+        "currencyCode": "CAD"
       }
     }
   },
@@ -17,17 +17,9 @@
       "name": "Cash on delivery"
     }
   ],
-  "presentmentCurrencyRate": "2.00",
-  "paymentCustomizations": [
-    {
-      "metafield": {
-        "value": "{\"cartSubtotal\":500,\"paymentMethod\":\"Credit card\"}"
-      }
-    },
-    {
-      "metafield": {
-        "value": "{\"cartSubtotal\":100,\"paymentMethod\":\"Cash on delivery\"}"
-      }
+  "paymentCustomization": {
+    "metafield": {
+      "value": "{\"cartSubtotal\":\"500\",\"paymentMethod\":\"Credit card\"}"
     }
-  ]
+  }
 }

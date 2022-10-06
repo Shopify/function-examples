@@ -11,10 +11,9 @@ query Input {
     id
     name
   }
-  presentmentCurrencyRate
   paymentCustomization {
     metafield(
-      namespace: "payment-customization-sample-app"
+      namespace: "payment-customization-hide"
       key: "function-configuration"
     ) {
       value

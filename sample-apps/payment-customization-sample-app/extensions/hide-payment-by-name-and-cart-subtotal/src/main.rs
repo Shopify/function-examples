@@ -1,14 +1,16 @@
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 
 mod api;
 use api::*;
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-
 pub struct Configuration {
     pub payment_method: String,
-    pub cart_subtotal: u64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub cart_subtotal: Decimal,
 }
 
 impl Configuration {
@@ -24,10 +26,20 @@ impl Input {
     }
 }
 
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let input: Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
+    /* TODO: after the patterns team adds the `presentment_currency_rate` field to the Input we need to change the following:
+        1. remove `mut` from the line bellow
+        2. remove the assignment to presentment_currency_rate = 1.0 on line 40
+        3. add presentmentCurrencyRate to input.graphql
+    */
+    let mut input: Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
+
     let mut out = std::io::stdout();
     let mut serializer = serde_json::Serializer::new(&mut out);
+
+    input.presentment_currency_rate = 1.0;
+
     function(input)?.serialize(&mut serializer)?;
     Ok(())
 }
@@ -41,14 +53,10 @@ fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> 
             let cart_subtotal_threshold = convert_to_cart_currency(
                 cart_subtotal,
                 input.presentment_currency_rate,
-                subtotal_amount.currencyCode,
+                subtotal_amount.currency_code,
             );
 
-            println!("Presentment currency rate: {}", input.presentment_currency_rate);
-            println!("Cart subtotal: {}", subtotal_amount.amount);
-            println!("Threshold: {}", cart_subtotal_threshold.subunits);
-
-            if cart_subtotal > 0 && subtotal_amount.amount >= cart_subtotal_threshold.subunits {
+            if cart_subtotal > 0.0 && subtotal_amount.amount >= cart_subtotal_threshold.amount {
                 let payment_methods = &input.payment_methods;
                 let payment_method_name = payment_method;
                 let operations = payment_methods
@@ -76,13 +84,13 @@ fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> 
 }
 
 fn convert_to_cart_currency(
-    subunits: u64,
-    presentment_currency_rate: f64,
+    subunits: Decimal,
+    presentment_currency_rate: Decimal,
     currency: String,
 ) -> Money {
     Money {
-        subunits: (subunits as f64 * presentment_currency_rate) as u64,
-        currency,
+        amount: subunits * presentment_currency_rate,
+        currency_code: currency.to_string(),
     }
 }
 
@@ -95,8 +103,8 @@ mod tests {
             "cart": {
                 "cost": {
                     "subtotalAmount": {
-                        "subunits": 1000,
-                        "currency": "CAD"
+                        "amount": "1000",
+                        "currencyCode": "CAD"
                     }
                 }
             },
@@ -114,8 +122,11 @@ mod tests {
                     "name": "Method C"
                 }
             ],
-            "paymentCustomization": { "metafield": null },
-            "presentmentCurrencyRate": "2.00"
+            "paymentCustomization": {
+                "metafield": {
+                    value: "{\"cartSubtotal\":\"1000\",\"paymentMethod\":\"Paypal\"}"
+                }
+            },
         }
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
