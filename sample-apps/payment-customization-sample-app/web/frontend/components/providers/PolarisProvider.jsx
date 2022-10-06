@@ -6,14 +6,15 @@ import "@shopify/polaris/build/esm/styles.css";
 
 function AppBridgeLink({ url, children, external, ...rest }) {
   const navigate = useNavigate();
-  const handleClick = useCallback(() => {
-    console.log({ url });
-    navigate(url);
-  }, [url]);
+  const handleClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      navigate(url);
+    },
+    [url]
+  );
 
   const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/;
-
-  console.log({provider: url, external, a: IS_EXTERNAL_LINK_REGEX.test(url)});
 
   if (external || IS_EXTERNAL_LINK_REGEX.test(url)) {
     return (
@@ -24,7 +25,7 @@ function AppBridgeLink({ url, children, external, ...rest }) {
   }
 
   return (
-    <a {...rest} onClick={handleClick}>
+    <a {...rest} href={url} onClick={handleClick}>
       {children}
     </a>
   );
