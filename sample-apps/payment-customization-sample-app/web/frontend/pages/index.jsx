@@ -33,8 +33,12 @@ export default function HomePage() {
 
   const isMutating = useIsMutating(["deleteCustomization"]);
 
-  const {selectedResources, allResourcesSelected, handleSelectionChange} =
-    useIndexResourceState(data);
+  const {
+    selectedResources,
+    allResourcesSelected,
+    handleSelectionChange,
+    clearSelection,
+  } = useIndexResourceState(data);
 
   const handleDeleteAction = async () => {
     if (isMutating) return
@@ -43,6 +47,7 @@ export default function HomePage() {
       const mutations = selectedResources.map(id => deleteCustomization({ params: { id }}))
       await Promise.all(mutations)
       refetch()
+      clearSelection();
     }
     catch (error) {
       console.error(error)
