@@ -101,32 +101,26 @@ mod tests {
         let input = r#"
         {
             "cart": {
-                "cost": {
-                    "subtotalAmount": {
-                        "amount": "1000",
-                        "currencyCode": "CAD"
-                    }
+              "cost": {
+                "subtotalAmount": {
+                  "amount": "1000",
+                  "currencyCode": "CAD"
                 }
+              }
             },
             "paymentMethods": [
-                {
-                    "id": "gid://shopify/PaymentCustomizationPaymentMethod/0",
-                    "name": "Method A"
-                },
-                {
-                    "id": "gid://shopify/PaymentCustomizationPaymentMethod/1",
-                    "name": "Method B"
-                },
-                {
-                    "id": "gid://shopify/PaymentCustomizationPaymentMethod/2",
-                    "name": "Method C"
-                }
+              {
+                "id": "gid://shopify/PaymentCustomizationPaymentMethod/0",
+                "name": "Credit card"
+              },
+              {
+                "id": "gid://shopify/PaymentCustomizationPaymentMethod/1",
+                "name": "Cash on delivery"
+              }
             ],
             "paymentCustomization": {
-                "metafield": {
-                    value: "{\"cartSubtotal\":\"1000\",\"paymentMethod\":\"Paypal\"}"
-                }
-            },
+              "metafield": null
+            }
         }
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
@@ -149,7 +143,7 @@ mod tests {
     #[test]
     fn test_does_not_hide_payment_method_when_subtotal_below_configured_cart_subtotal() {
         let input = input(Some(Configuration {
-            payment_method: "Method C".to_string(),
+            payment_method: "Credit card".to_string(),
             cart_subtotal: 10000,
         }));
         let operations = function(input).unwrap().operations;
@@ -160,15 +154,15 @@ mod tests {
     #[test]
     fn test_hides_payment_method_when_subtotal_exceeds_configured_cart_subtotal() {
         let input = input(Some(Configuration {
-            payment_method: "Method C".to_string(),
-            cart_subtotal: 10000,
+            payment_method: "Credit card".to_string(),
+            cart_subtotal: 500,
         }));
         let operations = function(input).unwrap().operations;
 
         assert_eq!(operations.len(), 1);
         assert_eq!(
             operations[0].hide.as_ref().unwrap().payment_method_id,
-            "gid://shopify/PaymentCustomizationPaymentMethod/2"
+            "gid://shopify/PaymentCustomizationPaymentMethod/0"
         );
     }
 }
