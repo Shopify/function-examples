@@ -2,24 +2,27 @@ import { useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
 
 import { CustomizationForm, CustomizationPageLayout } from "../components";
-import { useAppMutation, useCustomizationForm } from "../hooks";
+import { useCreatePaymentCustomization, useCustomizationForm } from "../hooks";
 
 export default function NewCustomizationPage() {
   const navigate = useNavigate();
-  const { handleInputChange, hasChanged, setData, data: formData } = useCustomizationForm();
-  const { mutateAsync: createCustomization, isLoading } = useAppMutation({
-    url: "/api/payment-customizations",
-    reactQueryOptions: {
-      mutationKey: "createCustomization",
-    },
-  });
+
+  const {
+    handleInputChange,
+    hasChanged,
+    setData,
+    data: formData,
+  } = useCustomizationForm();
+
+  const { mutateAsync: createCustomization, isLoading } =
+    useCreatePaymentCustomization();
 
   const handleSubmit = async () => {
-    if (isLoading) return
+    if (isLoading) return;
 
     try {
       await createCustomization({ payload: formData });
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error(error);
     }
@@ -29,8 +32,8 @@ export default function NewCustomizationPage() {
     setData({
       cartSubtotal: 10,
       paymentMethod: "Credit card",
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <CustomizationPageLayout

@@ -3,53 +3,49 @@ import { useParams } from 'react-router-dom';
 import { useNavigate } from "@shopify/app-bridge-react";
 
 import { CustomizationPageLayout, CustomizationForm } from '../components';
-import { useCustomizationForm, useAppQuery, useAppMutation } from '../hooks';
+import {
+  useCustomizationForm,
+  usePaymentCustomization,
+  useUpdatePaymentCustomization,
+} from "../hooks";
 
 export default function PaymentCustomizationDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
-  const {
-    data,
-    isFetching,
-  } = useAppQuery({
-    url: `/api/payment-customizations/${id}`,
+  const { data, isFetching } = usePaymentCustomization({
+    id,
   });
 
-  const { mutateAsync: updateCustomization, isLoading } = useAppMutation({
-    url: `/api/payment-customizations/${id}`,
-    fetchOptions: {
-      method: "PUT",
-    },
-    reactQueryOptions: {
-      mutationKey: "createCustomization",
-    },
-  });
+  const { mutateAsync: updateCustomization, isLoading } =
+    useUpdatePaymentCustomization({
+      id,
+    });
+
+  const disabled = isFetching || isLoading;
 
   const handleSubmit = async () => {
-    if (isLoading) return
+    if (disabled) return;
 
     try {
       await updateCustomization({ payload: formData });
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!data) return
+    if (!data) return;
 
-    const { cartSubtotal, paymentMethod} = data
+    const { cartSubtotal, paymentMethod } = data;
 
     setData({
       cartSubtotal,
-      paymentMethod
-    })
-  }, [data])
-
-  const disabled = isFetching || isLoading;
+      paymentMethod,
+    });
+  }, [data]);
 
   return (
     <CustomizationPageLayout loading={isLoading} actionProps={{ disabled }}>

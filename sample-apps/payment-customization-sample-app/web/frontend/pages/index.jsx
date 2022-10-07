@@ -10,26 +10,15 @@ import {
 import { PlusMinor } from "@shopify/polaris-icons";
 import { useIsMutating } from 'react-query'
 
-import { useAppQuery, useAppMutation } from "../hooks";
+import {
+  usePaymentCustomizations,
+  useDeletePaymentCustomization,
+} from "../hooks";
 
 export default function HomePage() {
-  const {
-    data = [],
-    isFetching,
-    refetch
-  } = useAppQuery({
-    url: "/api/payment-customizations",
-  });
+  const { data = [], isFetching, refetch } = usePaymentCustomizations();
 
-  const { mutateAsync: deleteCustomization } = useAppMutation({
-    url: "/api/payment-customizations/:id",
-    fetchOptions: {
-      method: "DELETE",
-    },
-    reactQueryOptions: {
-      mutationKey: "deleteCustomization"
-    }
-  });
+  const { mutateAsync: deleteCustomization } = useDeletePaymentCustomization();
 
   const isMutating = useIsMutating(["deleteCustomization"]);
 
