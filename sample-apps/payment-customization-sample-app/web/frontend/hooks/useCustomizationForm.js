@@ -14,7 +14,6 @@ export function useCustomizationForm(props) {
     setData((cur) => ({ ...cur, [name]: value }));
   };
 
-  console.log(data)
   const hasChanged = Object.keys(data).some(
     (key) => data[key] !== initialData[key]
   );

@@ -46,7 +46,7 @@ export default function HomePage() {
     try {
       const mutations = selectedResources.map(id => deleteCustomization({ params: { id }}))
       await Promise.all(mutations)
-      refetch()
+      await refetch();
       clearSelection();
     }
     catch (error) {
