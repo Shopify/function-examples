@@ -6,7 +6,7 @@ This is a sample app to help developers bootstrap a Shopify app that provides pa
 
 This template leverages the [Shopify API Library](https://github.com/Shopify/shopify-node-api) on the backend to create [an embedded app](https://shopify.dev/apps/tools/app-bridge/getting-started#embed-your-app-in-the-shopify-admin), and [Polaris](https://github.com/Shopify/polaris-react) and [App Bridge React](https://shopify.dev/tools/app-bridge/react-components) on the frontend.
 
-It also provides a [Shopify Function](https://shopify.dev/api/functions) that allow merchants to hide the Paypal payment option from their checkout if an order is above a configurable set amount.
+It also provides a [Shopify Function](https://shopify.dev/api/functions) that allow merchants to hide a payment method from their checkout if a cart's subtotal is above a configurable set amount.
 
 ## Requirements
 
@@ -19,6 +19,11 @@ It also provides a [Shopify Function](https://shopify.dev/api/functions) that al
 - On M1 Macs, you'll also need to install the Binaryen toolchain separately and set the `WASM_OPT` environment variable. ([related issue](https://github.com/bytecodealliance/cargo-wasi/issues/112))
   - `brew install binaryen`
   - Add `export WASM_OPT=/opt/homebrew/bin/wasm-opt` to your `.bashrc` or `.zshrc`
+
+### Before you start
+- Enable the **Bogus Gateway** payment method in your development store's admin.
+
+When testing this sample app make sure you use the full name of the payment method, which is **(for testing) Bogus Gateway**.
 
 ## Installation
 
