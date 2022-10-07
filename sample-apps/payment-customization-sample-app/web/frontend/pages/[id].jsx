@@ -47,8 +47,13 @@ export default function PaymentCustomizationDetailPage() {
     });
   }, [data]);
 
+  const primaryAction = {
+    disabled,
+    onAction: handleSubmit,
+  };
+
   return (
-    <CustomizationPageLayout loading={isLoading} actionProps={{ disabled }}>
+    <CustomizationPageLayout loading={isLoading} actionProps={primaryAction}>
       <CustomizationForm
         {...formData}
         loading={disabled}

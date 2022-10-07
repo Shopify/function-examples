@@ -28,6 +28,11 @@ export default function NewCustomizationPage() {
     }
   };
 
+  const primaryAction = {
+    disabled: !hasChanged || isLoading,
+    onAction: handleSubmit,
+  };
+
   useEffect(() => {
     setData({
       cartSubtotal: 10,
@@ -36,10 +41,7 @@ export default function NewCustomizationPage() {
   }, []);
 
   return (
-    <CustomizationPageLayout
-      loading={isLoading}
-      actionProps={{ disabled: !hasChanged || isLoading }}
-    >
+    <CustomizationPageLayout loading={isLoading} actionProps={primaryAction}>
       <CustomizationForm
         {...formData}
         loading={isLoading}
