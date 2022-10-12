@@ -28,11 +28,6 @@ impl Input {
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /* TODO: after the patterns team adds the `presentment_currency_rate` field to the Input we need to change the following:
-        1. remove `mut` from the line bellow
-        2. remove the assignment to presentment_currency_rate = 1.0 on line 40
-        3. add presentmentCurrencyRate to input.graphql
-    */
     let mut input: Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
 
     let mut out = std::io::stdout();
