@@ -1,0 +1,8 @@
+name = "reverse sort payments"
+type = "payment_customization"
+title = "reverse sort payments"
+api_version = "unstable"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/reverse_sort_payments.wasm"
