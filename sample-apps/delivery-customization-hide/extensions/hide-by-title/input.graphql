@@ -1,0 +1,20 @@
+query Input {
+  cart {
+    deliveryGroups {
+      deliveryOptions {
+        handle
+        title
+      }
+    }
+  }
+  deliveryCustomization {
+    metafield(namespace: "delivery-customization-hide", key: "function-configuration") {
+      value
+    }
+  }
+  localization {
+    country { isoCode }
+    language { isoCode }
+  }
+  presentmentCurrencyRate
+}
