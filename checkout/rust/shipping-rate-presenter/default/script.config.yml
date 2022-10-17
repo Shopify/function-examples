@@ -1,7 +1,0 @@
----
-version: '2'
-title: Shipping Rate Presenter 
-description: Shipping Rate Presenter default script
-configuration:
-  type: object
-  fields: {} 
