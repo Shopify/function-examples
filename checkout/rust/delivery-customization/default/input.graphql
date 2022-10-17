@@ -1,6 +1,7 @@
 query Input {
-  deliveryOptions {
-    id
-    title
+  deliveryCustomization {
+    metafield(namespace: "default", key: "function-configuration") {
+      value
+    }
   }
 }
