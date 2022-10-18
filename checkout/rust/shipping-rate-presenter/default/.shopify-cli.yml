@@ -1,9 +1,0 @@
----
-project_type: :script
-organization_id: 0
-extension_point_type: shipping_rate_presenter
-title: Default
-description:
-language: rust
-app_bridge_create_path: /
-app_bridge_details_path: /
