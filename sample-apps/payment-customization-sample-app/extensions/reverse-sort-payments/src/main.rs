@@ -37,13 +37,13 @@ mod tests {
         Input {
             payment_methods: vec![
                 PaymentMethod {
-                    id: "1".to_string(),
+                    id: "payment_method_id_1".to_string(),
                 },
                 PaymentMethod {
-                    id: "2".to_string(),
+                    id: "payment_method_id_2".to_string(),
                 },
                 PaymentMethod {
-                    id: "3".to_string(),
+                    id: "payment_method_id_3".to_string(),
                 },
             ]
         }
@@ -57,7 +57,7 @@ mod tests {
         assert_eq!(operations.len(), 3);
         assert_eq!(
             operations[0].r#move.as_ref().unwrap().payment_method_id,
-            "1"
+            "payment_method_id_1"
         );
         assert_eq!(
             operations[0].r#move.as_ref().unwrap().index,
@@ -66,7 +66,7 @@ mod tests {
 
         assert_eq!(
             operations[1].r#move.as_ref().unwrap().payment_method_id,
-            "2"
+            "payment_method_id_2"
         );
         assert_eq!(
             operations[1].r#move.as_ref().unwrap().index,
@@ -75,7 +75,7 @@ mod tests {
 
         assert_eq!(
             operations[2].r#move.as_ref().unwrap().payment_method_id,
-            "3"
+            "payment_method_id_3"
         );
         assert_eq!(
             operations[2].r#move.as_ref().unwrap().index,
