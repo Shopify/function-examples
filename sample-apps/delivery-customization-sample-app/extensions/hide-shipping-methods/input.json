@@ -1,0 +1,53 @@
+{
+  "cart": {
+    "cost": {
+      "subtotalAmount": {
+        "amount": "1100",
+        "currencyCode": "CAD"
+      }
+    },
+    "deliveryGroups": [
+      {
+        "deliveryOptions": [
+          {
+            "handle": "handle1",
+            "title": "FedEx"
+          },
+          {
+            "handle": "handle2",
+            "title": "UPS"
+          },
+          {
+            "handle": "handle3",
+            "title": "Express"
+          },
+          {
+            "handle": "handle4",
+            "title": "Canada Post Super Saver"
+          },
+          {
+            "handle": "handle5",
+            "title": "Canada Post Express"
+          }
+        ]
+      },
+      {
+        "deliveryOptions": [
+          {
+            "handle": "handle11",
+            "title": "FedEx1"
+          },
+          {
+            "handle": "handle22",
+            "title": "Express"
+          }
+        ]
+      }
+    ]
+  },
+  "deliveryCustomization": {
+    "metafield": {
+      "value": "{\"cartSubtotalThreshhold\": \"1000\", \"shippingMethod\": \"Express\", \"exactMatch\": true}"
+    }
+  }
+}

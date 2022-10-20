@@ -1,0 +1,5 @@
+# This file stores configurations for your Shopify app.
+
+name = "Delivery Customizations Sample App 2"
+scopes = "write_products,read_discounts,write_discounts,read_price_rules,write_price_rules,write_delivery_customizations,read_delivery_customizations"
+

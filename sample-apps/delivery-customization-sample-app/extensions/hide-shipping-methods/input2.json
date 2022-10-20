@@ -1,0 +1,16 @@
+{
+  "cart": {
+    "cost": {
+      "subtotalAmount": {
+        "amount": "900.0",
+        "currencyCode": "CAD"
+      }
+    },
+    "deliveryGroups": []
+  },
+  "deliveryCustomization": {
+    "metafield": {
+      "value": "{\"exactMatch\":true,\"cartSubtotalThreshhold\":\"1000\",\"shippingMethod\":\"Express\"}"
+    }
+  }
+}

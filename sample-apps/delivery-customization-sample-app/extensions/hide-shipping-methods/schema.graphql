@@ -1,0 +1,103 @@
+# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
+# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
+#
+# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
+# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
+# Check out the "Docs" tab in the top right.
+
+schema {
+  query: Input
+  mutation: MutationRoot
+}
+
+"""
+Exactly one field of input must be provided, and all others omitted.
+"""
+directive @oneOf on INPUT_OBJECT
+
+type DeliveryCustomizationDeliveryOption {
+  """
+  Unique identifier for the delivery option.
+  """
+  id: ID!
+  title: String!
+}
+
+"""
+The result of a delivery customization function.
+"""
+input FunctionResult {
+  """
+  The ordered list of operations to apply to the list of delivery options.
+  """
+  operations: [Operation!]!
+}
+
+input HideOperation {
+  """
+  The identifier of the delivery option to hide.
+  """
+  deliveryOptionId: ID!
+}
+
+"""
+Represents a unique identifier, often used to refetch an object.
+The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
+
+Example value: `"gid://shopify/Product/10079785100"`
+"""
+scalar ID
+
+type Input {
+  deliveryOptions: [DeliveryCustomizationDeliveryOption!]!
+}
+
+input MoveOperation {
+  """
+  The identifier of the delivery option to move.
+  """
+  deliveryOptionId: ID!
+
+  """
+  The index to move the delivery option to.
+  """
+  index: Int!
+}
+
+"""
+The root mutation for the API.
+"""
+type MutationRoot {
+  """
+  Handles the function result.
+  """
+  handleResult(
+    """
+    The result of the function.
+    """
+    result: FunctionResult!
+  ): Void!
+}
+
+input Operation @oneOf {
+  hide: HideOperation
+  move: MoveOperation
+  rename: RenameOperation
+}
+
+input RenameOperation {
+  """
+  The identifier of the delivery option to rename.
+  """
+  deliveryOptionId: ID!
+
+  """
+  The new name for the delivery option.
+  """
+  title: String!
+}
+
+"""
+A void type that can be used to return a null value from a mutation.
+"""
+scalar Void
