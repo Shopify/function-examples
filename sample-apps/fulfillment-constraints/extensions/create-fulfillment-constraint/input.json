@@ -5,6 +5,7 @@
         "id": "gid://shopify/CartLine/0",
         "merchandise": {
           "id": "gid://shopify/ProductVariant/0",
+          "sku": "SKU_ONE",
           "metafield": {
             "value": "IDENTIFIER_1"
           }
@@ -14,11 +15,24 @@
         "id": "gid://shopify/CartLine/1",
         "merchandise": {
           "id": "gid://shopify/ProductVariant/1",
+          "sku": "SKU_TWO",
           "metafield": {
             "value": "IDENTIFIER_1"
           }
         }
       }
     ]
-  }
+  },
+  "locations": [
+    {
+      "id": "gid://shopify/Location/1",
+      "name": "767 Labadie View",
+      "address1": "150 Elgin St"
+    },
+    {
+      "id": "gid://shopify/Location/2",
+      "name": "Laurier Office",
+      "address1": "234 Laurier St W"
+    }
+  ]
 }
