@@ -1,0 +1,8 @@
+name = "Order Discounts Error"
+type = "order_discounts"
+title = "Order Discounts Error"
+api_version = "unstable"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/panic.wasm"
