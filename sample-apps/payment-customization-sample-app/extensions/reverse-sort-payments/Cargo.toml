@@ -1,0 +1,12 @@
+[package]
+name = "reverse_sort_payments"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0.13", features = ["derive"] }
+
+[profile.release]
+lto = true
+opt-level = 's'
