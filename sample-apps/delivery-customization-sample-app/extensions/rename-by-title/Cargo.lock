@@ -38,7 +38,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "delivery_customization_hide_by_name"
+name = "delivery_customization_rename_by_title"
 version = "1.0.0"
 dependencies = [
  "serde",
