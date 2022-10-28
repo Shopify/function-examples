@@ -1,0 +1,13 @@
+[package]
+name = "delivery_customization_move_to_last_by_title"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+serde_json = "1.0"
+serde_with = "1.13.0"
+serde = { version = "1.0.13", features = ["derive"] }
+
+[profile.release]
+lto = true
+opt-level = 's'
