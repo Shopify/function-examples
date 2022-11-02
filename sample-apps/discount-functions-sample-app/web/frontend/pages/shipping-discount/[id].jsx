@@ -1,10 +1,10 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 
-import DiscountDetailsPage from '../../components/DiscountDetailsPage';
+import DiscountDetailsPage from "../../components/DiscountDetailsPage";
 import {
   default as ShippingDiscount,
   DEFAULT_CONFIGURATION,
-} from '../../components/function-configuration/ShippingDiscount';
+} from "../../components/function-configuration/ShippingDiscount";
 
 export default function ShippingDiscountDetailsPage() {
   const { id } = useParams();

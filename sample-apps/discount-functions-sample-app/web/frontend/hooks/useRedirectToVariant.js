@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
-import { useAppBridge } from '@shopify/app-bridge-react';
-import { Redirect } from '@shopify/app-bridge/actions';
+import { useCallback } from "react";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 
-import { gidToId } from '../utilities/gid';
+import { gidToId } from "../../helpers/gid";
 
 export function useRedirectToVariant(productId, variantId) {
   const app = useAppBridge();
