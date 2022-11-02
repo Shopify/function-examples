@@ -1,8 +1,10 @@
-from node:18-alpine
+FROM node:18-alpine
 
-ENV BACKEND_PORT=8081
-EXPOSE 8081/tcp
+ARG SHOPIFY_API_KEY
+ENV SHOPIFY_API_KEY=$SHOPIFY_API_KEY
+EXPOSE 8081
 WORKDIR /app
-CMD (cd web && npm install) && \
-		(cd web/frontend && npm install) && \
-		(cd web && npm run serve)
+COPY web .
+RUN npm install
+RUN cd frontend && npm install && npm run build
+CMD ["npm", "run", "serve"]

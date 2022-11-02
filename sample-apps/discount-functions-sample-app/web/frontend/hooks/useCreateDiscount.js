@@ -1,45 +1,12 @@
-import { gql } from 'graphql-request';
-
-import { useShopifyMutation } from './useShopifyMutation';
-
-const CREATE_MUTATION = gql`
-  mutation CreateDiscount($discount: DiscountAutomaticAppInput!) {
-    discountAutomaticAppCreate(automaticAppDiscount: $discount) {
-      userErrors {
-        code
-        message
-        field
-      }
-    }
-  }
-`;
+import { useAppMutation } from "./";
 
 export function useCreateDiscount() {
-  const [triggerMutation, { isLoading }] = useShopifyMutation({
-    query: CREATE_MUTATION,
+  const mutation = useAppMutation({
+    url: "/api/discount",
+    reactQueryOptions: {
+      mutationKey: "createDiscount",
+    },
   });
 
-  const createDiscount = async (functionId, discount) => {
-    return triggerMutation({
-      discount: {
-        ...discount,
-        functionId,
-      },
-    })
-      .then((response) => {
-        if (response.data.discountAutomaticAppCreate.userErrors.length) {
-          return Promise.reject(
-            response.data.discountAutomaticAppCreate.userErrors,
-          );
-        }
-
-        return response;
-      })
-      .catch((error) => {
-        console.error('Failed to create discount', error);
-        return Promise.reject(error);
-      });
-  };
-
-  return [createDiscount, { isLoading }];
+  return mutation;
 }

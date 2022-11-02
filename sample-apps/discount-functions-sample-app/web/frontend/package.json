@@ -1,11 +1,10 @@
 {
-  "name": "starter-react-frontend-app",
+  "name": "shopify-frontend-template-react",
   "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test": "vitest",
     "coverage": "vitest run --coverage"
   },
   "type": "module",
@@ -13,16 +12,11 @@
     "node": ">= 12.16"
   },
   "dependencies": {
-    "@shopify/app-bridge": "^2.0.25",
-    "@shopify/app-bridge-react": "^2.0.25",
-    "@shopify/app-bridge-utils": "^2.0.25",
-    "@shopify/polaris": "^9.2.2",
+    "@shopify/app-bridge": "^3.1.0",
+    "@shopify/app-bridge-react": "^3.1.0",
+    "@shopify/app-bridge-utils": "^3.1.0",
+    "@shopify/polaris": "^9.11.0",
     "@vitejs/plugin-react": "1.2.0",
-    "cross-env": "^7.0.3",
-    "dotenv": "^16.0.1",
-    "express": "^4.17.3",
-    "graphql": "^16.3.0",
-    "graphql-request": "^4.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.34.19",
@@ -30,16 +24,9 @@
     "vite": "^2.8.6"
   },
   "devDependencies": {
-    "@shopify/react-testing": "^3.3.10",
     "history": "^5.3.0",
     "jsdom": "^19.0.0",
     "prettier": "^2.6.0",
-    "vi-fetch": "^0.6.1",
-    "vitest": "^0.10.0"
-  },
-  "prettier": {
-    "trailingComma": "all",
-    "tabWidth": 2,
-    "singleQuote": true
+    "vi-fetch": "^0.6.1"
   }
 }

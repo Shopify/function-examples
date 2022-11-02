@@ -1,18 +1,15 @@
-import { Link, List, SkeletonDisplayText } from '@shopify/polaris';
-import { gql } from 'graphql-request';
-import { useRedirectToVariant } from '../hooks/useRedirectToVariant';
-import { useShopifyQuery } from '../hooks/useShopifyQuery';
+import { Link, List, SkeletonDisplayText } from "@shopify/polaris";
 
-const VARIANT_QUERY = gql`
-  query Variant($id: ID!) {
-    productVariant(id: $id) {
-      displayName
-      product {
-        id
-      }
-    }
-  }
-`;
+import { gidToId } from "../../helpers/gid";
+import { useAppQuery, useRedirectToVariant } from "../hooks";
+
+function useVariant({ id }) {
+  const result = useAppQuery({
+    url: `/api/product-variant/${id}`,
+  });
+
+  return result;
+}
 
 export default function VariantList({ ids }) {
   return (
@@ -27,30 +24,19 @@ export default function VariantList({ ids }) {
 }
 
 function VariantListItem({ id }) {
-  const { data, isLoading, isError } = useShopifyQuery({
-    key: ['Variant', id],
-    query: VARIANT_QUERY,
-    variables: { id },
+  const {
+    data,
+    isFetching: isLoading,
+    isError,
+  } = useVariant({
+    id: gidToId(id),
   });
 
-  const redirectToVariant = useRedirectToVariant(
-    data?.data.productVariant.product.id,
-    id,
-  );
+  const redirectToVariant = useRedirectToVariant(data?.product.id, id);
 
-  if (isLoading) {
-    return <SkeletonDisplayText size="small" />;
-  }
+  if (isLoading) return <SkeletonDisplayText size="small" />;
 
-  if (isError || !data) {
-    return id;
-  }
+  if (isError || !data) return id;
 
-  const { displayName } = data.data.productVariant;
-
-  return (
-    <>
-      <Link onClick={redirectToVariant}>{displayName}</Link>
-    </>
-  );
+  return <Link onClick={redirectToVariant}>{data.displayName}</Link>;
 }

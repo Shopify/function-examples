@@ -1,14 +1,14 @@
-import { useState, useMemo } from 'react';
-import { ResourcePicker } from '@shopify/app-bridge-react';
+import { useState, useMemo } from "react";
+import { ResourcePicker } from "@shopify/app-bridge-react";
 import {
   Stack,
   TextField,
   TextContainer,
   Button,
   TextStyle,
-} from '@shopify/polaris';
+} from "@shopify/polaris";
 
-import VariantList from '../VariantList';
+import VariantList from "../VariantList";
 
 export default function ProductDiscount({
   configuration,

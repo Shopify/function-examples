@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Banner,
   Card,
@@ -6,31 +6,36 @@ import {
   Page,
   PageActions,
   TextField,
-} from '@shopify/polaris';
+} from "@shopify/polaris";
 
-import { useCreateDiscount } from '../hooks/useCreateDiscount';
-import { useDiscount } from '../hooks/useDiscount';
-import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
-import { serializeDiscount } from '../utilities/serializeDiscount';
+import {
+  useCreateDiscount,
+  useFormDiscount,
+  useRedirectToDiscounts,
+} from "../hooks";
+import { serializeDiscount } from "../utilities/serializeDiscount";
 
 export default function DiscountCreatePage({
-  functionId,
+  type,
   defaultConfiguration,
   renderConfigurationForm,
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isError, setIsError] = useState(false);
   const { discount, title, configuration, setTitle, setConfiguration } =
-    useDiscount({
+    useFormDiscount({
       defaultConfiguration,
     });
 
-  const [createDiscount, { isLoading }] = useCreateDiscount();
+  const { mutateAsync: createDiscount, isLoading } = useCreateDiscount();
 
   const handleCreateDiscount = async () => {
     setIsError(false);
+
     try {
-      await createDiscount(functionId, serializeDiscount(discount));
+      await createDiscount({
+        payload: { discount: serializeDiscount(discount), type },
+      });
     } catch {
       setIsError(true);
       return;
@@ -73,7 +78,7 @@ export default function DiscountCreatePage({
         <Layout.Section>
           <PageActions
             primaryAction={{
-              content: 'Save',
+              content: "Save",
               onAction: handleCreateDiscount,
               loading: isLoading,
             }}

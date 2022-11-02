@@ -1,26 +1,41 @@
-import { BrowserRouter } from 'react-router-dom';
-import { AppProvider as PolarisProvider } from '@shopify/polaris';
-import translations from '@shopify/polaris/locales/en.json';
-import '@shopify/polaris/build/esm/styles.css';
+import { BrowserRouter } from "react-router-dom";
+import { NavigationMenu } from "@shopify/app-bridge-react";
+import Routes from "./Routes";
 
-import { AppBridgeProvider } from './components/providers/AppBridgeProvider';
-import { GraphQLProvider } from './components/providers/GraphQLProvider';
-import Routes from './Routes';
+import {
+  AppBridgeProvider,
+  QueryProvider,
+  PolarisProvider,
+} from "./components";
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
-  // .test.tsx or .test.jsx will be ignored
-  // [id] can be used to match dynamic paths, e.g: /blog/[id].jsx
-  // [..catchAll] will match all routes that don't match any files in /pages
-  const pages = import.meta.globEager('./pages/**/!(*.test.[jt]sx)*.([jt]sx)');
+  // See documentation for <Routes /> for more info
+  const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
   return (
-    <PolarisProvider i18n={translations}>
+    <PolarisProvider>
       <BrowserRouter>
         <AppBridgeProvider>
-          <GraphQLProvider>
+          <QueryProvider>
+            <NavigationMenu
+              navigationLinks={[
+                {
+                  label: "Order Discount",
+                  destination: "/order-discount/new",
+                },
+                {
+                  label: "Product Discount",
+                  destination: "/product-discount/new",
+                },
+                {
+                  label: "Shipping Discount",
+                  destination: "/shipping-discount/new",
+                },
+              ]}
+            />
             <Routes pages={pages} />
-          </GraphQLProvider>
+          </QueryProvider>
         </AppBridgeProvider>
       </BrowserRouter>
     </PolarisProvider>

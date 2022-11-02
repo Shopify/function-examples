@@ -1,4 +1,4 @@
-import { TextField } from '@shopify/polaris';
+import { TextField } from "@shopify/polaris";
 
 export default function ShippingDiscount({
   configuration,

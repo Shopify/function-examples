@@ -1,5 +1,5 @@
-import { Card, Layout, Link, Page } from '@shopify/polaris';
-import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
+import { Card, Layout, Link, Page } from "@shopify/polaris";
+import { useRedirectToDiscounts } from "../hooks/useRedirectToDiscounts";
 
 export default function HomePage() {
   const redirectToDiscounts = useRedirectToDiscounts();
@@ -10,7 +10,7 @@ export default function HomePage() {
         <Layout.Section>
           <Card sectioned>
             Welcome to the <b>Discount Functions Sample App</b>! To get started,
-            create a discount from the{' '}
+            create a discount from the{" "}
             <Link onClick={redirectToDiscounts} external>
               Discounts page
             </Link>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Page,
   Card,
@@ -8,14 +8,17 @@ import {
   Stack,
   Layout,
   Banner,
-} from '@shopify/polaris';
+} from "@shopify/polaris";
 
-import { useDeleteDiscount } from '../hooks/useDeleteDiscount';
-import { useDiscount } from '../hooks/useDiscount';
-import { useRedirectToDiscounts } from '../hooks/useRedirectToDiscounts';
-import { useSavedDiscount } from '../hooks/useSavedDiscount';
-import { useUpdateDiscount } from '../hooks/useUpdateDiscount';
-import { serializeDiscount } from '../utilities/serializeDiscount';
+import {
+  useDeleteDiscount,
+  useDiscount,
+  useRedirectToDiscounts,
+  useFormDiscount,
+  useUpdateDiscount,
+} from "../hooks/";
+
+import { serializeDiscount } from "../utilities/serializeDiscount";
 
 export default function DiscountDetailsPage({
   id,
@@ -24,7 +27,13 @@ export default function DiscountDetailsPage({
 }) {
   const redirectToDiscounts = useRedirectToDiscounts();
   const [isMutationError, setIsMutationError] = useState(false);
-  const { discount: savedDiscount, isLoading, isError } = useSavedDiscount(id);
+  const {
+    data: savedDiscount,
+    isFetching: isLoading,
+    isError,
+  } = useDiscount({
+    id,
+  });
   const {
     discount,
     isDirty,
@@ -32,36 +41,38 @@ export default function DiscountDetailsPage({
     setTitle,
     configuration,
     setConfiguration,
-  } = useDiscount({
+  } = useFormDiscount({
     savedDiscount,
     defaultConfiguration,
   });
+  const { mutateAsync: updateDiscount, isLoading: updateInProgress } =
+    useUpdateDiscount({
+      id,
+    });
+  const { mutateAsync: deleteDiscount, isLoading: deleteInProgress } =
+    useDeleteDiscount();
 
-  const [updateDiscount, { isLoading: updateInProgress }] = useUpdateDiscount();
-  const [deleteDiscount, { isLoading: deleteInProgress }] = useDeleteDiscount();
   const mutationInProgress = updateInProgress || deleteInProgress;
 
   const handleUpdateDiscount = async () => {
     setIsMutationError(false);
     try {
-      await updateDiscount(id, serializeDiscount(discount));
+      await updateDiscount({ payload: serializeDiscount(discount) });
+      redirectToDiscounts();
     } catch {
       setIsMutationError(true);
       return;
     }
   };
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <Stack distribution="center">
         <Spinner size="large" />
       </Stack>
     );
-  }
 
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
+  if (isError) return <div>Something went wrong!</div>;
 
   const errorMarkup = isMutationError ? (
     <Layout.Section>
@@ -94,18 +105,18 @@ export default function DiscountDetailsPage({
         <Layout.Section>
           <PageActions
             primaryAction={{
-              content: 'Save',
+              content: "Save",
               onAction: handleUpdateDiscount,
               loading: mutationInProgress,
               disabled: !isDirty,
             }}
             secondaryActions={[
               {
-                content: 'Delete',
+                content: "Delete",
                 destructive: true,
                 loading: mutationInProgress,
                 onAction: async () => {
-                  await deleteDiscount(id);
+                  await deleteDiscount({ params: { id } });
                   redirectToDiscounts();
                 },
               },
