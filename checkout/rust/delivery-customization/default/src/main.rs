@@ -22,16 +22,7 @@ mod tests {
     #[test]
     fn test_result_contains_no_operations() {
         let input = Input {
-            delivery_options: vec![
-                DeliveryOption {
-                    id: "1".to_string(),
-                    title: "Standard".to_string()
-                },
-                DeliveryOption {
-                    id: "2".to_string(),
-                    title: "Express".to_string()
-                }
-            ],
+            delivery_customization: DeliveryCustomization { metafield: None },
         };
         let operations = function(input).unwrap().operations;
 

@@ -1,7 +1,0 @@
-query Input {
-  paymentCustomization {
-    metafield(namespace: "default", key: "function-configuration") {
-      value
-    }
-  }
-}
