@@ -1,0 +1,7 @@
+query Input {
+  paymentCustomization {
+    metafield(namespace: "{{name | replace: " ", "-" | downcase}}", key: "function-configuration") {
+      value
+    }
+  }
+}
