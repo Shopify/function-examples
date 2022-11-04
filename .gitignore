@@ -5,8 +5,12 @@ node_modules
 .DS_Store
 
 # These files are generated from templating and should not be committed to this repo
-**/input.graphql
-**/Cargo.lock
-**/Cargo.toml
-**/shopify.function.extension.toml
+checkout/**/input.graphql
+checkout/**/Cargo.lock
+checkout/**/Cargo.toml
+checkout/**/shopify.function.extension.toml
+discounts/**/input.graphql
+discounts/**/Cargo.lock
+discounts/**/Cargo.toml
+discounts/**/shopify.function.extension.toml
 sample-apps/*/web/frontend/metafields.js
