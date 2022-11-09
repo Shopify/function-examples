@@ -30,7 +30,7 @@ It also provides [Shopify Functions](#) that allow merchants to set up discounts
 
 - [Introduction to Shopify apps](https://shopify.dev/apps/getting-started)
   - [App authentication](https://shopify.dev/apps/auth)
-- [Shopify CLI command reference](https://shopify.dev/apps/tools/cli/app)
+- [Shopify CLI command reference](https://shopify.dev/apps/tools/cli/commands)
 - [Shopify API Library documentation](https://github.com/Shopify/shopify-node-api/tree/main/docs)
 
 ## License
