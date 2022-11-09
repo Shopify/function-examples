@@ -1,0 +1,11 @@
+name = "shopifyvm"
+type = "product_discounts"
+api_version = "2022-07"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/shopifyvm.wasm"
+
+[ui.paths]
+create = "/shopifyvm/new"
+details = "/shopifyvm/:id"

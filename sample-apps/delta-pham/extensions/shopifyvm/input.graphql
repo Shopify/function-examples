@@ -1,0 +1,23 @@
+query Input {
+  cart {
+    buyerIdentity {
+      email
+    }
+    lines {
+      merchandise {
+        __typename
+        ...on ProductVariant {
+          id
+          product {
+            taggedShopifyVM: hasAnyTag(tags: ["ShopifyVM"])
+          }
+        }
+      }
+    }
+  }
+  discountNode {
+    metafield(namespace: "shopifyvm", key: "function-configuration") {
+      value
+    }
+  }
+}
