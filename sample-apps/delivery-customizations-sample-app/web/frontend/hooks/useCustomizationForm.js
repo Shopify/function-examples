@@ -4,7 +4,6 @@ export function useCustomizationForm(props) {
   const {
     initialData = {
       shippingMethodName: "Express",
-      operationType: "RENAME"
     },
   } = props || {};
 

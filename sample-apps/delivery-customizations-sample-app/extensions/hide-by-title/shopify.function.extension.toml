@@ -6,3 +6,7 @@ api_version = "unstable"
 [build]
 command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/delivery_customization_hide_by_title.wasm"
+
+[ui.paths]
+create = "/:functionId/new"
+details = "/:functionId/:id"

@@ -1,20 +1,8 @@
-import { useState, useCallback } from "react";
-import {
-  Form,
-  FormLayout,
-  TextField,
-  Button,
-  Checkbox,
-  Badge,
-  Stack,
-  RadioButton,
-} from "@shopify/polaris";
+import { Form, FormLayout, TextField, Button, Badge } from "@shopify/polaris";
 
 export function CustomizationForm({
   shippingMethodName,
   enabled,
-  operationType,
-  // Form Data Above
   isNewCustomization = false,
   onSubmit,
   onInputChange,
@@ -31,8 +19,6 @@ export function CustomizationForm({
     if (onInputChange) onInputChange({ value, name });
   };
 
-  const newCustomizationPage = location.pathname.includes("new");
-
   return (
     <Form onSubmit={handleSubmit} {...props}>
       <FormLayout>
@@ -43,40 +29,11 @@ export function CustomizationForm({
             <Badge>Inactive</Badge>
           )}
         </FormLayout.Group>
-        {newCustomizationPage && (
-          <FormLayout.Group>
-            <Stack vertical>
-              <RadioButton
-                label="Hide"
-                helpText="Hide a Delivery Customization"
-                checked={operationType === "HIDE"}
-                id="rename"
-                name="operationType"
-                onChange={() => handleInputChange("HIDE", "operationType")}
-              />
-              <RadioButton
-                label="Move"
-                helpText="Move a delivery method customization."
-                id="move"
-                name="operationType"
-                checked={operationType === "MOVE"}
-                onChange={() => handleInputChange("MOVE", "operationType")}
-              />
-              <RadioButton
-                label="Rename"
-                helpText="Rename a delivery method customization."
-                id="rename"
-                name="operationType"
-                checked={operationType === "RENAME"}
-                onChange={() => handleInputChange("RENAME", "operationType")}
-              />
-            </Stack>
-          </FormLayout.Group>
-        )}
         <FormLayout.Group>
           <TextField
             type="text"
-            label="Title"
+            label="Delivery Method Name"
+            helpText={"Will match the delivery method name exactly."}
             autoComplete="off"
             value={shippingMethodName}
             onChange={(value) => handleInputChange(value, "shippingMethodName")}

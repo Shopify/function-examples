@@ -1,17 +1,18 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
+import NotFound from "../NotFound";
 
-import { CustomizationForm, CustomizationPageLayout } from "../components";
+import { CustomizationForm, CustomizationPageLayout } from "../../components";
 import {
   useCustomizationForm,
   useDeliveryCustomization,
-  useUpdateDelivertyCustomization,
-} from "../hooks";
+  useUpdateDeliveryCustomization,
+} from "../../hooks";
 
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id, functionId } = useParams();
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
   const { data, isFetching } = useDeliveryCustomization({
@@ -19,7 +20,7 @@ export default function DeliveryCustomizationDetailPage() {
   });
 
   const { mutateAsync: updateCustomization, isLoading } =
-    useUpdateDelivertyCustomization({
+    useUpdateDeliveryCustomization({
       id,
     });
 
@@ -39,12 +40,13 @@ export default function DeliveryCustomizationDetailPage() {
   useEffect(() => {
     if (!data) return;
 
-    const { shippingMethodName, enabled, operationType } = data;
+    const { shippingMethodName, enabled, title } = data;
 
     setData({
       shippingMethodName,
-      operationType,
       enabled,
+      title,
+      functionId,
     });
   }, [data]);
 
@@ -53,8 +55,18 @@ export default function DeliveryCustomizationDetailPage() {
     onAction: handleSubmit,
   };
 
+  if (!isFetching && data?.id == null) {
+    return <NotFound />;
+  }
+
+  console.log(formData);
+
   return (
-    <CustomizationPageLayout loading={isLoading} actionProps={primaryAction}>
+    <CustomizationPageLayout
+      title={data?.title || ""}
+      loading={isLoading}
+      actionProps={primaryAction}
+    >
       <CustomizationForm
         {...formData}
         loading={disabled}

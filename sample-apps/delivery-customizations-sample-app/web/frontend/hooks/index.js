@@ -5,5 +5,5 @@ export { useCustomizationForm } from './useCustomizationForm';
 export { useCreateDeliveryCustomization } from './useCreateDeliveryCustomization';
 export { useDeliveryCustomization } from './useDeliveryCustomization';
 export { useDeliveryCustomizations } from './useDeliveryCustomizations';
-export { useUpdateDelivertyCustomization } from './useUpdateDelivertyCustomization';
+export { useUpdateDeliveryCustomization } from './useUpdateDeliveryCustomization';
 export { useDeleteDeliveryCustomization} from './useDeleteDeliveryCustomization';

@@ -6,3 +6,7 @@ api_version = "unstable"
 [build]
 command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/delivery_customization_rename_by_title.wasm"
+
+[ui.paths]
+create = "/new/:functionId"
+details = "/:functionId/:id"

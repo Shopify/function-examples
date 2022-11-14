@@ -7,6 +7,7 @@ import {
   useIndexResourceState,
   Link,
 } from "@shopify/polaris";
+
 import { PlusMinor } from "@shopify/polaris-icons";
 import { useIsMutating } from "react-query";
 import {
@@ -47,8 +48,10 @@ export default function HomePage() {
     }
   };
 
+  console.log(deliveryCustomizations);
+
   const rowMarkup = deliveryCustomizations.map(
-    ({ id, enabled, title, operationType }, index) => {
+    ({ id, enabled, title, functionId, shippingMethodName }, index) => {
       return (
         <IndexTable.Row
           id={id}
@@ -57,13 +60,12 @@ export default function HomePage() {
           position={index}
         >
           <IndexTable.Cell>
-            <Link dataPrimaryLink url={`/${id}`}>
+            <Link dataPrimaryLink url={`/${functionId}/${id}`}>
               <TextStyle variation="strong">{title}</TextStyle>
             </Link>
           </IndexTable.Cell>
+          <IndexTable.Cell>{shippingMethodName}</IndexTable.Cell>
           <IndexTable.Cell>{enabled && "Active"}</IndexTable.Cell>
-
-          <IndexTable.Cell>{operationType}</IndexTable.Cell>
         </IndexTable.Row>
       );
     }
@@ -100,8 +102,8 @@ export default function HomePage() {
           onSelectionChange={handleSelectionChange}
           headings={[
             { title: "Title" },
+            { title: "Shippin Method Name" },
             { title: "Enabled" },
-            { title: "Operation" },
           ]}
           promotedBulkActions={tableActions}
           loading={isLoading}

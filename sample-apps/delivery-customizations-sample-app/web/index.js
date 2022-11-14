@@ -12,6 +12,7 @@ import { setupGDPRWebHooks } from "./gdpr.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { AppInstallations } from "./app_installations.js";
 import { gidToId, idToGid } from "./helpers/gid.js";
+import { getOperationTypeFromFunctionId } from "./helpers/get-operation-from-functionId.js"
 
 const USE_ONLINE_TOKENS = false;
 
@@ -226,19 +227,9 @@ export async function createServer(
     readFileSync(join(process.cwd(), "../", ".env"), "utf8")
   );
 
-  function getExtensionId(methodName) {
-    if (methodName == "HIDE") {
-      return SHOPIFY_HIDE_BY_TITLE_ID;
-    } else if (methodName == "RENAME") {
-      return SHOPIFY_RENAME_BY_TITLE_ID;
-    } else if (methodName == "MOVE") {
-      return SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID;
-    }
-  }
-
   // CREATE DELIVERY CUSTOMIZATION
   app.post("/api/delivery-customization", async (req, res) => {
-    const functionOperation = req.body.operationType;
+    const functionId = req.body.functionId;
     const payload = req.body;
 
     let query = {
@@ -261,8 +252,8 @@ export async function createServer(
         `,
         variables: {
           deliveryCustomization: {
-            functionId: getExtensionId(functionOperation),
-            title: `${payload.operationType} "${payload.shippingMethodName}" shipping method`,
+            functionId: functionId,
+            title: `${getOperationTypeFromFunctionId(functionId)} shipping method`,
             enabled: true,
           },
         },
@@ -332,6 +323,9 @@ export async function createServer(
     const gid = idToGid(req.params.id);
 
     const payload = req.body;
+    const functionId = payload.functionId;
+
+    console.log(payload)
 
     // update metafield
     let query = {
@@ -364,6 +358,9 @@ export async function createServer(
     if (metafieldStatus !== 200)
       return res.status(metafieldStatus).send(metafieldData);
 
+    console.log("new title,");
+    console.log(`${getOperationTypeFromFunctionId(functionId)} shipping method`)
+
     query = {
       data: {
         query: `
@@ -383,8 +380,8 @@ export async function createServer(
         variables: {
           id: gid,
           deliveryCustomization: {
-            functionId: getExtensionId(req.body.operationType),
-            title: `${payload.operationType} "${payload.shippingMethodName}" shipping method`,
+            functionId: functionId,
+            title: `${getOperationTypeFromFunctionId(functionId)} shipping method`,
             enabled: payload.enabled,
           },
         },
@@ -395,6 +392,9 @@ export async function createServer(
       normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
 
     const { status, data } = await queryResponse(req, res, query, reducer);
+
+    console.log(data)
+    console.log("title not updating")
 
     return res.status(status).send(data);
   });

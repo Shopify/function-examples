@@ -4,6 +4,7 @@ export function CustomizationPageLayout({
   actionProps,
   loading,
   children,
+  title,
   ...props
 }) {
   const defaultActionProps = {
@@ -21,7 +22,7 @@ export function CustomizationPageLayout({
       {loading && <Loading />}
 
       <Page
-        title="Hide Shipping Method Above Threshold"
+        title={title}
         primaryAction={primaryActionProps}
         breadcrumbs={[{ content: "Customizations", url: "/" }]}
         {...props}
