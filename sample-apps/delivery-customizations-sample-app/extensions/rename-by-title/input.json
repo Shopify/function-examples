@@ -40,7 +40,7 @@
   "presentmentCurrencyRate": "1.0",
   "deliveryCustomization": {
     "metafield": {
-      "value": "{\"shippingMethodName\":\"Expresso\",\"operationType\":\"MOVE\"}"
+      "value": "{\"deliveryOptionName\":\"Expresso\",\"functionId\":\"01GHM0JQQ8MWEJRXE081TK0FH0\"}"
     }
   }
 }

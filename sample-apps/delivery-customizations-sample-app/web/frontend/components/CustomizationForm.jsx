@@ -1,7 +1,7 @@
 import { Form, FormLayout, TextField, Button, Badge } from "@shopify/polaris";
 
 export function CustomizationForm({
-  shippingMethodName,
+  deliveryOptionName,
   enabled,
   isNewCustomization = false,
   onSubmit,
@@ -12,7 +12,7 @@ export function CustomizationForm({
   ...props
 }) {
   const handleSubmit = () => {
-    if (onSubmit) onSubmit({ shippingMethodName, enabled, operationType });
+    if (onSubmit) onSubmit({ deliveryOptionName, enabled, operationType });
   };
 
   const handleInputChange = (value, name) => {
@@ -32,11 +32,11 @@ export function CustomizationForm({
         <FormLayout.Group>
           <TextField
             type="text"
-            label="Delivery Method Name"
-            helpText={"Will match the delivery method name exactly."}
+            label="Delivery Option Name"
+            helpText={"Will match the delivery option name exactly."}
             autoComplete="off"
-            value={shippingMethodName}
-            onChange={(value) => handleInputChange(value, "shippingMethodName")}
+            value={deliveryOptionName}
+            onChange={(value) => handleInputChange(value, "deliveryOptionName")}
             disabled={disabled}
             requiredIndicator
           />

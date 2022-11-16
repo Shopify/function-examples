@@ -40,10 +40,10 @@ export default function DeliveryCustomizationDetailPage() {
   useEffect(() => {
     if (!data) return;
 
-    const { shippingMethodName, enabled, title } = data;
+    const { deliveryOptionName, enabled, title } = data;
 
     setData({
-      shippingMethodName,
+      deliveryOptionName,
       enabled,
       title,
       functionId,
@@ -58,8 +58,6 @@ export default function DeliveryCustomizationDetailPage() {
   if (!isFetching && data?.id == null) {
     return <NotFound />;
   }
-
-  console.log(formData);
 
   return (
     <CustomizationPageLayout

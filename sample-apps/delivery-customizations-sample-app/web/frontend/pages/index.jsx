@@ -48,10 +48,8 @@ export default function HomePage() {
     }
   };
 
-  console.log(deliveryCustomizations);
-
   const rowMarkup = deliveryCustomizations.map(
-    ({ id, enabled, title, functionId, shippingMethodName }, index) => {
+    ({ id, enabled, title, functionId, deliveryOptionName }, index) => {
       return (
         <IndexTable.Row
           id={id}
@@ -64,7 +62,7 @@ export default function HomePage() {
               <TextStyle variation="strong">{title}</TextStyle>
             </Link>
           </IndexTable.Cell>
-          <IndexTable.Cell>{shippingMethodName}</IndexTable.Cell>
+          <IndexTable.Cell>{deliveryOptionName}</IndexTable.Cell>
           <IndexTable.Cell>{enabled && "Active"}</IndexTable.Cell>
         </IndexTable.Row>
       );

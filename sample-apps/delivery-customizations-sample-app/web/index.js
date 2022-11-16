@@ -325,8 +325,6 @@ export async function createServer(
     const payload = req.body;
     const functionId = payload.functionId;
 
-    console.log(payload)
-
     // update metafield
     let query = {
       data: {
@@ -357,9 +355,6 @@ export async function createServer(
 
     if (metafieldStatus !== 200)
       return res.status(metafieldStatus).send(metafieldData);
-
-    console.log("new title,");
-    console.log(`${getOperationTypeFromFunctionId(functionId)} shipping method`)
 
     query = {
       data: {
@@ -392,9 +387,6 @@ export async function createServer(
       normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
 
     const { status, data } = await queryResponse(req, res, query, reducer);
-
-    console.log(data)
-    console.log("title not updating")
 
     return res.status(status).send(data);
   });

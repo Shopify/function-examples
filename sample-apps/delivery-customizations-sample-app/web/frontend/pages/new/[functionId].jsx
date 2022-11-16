@@ -42,12 +42,10 @@ export default function NewDeliveryCustomizationPage() {
 
   useEffect(() => {
     setData({
-      shippingMethodName: "Express",
+      deliveryOptionName: "Express",
       functionId,
     });
   }, []);
-
-  console.log(formData);
 
   return (
     <CustomizationPageLayout

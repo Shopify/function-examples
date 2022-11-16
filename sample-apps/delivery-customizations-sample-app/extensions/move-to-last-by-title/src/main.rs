@@ -6,14 +6,14 @@ use api::*;
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    pub shipping_method_name: String,
+    pub delivery_option_name: String,
 }
 
 impl Input {
     pub fn configuration(&self) -> Configuration {
         match &self.delivery_customization.metafield {
             Some(Metafield { value }) => Configuration {
-                shipping_method_name: value.to_string(),
+                delivery_option_name: value.to_string(),
             },
             None => Configuration::default(),
         }
@@ -30,11 +30,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let delivery_options = delivery_options(&input.cart);
-    let shipping_method_name = input.configuration().shipping_method_name;
+    let delivery_option_name = input.configuration().delivery_option_name;
     let operations = delivery_options
         .iter()
         .filter_map(|delivery_option| {
-            if (&shipping_method_name.as_bytes() == &delivery_option.title.as_bytes()) {
+            if &delivery_option_name.as_str() == &delivery_option.title.as_str() {
                 Some(Operation {
                     r#move: Some(MoveOperation {
                         delivery_option_handle: delivery_option.handle.clone(),
@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn test_move_operations_with_configuration() {
         let input = input(Some(Configuration {
-            shipping_method_name: "Method A".to_string(),
+            delivery_option_name: "Method A".to_string(),
         }));
         let operations = function(input).unwrap().operations;
 

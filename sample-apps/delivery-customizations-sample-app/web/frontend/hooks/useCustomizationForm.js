@@ -3,7 +3,7 @@ import { useState } from "react";
 export function useCustomizationForm(props) {
   const {
     initialData = {
-      shippingMethodName: "Express",
+      deliveryOptionName: "Express",
     },
   } = props || {};
 
