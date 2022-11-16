@@ -7,7 +7,7 @@ export function useUpdateDeliveryCustomization({ id }) {
       method: "PUT",
     },
     reactQueryOptions: {
-      mutationKey: "createCustomization",
+      mutationKey: "updateCustomization",
     },
   });
 

@@ -1,10 +1,4 @@
-import {
-  Page,
-  Card,
-  EmptyState,
-  ResourceList,
-  ResourceItem,
-} from "@shopify/polaris";
+import { Page, Card, ResourceList, ResourceItem } from "@shopify/polaris";
 
 export default function HomePage() {
   return (
@@ -17,25 +11,25 @@ export default function HomePage() {
           resourceName={{ singular: "customer", plural: "customers" }}
           items={[
             {
-              title: "Hide Shipping Method",
-              functionId: "01GHM0JQQ8MWEJRXE081TK0FH0",
+              title: "Hide Delivery Option",
+              operation: "hide",
             },
             {
-              title: "Rename Shipping Method",
-              functionId: "01GHM0JSS7VNHFA65VZFTYVXAF",
+              title: "Rename Delivery Option",
+              operation: "rename",
             },
             {
-              title: "Move Shipping Method",
-              functionId: "01GHM0JVRQN906C45B7XJH75QQ",
+              title: "Reorder Delivery Option",
+              operation: "reorder",
             },
           ]}
           renderItem={(deliveryCustomization) => {
-            const { title, functionId } = deliveryCustomization;
+            const { title, functionId, operation } = deliveryCustomization;
 
             return (
               <ResourceItem
                 id={functionId}
-                url={`/new/${functionId}`}
+                url={`/${operation}/new`}
                 accessibilityLabel={`Create delivery customization ${title}`}
               >
                 {title}

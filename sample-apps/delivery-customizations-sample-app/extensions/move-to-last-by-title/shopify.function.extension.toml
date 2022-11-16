@@ -8,5 +8,5 @@ command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/delivery_customization_move_to_last_by_title.wasm"
 
 [ui.paths]
-create = "/new/:functionId"
-details = "/:functionId/:id"
+create = "/reorder/new"
+details = "/reorder/:id"

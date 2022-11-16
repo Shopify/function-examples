@@ -12,7 +12,7 @@ import {
 
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
-  const { id, functionId } = useParams();
+  const { id } = useParams();
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
   const { data, isFetching } = useDeliveryCustomization({
@@ -40,13 +40,13 @@ export default function DeliveryCustomizationDetailPage() {
   useEffect(() => {
     if (!data) return;
 
-    const { deliveryOptionName, enabled, title } = data;
+    const { deliveryOptionName, enabled, title, operation } = data;
 
     setData({
       deliveryOptionName,
       enabled,
       title,
-      functionId,
+      operation,
     });
   }, [data]);
 
@@ -64,6 +64,7 @@ export default function DeliveryCustomizationDetailPage() {
       title={data?.title || ""}
       loading={isLoading}
       actionProps={primaryAction}
+      isEditing={true}
     >
       <CustomizationForm
         {...formData}
@@ -71,7 +72,6 @@ export default function DeliveryCustomizationDetailPage() {
         disabled={disabled}
         onSubmit={handleSubmit}
         onInputChange={handleInputChange}
-        activeStatus={data?.enabled}
       />
     </CustomizationPageLayout>
   );

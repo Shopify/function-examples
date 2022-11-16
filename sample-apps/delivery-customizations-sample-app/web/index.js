@@ -4,15 +4,13 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { Shopify } from "@shopify/shopify-api";
 
-import dotenv from "dotenv";
-
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { AppInstallations } from "./app_installations.js";
 import { gidToId, idToGid } from "./helpers/gid.js";
-import { getOperationTypeFromFunctionId } from "./helpers/get-operation-from-functionId.js"
+import {matchOperationToFunctionId} from "./helpers/match-operation-to-functionId.js"
 
 const USE_ONLINE_TOKENS = false;
 
@@ -72,6 +70,22 @@ const BILLING_SETTINGS = {
 // More details can be found on shopify.dev:
 // https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
 setupGDPRWebHooks("/api/webhooks");
+
+// TODO: try moving to helper
+// const { SHOPIFY_HIDE_BY_TITLE_ID, SHOPIFY_RENAME_BY_TITLE_ID, SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID } = dotenv.parse(
+//   readFileSync(join(process.cwd(), "../", ".env"), "utf8")
+// );
+
+// function matchOperationToFunctionId(operation) {
+//   switch (operation) {
+//     case "hide":
+//       return SHOPIFY_HIDE_BY_TITLE_ID;
+//     case "rename":
+//       return SHOPIFY_RENAME_BY_TITLE_ID;
+//     case "move":
+//       return SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID;
+//   }
+// }
 
 // export for test use only
 export async function createServer(
@@ -223,13 +237,9 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  const { SHOPIFY_HIDE_BY_TITLE_ID, SHOPIFY_RENAME_BY_TITLE_ID, SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID } = dotenv.parse(
-    readFileSync(join(process.cwd(), "../", ".env"), "utf8")
-  );
-
   // CREATE DELIVERY CUSTOMIZATION
   app.post("/api/delivery-customization", async (req, res) => {
-    const functionId = req.body.functionId;
+    const functionId = matchOperationToFunctionId(req.body.operation);
     const payload = req.body;
 
     let query = {
@@ -253,8 +263,8 @@ export async function createServer(
         variables: {
           deliveryCustomization: {
             functionId: functionId,
-            title: `${getOperationTypeFromFunctionId(functionId)} shipping method`,
-            enabled: true,
+            title: `${payload.operation} delivery option`,
+            enabled: false,
           },
         },
       },
@@ -376,7 +386,7 @@ export async function createServer(
           id: gid,
           deliveryCustomization: {
             functionId: functionId,
-            title: `${getOperationTypeFromFunctionId(functionId)} shipping method`,
+            title: `${payload.operation} delivery option`,
             enabled: payload.enabled,
           },
         },

@@ -81,7 +81,11 @@ mod tests {
                     }
                 ]
             },
-            "deliveryCustomization": { "metafield": null },
+            "deliveryCustomization": {
+                "metafield": {
+                  "value": "{\"deliveryOptionName\":\"Method A\",\"enabled\":true,\"title\":\"Hide delivery option\",\"operation\":\"Hide\"}"
+                }
+            },
             "localization": {
                 "country": { "isoCode": "CA" },
                 "language": { "isoCode": "EN" }
@@ -111,18 +115,14 @@ mod tests {
     #[test]
     fn test_hide_operations_with_configuration() {
         let input = input(Some(Configuration {
-            delivery_option_name: vec!["Method A".to_string(), "Method C".to_string()],
+            delivery_option_name: "Method A".to_string(),
         }));
         let operations = function(input).unwrap().operations;
 
-        assert_eq!(operations.len(), 2);
+        assert_eq!(operations.len(), 1);
         assert_eq!(
             operations[0].hide.as_ref().unwrap().delivery_option_handle,
             "method-a"
-        );
-        assert_eq!(
-            operations[1].hide.as_ref().unwrap().delivery_option_handle,
-            "method-c"
         );
     }
 }

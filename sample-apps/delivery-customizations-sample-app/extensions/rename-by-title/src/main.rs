@@ -38,7 +38,7 @@ fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> 
     let operations = delivery_options
         .iter()
         .filter_map(|delivery_option| {
-            if (&delivery_option_name.as_bytes() == &delivery_option.title.as_bytes()) {
+            if &delivery_option_name.as_str() == &delivery_option.title.as_str() {
                 Some(Operation {
                     rename: Some(RenameOperation {
                         delivery_option_handle: delivery_option.handle.clone(),
@@ -82,12 +82,16 @@ mod tests {
                     }
                 ]
             },
-            "deliveryCustomization": { "metafield": null },
             "localization": {
                 "country": { "isoCode": "CA" },
                 "language": { "isoCode": "EN" }
             },
-            "presentmentCurrencyRate": "2.0"
+            "presentmentCurrencyRate": "2.0",
+            "deliveryCustomization": {
+                "metafield": {
+                  "value": "{\"deliveryOptionName\":\"Method A\",\"enabled\":true,\"title\":\"Rename delivery option\",\"operation\":\"Rename\"}"
+                }
+              }
         }
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
@@ -112,11 +116,11 @@ mod tests {
     #[test]
     fn test_rename_operations_with_configuration() {
         let input = input(Some(Configuration {
-            delivery_option_name: vec!["Method A".to_string(), "Method C".to_string()],
+            delivery_option_name: "Method A".to_string(),
         }));
         let operations = function(input).unwrap().operations;
 
-        assert_eq!(operations.len(), 2);
+        assert_eq!(operations.len(), 1);
         assert_eq!(
             operations[0]
                 .rename
@@ -128,18 +132,6 @@ mod tests {
         assert_eq!(
             operations[0].rename.as_ref().unwrap().title,
             "Method A renamed"
-        );
-        assert_eq!(
-            operations[1]
-                .rename
-                .as_ref()
-                .unwrap()
-                .delivery_option_handle,
-            "method-c"
-        );
-        assert_eq!(
-            operations[1].rename.as_ref().unwrap().title,
-            "Method C renamed"
         );
     }
 }

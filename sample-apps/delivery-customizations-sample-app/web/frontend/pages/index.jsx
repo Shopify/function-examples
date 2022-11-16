@@ -49,7 +49,7 @@ export default function HomePage() {
   };
 
   const rowMarkup = deliveryCustomizations.map(
-    ({ id, enabled, title, functionId, deliveryOptionName }, index) => {
+    ({ id, enabled, title, deliveryOptionName, operation }, index) => {
       return (
         <IndexTable.Row
           id={id}
@@ -58,7 +58,7 @@ export default function HomePage() {
           position={index}
         >
           <IndexTable.Cell>
-            <Link dataPrimaryLink url={`/${functionId}/${id}`}>
+            <Link dataPrimaryLink url={`/${operation}/${id}`}>
               <TextStyle variation="strong">{title}</TextStyle>
             </Link>
           </IndexTable.Cell>
@@ -100,7 +100,7 @@ export default function HomePage() {
           onSelectionChange={handleSelectionChange}
           headings={[
             { title: "Title" },
-            { title: "Shippin Method Name" },
+            { title: "Delivery Option Name" },
             { title: "Enabled" },
           ]}
           promotedBulkActions={tableActions}

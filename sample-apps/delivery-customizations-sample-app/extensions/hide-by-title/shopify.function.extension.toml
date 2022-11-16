@@ -8,5 +8,5 @@ command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/delivery_customization_hide_by_title.wasm"
 
 [ui.paths]
-create = "/new/:functionId"
-details = "/:functionId/:id"
+create = "/hide/new"
+details = "/hide/:id"

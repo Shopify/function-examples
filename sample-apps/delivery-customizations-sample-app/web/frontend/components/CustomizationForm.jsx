@@ -3,16 +3,16 @@ import { Form, FormLayout, TextField, Button, Badge } from "@shopify/polaris";
 export function CustomizationForm({
   deliveryOptionName,
   enabled,
+  operation,
   isNewCustomization = false,
   onSubmit,
   onInputChange,
   loading,
   disabled,
-  activeStatus,
   ...props
 }) {
   const handleSubmit = () => {
-    if (onSubmit) onSubmit({ deliveryOptionName, enabled, operationType });
+    if (onSubmit) onSubmit({ deliveryOptionName, enabled, operation });
   };
 
   const handleInputChange = (value, name) => {
@@ -23,7 +23,7 @@ export function CustomizationForm({
     <Form onSubmit={handleSubmit} {...props}>
       <FormLayout>
         <FormLayout.Group>
-          {activeStatus || isNewCustomization ? (
+          {enabled || isNewCustomization ? (
             <Badge status="success">Active</Badge>
           ) : (
             <Badge>Inactive</Badge>
@@ -33,7 +33,7 @@ export function CustomizationForm({
           <TextField
             type="text"
             label="Delivery Option Name"
-            helpText={"Will match the delivery option name exactly."}
+            helpText="Will match the delivery option name exactly."
             autoComplete="off"
             value={deliveryOptionName}
             onChange={(value) => handleInputChange(value, "deliveryOptionName")}

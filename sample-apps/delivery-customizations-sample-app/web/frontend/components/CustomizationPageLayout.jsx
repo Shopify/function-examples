@@ -5,6 +5,7 @@ export function CustomizationPageLayout({
   loading,
   children,
   title,
+  isEditing,
   ...props
 }) {
   const defaultActionProps = {
@@ -17,6 +18,8 @@ export function CustomizationPageLayout({
     ...actionProps,
   };
 
+  const url = isEditing ? "/" : "/new";
+
   return (
     <Frame>
       {loading && <Loading />}
@@ -24,7 +27,7 @@ export function CustomizationPageLayout({
       <Page
         title={title}
         primaryAction={primaryActionProps}
-        breadcrumbs={[{ content: "Customizations", url: "/" }]}
+        breadcrumbs={[{ content: "Customizations", url: url }]}
         {...props}
       >
         <Card title="Customization">

@@ -7,20 +7,11 @@ import {
   useCreateDeliveryCustomization,
 } from "../../hooks";
 
-import { useParams } from "react-router-dom";
-import { getOperationTypeFromFunctionId } from "../../../helpers/get-operation-from-functionId";
-
 export default function NewDeliveryCustomizationPage() {
   const navigate = useNavigate();
-  const { functionId } = useParams();
   const isNewCustomization = window.location.href.indexOf("new") > -1;
 
-  const {
-    handleInputChange,
-    hasChanged,
-    setData,
-    data: formData,
-  } = useCustomizationForm();
+  const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
   const { mutateAsync: createCustomization, isLoading } =
     useCreateDeliveryCustomization();
@@ -43,15 +34,16 @@ export default function NewDeliveryCustomizationPage() {
   useEffect(() => {
     setData({
       deliveryOptionName: "Express",
-      functionId,
+      operation: "Reorder",
     });
   }, []);
 
   return (
     <CustomizationPageLayout
-      title={`${getOperationTypeFromFunctionId(functionId)} shipping method`}
+      title={`Reorder delivery option`}
       loading={isLoading}
       actionProps={primaryAction}
+      subtitle="Moves the delivery option to the last position."
     >
       <CustomizationForm
         {...formData}
