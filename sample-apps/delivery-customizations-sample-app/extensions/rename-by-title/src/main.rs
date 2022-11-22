@@ -9,16 +9,12 @@ pub struct Configuration {
     pub delivery_option_name: String,
 }
 
-impl Configuration {
-    fn from_str(value: &str) -> Self {
-        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
-    }
-}
-
 impl Input {
     pub fn configuration(&self) -> Configuration {
         match &self.delivery_customization.metafield {
-            Some(Metafield { value }) => Configuration::from_str(value),
+            Some(Metafield { value }) => Configuration {
+                delivery_option_name: value.to_string(),
+            },
             None => Configuration::default(),
         }
     }
@@ -35,6 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let delivery_options = delivery_options(&input.cart);
     let delivery_option_name = input.configuration().delivery_option_name;
+    print!("{:?}", delivery_option_name);
     let operations = delivery_options
         .iter()
         .filter_map(|delivery_option| {
@@ -89,7 +86,7 @@ mod tests {
             "presentmentCurrencyRate": "2.0",
             "deliveryCustomization": {
                 "metafield": {
-                  "value": "{\"deliveryOptionName\":\"Method A\",\"enabled\":true,\"title\":\"Rename delivery option\",\"operation\":\"Rename\"}"
+                  "value": "{\"deliveryOptionName\":\"Method A\"}"
                 }
               }
         }

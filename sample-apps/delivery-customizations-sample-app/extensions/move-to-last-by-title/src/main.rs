@@ -9,16 +9,12 @@ pub struct Configuration {
     pub delivery_option_name: String,
 }
 
-impl Configuration {
-    fn from_str(value: &str) -> Self {
-        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
-    }
-}
-
 impl Input {
     pub fn configuration(&self) -> Configuration {
         match &self.delivery_customization.metafield {
-            Some(Metafield { value }) => Configuration::from_str(value),
+            Some(Metafield { value }) => Configuration {
+                delivery_option_name: value.to_string(),
+            },
             None => Configuration::default(),
         }
     }
@@ -38,7 +34,7 @@ fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> 
     let operations = delivery_options
         .iter()
         .filter_map(|delivery_option| {
-            if &delivery_option_name.as_str() == &delivery_option.title.as_str() {
+            if &delivery_option_name == &delivery_option.title.as_str() {
                 Some(Operation {
                     r#move: Some(MoveOperation {
                         delivery_option_handle: delivery_option.handle.clone(),
@@ -84,7 +80,7 @@ mod tests {
             },
             "deliveryCustomization": {
                 "metafield": {
-                  "value": "{\"deliveryOptionName\":\"Method A\",\"enabled\":true,\"title\":\"Reorder delivery option\",\"operation\":\"Reorder\"}"
+                  "value": "Method A"
                 }
             },
             "localization": {
@@ -96,6 +92,8 @@ mod tests {
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
         let value = serde_json::to_string(&configuration.unwrap_or_default()).unwrap();
+
+        
 
         Input {
             delivery_customization: DeliveryCustomization {

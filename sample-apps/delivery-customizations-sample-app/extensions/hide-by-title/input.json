@@ -40,7 +40,7 @@
   "presentmentCurrencyRate": "1.0",
   "deliveryCustomization": {
     "metafield": {
-      "value": "{\"deliveryOptionName\":\"Expresso\",\"enabled\":true,\"title\":\"Hide delivery option\",\"operation\":\"Hide\"}"
+      "value": "Xpresspost"
     }
   }
 }

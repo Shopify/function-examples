@@ -10,7 +10,7 @@ import { setupGDPRWebHooks } from "./gdpr.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { AppInstallations } from "./app_installations.js";
 import { gidToId, idToGid } from "./helpers/gid.js";
-import {matchOperationToFunctionId} from "./helpers/match-operation-to-functionId.js"
+import {matchOperationToFunctionId, matchFunctionIdToOperation} from "./helpers/match-operation-to-functionId.js"
 
 const USE_ONLINE_TOKENS = false;
 
@@ -154,6 +154,9 @@ export async function createServer(
       throw new Error("queryResponse: missing required argument");
     try {
       const result = await executeQuery(req, res, query);
+
+      // there errors are really hidden
+      // console.log("resule of query", result.deliveryCustomizationCreate.userErrors)
       const data = reducer ? reducer(result) : result;
 
       return { status: 200, data };
@@ -216,6 +219,7 @@ export async function createServer(
           edges {
             node {
               id
+              functionId
               title
               enabled
               metafield(namespace: "${METAFIELD.namespace}", key:"${METAFIELD.key}") {
@@ -234,7 +238,14 @@ export async function createServer(
 
     const { status, data } = await queryResponse(req, res, query, reducer);
 
-    return res.status(status).send(data);
+    const xxx = data.map((deliveryCustomization) => {
+      return {
+        ...deliveryCustomization,
+        operation: matchFunctionIdToOperation(deliveryCustomization.functionId)
+      }
+    })
+
+    return res.status(status).send(xxx);
   });
 
   // CREATE DELIVERY CUSTOMIZATION
@@ -264,7 +275,7 @@ export async function createServer(
           deliveryCustomization: {
             functionId: functionId,
             title: `${payload.operation} delivery option`,
-            enabled: false,
+            enabled: true,
           },
         },
       },
@@ -284,6 +295,14 @@ export async function createServer(
         .send(deliveryCustomizationData);
 
     // we need the id from the customization to create the metafield
+
+    const config = {
+      deliveryOptionName: payload.deliveryOptionName,
+    }
+
+    console.log(deliveryCustomizationData)
+    console.log(config)
+
     query = {
       data: {
         query: `
@@ -301,7 +320,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: deliveryCustomizationData.id,
               type: "json",
-              value: JSON.stringify(payload),
+              value: JSON.stringify(config),
             },
           ],
         },
@@ -335,6 +354,10 @@ export async function createServer(
     const payload = req.body;
     const functionId = payload.functionId;
 
+    const config = {
+      deliveryOptionName: payload.deliveryOptionName,
+    }
+
     // update metafield
     let query = {
       data: {
@@ -353,7 +376,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: gid,
               type: "json",
-              value: JSON.stringify(payload),
+              value: JSON.stringify(config),
             },
           ],
         },

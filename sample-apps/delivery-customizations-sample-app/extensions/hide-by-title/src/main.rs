@@ -9,16 +9,12 @@ pub struct Configuration {
     pub delivery_option_name: String,
 }
 
-impl Configuration {
-    fn from_str(value: &str) -> Self {
-        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
-    }
-}
-
 impl Input {
     pub fn configuration(&self) -> Configuration {
         match &self.delivery_customization.metafield {
-            Some(Metafield { value }) => Configuration::from_str(value),
+            Some(Metafield { value }) => Configuration {
+                delivery_option_name: value.to_string(),
+            },
             None => Configuration::default(),
         }
     }

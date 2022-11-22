@@ -16,3 +16,14 @@ export function matchOperationToFunctionId(operation) {
       return SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID;
   }
 }
+
+export function matchFunctionIdToOperation(operation) {
+  switch (operation) {
+    case SHOPIFY_HIDE_BY_TITLE_ID:
+      return "Hide";
+    case SHOPIFY_RENAME_BY_TITLE_ID:
+      return "Rename";
+    case SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID:
+      return "Reorder";
+  }
+}

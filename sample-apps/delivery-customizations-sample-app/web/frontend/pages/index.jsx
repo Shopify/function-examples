@@ -48,6 +48,8 @@ export default function HomePage() {
     }
   };
 
+  console.log(deliveryCustomizations);
+
   const rowMarkup = deliveryCustomizations.map(
     ({ id, enabled, title, deliveryOptionName, operation }, index) => {
       return (

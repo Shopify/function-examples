@@ -40,7 +40,7 @@
   "presentmentCurrencyRate": "1.0",
   "deliveryCustomization": {
     "metafield": {
-      "value": "{\"deliveryOptionName\":\"Expresso\",\"enabled\":true,\"title\":\"Rename delivery option\",\"operation\":\"Rename\"}"
+      "value": "Expresso"
     }
   }
 }

@@ -40,7 +40,7 @@
   "presentmentCurrencyRate": "1.0",
   "deliveryCustomization": {
     "metafield": {
-      "value": "{\"deliveryOptionName\":\"Expresso\",\"enabled\":true,\"title\":\"Reorder delivery option\",\"operation\":\"Reorder\"}"
+      "value": "Expresso"
     }
   }
 }
