@@ -1,11 +1,5 @@
 {
   "cart": {
-    "cost": {
-      "subtotalAmount": {
-        "amount": "200.0",
-        "currencyCode": "CAD"
-      }
-    },
     "deliveryGroups": [
       {
         "deliveryOptions": [
@@ -29,15 +23,6 @@
       }
     ]
   },
-  "localization": {
-    "country": {
-      "isoCode": "CA"
-    },
-    "language": {
-      "isoCode": "EN"
-    }
-  },
-  "presentmentCurrencyRate": "1.0",
   "deliveryCustomization": {
     "metafield": {
       "value": "Expresso"
