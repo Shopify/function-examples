@@ -6,14 +6,14 @@ use api::*;
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration {
-    pub delivery_option_name: String,
+    pub delivery_option_title: String,
 }
 
 impl Input {
     pub fn configuration(&self) -> Configuration {
         match &self.delivery_customization.metafield {
             Some(Metafield { value }) => Configuration {
-                delivery_option_name: value.to_string(),
+                delivery_option_title: value.to_string(),
             },
             None => Configuration::default(),
         }
@@ -30,11 +30,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let delivery_options = delivery_options(&input.cart);
-    let delivery_option_name = input.configuration().delivery_option_name;
+    let delivery_option_title = input.configuration().delivery_option_title;
     let operations = delivery_options
         .iter()
         .filter_map(|delivery_option| {
-            if &delivery_option_name.as_str() == &delivery_option.title.as_str() {
+            if &delivery_option_title.as_str() == &delivery_option.title.as_str() {
                 Some(Operation {
                     hide: Some(HideOperation {
                         delivery_option_handle: delivery_option.handle.clone(),
@@ -59,7 +59,7 @@ fn delivery_options(cart: &Cart) -> Vec<&CartDeliveryOption> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn input(configuration: Option<Configuration>) -> Input {
+    fn input(delivery_option_title: Option<String>) -> Input {
         let input = r#"
         {
             "cart": {
@@ -78,9 +78,7 @@ mod tests {
                 ]
             },
             "deliveryCustomization": {
-                "metafield": {
-                  "value": "{\"deliveryOptionName\":\"Method A\",\"enabled\":true,\"title\":\"Hide delivery option\",\"operation\":\"Hide\"}"
-                }
+                "metafield": null
             },
             "localization": {
                 "country": { "isoCode": "CA" },
@@ -90,12 +88,10 @@ mod tests {
         }
         "#;
         let default_input: Input = serde_json::from_str(input).unwrap();
-        let value = serde_json::to_string(&configuration.unwrap_or_default()).unwrap();
+        let metafield = delivery_option_title.map(|value| Metafield { value });
 
         Input {
-            delivery_customization: DeliveryCustomization {
-                metafield: Some(Metafield { value }),
-            },
+            delivery_customization: DeliveryCustomization { metafield },
             ..default_input
         }
     }
@@ -110,9 +106,7 @@ mod tests {
 
     #[test]
     fn test_hide_operations_with_configuration() {
-        let input = input(Some(Configuration {
-            delivery_option_name: "Method A".to_string(),
-        }));
+        let input = input(Some("Method A".to_string()));
         let operations = function(input).unwrap().operations;
 
         assert_eq!(operations.len(), 1);
