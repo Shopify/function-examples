@@ -1,45 +1,34 @@
-use serde::{Deserialize, Serialize};
+use shopify_function::prelude::*;
+use shopify_function::Result;
 
-mod api;
-use api::*;
+use graphql_client;
+use serde::Serialize;
+use serde_json;
 
-#[derive(Clone, Debug, Serialize, Deserialize, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Configuration {
-    pub delivery_option_title: String,
-}
+generate_types!(
+    query_path = "./input.graphql",
+    schema_path = "./schema.graphql"
+);
 
-impl Input {
-    pub fn configuration(&self) -> Configuration {
-        match &self.delivery_customization.metafield {
-            Some(Metafield { value }) => Configuration {
-                delivery_option_title: value.to_string(),
-            },
-            None => Configuration::default(),
-        }
+#[shopify_function]
+fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
+    let title_to_move: Option<String> = input.delivery_customization.metafield.map(|m| m.value);
+    if title_to_move.is_none() {
+        return Ok(output::FunctionResult { operations: vec![] });
     }
-}
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let input: Input = serde_json::from_reader(std::io::BufReader::new(std::io::stdin()))?;
-    let mut out = std::io::stdout();
-    let mut serializer = serde_json::Serializer::new(&mut out);
-    function(input)?.serialize(&mut serializer)?;
-    Ok(())
-}
-
-fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
     let delivery_options = delivery_options(&input.cart);
-    let delivery_option_title = input.configuration().delivery_option_title;
     let operations = delivery_options
         .iter()
         .filter_map(|delivery_option| {
-            if &delivery_option_title == &delivery_option.title.as_str() {
-                Some(Operation {
-                    r#move: Some(MoveOperation {
+            if title_to_move.as_ref().unwrap() == delivery_option.title.as_ref().unwrap().as_str() {
+                Some(output::Operation {
+                    move_: Some(output::MoveOperation {
                         delivery_option_handle: delivery_option.handle.clone(),
-                        index: delivery_options.len() as i32 - 1,
+                        index: delivery_options.len() as i64 - 1,
                     }),
+                    hide: None,
+                    rename: None,
                 })
             } else {
                 None
@@ -47,10 +36,12 @@ fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> 
         })
         .collect();
 
-    Ok(FunctionResult { operations })
+    Ok(output::FunctionResult { operations })
 }
 
-fn delivery_options(cart: &Cart) -> Vec<&CartDeliveryOption> {
+fn delivery_options(
+    cart: &input::InputCart,
+) -> Vec<&input::InputCartDeliveryGroupsDeliveryOptions> {
     cart.delivery_groups
         .iter()
         .flat_map(|delivery_group| &delivery_group.delivery_options)
@@ -58,67 +49,4 @@ fn delivery_options(cart: &Cart) -> Vec<&CartDeliveryOption> {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    fn input(delivery_option_title: Option<String>) -> Input {
-        let input = r#"
-        {
-            "cart": {
-                "deliveryGroups": [
-                    {
-                        "deliveryOptions": [
-                            { "handle": "method-a", "title": "Method A" }
-                        ]
-                    },
-                    {
-                        "deliveryOptions": [
-                            { "handle": "method-b", "title": "Method B" },
-                            { "handle": "method-c", "title": "Method C" }
-                        ]
-                    }
-                ]
-            },
-            "deliveryCustomization": {
-                "metafield": null
-            },
-            "localization": {
-                "country": { "isoCode": "CA" },
-                "language": { "isoCode": "EN" }
-            },
-            "presentmentCurrencyRate": "2.0"
-        }
-        "#;
-        let default_input: Input = serde_json::from_str(input).unwrap();
-        let metafield = delivery_option_title.map(|value| Metafield { value });
-
-        Input {
-            delivery_customization: DeliveryCustomization { metafield },
-            ..default_input
-        }
-    }
-
-    #[test]
-    fn test_with_no_configuration() {
-        let input = input(None);
-        let operations = function(input).unwrap().operations;
-
-        assert!(operations.is_empty());
-    }
-
-    #[test]
-    fn test_move_operations_with_configuration() {
-        let input = input(Some("Method A".to_string()));
-        let operations = function(input).unwrap().operations;
-
-        assert_eq!(operations.len(), 1);
-        assert_eq!(
-            operations[0]
-                .r#move
-                .as_ref()
-                .unwrap()
-                .delivery_option_handle,
-            "method-a"
-        );
-        assert_eq!(operations[0].r#move.as_ref().unwrap().index, 2);
-    }
-}
+mod tests;

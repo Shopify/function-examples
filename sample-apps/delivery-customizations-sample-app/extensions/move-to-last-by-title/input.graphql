@@ -1,0 +1,15 @@
+query Input {
+  cart {
+    deliveryGroups {
+      deliveryOptions {
+        handle
+        title
+      }
+    }
+  }
+  deliveryCustomization {
+    metafield(namespace: "delivery-customizations-sample-app", key: "function-configuration") {
+      value
+    }
+  }
+}
