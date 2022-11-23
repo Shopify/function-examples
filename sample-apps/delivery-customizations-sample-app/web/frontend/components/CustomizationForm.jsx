@@ -33,7 +33,6 @@ export function CustomizationForm({
           <TextField
             type="text"
             label="Delivery Option Name"
-            helpText="Will match the delivery option name exactly."
             autoComplete="off"
             value={deliveryOptionName}
             onChange={(value) => handleInputChange(value, "deliveryOptionName")}

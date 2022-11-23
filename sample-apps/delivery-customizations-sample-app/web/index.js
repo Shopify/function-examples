@@ -22,8 +22,8 @@ const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
 const METAFIELD = {
-  namespace: "sample-delivery-customization-hide",
-  key: "sample-function-configuration",
+  namespace: "delivery-customizations-sample-app",
+  key: "function-configuration",
 };
 
 Shopify.Context.initialize({
@@ -70,22 +70,6 @@ const BILLING_SETTINGS = {
 // More details can be found on shopify.dev:
 // https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
 setupGDPRWebHooks("/api/webhooks");
-
-// TODO: try moving to helper
-// const { SHOPIFY_HIDE_BY_TITLE_ID, SHOPIFY_RENAME_BY_TITLE_ID, SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID } = dotenv.parse(
-//   readFileSync(join(process.cwd(), "../", ".env"), "utf8")
-// );
-
-// function matchOperationToFunctionId(operation) {
-//   switch (operation) {
-//     case "hide":
-//       return SHOPIFY_HIDE_BY_TITLE_ID;
-//     case "rename":
-//       return SHOPIFY_RENAME_BY_TITLE_ID;
-//     case "move":
-//       return SHOPIFY_MOVE_TO_LAST_BY_TITLE_ID;
-//   }
-// }
 
 // export for test use only
 export async function createServer(
@@ -155,8 +139,6 @@ export async function createServer(
     try {
       const result = await executeQuery(req, res, query);
 
-      // there errors are really hidden
-      // console.log("resule of query", result.deliveryCustomizationCreate.userErrors)
       const data = reducer ? reducer(result) : result;
 
       return { status: 200, data };
@@ -175,7 +157,7 @@ export async function createServer(
       {},
       customization,
       { id: gidToId(id) },
-      JSON.parse(metafield?.value || "{}")
+      metafield
     );
   }
 
@@ -237,15 +219,14 @@ export async function createServer(
       );
 
     const { status, data } = await queryResponse(req, res, query, reducer);
-
-    const xxx = data.map((deliveryCustomization) => {
+    const deliveryCustomizationData = data.map((deliveryCustomization) => {
       return {
         ...deliveryCustomization,
         operation: matchFunctionIdToOperation(deliveryCustomization.functionId)
       }
     })
 
-    return res.status(status).send(xxx);
+    return res.status(status).send(deliveryCustomizationData);
   });
 
   // CREATE DELIVERY CUSTOMIZATION
@@ -295,14 +276,6 @@ export async function createServer(
         .send(deliveryCustomizationData);
 
     // we need the id from the customization to create the metafield
-
-    const config = {
-      deliveryOptionName: payload.deliveryOptionName,
-    }
-
-    console.log(deliveryCustomizationData)
-    console.log(config)
-
     query = {
       data: {
         query: `
@@ -319,8 +292,8 @@ export async function createServer(
             {
               ...METAFIELD,
               ownerId: deliveryCustomizationData.id,
-              type: "json",
-              value: JSON.stringify(config),
+              type: "single_line_text_field",
+              value: payload.deliveryOptionName
             },
           ],
         },
@@ -337,11 +310,10 @@ export async function createServer(
     );
 
     if (status !== 200) return res.status(status).send(metafieldData);
-
     const send = Object.assign(
       {},
       normalizeCustomization(deliveryCustomizationData),
-      JSON.parse(metafieldData?.value || "{}")
+      metafieldData
     );
 
     return res.status(200).send(send);
@@ -353,10 +325,6 @@ export async function createServer(
 
     const payload = req.body;
     const functionId = payload.functionId;
-
-    const config = {
-      deliveryOptionName: payload.deliveryOptionName,
-    }
 
     // update metafield
     let query = {
@@ -375,8 +343,8 @@ export async function createServer(
             {
               ...METAFIELD,
               ownerId: gid,
-              type: "json",
-              value: JSON.stringify(config),
+              type: "single_line_text_field",
+              value: payload.deliveryOptionName,
             },
           ],
         },

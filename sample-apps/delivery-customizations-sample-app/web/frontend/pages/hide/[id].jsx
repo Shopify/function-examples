@@ -40,7 +40,7 @@ export default function DeliveryCustomizationDetailPage() {
   useEffect(() => {
     if (!data) return;
 
-    const { deliveryOptionName, enabled, title, operation } = data;
+    const { value: deliveryOptionName, enabled, title, operation } = data;
 
     setData({
       deliveryOptionName,
@@ -65,6 +65,7 @@ export default function DeliveryCustomizationDetailPage() {
       loading={isLoading}
       actionProps={primaryAction}
       isEditing={true}
+      subtitle="Any delivery option matching this name exactly will be hidden."
     >
       <CustomizationForm
         {...formData}

@@ -43,7 +43,7 @@ export default function NewDeliveryCustomizationPage() {
       title={`Hide Delivery Option`}
       loading={isLoading}
       actionProps={primaryAction}
-      subtitle="Hides the delivery option."
+      subtitle="Any delivery option matching this name exactly will be hidden."
     >
       <CustomizationForm
         {...formData}

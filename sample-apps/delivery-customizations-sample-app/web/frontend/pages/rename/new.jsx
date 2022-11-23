@@ -43,7 +43,7 @@ export default function NewDeliveryCustomizationPage() {
       title={`Rename delivery option`}
       loading={isLoading}
       actionProps={primaryAction}
-      subtitle="Renames the delivery option."
+      subtitle="Any delivery option matching this name exactly will be renamed."
     >
       <CustomizationForm
         {...formData}

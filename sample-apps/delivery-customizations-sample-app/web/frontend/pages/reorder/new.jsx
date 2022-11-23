@@ -43,7 +43,7 @@ export default function NewDeliveryCustomizationPage() {
       title={`Reorder delivery option`}
       loading={isLoading}
       actionProps={primaryAction}
-      subtitle="Moves the delivery option to the last position."
+      subtitle="Any delivery option matching this name exactly will be moved to the last position."
     >
       <CustomizationForm
         {...formData}
