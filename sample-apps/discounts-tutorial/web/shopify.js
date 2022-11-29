@@ -1,24 +1,18 @@
-import "@shopify/shopify-api/adapters/node";
-import { shopifyApi, LATEST_API_VERSION } from "@shopify/shopify-api";
+import { LogSeverity, LATEST_API_VERSION } from "@shopify/shopify-api";
+import { shopifyApp } from "@shopify/shopify-app-express";
+import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
 let { restResources } = await import(
   `@shopify/shopify-api/rest/admin/${LATEST_API_VERSION}`
 );
 
-const apiConfig = {
-  apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  scopes: process.env.SCOPES.split(","),
-  hostName: process.env.HOST.replace(/https?:\/\//, ""),
-  hostScheme: process.env.HOST.split("://")[0],
-  apiVersion: LATEST_API_VERSION,
-  isEmbeddedApp: true,
-  ...(process.env.SHOP_CUSTOM_DOMAIN && {
-    customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN],
-  }),
-  userAgentPrefix: `Discounts Tutorial App Template`,
-  billing: undefined,
-  restResources,
-};
+const DB_PATH = `${process.cwd()}/database.sqlite`;
 
-const shopify = shopifyApi(apiConfig);
+const shopify = shopifyApp({
+  api: {
+    restResources,
+  },
+  // This should be replaced with your preferred storage strategy
+  sessionStorage: new SQLiteSessionStorage(DB_PATH),
+});
+
 export default shopify;
