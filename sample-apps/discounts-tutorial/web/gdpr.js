@@ -1,34 +1,38 @@
-import { Shopify } from "@shopify/shopify-api";
+import { DeliveryMethod } from "@shopify/shopify-api";
+import shopify from "./shopify.js";
 
-export function setupGDPRWebHooks(path) {
+export async function setupGDPRWebHooks(path) {
   /**
    * Customers can request their data from a store owner. When this happens,
    * Shopify invokes this webhook.
    *
    * https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks#customers-data_request
    */
-  Shopify.Webhooks.Registry.addHandler("CUSTOMERS_DATA_REQUEST", {
-    path,
-    webhookHandler: async (topic, shop, body) => {
-      const payload = JSON.parse(body);
-      // Payload has the following shape:
-      // {
-      //   "shop_id": 954889,
-      //   "shop_domain": "{shop}.myshopify.com",
-      //   "orders_requested": [
-      //     299938,
-      //     280263,
-      //     220458
-      //   ],
-      //   "customer": {
-      //     "id": 191167,
-      //     "email": "john@example.com",
-      //     "phone": "555-625-1199"
-      //   },
-      //   "data_request": {
-      //     "id": 9999
-      //   }
-      // }
+  await shopify.webhooks.addHandlers({
+    CUSTOMERS_DATA_REQUEST: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: path,
+      callback: async (topic, shop, body) => {
+        const payload = JSON.parse(body);
+        // Payload has the following shape:
+        // {
+        //   "shop_id": 954889,
+        //   "shop_domain": "{shop}.myshopify.com",
+        //   "orders_requested": [
+        //     299938,
+        //     280263,
+        //     220458
+        //   ],
+        //   "customer": {
+        //     "id": 191167,
+        //     "email": "john@example.com",
+        //     "phone": "555-625-1199"
+        //   },
+        //   "data_request": {
+        //     "id": 9999
+        //   }
+        // }
+      },
     },
   });
 
@@ -38,25 +42,28 @@ export function setupGDPRWebHooks(path) {
    *
    * https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks#customers-redact
    */
-  Shopify.Webhooks.Registry.addHandler("CUSTOMERS_REDACT", {
-    path,
-    webhookHandler: async (topic, shop, body) => {
-      const payload = JSON.parse(body);
-      // Payload has the following shape:
-      // {
-      //   "shop_id": 954889,
-      //   "shop_domain": "{shop}.myshopify.com",
-      //   "customer": {
-      //     "id": 191167,
-      //     "email": "john@example.com",
-      //     "phone": "555-625-1199"
-      //   },
-      //   "orders_to_redact": [
-      //     299938,
-      //     280263,
-      //     220458
-      //   ]
-      // }
+  await shopify.webhooks.addHandlers({
+    CUSTOMERS_REDACT: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: path,
+      callback: async (topic, shop, body) => {
+        const payload = JSON.parse(body);
+        // Payload has the following shape:
+        // {
+        //   "shop_id": 954889,
+        //   "shop_domain": "{shop}.myshopify.com",
+        //   "customer": {
+        //     "id": 191167,
+        //     "email": "john@example.com",
+        //     "phone": "555-625-1199"
+        //   },
+        //   "orders_to_redact": [
+        //     299938,
+        //     280263,
+        //     220458
+        //   ]
+        // }
+      },
     },
   });
 
@@ -66,15 +73,18 @@ export function setupGDPRWebHooks(path) {
    *
    * https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks#shop-redact
    */
-  Shopify.Webhooks.Registry.addHandler("SHOP_REDACT", {
-    path,
-    webhookHandler: async (topic, shop, body) => {
-      const payload = JSON.parse(body);
-      // Payload has the following shape:
-      // {
-      //   "shop_id": 954889,
-      //   "shop_domain": "{shop}.myshopify.com"
-      // }
+  await shopify.webhooks.addHandlers({
+    SHOP_REDACT: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: path,
+      callback: async (topic, shop, body) => {
+        const payload = JSON.parse(body);
+        // Payload has the following shape:
+        // {
+        //   "shop_id": 954889,
+        //   "shop_domain": "{shop}.myshopify.com"
+        // }
+      },
     },
   });
 }
