@@ -18,7 +18,6 @@ async function expandLiquidTemplates(template, liquidData) {
 
   for (const entry of entries) {
     const engine = new Liquid();
-    const content = await fs.readFile(entry, "utf8");
     const rendered = await engine.renderFile(entry, liquidData);
     const outputPath = entry.replace(".liquid", "");
     await fs.writeFile(outputPath, rendered);
@@ -53,45 +52,7 @@ async function expandAppLiquidTemplates(appDir) {
   }
 }
 
-async function directoryNames(parentPath) {
-  return (await fs.readdir(parentPath, { withFileTypes: true }))
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
-}
-
-async function expandExtensionLiquidTemplates(domainName) {
-  console.log(`Expanding liquid templates for ${domainName}`);
-  const domainPath = path.join(process.cwd(), domainName);
-
-  const langNames = await directoryNames(domainPath);
-  for (const langName of langNames) {
-    const langPath = path.join(domainPath, langName);
-    const extensionTypeNames = await directoryNames(langPath);
-
-    for (const extensionTypeName of extensionTypeNames) {
-      const extensionTypePath = path.join(langPath, extensionTypeName);
-      const templateNames = await directoryNames(extensionTypePath);
-
-      for (const templateName of templateNames) {
-        const templatePath = path.join(extensionTypePath, templateName);
-        const liquidData = {
-          name: templateName,
-          extensionType: extensionTypeName.replaceAll('-', '_'),
-        };
-
-        await expandLiquidTemplates(templatePath, liquidData);
-      }
-    }
-  }
-  console.log();
-}
-
 const SAMPLE_APP_DIR = 'sample-apps';
 await expandAppLiquidTemplates(SAMPLE_APP_DIR);
-
-const DOMAINS = ['checkout', 'discounts'];
-for (const domain of DOMAINS) {
-  await expandExtensionLiquidTemplates(domain);
-}
 
 console.log('The above files should be added to .gitignore if they have not already been added.');
