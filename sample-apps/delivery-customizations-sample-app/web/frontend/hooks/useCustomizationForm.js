@@ -1,21 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+const INITIAL_DATA = {value: "Express"}
 
 export function useCustomizationForm(props) {
-  const {
-    initialData = {
-      deliveryOptionName: "Express",
-    },
-  } = props || {};
 
-  const [data, setData] = useState(initialData);
+  const initialData = props || INITIAL_DATA;
+
+  const [data, setData] = useState({value: props?.deliveryOptionName || INITIAL_DATA.value});
 
   const handleInputChange = ({ value, name }) => {
     setData((cur) => ({ ...cur, [name]: value }));
   };
 
-  const hasChanged = Object.keys(data).some(
+  const hasChanged = useMemo(() => {
+    return Object.keys(initialData).some(
     (key) => data[key] !== initialData[key]
-  );
+  )}, [data]);
 
   return {
     data,

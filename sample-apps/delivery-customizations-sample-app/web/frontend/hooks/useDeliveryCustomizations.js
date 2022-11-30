@@ -5,7 +5,5 @@ export function useDeliveryCustomizations() {
     url: "/api/delivery-customizations",
   });
 
-  console.log(result)
-
   return result;
 }

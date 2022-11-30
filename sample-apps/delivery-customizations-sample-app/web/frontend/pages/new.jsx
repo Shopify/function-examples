@@ -1,6 +1,6 @@
 import { Page, Card, ResourceList, ResourceItem } from "@shopify/polaris";
 
-export default function HomePage() {
+export default function NewCustomizationPage() {
   return (
     <Page
       title="Create Customization"
@@ -8,7 +8,10 @@ export default function HomePage() {
     >
       <Card>
         <ResourceList
-          resourceName={{ singular: "customer", plural: "customers" }}
+          resourceName={{
+            singular: "customization template",
+            plural: "customization templates",
+          }}
           items={[
             {
               title: "Hide Delivery Option",
@@ -23,14 +26,12 @@ export default function HomePage() {
               operation: "reorder",
             },
           ]}
-          renderItem={(deliveryCustomization) => {
-            const { title, functionId, operation } = deliveryCustomization;
-
+          renderItem={({ title, functionId, operation }) => {
             return (
               <ResourceItem
                 id={functionId}
                 url={`/${operation}/new`}
-                accessibilityLabel={`Create delivery customization ${title}`}
+                accessibilityLabel={`Create ${operation} delivery customization template`}
               >
                 {title}
               </ResourceItem>

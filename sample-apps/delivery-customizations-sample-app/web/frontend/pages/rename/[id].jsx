@@ -13,11 +13,17 @@ import {
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
   const { data, isFetching } = useDeliveryCustomization({
     id,
   });
+
+  const {
+    handleInputChange,
+    setData,
+    data: formData,
+    hasChanged,
+  } = useCustomizationForm({ deliveryOptionName: data?.value });
 
   const { mutateAsync: updateCustomization, isLoading } =
     useUpdateDeliveryCustomization({
@@ -51,7 +57,7 @@ export default function DeliveryCustomizationDetailPage() {
   }, [data]);
 
   const primaryAction = {
-    disabled,
+    disabled: disabled || !hasChanged,
     onAction: handleSubmit,
   };
 
@@ -61,11 +67,11 @@ export default function DeliveryCustomizationDetailPage() {
 
   return (
     <CustomizationPageLayout
-      title={data?.title || ""}
+      title="Rename delivery option"
       loading={isLoading}
       actionProps={primaryAction}
       isEditing={true}
-      subtitle="Any delivery option matching this name exactly will be renamed."
+      subtitle="Any delivery option matching this name exactly will have 'renamed' appended to it"
     >
       <CustomizationForm
         {...formData}
@@ -73,6 +79,7 @@ export default function DeliveryCustomizationDetailPage() {
         disabled={disabled}
         onSubmit={handleSubmit}
         onInputChange={handleInputChange}
+        hasChanged={hasChanged}
       />
     </CustomizationPageLayout>
   );

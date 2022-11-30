@@ -9,6 +9,7 @@ export function CustomizationForm({
   onInputChange,
   loading,
   disabled,
+  hasChanged,
   ...props
 }) {
   const handleSubmit = () => {
@@ -40,7 +41,12 @@ export function CustomizationForm({
             requiredIndicator
           />
         </FormLayout.Group>
-        <Button submit primary loading={loading}>
+        <Button
+          submit
+          primary
+          loading={loading}
+          disabled={!isNewCustomization && !hasChanged}
+        >
           Save Customization
         </Button>
       </FormLayout>

@@ -9,7 +9,6 @@ import {
 
 export default function NewDeliveryCustomizationPage() {
   const navigate = useNavigate();
-  const isNewCustomization = window.location.href.indexOf("new") > -1;
 
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
@@ -40,14 +39,14 @@ export default function NewDeliveryCustomizationPage() {
 
   return (
     <CustomizationPageLayout
-      title={`Hide Delivery Option`}
+      title="Hide Delivery Option"
       loading={isLoading}
       actionProps={primaryAction}
       subtitle="Any delivery option matching this name exactly will be hidden."
     >
       <CustomizationForm
         {...formData}
-        isNewCustomization={isNewCustomization}
+        isNewCustomization={true}
         loading={isLoading}
         disabled={isLoading}
         onSubmit={handleSubmit}
