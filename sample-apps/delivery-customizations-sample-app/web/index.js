@@ -1,9 +1,8 @@
-import { join, normalize } from "path";
+import { join } from "path";
 import { readFileSync } from "fs";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { Shopify } from "@shopify/shopify-api";
-import dotenv from "dotenv";
 
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
@@ -11,23 +10,19 @@ import { setupGDPRWebHooks } from "./gdpr.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { AppInstallations } from "./app_installations.js";
 import { gidToId, idToGid } from "./helpers/gid.js";
+import {matchOperationToFunctionId, matchFunctionIdToOperation} from "./helpers/match-operation-to-functionId.js"
 
 const USE_ONLINE_TOKENS = false;
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
-// TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
 const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
-const { SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID } = dotenv.parse(
-  readFileSync(join(process.cwd(), "../", ".env"), "utf8")
-);
-
 const METAFIELD = {
-  namespace: "payment-customization-hide",
+  namespace: "delivery-customizations-sample-app",
   key: "function-configuration",
 };
 
@@ -41,8 +36,14 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
-  CUSTOM_SHOP_DOMAINS: ['[a-zA-Z0-9-_\\.]+\\.spin\\.dev']
+  CUSTOM_SHOP_DOMAINS: ['[a-zA-Z0-9-_\\.]+\\.spin\\.dev'],
 });
+
+// NOTE: If you choose to implement your own storage strategy using
+// Shopify.Session.CustomSessionStorage, you MUST implement the optional
+// findSessionsByShopCallback and deleteSessionsCallback methods.  These are
+// required for the app_installations.js component in this template to
+// work properly.
 
 Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
   path: "/api/webhooks",
@@ -103,7 +104,6 @@ export async function createServer(
 
   // All endpoints after this point will require an active session
   app.use(express.json());
-
   app.use(
     "/api/*",
     verifyRequest(app, {
@@ -136,7 +136,6 @@ export async function createServer(
   async function queryResponse(req, res, query, reducer) {
     if (!req || !res || !query)
       throw new Error("queryResponse: missing required argument");
-
     try {
       const result = await executeQuery(req, res, query);
 
@@ -158,17 +157,51 @@ export async function createServer(
       {},
       customization,
       { id: gidToId(id) },
-      JSON.parse(metafield?.value || "{}")
+      metafield
     );
   }
 
-  app.get("/api/payment-customizations", async (req, res) => {
+  // GET DELIVERY CUSTOMIZATION
+  app.get("/api/delivery-customization/:id", async (req, res) => {
+    const gid = idToGid(req.params.id);
+
+    const query = {
+      data: {
+        query: `
+          query DeliveryCustomization($id: ID!) {
+            deliveryCustomization(id: $id) {
+              id
+              enabled
+              title
+              metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                value
+              }
+            }
+          }
+        `,
+        variables: {
+          id: gid,
+        },
+      },
+    };
+
+    const reducer = ({ deliveryCustomization }) =>
+      normalizeCustomization(deliveryCustomization);
+
+    const { status, data } = await queryResponse(req, res, query, reducer);
+
+    return res.status(status).send(data);
+  });
+
+  // GET DELIVERY CUSTOMIZATIONS
+  app.get("/api/delivery-customizations", async (req, res) => {
     const query = {
       data: `{
-        paymentCustomizations(first: 50) {
+        deliveryCustomizations(first: 50) {
           edges {
             node {
               id
+              functionId
               title
               enabled
               metafield(namespace: "${METAFIELD.namespace}", key:"${METAFIELD.key}") {
@@ -180,54 +213,67 @@ export async function createServer(
       }`,
     };
 
-    const reducer = ({ paymentCustomizations }) =>
-      paymentCustomizations.edges.map(({ node }) =>
+    const reducer = ({ deliveryCustomizations }) =>
+    deliveryCustomizations.edges.map(({ node }) =>
         normalizeCustomization(node)
       );
 
     const { status, data } = await queryResponse(req, res, query, reducer);
+    const deliveryCustomizationData = data.map((deliveryCustomization) => {
+      return {
+        ...deliveryCustomization,
+        operation: matchFunctionIdToOperation(deliveryCustomization.functionId)
+      }
+    })
 
-    return res.status(status).send(data);
+    return res.status(status).send(deliveryCustomizationData);
   });
 
-  app.post("/api/payment-customizations", async (req, res) => {
+  // CREATE DELIVERY CUSTOMIZATION
+  app.post("/api/delivery-customization", async (req, res) => {
+    const functionId = matchOperationToFunctionId(req.body.operation);
     const payload = req.body;
 
     let query = {
       data: {
         query: `
-            mutation PaymentCustomization($input: PaymentCustomizationInput!) {
-              paymentCustomizationCreate(paymentCustomization: $input) {
-                paymentCustomization {
-                  id
-                  title
-                  enabled
-                }
+          mutation DeliveryCustomization($deliveryCustomization: DeliveryCustomizationInput!) {
+            deliveryCustomizationCreate(deliveryCustomization: $deliveryCustomization) {
+              userErrors {
+                code
+                message
+                field
+              }
+              deliveryCustomization {
+                functionId
+                id
+                title
               }
             }
-          `,
+          }
+        `,
         variables: {
-          input: {
-            functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
-            title: `Hide ${payload.paymentMethod} if cart subtotal is bigger than ${payload.cartSubtotal}`,
+          deliveryCustomization: {
+            functionId: functionId,
+            title: `${payload.operation} delivery option`,
             enabled: true,
           },
         },
       },
     };
 
-    let reducer = ({ paymentCustomizationCreate }) =>
-      paymentCustomizationCreate.paymentCustomization;
+    let reducer = ({ deliveryCustomizationCreate }) =>
+      deliveryCustomizationCreate.deliveryCustomization;
 
     const {
-      status: paymentCustomizationStatus,
-      data: paymentCustomizationData,
+      status: deliveryCustomizationStatus,
+      data: deliveryCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
-    if (paymentCustomizationStatus !== 200)
+    if (deliveryCustomizationStatus !== 200)
       return res
-        .status(paymentCustomizationStatus)
-        .send(paymentCustomizationData);
+        .status(deliveryCustomizationStatus)
+        .send(deliveryCustomizationData);
 
     // we need the id from the customization to create the metafield
     query = {
@@ -245,9 +291,9 @@ export async function createServer(
           metafields: [
             {
               ...METAFIELD,
-              ownerId: paymentCustomizationData.id,
-              type: "json",
-              value: JSON.stringify(payload),
+              ownerId: deliveryCustomizationData.id,
+              type: "single_line_text_field",
+              value: payload.deliveryOptionName
             },
           ],
         },
@@ -264,53 +310,95 @@ export async function createServer(
     );
 
     if (status !== 200) return res.status(status).send(metafieldData);
-
     const send = Object.assign(
       {},
-      normalizeCustomization(paymentCustomizationData),
-      JSON.parse(metafieldData?.value || "{}")
+      normalizeCustomization(deliveryCustomizationData),
+      metafieldData
     );
 
     return res.status(200).send(send);
   });
 
-  app.get("/api/payment-customizations/:id", async (req, res) => {
+  // UPDATE DELIVERY CUSTOMIZATION
+  app.put("/api/delivery-customization/:id", async (req, res) => {
     const gid = idToGid(req.params.id);
 
-    const query = {
+    const payload = req.body;
+    const functionId = payload.functionId;
+
+    // update metafield
+    let query = {
       data: {
         query: `
-          query PaymentCustomization($id: ID!) {
-            paymentCustomization(id: $id) {
-              id
-              enabled
-              title
-              metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+          mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
+            metafieldsSet(metafields: $metafields) {
+              metafields {
                 value
               }
             }
           }
         `,
         variables: {
-          id: gid,
+          metafields: [
+            {
+              ...METAFIELD,
+              ownerId: gid,
+              type: "single_line_text_field",
+              value: payload.deliveryOptionName,
+            },
+          ],
         },
       },
     };
 
-    const reducer = ({ paymentCustomization }) =>
-      normalizeCustomization(paymentCustomization);
+    const { status: metafieldStatus, data: metafieldData } =
+      await queryResponse(req, res, query);
+
+    if (metafieldStatus !== 200)
+      return res.status(metafieldStatus).send(metafieldData);
+
+    query = {
+      data: {
+        query: `
+          mutation DeliveryCustomizationUpdate($id: ID!, $deliveryCustomization: DeliveryCustomizationInput!) {
+            deliveryCustomizationUpdate(id: $id, deliveryCustomization: $deliveryCustomization) {
+              deliveryCustomization {
+                id
+                title
+                enabled
+                metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                  value
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          id: gid,
+          deliveryCustomization: {
+            functionId: functionId,
+            title: `${payload.operation} delivery option`,
+            enabled: payload.enabled,
+          },
+        },
+      },
+    };
+
+    const reducer = ({ deliveryCustomizationUpdate }) =>
+      normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
 
     const { status, data } = await queryResponse(req, res, query, reducer);
 
     return res.status(status).send(data);
   });
 
-  app.delete("/api/payment-customizations/:id", async (req, res) => {
+  // DELETE DELVIERY CUSTOMIZATION
+  app.delete("/api/delivery-customization/:id", async (req, res) => {
     let query = {
       data: {
         query: `
-          query PaymentCustomization($id: ID!) {
-            paymentCustomization(id: $id) {
+          query DeliveryCustomization($id: ID!) {
+            deliveryCustomization(id: $id) {
               id
               metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
                 id
@@ -324,7 +412,7 @@ export async function createServer(
       },
     };
 
-    let reducer = ({ paymentCustomization }) => paymentCustomization;
+    let reducer = ({ deliveryCustomization }) => deliveryCustomization;
 
     let { status: customizationStatus, data: customizationData } =
       await queryResponse(req, res, query, reducer);
@@ -361,8 +449,8 @@ export async function createServer(
     query = {
       data: {
         query: `
-          mutation PaymentCustomizationDelete($id: ID!) {
-            paymentCustomizationDelete(id: $id) {
+          mutation DeliveryCustomizationDelete($id: ID!) {
+            deliveryCustomizationDelete(id: $id) {
               deletedId
             }
           }
@@ -380,75 +468,8 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  app.put("/api/payment-customizations/:id", async (req, res) => {
-    const payload = req.body;
-    const gid = idToGid(req.params.id);
-
-    // update metafield
-    let query = {
-      data: {
-        query: `
-          mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
-            metafieldsSet(metafields: $metafields) {
-              metafields {
-                value
-              }
-            }
-          }
-        `,
-        variables: {
-          metafields: [
-            {
-              ...METAFIELD,
-              ownerId: gid,
-              type: "json",
-              value: JSON.stringify(payload),
-            },
-          ],
-        },
-      },
-    };
-
-    const { status: metafieldStatus, data: metafieldData } =
-      await queryResponse(req, res, query);
-
-    if (metafieldStatus !== 200)
-      return res.status(metafieldStatus).send(metafieldData);
-
-    query = {
-      data: {
-        query: `
-          mutation PaymentCustomizationUpdate($id: ID!, $input: PaymentCustomizationInput!) {
-            paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
-              paymentCustomization {
-                id
-                title
-                enabled
-                metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
-                  value
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          id: gid,
-          input: {
-            functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
-            title: `Hide ${payload.paymentMethod} if cart subtotal is bigger than ${payload.cartSubtotal}`,
-            enabled: true,
-          },
-        },
-      },
-    };
-
-    const reducer = ({ paymentCustomizationUpdate }) =>
-      normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
-
-    const { status, data } = await queryResponse(req, res, query, reducer);
-
-    return res.status(status).send(data);
-  });
+  // All endpoints after this point will have access to a request.body
+  // attribute, as a result of the express.json() middleware
 
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);

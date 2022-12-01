@@ -1,0 +1,31 @@
+{
+  "cart": {
+    "deliveryGroups": [
+      {
+        "deliveryOptions": [
+          {
+            "handle": "31159e27cbc00b85a376a92a7ba3ba06-d221ab9b3cf7900f203c760f0430af6a",
+            "title": "Expedited Parcel"
+          },
+          {
+            "handle": "31159e27cbc00b85a376a92a7ba3ba06-bd3f9571a5666162c6625823b92f6340",
+            "title": "Xpresspost"
+          },
+          {
+            "handle": "31159e27cbc00b85a376a92a7ba3ba06-f5395fdb26e0d022908d71c014de3959",
+            "title": "Expresso"
+          },
+          {
+            "handle": "31159e27cbc00b85a376a92a7ba3ba06-f4f7ffe6bdf23c8cf3adfe7b373290b9",
+            "title": "Priority"
+          }
+        ]
+      }
+    ]
+  },
+  "deliveryCustomization": {
+    "metafield": {
+      "value": "Expresso"
+    }
+  }
+}

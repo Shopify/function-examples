@@ -1,5 +1,5 @@
 {
-  "name": "payment-customization-sample",
+  "name": "delivery-customization-sample",
   "version": "1.0.0",
   "main": "web/index.js",
   "license": "UNLICENSED",
@@ -12,8 +12,9 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
-    "@shopify/app": "3.14.0",
-    "@shopify/cli": "3.14.0"
+    "@shopify/app": "3.22.1",
+    "@shopify/cli": "3.22.1",
+    "dotenv": "^16.0.3"
   },
-  "author": "marlonmarcello"
+  "author": "med"
 }
