@@ -16,9 +16,6 @@ It also provides a [Shopify Function](https://shopify.dev/api/functions) that al
   - On Windows, Rust requires the [Microsoft C++ Build Tools](https://docs.microsoft.com/en-us/windows/dev-environment/rust/setup). Be sure to select the _Desktop development with C++_ workload when installing them.
 - Install [`cargo-wasi`](https://bytecodealliance.github.io/cargo-wasi/)
   - `cargo install cargo-wasi`
-- On M1 Macs, you'll also need to install the Binaryen toolchain separately and set the `WASM_OPT` environment variable. ([related issue](https://github.com/bytecodealliance/cargo-wasi/issues/112))
-  - `brew install binaryen`
-  - Add `export WASM_OPT=/opt/homebrew/bin/wasm-opt` to your `.bashrc` or `.zshrc`
 
 ### Before you start
 - Enable the **Bogus Gateway** payment method in your development store's admin.
