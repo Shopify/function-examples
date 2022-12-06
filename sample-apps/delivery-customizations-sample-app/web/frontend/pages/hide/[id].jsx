@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
 import NotFound from "../NotFound";
@@ -13,6 +13,8 @@ import {
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const [userErrors, setUserErrors] = useState(null);
 
   const { data, isFetching } = useDeliveryCustomization({
     id,
@@ -36,8 +38,12 @@ export default function DeliveryCustomizationDetailPage() {
     if (disabled) return;
 
     try {
-      await updateCustomization({ payload: formData });
-      navigate("/");
+      const data = await updateCustomization({ payload: formData });
+      if (data?.userErrors) {
+        setUserErrors(data.userErrors);
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -52,7 +58,7 @@ export default function DeliveryCustomizationDetailPage() {
       deliveryOptionName,
       enabled,
       title,
-      operation,
+      operation: "Hide",
     });
   }, [data]);
 
@@ -72,6 +78,7 @@ export default function DeliveryCustomizationDetailPage() {
       actionProps={primaryAction}
       isEditing={true}
       subtitle="Any delivery option matching this name exactly will be hidden."
+      userErrors={userErrors}
     >
       <CustomizationForm
         {...formData}

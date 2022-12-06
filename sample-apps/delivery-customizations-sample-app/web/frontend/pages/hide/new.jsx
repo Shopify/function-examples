@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
 
 import { CustomizationForm, CustomizationPageLayout } from "../../components";
@@ -10,6 +10,8 @@ import {
 export default function NewDeliveryCustomizationPage() {
   const navigate = useNavigate();
 
+  const [userErrors, setUserErrors] = useState(null);
+
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
   const { mutateAsync: createCustomization, isLoading } =
@@ -18,8 +20,12 @@ export default function NewDeliveryCustomizationPage() {
   const handleSubmit = async () => {
     if (isLoading) return;
     try {
-      await createCustomization({ payload: formData });
-      navigate("/");
+      const data = await createCustomization({ payload: formData });
+      if (data?.userErrors) {
+        setUserErrors(data.userErrors);
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -43,6 +49,7 @@ export default function NewDeliveryCustomizationPage() {
       loading={isLoading}
       actionProps={primaryAction}
       subtitle="Any delivery option matching this name exactly will be hidden."
+      userErrors={userErrors}
     >
       <CustomizationForm
         {...formData}

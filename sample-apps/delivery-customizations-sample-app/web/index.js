@@ -138,8 +138,8 @@ export async function createServer(
       throw new Error("queryResponse: missing required argument");
     try {
       const result = await executeQuery(req, res, query);
-
       const data = reducer ? reducer(result) : result;
+
 
       return { status: 200, data };
     } catch (err) {
@@ -152,7 +152,9 @@ export async function createServer(
     }
   }
 
-  function normalizeCustomization({ id, metafield, ...customization }) {
+  function normalizeCustomization(data) {
+    const { id, metafield, ...customization } = data;
+
     return Object.assign(
       {},
       customization,
@@ -219,6 +221,7 @@ export async function createServer(
       );
 
     const { status, data } = await queryResponse(req, res, query, reducer);
+
     const deliveryCustomizationData = data.map((deliveryCustomization) => {
       return {
         ...deliveryCustomization,
@@ -254,7 +257,7 @@ export async function createServer(
         `,
         variables: {
           deliveryCustomization: {
-            functionId: functionId,
+            functionId,
             title: `${payload.operation} delivery option`,
             enabled: true,
           },
@@ -263,17 +266,18 @@ export async function createServer(
     };
 
     let reducer = ({ deliveryCustomizationCreate }) =>
-      deliveryCustomizationCreate.deliveryCustomization;
+      deliveryCustomizationCreate;
 
     const {
       status: deliveryCustomizationStatus,
       data: deliveryCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
-    if (deliveryCustomizationStatus !== 200)
+    if (deliveryCustomizationStatus !== 200 || deliveryCustomizationData?.userErrors.length > 0) {
       return res
         .status(deliveryCustomizationStatus)
         .send(deliveryCustomizationData);
+    }
 
     // we need the id from the customization to create the metafield
     query = {
@@ -291,7 +295,7 @@ export async function createServer(
           metafields: [
             {
               ...METAFIELD,
-              ownerId: deliveryCustomizationData.id,
+              ownerId: deliveryCustomizationData.deliveryCustomization.id,
               type: "single_line_text_field",
               value: payload.deliveryOptionName
             },
@@ -324,7 +328,7 @@ export async function createServer(
     const gid = idToGid(req.params.id);
 
     const payload = req.body;
-    const functionId = payload.functionId;
+    const functionId = matchOperationToFunctionId(payload.operation);
 
     // update metafield
     let query = {
@@ -354,8 +358,16 @@ export async function createServer(
     const { status: metafieldStatus, data: metafieldData } =
       await queryResponse(req, res, query);
 
-    if (metafieldStatus !== 200)
-      return res.status(metafieldStatus).send(metafieldData);
+    if (metafieldStatus !== 200 || metafieldData.error){
+      // A bit odd here, metafields errors return data like: {error: { errors: []  }}
+      // but this would break if that ever changes, so just simplified it: WDYT?
+      return res.status(metafieldStatus).send({
+        userErrors: [{
+          message: "There was an error setting the metafield"
+        }],
+        ...metafieldData
+      });
+    }
 
     query = {
       data: {
@@ -376,7 +388,7 @@ export async function createServer(
         variables: {
           id: gid,
           deliveryCustomization: {
-            functionId: functionId,
+            functionId,
             title: `${payload.operation} delivery option`,
             enabled: payload.enabled,
           },
@@ -388,7 +400,7 @@ export async function createServer(
       normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
 
     const { status, data } = await queryResponse(req, res, query, reducer);
-
+    
     return res.status(status).send(data);
   });
 
