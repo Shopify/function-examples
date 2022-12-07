@@ -54,14 +54,7 @@ export function CustomizationPageLayout({
         userErrors={userErrors}
         {...props}
       >
-        <Layout>
-          {bannerMarkup}
-          <Layout.Section>
-            <Card title="Customization">
-              <Card.Section>{children}</Card.Section>
-            </Card>
-          </Layout.Section>
-        </Layout>
+        <Layout>{children}</Layout>
       </Page>
     </Frame>
   );

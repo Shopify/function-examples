@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
 
-import { CustomizationForm, CustomizationPageLayout } from "../../components";
+import { Card, Banner, List, Layout } from "@shopify/polaris";
+
+import {
+  CustomizationForm,
+  CustomizationPageLayout,
+  ErrorsBanner,
+} from "../../components";
 import {
   useCustomizationForm,
   useCreateDeliveryCustomization,
@@ -49,16 +55,24 @@ export default function NewDeliveryCustomizationPage() {
       loading={isLoading}
       actionProps={primaryAction}
       subtitle="Any delivery option matching this name exactly will be hidden."
-      userErrors={userErrors}
     >
-      <CustomizationForm
-        {...formData}
-        isNewCustomization={true}
-        loading={isLoading}
-        disabled={isLoading}
-        onSubmit={handleSubmit}
-        onInputChange={handleInputChange}
-      />
+      <Layout.Section>
+        <ErrorsBanner userErrors={userErrors} />
+      </Layout.Section>
+      <Layout.Section>
+        <Card>
+          <Card.Section>
+            <CustomizationForm
+              {...formData}
+              isNewCustomization={true}
+              loading={isLoading}
+              disabled={isLoading}
+              onSubmit={handleSubmit}
+              onInputChange={handleInputChange}
+            />
+          </Card.Section>
+        </Card>
+      </Layout.Section>
     </CustomizationPageLayout>
   );
 }

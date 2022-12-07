@@ -3,7 +3,13 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
 import NotFound from "../NotFound";
 
-import { CustomizationForm, CustomizationPageLayout } from "../../components";
+import { Layout, Card } from "@shopify/polaris";
+
+import {
+  CustomizationForm,
+  CustomizationPageLayout,
+  ErrorsBanner,
+} from "../../components";
 import {
   useCustomizationForm,
   useDeliveryCustomization,
@@ -80,14 +86,24 @@ export default function DeliveryCustomizationDetailPage() {
       subtitle="Any delivery option matching this name exactly will have 'renamed' appended to it"
       userErrors={userErrors}
     >
-      <CustomizationForm
-        {...formData}
-        loading={disabled}
-        disabled={disabled}
-        onSubmit={handleSubmit}
-        onInputChange={handleInputChange}
-        hasChanged={hasChanged}
-      />
+      <Layout.Section>
+        <ErrorsBanner userErrors={userErrors} />
+      </Layout.Section>
+      <Layout.Section>
+        <Card>
+          <Card.Section>
+            <CustomizationForm
+              {...formData}
+              isNewCustomization={true}
+              loading={isLoading}
+              disabled={isLoading}
+              onSubmit={handleSubmit}
+              onInputChange={handleInputChange}
+              hasChanged={hasChanged}
+            />
+          </Card.Section>
+        </Card>
+      </Layout.Section>
     </CustomizationPageLayout>
   );
 }
