@@ -5,7 +5,7 @@ import { Banner, List } from "@shopify/polaris";
 export function ErrorsBanner({ userErrors }) {
   return userErrors ? (
     <Banner
-      title="There are errors with creating the customization:"
+      title="There are errors with saving the customization:"
       status="warning"
     >
       <List>

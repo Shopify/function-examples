@@ -1,12 +1,4 @@
-import {
-  Card,
-  Page,
-  Loading,
-  Frame,
-  Banner,
-  List,
-  Layout,
-} from "@shopify/polaris";
+import { Page, Loading, Frame, Layout } from "@shopify/polaris";
 
 export function CustomizationPageLayout({
   actionProps,
@@ -14,7 +6,6 @@ export function CustomizationPageLayout({
   children,
   title,
   isEditing,
-  userErrors,
   ...props
 }) {
   const defaultActionProps = {
@@ -29,21 +20,6 @@ export function CustomizationPageLayout({
 
   const url = isEditing ? "/" : "/new";
 
-  const bannerMarkup = userErrors ? (
-    <Layout.Section>
-      <Banner
-        title="There are errors with creating the customization:"
-        status="warning"
-      >
-        <List>
-          {userErrors.map((error) => (
-            <List.Item key={error.code}>{error.message}</List.Item>
-          ))}
-        </List>
-      </Banner>
-    </Layout.Section>
-  ) : null;
-
   return (
     <Frame>
       {loading && <Loading />}
@@ -51,7 +27,6 @@ export function CustomizationPageLayout({
         title={title}
         primaryAction={primaryActionProps}
         breadcrumbs={[{ content: "Customizations", url: url }]}
-        userErrors={userErrors}
         {...props}
       >
         <Layout>{children}</Layout>
