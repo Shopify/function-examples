@@ -58,7 +58,7 @@ export default function DeliveryCustomizationDetailPage() {
       deliveryOptionName,
       enabled,
       title,
-      operation,
+      operation: "Rename",
     });
   }, [data]);
 

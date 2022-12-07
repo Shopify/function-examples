@@ -138,8 +138,8 @@ export async function createServer(
       throw new Error("queryResponse: missing required argument");
     try {
       const result = await executeQuery(req, res, query);
-      const data = reducer ? reducer(result) : result;
 
+      const data = reducer ? reducer(result) : result;
 
       return { status: 200, data };
     } catch (err) {
@@ -316,7 +316,7 @@ export async function createServer(
     if (status !== 200) return res.status(status).send(metafieldData);
     const send = Object.assign(
       {},
-      normalizeCustomization(deliveryCustomizationData),
+      normalizeCustomization(deliveryCustomizationData.deliveryCustomization),
       metafieldData
     );
 
@@ -346,7 +346,7 @@ export async function createServer(
           metafields: [
             {
               ...METAFIELD,
-              ownerId: gid,
+              ownerId: "123",
               type: "single_line_text_field",
               value: payload.deliveryOptionName,
             },
@@ -398,9 +398,8 @@ export async function createServer(
 
     const reducer = ({ deliveryCustomizationUpdate }) =>
       normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
-
     const { status, data } = await queryResponse(req, res, query, reducer);
-    
+
     return res.status(status).send(data);
   });
 
