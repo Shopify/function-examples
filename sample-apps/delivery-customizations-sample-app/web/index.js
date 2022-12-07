@@ -152,9 +152,7 @@ export async function createServer(
     }
   }
 
-  function normalizeCustomization(data) {
-    const { id, metafield, ...customization } = data;
-
+  function normalizeCustomization({ id, metafield, ...customization }) {
     return Object.assign(
       {},
       customization,
@@ -273,6 +271,7 @@ export async function createServer(
       data: deliveryCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
+
     if (deliveryCustomizationStatus !== 200 || deliveryCustomizationData?.userErrors.length > 0) {
       return res
         .status(deliveryCustomizationStatus)
@@ -287,6 +286,10 @@ export async function createServer(
             metafieldsSet(metafields: $metafields) {
               metafields {
                 value
+              }
+              userErrors {
+                code
+                message
               }
             }
           }
@@ -304,7 +307,10 @@ export async function createServer(
       },
     };
 
-    reducer = ({ metafieldsSet }) => metafieldsSet.metafields[0];
+    reducer = ({ metafieldsSet }) => ({
+        metafields: metafieldsSet?.metafields[0],
+        userErrors: metafieldsSet?.userErrors
+      });
 
     const { status, data: metafieldData } = await queryResponse(
       req,
@@ -314,6 +320,16 @@ export async function createServer(
     );
 
     if (status !== 200) return res.status(status).send(metafieldData);
+
+    if (metafieldData?.userErrors.length > 0) {
+      const send = Object.assign(
+        {},
+        metafieldData
+      )
+
+      res.status(200).send(send);
+    }
+
     const send = Object.assign(
       {},
       normalizeCustomization(deliveryCustomizationData.deliveryCustomization),
@@ -339,6 +355,10 @@ export async function createServer(
               metafields {
                 value
               }
+              userErrors {
+                code
+                message
+              }
             }
           }
         `,
@@ -346,7 +366,7 @@ export async function createServer(
           metafields: [
             {
               ...METAFIELD,
-              ownerId: "123",
+              ownerId: gid,
               type: "single_line_text_field",
               value: payload.deliveryOptionName,
             },
@@ -355,18 +375,27 @@ export async function createServer(
       },
     };
 
-    const { status: metafieldStatus, data: metafieldData } =
-      await queryResponse(req, res, query);
+    let reducer = ({ metafieldsSet }) => {
+      return {
+        metafields: metafieldsSet?.metafields[0],
+        userErrors: metafieldsSet?.userErrors
+      }
+    };
 
-    if (metafieldStatus !== 200 || metafieldData.error){
-      // A bit odd here, metafields errors return data like: {error: { errors: []  }}
-      // but this would break if that ever changes, so just simplified it: WDYT?
-      return res.status(metafieldStatus).send({
-        userErrors: [{
-          message: "There was an error setting the metafield"
-        }],
-        ...metafieldData
-      });
+    const { status: metafieldStatus, data: metafieldData } =
+      await queryResponse(req, res, query, reducer);
+
+    if (metafieldStatus !== 200 ){
+      return res.status(metafieldStatus).send(metafieldData);
+    }
+
+    if (metafieldData?.userErrors.length > 0) {
+      const send = Object.assign(
+        {},
+        metafieldData
+      )
+
+      res.status(200).send(send);
     }
 
     query = {
@@ -396,7 +425,7 @@ export async function createServer(
       },
     };
 
-    const reducer = ({ deliveryCustomizationUpdate }) =>
+    reducer = ({ deliveryCustomizationUpdate }) =>
       normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
     const { status, data } = await queryResponse(req, res, query, reducer);
 

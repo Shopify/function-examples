@@ -21,7 +21,7 @@ export default function NewDeliveryCustomizationPage() {
     if (isLoading) return;
     try {
       const data = await createCustomization({ payload: formData });
-      if (data?.userErrors) {
+      if (data?.userErrors.length > 0) {
         setUserErrors(data.userErrors);
       } else {
         navigate("/");
