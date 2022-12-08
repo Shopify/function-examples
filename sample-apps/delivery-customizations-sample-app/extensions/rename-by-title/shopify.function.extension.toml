@@ -8,5 +8,5 @@ command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/delivery_customization_rename_by_title.wasm"
 
 [ui.paths]
-create = "/rename/new"
-details = "/rename/:id"
+create = "/rename/:functionId/new"
+details = "/rename/:functionId/:id"

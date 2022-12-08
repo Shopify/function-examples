@@ -89,14 +89,8 @@ export default function HomePage() {
     },
   ];
 
-  const primaryAction = {
-    content: "Create customization",
-    icon: PlusMinor,
-    url: "/new",
-  };
-
   return (
-    <Page title="Customizations" primaryAction={primaryAction}>
+    <Page title="Customizations">
       <Card>
         <IndexTable
           resourceName={resourceName}
@@ -110,7 +104,7 @@ export default function HomePage() {
           ]}
           promotedBulkActions={tableActions}
           loading={isLoading}
-          emptyState={<EmptyTable action={primaryAction} />}
+          emptyState={<EmptyTable />}
         >
           {rowMarkup}
         </IndexTable>
@@ -121,11 +115,12 @@ export default function HomePage() {
 
 function EmptyTable(props) {
   return (
-    <EmptyState heading="Hello world! 🎉" {...props}>
+    <EmptyState heading="Hello world! 🎉">
       <p>
         Welcome to the <b>Delivery Customizations Sample App</b>! To get
-        started, create a new customization.
+        started, create a new customization from <Link>here</Link>.
       </p>
+      <p>put shopify palceholder image here ?? </p>
     </EmptyState>
   );
 }
