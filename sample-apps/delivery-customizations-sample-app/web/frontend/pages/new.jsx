@@ -30,7 +30,7 @@ export default function NewCustomizationPage() {
             return (
               <ResourceItem
                 id={functionId}
-                url={`/${operation}/new`}
+                url={`/${operation}/${functionId}/new`}
                 accessibilityLabel={`Create ${operation} delivery customization template`}
               >
                 {title}

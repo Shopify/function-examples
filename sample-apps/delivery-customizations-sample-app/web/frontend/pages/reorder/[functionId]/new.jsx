@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
+import { useParams } from "react-router-dom";
 
 import { Layout, Card } from "@shopify/polaris";
 
@@ -7,14 +8,17 @@ import {
   CustomizationForm,
   CustomizationPageLayout,
   ErrorsBanner,
-} from "../../components";
+} from "../../../components";
 import {
   useCustomizationForm,
   useCreateDeliveryCustomization,
-} from "../../hooks";
+} from "../../../hooks";
 
 export default function NewDeliveryCustomizationPage() {
   const navigate = useNavigate();
+
+  const { functionId } = useParams();
+  console.log(functionId);
 
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 
@@ -46,6 +50,7 @@ export default function NewDeliveryCustomizationPage() {
     setData({
       deliveryOptionName: "Express",
       operation: "Reorder",
+      functionId,
     });
   }, []);
 

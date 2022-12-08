@@ -33,6 +33,8 @@ export default function HomePage() {
     clearSelection,
   } = useIndexResourceState(deliveryCustomizations);
 
+  console.log(deliveryCustomizations);
+
   const handleDeleteAction = async () => {
     if (isMutating) return;
 
@@ -49,7 +51,10 @@ export default function HomePage() {
   };
 
   const rowMarkup = deliveryCustomizations.map(
-    ({ id, enabled, title, value: deliveryOptionName, operation }, index) => {
+    (
+      { functionId, id, enabled, title, value: deliveryOptionName, operation },
+      index
+    ) => {
       return (
         <IndexTable.Row
           id={id}
@@ -58,7 +63,7 @@ export default function HomePage() {
           position={index}
         >
           <IndexTable.Cell>
-            <Link dataPrimaryLink url={`/${operation}/${id}`}>
+            <Link dataPrimaryLink url={`/${operation}/${functionId}/${id}`}>
               <TextStyle variation="strong">{title}</TextStyle>
             </Link>
           </IndexTable.Cell>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
-import NotFound from "../NotFound";
+import NotFound from "../../NotFound";
 
 import { Layout, Card } from "@shopify/polaris";
 
@@ -9,16 +9,16 @@ import {
   CustomizationForm,
   CustomizationPageLayout,
   ErrorsBanner,
-} from "../../components";
+} from "../../../components";
 import {
   useCustomizationForm,
   useDeliveryCustomization,
   useUpdateDeliveryCustomization,
-} from "../../hooks";
+} from "../../../hooks";
 
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id, functionId } = useParams();
 
   const [userErrors, setUserErrors] = useState(null);
 
@@ -44,7 +44,12 @@ export default function DeliveryCustomizationDetailPage() {
     if (disabled) return;
 
     try {
-      const data = await updateCustomization({ payload: formData });
+      const data = await updateCustomization({
+        payload: {
+          ...formData,
+          functionId,
+        },
+      });
       if (data?.userErrors) {
         setUserErrors(data.userErrors);
       } else {

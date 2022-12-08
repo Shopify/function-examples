@@ -1,20 +1,23 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
 
-import { Layout, Card } from "@shopify/polaris";
+import { Card, Banner, List, Layout } from "@shopify/polaris";
 
 import {
   CustomizationForm,
   CustomizationPageLayout,
   ErrorsBanner,
-} from "../../components";
+} from "../../../components";
 import {
   useCustomizationForm,
   useCreateDeliveryCustomization,
-} from "../../hooks";
+} from "../../../hooks";
 
 export default function NewDeliveryCustomizationPage() {
   const navigate = useNavigate();
+
+  const { functionId } = useParams();
 
   const [userErrors, setUserErrors] = useState(null);
 
@@ -45,16 +48,19 @@ export default function NewDeliveryCustomizationPage() {
   useEffect(() => {
     setData({
       deliveryOptionName: "Express",
-      operation: "Rename",
+      operation: "Hide",
+      functionId,
     });
   }, []);
 
+  console.log(formData);
+
   return (
     <CustomizationPageLayout
-      title="Rename delivery option"
+      title="Hide Delivery Option"
       loading={isLoading}
       actionProps={primaryAction}
-      subtitle="Any delivery option matching this name exactly will have 'renamed' appended to it"
+      subtitle="Any delivery option matching this name exactly will be hidden."
     >
       <Layout.Section>
         <ErrorsBanner userErrors={userErrors} />

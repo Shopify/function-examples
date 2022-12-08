@@ -344,7 +344,7 @@ export async function createServer(
     const gid = idToGid(req.params.id);
 
     const payload = req.body;
-    const functionId = matchOperationToFunctionId(payload.operation);
+    const functionId = payload.functionId;
 
     // update metafield
     let query = {
@@ -418,7 +418,7 @@ export async function createServer(
           id: gid,
           deliveryCustomization: {
             functionId,
-            title: `${payload.operation} delivery option`,
+            title: `${matchFunctionIdToOperation(functionId)} delivery option`,
             enabled: payload.enabled,
           },
         },

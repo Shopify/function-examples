@@ -3,22 +3,22 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { Layout, Card } from "@shopify/polaris";
 
-import NotFound from "../NotFound";
+import NotFound from "../../NotFound";
 
 import {
   CustomizationForm,
   CustomizationPageLayout,
   ErrorsBanner,
-} from "../../components";
+} from "../../../components";
 import {
   useCustomizationForm,
   useDeliveryCustomization,
   useUpdateDeliveryCustomization,
-} from "../../hooks";
+} from "../../../hooks";
 
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { functionId, id } = useParams();
 
   const [userErrors, setUserErrors] = useState(null);
 
@@ -60,13 +60,17 @@ export default function DeliveryCustomizationDetailPage() {
 
     const { value: deliveryOptionName, enabled, title, operation } = data;
 
+    console.log("operation", operation);
+
     setData({
       deliveryOptionName,
       enabled,
       title,
-      operation: "Reorder",
+      operation,
     });
   }, [data]);
+
+  console.log("data", data);
 
   const primaryAction = {
     disabled: disabled || !hasChanged,
@@ -79,12 +83,11 @@ export default function DeliveryCustomizationDetailPage() {
 
   return (
     <CustomizationPageLayout
-      title="Reorder delivery option"
+      title="Hide Delivery Option"
       loading={isLoading}
       actionProps={primaryAction}
       isEditing={true}
-      subtitle="Any delivery option matching this name exactly will be moved to the last position."
-      userErrors={userErrors}
+      subtitle="Any delivery option matching this name exactly will be hidden."
     >
       <Layout.Section>
         <ErrorsBanner userErrors={userErrors} />
