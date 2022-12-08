@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { useParams } from "react-router-dom";
-
 import { Layout, Card } from "@shopify/polaris";
 
 import {
@@ -18,7 +17,6 @@ export default function NewDeliveryCustomizationPage() {
   const navigate = useNavigate();
 
   const { functionId } = useParams();
-  console.log(functionId);
 
   const { handleInputChange, setData, data: formData } = useCustomizationForm();
 

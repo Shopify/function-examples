@@ -67,6 +67,7 @@ export default function DeliveryCustomizationDetailPage() {
       enabled,
       title,
       operation,
+      functionId,
     });
   }, [data]);
 

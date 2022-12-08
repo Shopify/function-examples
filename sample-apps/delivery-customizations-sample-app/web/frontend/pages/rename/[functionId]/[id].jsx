@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
-import NotFound from "../../NotFound";
-
 import { Layout, Card } from "@shopify/polaris";
+
+import NotFound from "../../NotFound";
 
 import {
   CustomizationForm,
@@ -44,12 +44,7 @@ export default function DeliveryCustomizationDetailPage() {
     if (disabled) return;
 
     try {
-      const data = await updateCustomization({
-        payload: {
-          ...formData,
-          functionId,
-        },
-      });
+      const data = await updateCustomization({ payload: formData });
       if (data?.userErrors) {
         setUserErrors(data.userErrors);
       } else {
@@ -70,6 +65,7 @@ export default function DeliveryCustomizationDetailPage() {
       enabled,
       title,
       operation: "Rename",
+      functionId,
     });
   }, [data]);
 

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
-
-import { Card, Banner, List, Layout } from "@shopify/polaris";
+import { Card, Layout } from "@shopify/polaris";
 
 import {
   CustomizationForm,
