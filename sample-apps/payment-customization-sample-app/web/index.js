@@ -171,6 +171,7 @@ export async function createServer(
               id
               title
               enabled
+              functionId
               metafield(namespace: "${METAFIELD.namespace}", key:"${METAFIELD.key}") {
                 value
               }
@@ -209,7 +210,7 @@ export async function createServer(
         variables: {
           input: {
             functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
-            title: `Hide ${payload.paymentMethod} if cart subtotal is bigger than ${payload.cartSubtotal}`,
+            title: `hide`,
             enabled: true,
           },
         },
@@ -435,7 +436,7 @@ export async function createServer(
           id: gid,
           input: {
             functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
-            title: `Hide ${payload.paymentMethod} if cart subtotal is bigger than ${payload.cartSubtotal}`,
+            title: `hide`,
             enabled: true,
           },
         },

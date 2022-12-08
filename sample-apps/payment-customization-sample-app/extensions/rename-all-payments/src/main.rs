@@ -12,19 +12,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn function(input: Input) -> Result<FunctionResult, Box<dyn std::error::Error>> {
-    let operations = input.payment_methods.iter().map(|payment_method| {
-        Operation {
+    let operations = input
+        .payment_methods
+        .iter()
+        .map(|payment_method| Operation {
             rename: Some(RenameOperation {
                 payment_method_id: payment_method.id.clone(),
                 name: format!("{} renamed", payment_method.name.clone()),
             }),
-        }
-    }).collect();
-    Ok(
-        FunctionResult {
-            operations,
-        }
-    )
+        })
+        .collect();
+    Ok(FunctionResult { operations })
 }
 
 #[cfg(test)]
@@ -35,17 +33,17 @@ mod tests {
             payment_methods: vec![
                 PaymentMethod {
                     id: "payment_method_id_1".to_string(),
-                    name: "payment method 1".to_string()
+                    name: "payment method 1".to_string(),
                 },
                 PaymentMethod {
                     id: "payment_method_id_2".to_string(),
-                    name: "payment method 2".to_string()
+                    name: "payment method 2".to_string(),
                 },
                 PaymentMethod {
                     id: "payment_method_id_3".to_string(),
-                    name: "payment method 3".to_string()
+                    name: "payment method 3".to_string(),
                 },
-            ]
+            ],
         }
     }
 

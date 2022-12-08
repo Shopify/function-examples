@@ -1,11 +1,20 @@
 import { useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
+import { useParams } from "react-router-dom";
 
-import { CustomizationForm, CustomizationPageLayout } from "../components";
-import { useCreatePaymentCustomization, useCustomizationForm } from "../hooks";
+import {
+  CustomizationForm,
+  CustomizationPageLayout,
+} from "../../../components";
+import {
+  useCreatePaymentCustomization,
+  useCustomizationForm,
+} from "../../../hooks";
 
 export default function NewCustomizationPage() {
   const navigate = useNavigate();
+
+  const { functionId } = useParams();
 
   const {
     handleInputChange,
