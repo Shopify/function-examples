@@ -18,15 +18,13 @@ export function CustomizationPageLayout({
     ...actionProps,
   };
 
-  const url = isEditing ? "/" : "/new";
-
   return (
     <Frame>
       {loading && <Loading />}
       <Page
         title={title}
         primaryAction={primaryActionProps}
-        breadcrumbs={[{ content: "Customizations", url: url }]}
+        breadcrumbs={[{ content: "Customizations", url: "/" }]}
         {...props}
       >
         <Layout>{children}</Layout>
