@@ -16,15 +16,10 @@ const USE_ONLINE_TOKENS = false;
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
-// TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
 const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
-
-const { SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID } = dotenv.parse(
-  readFileSync(join(process.cwd(), "../", ".env"), "utf8")
-);
 
 const METAFIELD = {
   namespace: "payment-customization-hide",
@@ -162,6 +157,7 @@ export async function createServer(
     );
   }
 
+  // GET CUSTOMIZATIONS
   app.get("/api/payment-customizations", async (req, res) => {
     const query = {
       data: `{
@@ -191,6 +187,39 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
+  // GET CUSTOMIZATION
+  app.get("/api/payment-customizations/:id", async (req, res) => {
+    const gid = idToGid(req.params.id);
+
+    const query = {
+      data: {
+        query: `
+          query PaymentCustomization($id: ID!) {
+            paymentCustomization(id: $id) {
+              id
+              enabled
+              title
+              metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                value
+              }
+            }
+          }
+        `,
+        variables: {
+          id: gid,
+        },
+      },
+    };
+
+    const reducer = ({ paymentCustomization }) =>
+      normalizeCustomization(paymentCustomization);
+
+    const { status, data } = await queryResponse(req, res, query, reducer);
+
+    return res.status(status).send(data);
+  });
+
+  // CREATE CUSTOMIZATION
   app.post("/api/payment-customizations", async (req, res) => {
     const {title, functionId, cartSubtotal, paymentMethod} = req.body;
 
@@ -230,8 +259,6 @@ export async function createServer(
         .status(paymentCustomizationStatus)
         .send(paymentCustomizationData);
 
-    console.log(paymentCustomizationData)
-
     // we need the id from the customization to create the metafield
     query = {
       data: {
@@ -266,8 +293,6 @@ export async function createServer(
       reducer
     );
 
-    console.log(metafieldData)
-
     if (status !== 200) return res.status(status).send(metafieldData);
 
     const send = Object.assign(
@@ -279,37 +304,80 @@ export async function createServer(
     return res.status(200).send(send);
   });
 
-  app.get("/api/payment-customizations/:id", async (req, res) => {
+  // UPDATE CUSTOMIZATION
+  app.put("/api/payment-customizations/:id", async (req, res) => {
+    const payload = req.body;
     const gid = idToGid(req.params.id);
 
-    const query = {
+    const {functionId, title, paymentMethod, cartSubtotal} = payload;
+
+    // update metafield
+    let query = {
       data: {
         query: `
-          query PaymentCustomization($id: ID!) {
-            paymentCustomization(id: $id) {
-              id
-              enabled
-              title
-              metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+          mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
+            metafieldsSet(metafields: $metafields) {
+              metafields {
                 value
               }
             }
           }
         `,
         variables: {
-          id: gid,
+          metafields: [
+            {
+              ...METAFIELD,
+              ownerId: gid,
+              type: "json",
+              value: JSON.stringify({cartSubtotal, paymentMethod}),
+            },
+          ],
         },
       },
     };
 
-    const reducer = ({ paymentCustomization }) =>
-      normalizeCustomization(paymentCustomization);
+    const { status: metafieldStatus, data: metafieldData } =
+      await queryResponse(req, res, query);
+
+    if (metafieldStatus !== 200)
+      return res.status(metafieldStatus).send(metafieldData);
+
+    query = {
+      data: {
+        query: `
+          mutation PaymentCustomizationUpdate($id: ID!, $input: PaymentCustomizationInput!) {
+            paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
+              paymentCustomization {
+                id
+                title
+                enabled
+                metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
+                  value
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          id: gid,
+          input: {
+            functionId,
+            title,
+            enabled: true,
+          },
+        },
+      },
+    };
+
+    const reducer = ({ paymentCustomizationUpdate }) =>
+      normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
 
     const { status, data } = await queryResponse(req, res, query, reducer);
 
     return res.status(status).send(data);
   });
 
+  // DELETE CUSTOMIZATION
   app.delete("/api/payment-customizations/:id", async (req, res) => {
     let query = {
       data: {
@@ -381,87 +449,6 @@ export async function createServer(
     let { status, data } = await queryResponse(req, res, query);
 
     if (status === 200) data = { message: "Deleted with success" };
-
-    return res.status(status).send(data);
-  });
-
-  app.put("/api/payment-customizations/:id", async (req, res) => {
-    const payload = req.body;
-    const gid = idToGid(req.params.id);
-
-    const {functionId, title, paymentMethod, cartSubtotal} = payload;
-
-    console.log(title)
-    console.log(functionId)
-    console.log(paymentMethod)
-    console.log(cartSubtotal)
-
-
-    // update metafield
-    let query = {
-      data: {
-        query: `
-          mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
-            metafieldsSet(metafields: $metafields) {
-              metafields {
-                value
-              }
-            }
-          }
-        `,
-        variables: {
-          metafields: [
-            {
-              ...METAFIELD,
-              ownerId: gid,
-              type: "json",
-              value: JSON.stringify({cartSubtotal, paymentMethod}),
-            },
-          ],
-        },
-      },
-    };
-
-    const { status: metafieldStatus, data: metafieldData } =
-      await queryResponse(req, res, query);
-
-      console.log(metafieldData)
-
-    if (metafieldStatus !== 200)
-      return res.status(metafieldStatus).send(metafieldData);
-
-    query = {
-      data: {
-        query: `
-          mutation PaymentCustomizationUpdate($id: ID!, $input: PaymentCustomizationInput!) {
-            paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
-              paymentCustomization {
-                id
-                title
-                enabled
-                metafield(namespace:"${METAFIELD.namespace}", key:"${METAFIELD.key}") {
-                  value
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          id: gid,
-          input: {
-            functionId,
-            title,
-            enabled: true,
-          },
-        },
-      },
-    };
-
-    const reducer = ({ paymentCustomizationUpdate }) =>
-      normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
-
-    const { status, data } = await queryResponse(req, res, query, reducer);
-    console.log(data)
 
     return res.status(status).send(data);
   });

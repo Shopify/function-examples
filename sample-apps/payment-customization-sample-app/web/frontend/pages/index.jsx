@@ -77,7 +77,6 @@ export default function HomePage() {
   const isLoading = isFetching || isMutating;
 
   return (
-    // <Page title="Customizations" primaryAction={primaryAction}>
     <Page title="Customizations">
       <Card>
         <IndexTable
