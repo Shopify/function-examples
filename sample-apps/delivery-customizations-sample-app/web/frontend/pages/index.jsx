@@ -8,7 +8,6 @@ import {
   Link,
 } from "@shopify/polaris";
 
-import { PlusMinor } from "@shopify/polaris-icons";
 import { useIsMutating } from "react-query";
 import {
   useDeliveryCustomizations,
@@ -32,8 +31,6 @@ export default function HomePage() {
     handleSelectionChange,
     clearSelection,
   } = useIndexResourceState(deliveryCustomizations);
-
-  console.log(deliveryCustomizations);
 
   const handleDeleteAction = async () => {
     if (isMutating) return;

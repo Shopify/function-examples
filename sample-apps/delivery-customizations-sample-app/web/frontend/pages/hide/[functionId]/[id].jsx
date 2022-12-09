@@ -60,8 +60,6 @@ export default function DeliveryCustomizationDetailPage() {
 
     const { value: deliveryOptionName, enabled, title, operation } = data;
 
-    console.log("operation", operation);
-
     setData({
       deliveryOptionName,
       enabled,
