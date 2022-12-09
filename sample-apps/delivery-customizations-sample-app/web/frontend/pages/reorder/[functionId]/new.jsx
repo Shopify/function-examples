@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "@shopify/app-bridge-react";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 import { useParams } from "react-router-dom";
 import { Layout, Card } from "@shopify/polaris";
 
@@ -14,7 +15,8 @@ import {
 } from "../../../hooks";
 
 export default function NewDeliveryCustomizationPage() {
-  const navigate = useNavigate();
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
 
   const { functionId } = useParams();
 
@@ -32,7 +34,9 @@ export default function NewDeliveryCustomizationPage() {
       if (data?.userErrors.length > 0) {
         setUserErrors(data.userErrors);
       } else {
-        navigate("/");
+        redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+          path: "/settings/shipping/customizations",
+        });
       }
     } catch (error) {
       console.error(error);
