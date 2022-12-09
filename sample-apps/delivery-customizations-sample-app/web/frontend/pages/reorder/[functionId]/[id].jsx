@@ -64,7 +64,6 @@ export default function DeliveryCustomizationDetailPage() {
       deliveryOptionName,
       enabled,
       title,
-      operation: "Reorder",
       functionId,
     });
   }, [data]);

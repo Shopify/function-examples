@@ -51,12 +51,10 @@ export default function NewDeliveryCustomizationPage() {
   useEffect(() => {
     setData({
       deliveryOptionName: "Express",
-      operation: "Hide",
+      title: "Hide",
       functionId,
     });
   }, []);
-
-  console.log(formData);
 
   return (
     <CustomizationPageLayout

@@ -51,7 +51,7 @@ export default function NewDeliveryCustomizationPage() {
   useEffect(() => {
     setData({
       deliveryOptionName: "Express",
-      operation: "Rename",
+      title: "Rename",
       functionId,
     });
   }, []);

@@ -58,13 +58,12 @@ export default function DeliveryCustomizationDetailPage() {
   useEffect(() => {
     if (!data) return;
 
-    const { value: deliveryOptionName, enabled, title, operation } = data;
+    const { value: deliveryOptionName, enabled, title } = data;
 
     setData({
       deliveryOptionName,
       enabled,
       title,
-      operation: "Rename",
       functionId,
     });
   }, [data]);

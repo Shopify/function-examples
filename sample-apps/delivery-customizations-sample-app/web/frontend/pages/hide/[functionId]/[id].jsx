@@ -64,12 +64,9 @@ export default function DeliveryCustomizationDetailPage() {
       deliveryOptionName,
       enabled,
       title,
-      operation,
       functionId,
     });
   }, [data]);
-
-  console.log("data", data);
 
   const primaryAction = {
     disabled: disabled || !hasChanged,

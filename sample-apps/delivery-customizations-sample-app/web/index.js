@@ -232,8 +232,7 @@ export async function createServer(
 
   // CREATE DELIVERY CUSTOMIZATION
   app.post("/api/delivery-customization", async (req, res) => {
-    const functionId = matchOperationToFunctionId(req.body.operation);
-    const payload = req.body;
+    const {functionId, title, deliveryOptionName } = req.body
 
     let query = {
       data: {
@@ -256,7 +255,7 @@ export async function createServer(
         variables: {
           deliveryCustomization: {
             functionId,
-            title: `${payload.operation} delivery option`,
+            title,
             enabled: true,
           },
         },
@@ -300,7 +299,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: deliveryCustomizationData.deliveryCustomization.id,
               type: "single_line_text_field",
-              value: payload.deliveryOptionName
+              value: deliveryOptionName
             },
           ],
         },
@@ -343,8 +342,8 @@ export async function createServer(
   app.put("/api/delivery-customization/:id", async (req, res) => {
     const gid = idToGid(req.params.id);
 
-    const payload = req.body;
-    const functionId = payload.functionId;
+    const {functionId, title, deliveryOptionName, enabled} = req.body
+
 
     // update metafield
     let query = {
@@ -368,7 +367,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: gid,
               type: "single_line_text_field",
-              value: payload.deliveryOptionName,
+              value: deliveryOptionName,
             },
           ],
         },
@@ -423,8 +422,8 @@ export async function createServer(
           id: gid,
           deliveryCustomization: {
             functionId,
-            title: `${matchFunctionIdToOperation(functionId)} delivery option`,
-            enabled: payload.enabled,
+            title,
+            enabled: enabled,
           },
         },
       },
