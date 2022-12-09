@@ -411,6 +411,11 @@ export async function createServer(
                   value
                 }
               }
+              userErrors {
+                code
+                message
+                field
+              }
             }
           }
         `,
@@ -425,8 +430,15 @@ export async function createServer(
       },
     };
 
-    reducer = ({ deliveryCustomizationUpdate }) =>
-      normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
+
+    reducer = ({ deliveryCustomizationUpdate }) => {
+      if (deliveryCustomizationUpdate?.userErrors?.length > 0) {
+        return deliveryCustomizationUpdate
+      } else {
+        return normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
+      }
+    }
+
     const { status, data } = await queryResponse(req, res, query, reducer);
 
     return res.status(status).send(data);
