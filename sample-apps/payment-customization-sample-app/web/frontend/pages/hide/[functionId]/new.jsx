@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "@shopify/app-bridge-react";
 import { useParams } from "react-router-dom";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 import { Layout, Card } from "@shopify/polaris";
 
 import {
@@ -14,7 +15,8 @@ import {
 } from "../../../hooks";
 
 export default function NewCustomizationPage() {
-  const navigate = useNavigate();
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
 
   const [userErrors, setUserErrors] = useState(null);
 
@@ -35,10 +37,12 @@ export default function NewCustomizationPage() {
 
     try {
       const data = await createCustomization({ payload: formData });
-      if (data?.userErrors) {
+      if (data?.userErrors.length > 0) {
         setUserErrors(data.userErrors);
       } else {
-        navigate("/");
+        redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+          path: "/settings/payments/customizations",
+        });
       }
     } catch (error) {
       console.error(error);

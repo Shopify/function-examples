@@ -135,12 +135,6 @@ export async function createServer(
     try {
       const result = await executeQuery(req, res, query);
 
-      if (result?.userErrors) {
-        res.send(200).send({
-          userErrors: result.userErrors
-        })
-      }
-
       const data = reducer ? reducer(result) : result;
 
       return { status: 200, data };
@@ -257,19 +251,26 @@ export async function createServer(
       },
     };
 
-    let reducer = ({ paymentCustomizationCreate }) =>
-      paymentCustomizationCreate;
+    let reducer = ({paymentCustomizationCreate}) => ( {
+        paymentCustomization: normalizeCustomization(paymentCustomizationCreate.paymentCustomization),
+        userErrors: paymentCustomizationCreate.userErrors
+      }
+    );
 
     const {
       status: paymentCustomizationStatus,
       data: paymentCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
+    
+    const {paymentCustomization, userErrors} = paymentCustomizationData;
 
-    if (paymentCustomizationStatus !== 200 || paymentCustomizationData?.userErrors?.length > 0)
+    if (paymentCustomizationStatus !== 200 || userErrors?.length > 0)
       return res
         .status(paymentCustomizationStatus)
         .send(paymentCustomizationData);
+
+    const gid = idToGid(paymentCustomization.id)
 
     // we need the id from the customization to create the metafield
     query = {
@@ -280,6 +281,11 @@ export async function createServer(
               metafields {
                 value
               }
+              userErrors {
+                code
+                message
+                field
+              }
             }
           }
         `,
@@ -287,7 +293,7 @@ export async function createServer(
           metafields: [
             {
               ...METAFIELD,
-              ownerId: paymentCustomizationData.id,
+              ownerId: gid,
               type: "json",
               value: JSON.stringify({cartSubtotal, paymentMethod}),
             },
@@ -296,7 +302,12 @@ export async function createServer(
       },
     };
 
-    reducer = ({ metafieldsSet }) => metafieldsSet.metafields[0];
+    reducer = ( { metafieldsSet } ) => {
+      return {
+        metafields: metafieldsSet?.metafields[0],
+        userErrors: metafieldsSet?.userErrors
+      }
+    }
 
     const { status, data: metafieldData } = await queryResponse(
       req,
@@ -309,7 +320,7 @@ export async function createServer(
 
     const send = Object.assign(
       {},
-      normalizeCustomization(paymentCustomizationData),
+      paymentCustomizationData,
       JSON.parse(metafieldData?.value || "{}")
     );
 

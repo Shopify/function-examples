@@ -7,7 +7,6 @@ import {
   useIndexResourceState,
   Link,
 } from "@shopify/polaris";
-import { PlusMinor } from "@shopify/polaris-icons";
 import { useIsMutating } from "react-query";
 
 import {
@@ -74,7 +73,7 @@ export default function HomePage() {
           headings={tableHeadings}
           promotedBulkActions={tableActions}
           loading={isLoading}
-          emptyState={<EmptyTable action={primaryAction} />}
+          emptyState={<EmptyTable />}
           selectedItemsCount={selectedCount}
           onSelectionChange={handleSelectionChange}
         >
