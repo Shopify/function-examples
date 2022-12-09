@@ -48,10 +48,7 @@ export default function HomePage() {
   };
 
   const rowMarkup = deliveryCustomizations.map(
-    (
-      { functionId, id, enabled, title, value: deliveryOptionName, operation },
-      index
-    ) => {
+    ({ functionId, id, enabled, title, value: deliveryOptionName }, index) => {
       return (
         <IndexTable.Row
           id={id}
@@ -60,7 +57,7 @@ export default function HomePage() {
           position={index}
         >
           <IndexTable.Cell>
-            <Link dataPrimaryLink url={`/${operation}/${functionId}/${id}`}>
+            <Link dataPrimaryLink url={`/${title}/${functionId}/${id}`}>
               <TextStyle variation="strong">{title}</TextStyle>
             </Link>
           </IndexTable.Cell>

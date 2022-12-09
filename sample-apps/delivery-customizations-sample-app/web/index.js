@@ -10,7 +10,6 @@ import { setupGDPRWebHooks } from "./gdpr.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { AppInstallations } from "./app_installations.js";
 import { gidToId, idToGid } from "./helpers/gid.js";
-import {matchOperationToFunctionId, matchFunctionIdToOperation} from "./helpers/match-operation-to-functionId.js"
 
 const USE_ONLINE_TOKENS = false;
 
@@ -218,14 +217,7 @@ export async function createServer(
         normalizeCustomization(node)
       );
 
-    const { status, data } = await queryResponse(req, res, query, reducer);
-
-    const deliveryCustomizationData = data.map((deliveryCustomization) => {
-      return {
-        ...deliveryCustomization,
-        operation: matchFunctionIdToOperation(deliveryCustomization.functionId)
-      }
-    })
+    const { status, data: deliveryCustomizationData } = await queryResponse(req, res, query, reducer);
 
     return res.status(status).send(deliveryCustomizationData);
   });
