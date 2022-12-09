@@ -18,8 +18,6 @@ import {
 export default function HomePage() {
   const { data = [], isFetching, refetch } = usePaymentCustomizations();
 
-  console.log(data);
-
   const { mutateAsync: deleteCustomization } = useDeletePaymentCustomization();
 
   const isMutating = useIsMutating(["deleteCustomization"]);
@@ -46,13 +44,6 @@ export default function HomePage() {
     }
   };
 
-  // Update Me
-  const primaryAction = {
-    content: "Create customization",
-    icon: PlusMinor,
-    url: "/hide/01GKSVW5K8JE6EF9CSCJ3NKNSZ/new",
-  };
-
   const resourceName = {
     singular: "customization",
     plural: "customizations",
@@ -63,8 +54,6 @@ export default function HomePage() {
     { title: "Payment Method" },
     { title: "Cart Subtotal" },
   ];
-
-  console.log(data);
 
   const tableActions = [
     {

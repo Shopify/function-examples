@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { useParams } from "react-router-dom";
+import { Layout, Card } from "@shopify/polaris";
 
 import {
   CustomizationForm,
   CustomizationPageLayout,
+  ErrorsBanner,
 } from "../../../components";
 import {
   useCreatePaymentCustomization,
@@ -13,6 +15,8 @@ import {
 
 export default function NewCustomizationPage() {
   const navigate = useNavigate();
+
+  const [userErrors, setUserErrors] = useState(null);
 
   const { functionId } = useParams();
 
@@ -30,8 +34,12 @@ export default function NewCustomizationPage() {
     if (isLoading) return;
 
     try {
-      await createCustomization({ payload: formData });
-      navigate("/");
+      const data = await createCustomization({ payload: formData });
+      if (data?.userErrors) {
+        setUserErrors(data.userErrors);
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -53,13 +61,22 @@ export default function NewCustomizationPage() {
 
   return (
     <CustomizationPageLayout loading={isLoading} actionProps={primaryAction}>
-      <CustomizationForm
-        {...formData}
-        loading={isLoading}
-        disabled={isLoading}
-        onSubmit={handleSubmit}
-        onInputChange={handleInputChange}
-      />
+      <Layout.Section>
+        <ErrorsBanner userErrors={userErrors} />
+      </Layout.Section>
+      <Layout.Section>
+        <Card>
+          <Card.Section>
+            <CustomizationForm
+              {...formData}
+              loading={isLoading}
+              disabled={isLoading}
+              onSubmit={handleSubmit}
+              onInputChange={handleInputChange}
+            />
+          </Card.Section>
+        </Card>
+      </Layout.Section>
     </CustomizationPageLayout>
   );
 }

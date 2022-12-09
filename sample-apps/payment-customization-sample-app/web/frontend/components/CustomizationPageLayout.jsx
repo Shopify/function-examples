@@ -1,6 +1,11 @@
-import { Card, Page, Loading, Frame } from "@shopify/polaris";
+import { Layout, Page, Loading, Frame } from "@shopify/polaris";
 
-export function CustomizationPageLayout({ actionProps, loading, children, ...props }) {
+export function CustomizationPageLayout({
+  actionProps,
+  loading,
+  children,
+  ...props
+}) {
   const defaultActionProps = {
     content: "Save",
     disabled: true,
@@ -22,9 +27,7 @@ export function CustomizationPageLayout({ actionProps, loading, children, ...pro
         breadcrumbs={[{ content: "Customizations", url: "/" }]}
         {...props}
       >
-        <Card title="Customization">
-          <Card.Section>{children}</Card.Section>
-        </Card>
+        <Layout>{children}</Layout>
       </Page>
     </Frame>
   );

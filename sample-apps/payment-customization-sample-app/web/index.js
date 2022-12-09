@@ -135,6 +135,12 @@ export async function createServer(
     try {
       const result = await executeQuery(req, res, query);
 
+      if (result?.userErrors) {
+        res.send(200).send({
+          userErrors: result.userErrors
+        })
+      }
+
       const data = reducer ? reducer(result) : result;
 
       return { status: 200, data };
@@ -233,6 +239,11 @@ export async function createServer(
                   title
                   enabled
                 }
+                userErrors {
+                  code
+                  message
+                  field
+                }
               }
             }
           `,
@@ -247,14 +258,15 @@ export async function createServer(
     };
 
     let reducer = ({ paymentCustomizationCreate }) =>
-      paymentCustomizationCreate.paymentCustomization;
+      paymentCustomizationCreate;
 
     const {
       status: paymentCustomizationStatus,
       data: paymentCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
-    if (paymentCustomizationStatus !== 200)
+
+    if (paymentCustomizationStatus !== 200 || paymentCustomizationData?.userErrors?.length > 0)
       return res
         .status(paymentCustomizationStatus)
         .send(paymentCustomizationData);
@@ -355,6 +367,11 @@ export async function createServer(
                   value
                 }
               }
+              userErrors {
+                code
+                message
+                field
+              }
             }
           }
         `,
@@ -369,8 +386,13 @@ export async function createServer(
       },
     };
 
-    const reducer = ({ paymentCustomizationUpdate }) =>
-      normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
+    const reducer = ({ paymentCustomizationUpdate }) => {
+      if (paymentCustomizationUpdate?.userErrors?.length > 0) {
+        return paymentCustomizationUpdate
+      } else {
+        return normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
+      }
+    }
 
     const { status, data } = await queryResponse(req, res, query, reducer);
 
