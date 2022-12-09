@@ -46,6 +46,7 @@ export default function HomePage() {
     }
   };
 
+  // Update Me
   const primaryAction = {
     content: "Create customization",
     icon: PlusMinor,
@@ -76,7 +77,8 @@ export default function HomePage() {
   const isLoading = isFetching || isMutating;
 
   return (
-    <Page title="Customizations" primaryAction={primaryAction}>
+    // <Page title="Customizations" primaryAction={primaryAction}>
+    <Page title="Customizations">
       <Card>
         <IndexTable
           resourceName={resourceName}

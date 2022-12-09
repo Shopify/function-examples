@@ -192,7 +192,7 @@ export async function createServer(
   });
 
   app.post("/api/payment-customizations", async (req, res) => {
-    const payload = req.body;
+    const {title, functionId, cartSubtotal, paymentMethod} = req.body;
 
     let query = {
       data: {
@@ -209,8 +209,8 @@ export async function createServer(
           `,
         variables: {
           input: {
-            functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
-            title: `hide`,
+            functionId,
+            title,
             enabled: true,
           },
         },
@@ -230,6 +230,8 @@ export async function createServer(
         .status(paymentCustomizationStatus)
         .send(paymentCustomizationData);
 
+    console.log(paymentCustomizationData)
+
     // we need the id from the customization to create the metafield
     query = {
       data: {
@@ -248,7 +250,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: paymentCustomizationData.id,
               type: "json",
-              value: JSON.stringify(payload),
+              value: JSON.stringify({cartSubtotal, paymentMethod}),
             },
           ],
         },
@@ -263,6 +265,8 @@ export async function createServer(
       query,
       reducer
     );
+
+    console.log(metafieldData)
 
     if (status !== 200) return res.status(status).send(metafieldData);
 
@@ -385,6 +389,14 @@ export async function createServer(
     const payload = req.body;
     const gid = idToGid(req.params.id);
 
+    const {functionId, title, paymentMethod, cartSubtotal} = payload;
+
+    console.log(title)
+    console.log(functionId)
+    console.log(paymentMethod)
+    console.log(cartSubtotal)
+
+
     // update metafield
     let query = {
       data: {
@@ -403,7 +415,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: gid,
               type: "json",
-              value: JSON.stringify(payload),
+              value: JSON.stringify({cartSubtotal, paymentMethod}),
             },
           ],
         },
@@ -412,6 +424,8 @@ export async function createServer(
 
     const { status: metafieldStatus, data: metafieldData } =
       await queryResponse(req, res, query);
+
+      console.log(metafieldData)
 
     if (metafieldStatus !== 200)
       return res.status(metafieldStatus).send(metafieldData);
@@ -435,8 +449,8 @@ export async function createServer(
         variables: {
           id: gid,
           input: {
-            functionId: SHOPIFY_HIDE_PAYMENT_BY_NAME_AND_CART_SUBTOTAL_ID,
-            title: `hide`,
+            functionId,
+            title,
             enabled: true,
           },
         },
@@ -447,6 +461,7 @@ export async function createServer(
       normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
 
     const { status, data } = await queryResponse(req, res, query, reducer);
+    console.log(data)
 
     return res.status(status).send(data);
   });

@@ -46,6 +46,8 @@ export default function NewCustomizationPage() {
     setData({
       cartSubtotal: 10,
       paymentMethod: "Credit card",
+      functionId,
+      title: "HIDE",
     });
   }, []);
 

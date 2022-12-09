@@ -7,5 +7,5 @@ command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/hide-payment-by-name-and-cart-subtotal.wasm"
 
 [ui.paths]
-create = "/new"
-details = "/:id"
+create = "/hide/:functionId/new"
+details = "/hide/:functionId/:id"
