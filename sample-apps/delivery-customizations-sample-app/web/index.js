@@ -366,12 +366,7 @@ export async function createServer(
       },
     };
 
-    let reducer = ({ metafieldsSet }) => {
-      return {
-        metafields: metafieldsSet?.metafields[0],
-        userErrors: metafieldsSet?.userErrors
-      }
-    };
+    let reducer = ({metafieldsSet}) => metafieldsSet
 
     const { status: metafieldStatus, data: metafieldData } =
       await queryResponse(req, res, query, reducer);
@@ -381,12 +376,7 @@ export async function createServer(
     }
 
     if (metafieldData?.userErrors.length > 0) {
-      const send = Object.assign(
-        {},
-        metafieldData
-      )
-
-      res.status(200).send(send);
+      return res.status(200).send(metafieldData);
     }
 
     query = {
@@ -415,7 +405,7 @@ export async function createServer(
           deliveryCustomization: {
             functionId,
             title,
-            enabled: enabled,
+            enabled,
           },
         },
       },

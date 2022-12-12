@@ -114,7 +114,6 @@ function EmptyTable(props) {
         Welcome to the <b>Delivery Customizations Sample App</b>! To get
         started, create a new customization from <Link>here</Link>.
       </p>
-      <p>put shopify palceholder image here ?? </p>
     </EmptyState>
   );
 }
