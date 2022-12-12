@@ -35,7 +35,7 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
-  CUSTOM_SHOP_DOMAINS: ['[a-zA-Z0-9-_\\.]+\\.spin\\.dev'],
+  CUSTOM_SHOP_DOMAINS: ["[a-zA-Z0-9-_\\.]+\\.spin\\.dev"],
 });
 
 // NOTE: If you choose to implement your own storage strategy using
@@ -152,12 +152,7 @@ export async function createServer(
   }
 
   function normalizeCustomization({ id, metafield, ...customization }) {
-    return Object.assign(
-      {},
-      customization,
-      { id: gidToId(id) },
-      metafield
-    );
+    return Object.assign({}, customization, { id: gidToId(id) }, metafield);
   }
 
   // GET DELIVERY CUSTOMIZATION
@@ -213,18 +208,23 @@ export async function createServer(
     };
 
     const reducer = ({ deliveryCustomizations }) =>
-    deliveryCustomizations.edges.map(({ node }) =>
+      deliveryCustomizations.edges.map(({ node }) =>
         normalizeCustomization(node)
       );
 
-    const { status, data: deliveryCustomizationData } = await queryResponse(req, res, query, reducer);
+    const { status, data: deliveryCustomizationData } = await queryResponse(
+      req,
+      res,
+      query,
+      reducer
+    );
 
     return res.status(status).send(deliveryCustomizationData);
   });
 
   // CREATE DELIVERY CUSTOMIZATION
   app.post("/api/delivery-customization", async (req, res) => {
-    const {functionId, title, deliveryOptionName } = req.body
+    const { functionId, title, deliveryOptionName } = req.body;
 
     let query = {
       data: {
@@ -262,8 +262,10 @@ export async function createServer(
       data: deliveryCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
-
-    if (deliveryCustomizationStatus !== 200 || deliveryCustomizationData?.userErrors.length > 0) {
+    if (
+      deliveryCustomizationStatus !== 200 ||
+      deliveryCustomizationData?.userErrors.length > 0
+    ) {
       return res
         .status(deliveryCustomizationStatus)
         .send(deliveryCustomizationData);
@@ -291,7 +293,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: deliveryCustomizationData.deliveryCustomization.id,
               type: "single_line_text_field",
-              value: deliveryOptionName
+              value: deliveryOptionName,
             },
           ],
         },
@@ -299,9 +301,9 @@ export async function createServer(
     };
 
     reducer = ({ metafieldsSet }) => ({
-        metafields: metafieldsSet?.metafields[0],
-        userErrors: metafieldsSet?.userErrors
-      });
+      metafields: metafieldsSet?.metafields[0],
+      userErrors: metafieldsSet?.userErrors,
+    });
 
     const { status, data: metafieldData } = await queryResponse(
       req,
@@ -313,10 +315,7 @@ export async function createServer(
     if (status !== 200) return res.status(status).send(metafieldData);
 
     if (metafieldData?.userErrors.length > 0) {
-      const send = Object.assign(
-        {},
-        metafieldData
-      )
+      const send = Object.assign({}, metafieldData);
 
       res.status(200).send(send);
     }
@@ -334,8 +333,7 @@ export async function createServer(
   app.put("/api/delivery-customization/:id", async (req, res) => {
     const gid = idToGid(req.params.id);
 
-    const {functionId, title, deliveryOptionName, enabled} = req.body
-
+    const { functionId, title, deliveryOptionName, enabled } = req.body;
 
     // update metafield
     let query = {
@@ -366,12 +364,12 @@ export async function createServer(
       },
     };
 
-    let reducer = ({metafieldsSet}) => metafieldsSet
+    let reducer = ({ metafieldsSet }) => metafieldsSet;
 
     const { status: metafieldStatus, data: metafieldData } =
       await queryResponse(req, res, query, reducer);
 
-    if (metafieldStatus !== 200 ){
+    if (metafieldStatus !== 200) {
       return res.status(metafieldStatus).send(metafieldData);
     }
 
@@ -411,14 +409,15 @@ export async function createServer(
       },
     };
 
-
     reducer = ({ deliveryCustomizationUpdate }) => {
       if (deliveryCustomizationUpdate?.userErrors?.length > 0) {
-        return deliveryCustomizationUpdate
+        return deliveryCustomizationUpdate;
       } else {
-        return normalizeCustomization(deliveryCustomizationUpdate.deliveryCustomization);
+        return normalizeCustomization(
+          deliveryCustomizationUpdate.deliveryCustomization
+        );
       }
-    }
+    };
 
     const { status, data } = await queryResponse(req, res, query, reducer);
 
