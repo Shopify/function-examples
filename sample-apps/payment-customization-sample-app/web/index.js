@@ -36,7 +36,7 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
-  CUSTOM_SHOP_DOMAINS: ['[a-zA-Z0-9-_\\.]+\\.spin\\.dev']
+  CUSTOM_SHOP_DOMAINS: ["[a-zA-Z0-9-_\\.]+\\.spin\\.dev"],
 });
 
 Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
@@ -221,7 +221,7 @@ export async function createServer(
 
   // CREATE CUSTOMIZATION
   app.post("/api/payment-customizations", async (req, res) => {
-    const {title, functionId, cartSubtotal, paymentMethod} = req.body;
+    const { title, functionId, cartSubtotal, paymentMethod } = req.body;
 
     let query = {
       data: {
@@ -251,26 +251,26 @@ export async function createServer(
       },
     };
 
-    let reducer = ({paymentCustomizationCreate}) => ( {
-        paymentCustomization: normalizeCustomization(paymentCustomizationCreate.paymentCustomization),
-        userErrors: paymentCustomizationCreate.userErrors
-      }
-    );
+    let reducer = ({ paymentCustomizationCreate }) => ({
+      paymentCustomization: normalizeCustomization(
+        paymentCustomizationCreate.paymentCustomization
+      ),
+      userErrors: paymentCustomizationCreate.userErrors,
+    });
 
     const {
       status: paymentCustomizationStatus,
       data: paymentCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
-    
-    const {paymentCustomization, userErrors} = paymentCustomizationData;
+    const { paymentCustomization, userErrors } = paymentCustomizationData;
 
     if (paymentCustomizationStatus !== 200 || userErrors?.length > 0)
       return res
         .status(paymentCustomizationStatus)
         .send(paymentCustomizationData);
 
-    const gid = idToGid(paymentCustomization.id)
+    const gid = idToGid(paymentCustomization.id);
 
     // we need the id from the customization to create the metafield
     query = {
@@ -295,19 +295,19 @@ export async function createServer(
               ...METAFIELD,
               ownerId: gid,
               type: "json",
-              value: JSON.stringify({cartSubtotal, paymentMethod}),
+              value: JSON.stringify({ cartSubtotal, paymentMethod }),
             },
           ],
         },
       },
     };
 
-    reducer = ( { metafieldsSet } ) => {
+    reducer = ({ metafieldsSet }) => {
       return {
         metafields: metafieldsSet?.metafields[0],
-        userErrors: metafieldsSet?.userErrors
-      }
-    }
+        userErrors: metafieldsSet?.userErrors,
+      };
+    };
 
     const { status, data: metafieldData } = await queryResponse(
       req,
@@ -332,7 +332,7 @@ export async function createServer(
     const payload = req.body;
     const gid = idToGid(req.params.id);
 
-    const {functionId, title, paymentMethod, cartSubtotal} = payload;
+    const { functionId, title, paymentMethod, cartSubtotal } = payload;
 
     // update metafield
     let query = {
@@ -352,7 +352,7 @@ export async function createServer(
               ...METAFIELD,
               ownerId: gid,
               type: "json",
-              value: JSON.stringify({cartSubtotal, paymentMethod}),
+              value: JSON.stringify({ cartSubtotal, paymentMethod }),
             },
           ],
         },
@@ -399,11 +399,13 @@ export async function createServer(
 
     const reducer = ({ paymentCustomizationUpdate }) => {
       if (paymentCustomizationUpdate?.userErrors?.length > 0) {
-        return paymentCustomizationUpdate
+        return paymentCustomizationUpdate;
       } else {
-        return normalizeCustomization(paymentCustomizationUpdate.paymentCustomization);
+        return normalizeCustomization(
+          paymentCustomizationUpdate.paymentCustomization
+        );
       }
-    }
+    };
 
     const { status, data } = await queryResponse(req, res, query, reducer);
 

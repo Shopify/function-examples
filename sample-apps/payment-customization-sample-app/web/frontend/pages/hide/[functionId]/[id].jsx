@@ -19,10 +19,18 @@ export default function PaymentCustomizationDetailPage() {
   const { id, functionId } = useParams();
   const [userErrors, setUserErrors] = useState(null);
 
-  const { handleInputChange, setData, data: formData } = useCustomizationForm();
-
   const { data, isFetching } = usePaymentCustomization({
     id,
+  });
+
+  const {
+    handleInputChange,
+    setData,
+    data: formData,
+    hasChanged,
+  } = useCustomizationForm({
+    cartSubtotal: data?.cartSubtotal,
+    paymentMethod: data?.paymentMethod,
   });
 
   const { mutateAsync: updateCustomization, isLoading } =
@@ -50,18 +58,18 @@ export default function PaymentCustomizationDetailPage() {
   useEffect(() => {
     if (!data) return;
 
-    const { cartSubtotal, paymentMethod } = data;
+    const { cartSubtotal, paymentMethod, title } = data;
 
     setData({
       cartSubtotal,
       paymentMethod,
       functionId,
-      title: "HIDE",
+      title,
     });
   }, [data]);
 
   const primaryAction = {
-    disabled,
+    disabled: disabled || !hasChanged,
     onAction: handleSubmit,
   };
 
@@ -75,10 +83,11 @@ export default function PaymentCustomizationDetailPage() {
           <Card.Section>
             <CustomizationForm
               {...formData}
-              loading={isLoading}
-              disabled={isLoading}
+              loading={disabled}
+              disabled={disabled}
               onSubmit={handleSubmit}
               onInputChange={handleInputChange}
+              hasChanged={hasChanged}
             />
           </Card.Section>
         </Card>
