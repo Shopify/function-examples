@@ -49,7 +49,7 @@ export default function HomePage() {
   };
 
   const tableHeadings = [
-    { title: "ID" },
+    { title: "Title" },
     { title: "Payment Method" },
     { title: "Cart Subtotal" },
   ];
@@ -104,7 +104,7 @@ function TableRow({
     <IndexTable.Row id={id} selected={selected} position={index}>
       <IndexTable.Cell>
         <Link dataPrimaryLink url={`/${title}/${functionId}/${id}`}>
-          <TextStyle variation="strong">{id}</TextStyle>
+          <TextStyle variation="strong">{title}</TextStyle>
         </Link>
       </IndexTable.Cell>
       <IndexTable.Cell>{paymentMethod}</IndexTable.Cell>
