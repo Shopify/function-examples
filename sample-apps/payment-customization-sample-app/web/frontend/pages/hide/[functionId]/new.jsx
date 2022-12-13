@@ -77,6 +77,7 @@ export default function NewCustomizationPage() {
               disabled={isLoading}
               onSubmit={handleSubmit}
               onInputChange={handleInputChange}
+              isNewCustomization={true}
             />
           </Card.Section>
         </Card>

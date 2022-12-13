@@ -149,15 +149,13 @@ export async function createServer(
   }
 
   function normalizeCustomization({ id, metafield, ...customization }) {
-    return Object.assign(
-      {},
-      customization,
-      { id: gidToId(id) },
-      JSON.parse(metafield?.value || "{}")
-    );
+    return {
+      ...customization,
+      ...JSON.parse(metafield?.value || "{}"),
+      id: gidToId(id),
+    };
   }
 
-  // GET CUSTOMIZATIONS
   app.get("/api/payment-customizations", async (req, res) => {
     const query = {
       data: `{
@@ -187,7 +185,6 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  // GET CUSTOMIZATION
   app.get("/api/payment-customizations/:id", async (req, res) => {
     const gid = idToGid(req.params.id);
 
@@ -219,7 +216,6 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  // CREATE CUSTOMIZATION
   app.post("/api/payment-customizations", async (req, res) => {
     const { title, functionId, cartSubtotal, paymentMethod } = req.body;
 
@@ -302,12 +298,7 @@ export async function createServer(
       },
     };
 
-    reducer = ({ metafieldsSet }) => {
-      return {
-        metafields: metafieldsSet?.metafields[0],
-        userErrors: metafieldsSet?.userErrors,
-      };
-    };
+    reducer = ({ metafieldsSet }) => metafieldsSet;
 
     const { status, data: metafieldData } = await queryResponse(
       req,
@@ -318,16 +309,14 @@ export async function createServer(
 
     if (status !== 200) return res.status(status).send(metafieldData);
 
-    const send = Object.assign(
-      {},
-      paymentCustomizationData,
-      JSON.parse(metafieldData?.value || "{}")
-    );
+    const send = {
+      ...paymentCustomizationData,
+      ...JSON.parse(metafieldData?.value || "{}"),
+    };
 
     return res.status(200).send(send);
   });
 
-  // UPDATE CUSTOMIZATION
   app.put("/api/payment-customizations/:id", async (req, res) => {
     const payload = req.body;
     const gid = idToGid(req.params.id);
@@ -412,7 +401,6 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  // DELETE CUSTOMIZATION
   app.delete("/api/payment-customizations/:id", async (req, res) => {
     let query = {
       data: {
