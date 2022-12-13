@@ -155,7 +155,6 @@ export async function createServer(
     return Object.assign({}, customization, { id: gidToId(id) }, metafield);
   }
 
-  // GET DELIVERY CUSTOMIZATION
   app.get("/api/delivery-customization/:id", async (req, res) => {
     const gid = idToGid(req.params.id);
 
@@ -187,7 +186,6 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  // GET DELIVERY CUSTOMIZATIONS
   app.get("/api/delivery-customizations", async (req, res) => {
     const query = {
       data: `{
@@ -222,7 +220,6 @@ export async function createServer(
     return res.status(status).send(deliveryCustomizationData);
   });
 
-  // CREATE DELIVERY CUSTOMIZATION
   app.post("/api/delivery-customization", async (req, res) => {
     const { functionId, title, deliveryOptionName } = req.body;
 
@@ -329,7 +326,6 @@ export async function createServer(
     return res.status(200).send(send);
   });
 
-  // UPDATE DELIVERY CUSTOMIZATION
   app.put("/api/delivery-customization/:id", async (req, res) => {
     const gid = idToGid(req.params.id);
 
@@ -424,7 +420,6 @@ export async function createServer(
     return res.status(status).send(data);
   });
 
-  // DELETE DELVIERY CUSTOMIZATION
   app.delete("/api/delivery-customization/:id", async (req, res) => {
     let query = {
       data: {
