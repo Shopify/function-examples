@@ -152,7 +152,11 @@ export async function createServer(
   }
 
   function normalizeCustomization({ id, metafield, ...customization }) {
-    return Object.assign({}, customization, { id: gidToId(id) }, metafield);
+    return {
+      ...customization,
+      ...metafield,
+      id: gidToId(id),
+    };
   }
 
   app.get("/api/delivery-customization/:id", async (req, res) => {
@@ -309,19 +313,15 @@ export async function createServer(
       reducer
     );
 
-    if (status !== 200) return res.status(status).send(metafieldData);
+    if (status !== 200 || metafieldData?.userErrors.length > 0)
+      return res.status(status).send(metafieldData);
 
-    if (metafieldData?.userErrors.length > 0) {
-      const send = Object.assign({}, metafieldData);
-
-      res.status(200).send(send);
-    }
-
-    const send = Object.assign(
-      {},
-      normalizeCustomization(deliveryCustomizationData.deliveryCustomization),
-      metafieldData
-    );
+    const send = {
+      ...normalizeCustomization(
+        deliveryCustomizationData.deliveryCustomization
+      ),
+      ...metafieldData,
+    };
 
     return res.status(200).send(send);
   });
