@@ -14,10 +14,12 @@ import {
   useUpdatePaymentCustomization,
 } from "../../../hooks";
 
+import { userErrorBannerTitle } from "../../../utilities/helpers";
+
 export default function PaymentCustomizationDetailPage() {
   const navigate = useNavigate();
   const { id, functionId } = useParams();
-  const [userErrors, setUserErrors] = useState(null);
+  const [errorBanner, setErrorBanner] = useState(null);
 
   const { data, isFetching } = usePaymentCustomization({
     id,
@@ -29,8 +31,7 @@ export default function PaymentCustomizationDetailPage() {
     data: formData,
     hasChanged,
   } = useCustomizationForm({
-    cartSubtotal: data?.cartSubtotal,
-    paymentMethod: data?.paymentMethod,
+    functionId,
   });
 
   const { mutateAsync: updateCustomization, isLoading } =
@@ -42,16 +43,25 @@ export default function PaymentCustomizationDetailPage() {
 
   const handleSubmit = async () => {
     if (disabled) return;
+    setErrorBanner(null);
 
     try {
       const data = await updateCustomization({ payload: formData });
       if (data?.userErrors?.length > 0) {
-        setUserErrors(data.userErrors);
+        setErrorBanner({
+          status: "warning",
+          title: userErrorBannerTitle(data.userErrors),
+          errors: data.userErrors,
+        });
       } else {
         navigate("/");
       }
     } catch (error) {
-      console.error(error);
+      setErrorBanner({
+        status: "critical",
+        title: "Something went wrong. Please try again.",
+        errors: [error],
+      });
     }
   };
 
@@ -75,9 +85,11 @@ export default function PaymentCustomizationDetailPage() {
 
   return (
     <CustomizationPageLayout loading={isLoading} actionProps={primaryAction}>
-      <Layout.Section>
-        <ErrorsBanner userErrors={userErrors} />
-      </Layout.Section>
+      {errorBanner && (
+        <Layout.Section>
+          <ErrorsBanner {...errorBanner} />
+        </Layout.Section>
+      )}
       <Layout.Section>
         <Card>
           <Card.Section>

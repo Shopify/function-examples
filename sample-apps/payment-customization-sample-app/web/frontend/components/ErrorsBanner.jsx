@@ -2,15 +2,12 @@ import React from "react";
 
 import { Banner, List } from "@shopify/polaris";
 
-export function ErrorsBanner({ userErrors }) {
-  return userErrors ? (
-    <Banner
-      title="There are errors with saving the customization:"
-      status="warning"
-    >
+export function ErrorsBanner({ title, status, errors }) {
+  return errors.length > 0 ? (
+    <Banner title={title} status={status}>
       <List>
-        {userErrors.map((error) => (
-          <List.Item key={error.code}>{error.message}</List.Item>
+        {errors.map((error, index) => (
+          <List.Item key={index}>{error.message}</List.Item>
         ))}
       </List>
     </Banner>

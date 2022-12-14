@@ -1,15 +1,14 @@
 import { useState, useMemo } from "react";
 
 export function useCustomizationForm(props) {
-  const initialData = props || {
+  const initialData = {
     cartSubtotal: 0,
     paymentMethod: "Credit Card",
+    title: "HIDE",
+    ...props,
   };
 
-  const [data, setData] = useState({
-    cartSubtotal: props?.cartSubtotal || initialData.cartSubtotal,
-    paymentMethod: props?.paymentMethod || initialData.paymentMethod,
-  });
+  const [data, setData] = useState(initialData);
 
   const handleInputChange = ({ value, name }) => {
     setData((cur) => ({ ...cur, [name]: value }));

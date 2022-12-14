@@ -8,6 +8,8 @@ import {
   Link,
 } from "@shopify/polaris";
 import { useIsMutating } from "react-query";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 
 import {
   usePaymentCustomizations,
@@ -114,11 +116,24 @@ function TableRow({
 }
 
 function EmptyTable(props) {
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
+
+  const handleRedirectToPaymentCustomizations = () => {
+    redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+      path: "/settings/payments/customizations",
+    });
+  };
+
   return (
     <EmptyState heading="Hello world! 🎉" {...props}>
       <p>
         Welcome to the <b>Payment Customizations Functions Sample App</b>! To
-        get started, create a new customization.
+        get started, create a new customization from the{" "}
+        <Link onClick={handleRedirectToPaymentCustomizations}>
+          payment customizations page
+        </Link>
+        .
       </p>
     </EmptyState>
   );

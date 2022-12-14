@@ -139,6 +139,7 @@ export async function createServer(
 
       return { status: 200, data };
     } catch (err) {
+      console.log("error from here", err);
       const data =
         err instanceof Shopify.Errors.GraphqlQueryError
           ? err.response
@@ -247,19 +248,26 @@ export async function createServer(
       },
     };
 
-    let reducer = ({ paymentCustomizationCreate }) => ({
-      paymentCustomization: normalizeCustomization(
-        paymentCustomizationCreate.paymentCustomization
-      ),
-      userErrors: paymentCustomizationCreate.userErrors,
-    });
+    let reducer = ({ paymentCustomizationCreate }) => {
+      if (paymentCustomizationCreate.userErrors.length > 0) {
+        return { userErrors: paymentCustomizationCreate.userErrors };
+      } else {
+        return {
+          paymentCustomization: normalizeCustomization(
+            paymentCustomizationCreate.paymentCustomization
+          ),
+          userErrors: paymentCustomizationCreate.userErrors,
+        };
+      }
+    };
 
     const {
       status: paymentCustomizationStatus,
       data: paymentCustomizationData,
     } = await queryResponse(req, res, query, reducer);
 
-    const { paymentCustomization, userErrors } = paymentCustomizationData;
+    const paymentCustomization = paymentCustomizationData?.paymentCustomization;
+    const userErrors = paymentCustomizationData?.userErrors;
 
     if (paymentCustomizationStatus !== 200 || userErrors?.length > 0)
       return res
@@ -387,12 +395,14 @@ export async function createServer(
     };
 
     const reducer = ({ paymentCustomizationUpdate }) => {
-      if (paymentCustomizationUpdate?.userErrors?.length > 0) {
-        return paymentCustomizationUpdate;
+      if (paymentCustomizationUpdate?.userErrors.length > 0) {
+        return { userErrors: paymentCustomizationUpdate.userErrors };
       } else {
-        return normalizeCustomization(
-          paymentCustomizationUpdate.paymentCustomization
-        );
+        return {
+          paymentCustomization: normalizeCustomization(
+            paymentCustomizationUpdate.paymentCustomization
+          ),
+        };
       }
     };
 
