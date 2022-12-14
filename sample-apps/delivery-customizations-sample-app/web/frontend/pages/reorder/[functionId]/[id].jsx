@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { Layout, Card } from "@shopify/polaris";
 
-import NotFound from "../../NotFound";
+import { NotFound } from "../../../components";
 
 import {
   CustomizationForm,
