@@ -7,8 +7,10 @@ import {
   useIndexResourceState,
   Link,
 } from "@shopify/polaris";
-
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 import { useIsMutating } from "react-query";
+
 import {
   useDeliveryCustomizations,
   useDeleteDeliveryCustomization,
@@ -108,11 +110,24 @@ export default function HomePage() {
 }
 
 function EmptyTable(props) {
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
+
+  const handleRedirectToShippingCustomizations = () => {
+    redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+      path: "/settings/shipping/customizations",
+    });
+  };
+
   return (
     <EmptyState heading="Hello world! 🎉">
       <p>
         Welcome to the <b>Delivery Customizations Sample App</b>! To get
-        started, create a new customization from <Link>here</Link>.
+        started, create a new customization from the{" "}
+        <Link onClick={handleRedirectToShippingCustomizations}>
+          shipping customizations page
+        </Link>
+        .
       </p>
     </EmptyState>
   );
