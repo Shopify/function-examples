@@ -16,11 +16,12 @@ import {
   useUpdateDeliveryCustomization,
 } from "../../../hooks";
 
+import { userErrorBannerTitle } from "../../../utilities/helpers";
+
 export default function DeliveryCustomizationDetailPage() {
   const navigate = useNavigate();
   const { functionId, id } = useParams();
-
-  const [userErrors, setUserErrors] = useState(null);
+  const [errorBanner, setErrorBanner] = useState(null);
 
   const { data, isFetching } = useDeliveryCustomization({
     id,
@@ -31,7 +32,7 @@ export default function DeliveryCustomizationDetailPage() {
     setData,
     data: formData,
     hasChanged,
-  } = useCustomizationForm({ deliveryOptionName: data?.value });
+  } = useCustomizationForm({ functionId, title: "Hide" });
 
   const { mutateAsync: updateCustomization, isLoading } =
     useUpdateDeliveryCustomization({
@@ -42,16 +43,25 @@ export default function DeliveryCustomizationDetailPage() {
 
   const handleSubmit = async () => {
     if (disabled) return;
+    setErrorBanner(null);
 
     try {
       const data = await updateCustomization({ payload: formData });
       if (data?.userErrors) {
-        setUserErrors(data.userErrors);
+        setErrorBanner({
+          status: "warning",
+          title: userErrorBannerTitle(data.userErrors),
+          errors: data.userErrors,
+        });
       } else {
         navigate("/");
       }
     } catch (error) {
-      console.error(error);
+      setErrorBanner({
+        status: "critical",
+        title: "Something went wrong. Please try again.",
+        errors: [error],
+      });
     }
   };
 
@@ -85,9 +95,11 @@ export default function DeliveryCustomizationDetailPage() {
       isEditing={true}
       subtitle="Any delivery option matching this name exactly will be hidden."
     >
-      <Layout.Section>
-        <ErrorsBanner userErrors={userErrors} />
-      </Layout.Section>
+      {errorBanner && (
+        <Layout.Section>
+          <ErrorsBanner {...errorBanner} />
+        </Layout.Section>
+      )}
       <Layout.Section>
         <Card>
           <Card.Section>

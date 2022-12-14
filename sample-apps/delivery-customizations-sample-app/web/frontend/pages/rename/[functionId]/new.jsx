@@ -14,47 +14,55 @@ import {
   useCreateDeliveryCustomization,
 } from "../../../hooks";
 
+import { userErrorBannerTitle } from "../../../utilities/helpers";
+
 export default function NewDeliveryCustomizationPage() {
   const app = useAppBridge();
   const redirect = Redirect.create(app);
 
+  const [errorBanner, setErrorBanner] = useState(null);
+
   const { functionId } = useParams();
 
-  const [userErrors, setUserErrors] = useState(null);
-
-  const { handleInputChange, setData, data: formData } = useCustomizationForm();
+  const {
+    handleInputChange,
+    data: formData,
+    hasChanged,
+  } = useCustomizationForm({ functionId, title: "Rename" });
 
   const { mutateAsync: createCustomization, isLoading } =
     useCreateDeliveryCustomization();
 
   const handleSubmit = async () => {
     if (isLoading) return;
+    setErrorBanner(null);
+
     try {
       const data = await createCustomization({ payload: formData });
       if (data?.userErrors.length > 0) {
-        setUserErrors(data.userErrors);
+        setErrorBanner({
+          status: "warning",
+          title: userErrorBannerTitle(data.userErrors),
+          errors: data.userErrors,
+        });
       } else {
         redirect.dispatch(Redirect.Action.ADMIN_PATH, {
           path: "/settings/shipping/customizations",
         });
       }
     } catch (error) {
-      console.error(error);
+      setErrorBanner({
+        status: "critical",
+        title: "Something went wrong. Please try again.",
+        errors: [error],
+      });
     }
   };
 
   const primaryAction = {
-    disabled: isLoading,
+    disabled: isLoading || hasChanged,
     onAction: handleSubmit,
   };
-
-  useEffect(() => {
-    setData({
-      deliveryOptionName: "Express",
-      title: "Rename",
-      functionId,
-    });
-  }, []);
 
   return (
     <CustomizationPageLayout
@@ -63,9 +71,11 @@ export default function NewDeliveryCustomizationPage() {
       actionProps={primaryAction}
       subtitle="Any delivery option matching this name exactly will have 'renamed' appended to it"
     >
-      <Layout.Section>
-        <ErrorsBanner userErrors={userErrors} />
-      </Layout.Section>
+      {errorBanner && (
+        <Layout.Section>
+          <ErrorsBanner {...errorBanner} />
+        </Layout.Section>
+      )}
       <Layout.Section>
         <Card>
           <Card.Section>
