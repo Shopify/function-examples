@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { Redirect } from "@shopify/app-bridge/actions";
@@ -81,6 +81,7 @@ export default function NewCustomizationPage() {
               onSubmit={handleSubmit}
               onInputChange={handleInputChange}
               isNewCustomization={true}
+              setErrorBanner={setErrorBanner}
             />
           </Card.Section>
         </Card>

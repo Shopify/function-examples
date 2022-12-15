@@ -1,4 +1,5 @@
 import { Form, FormLayout, TextField, Button } from "@shopify/polaris";
+import { userErrorBannerTitle } from "../utilities/helpers";
 
 export function CustomizationForm({
   cartSubtotal,
@@ -9,9 +10,34 @@ export function CustomizationForm({
   disabled,
   hasChanged,
   isNewCustomization = false,
+  setErrorBanner,
   ...props
 }) {
   const handleSubmit = () => {
+    setErrorBanner(null);
+    let validationErrors = [];
+
+    if (cartSubtotal < 0) {
+      validationErrors.push({
+        message: "Cart subtotal cannot be less than 0",
+      });
+    }
+
+    if (paymentMethod == "") {
+      validationErrors.push({
+        message: "Payment method is required",
+      });
+    }
+
+    if (validationErrors.length > 0) {
+      setErrorBanner({
+        status: "warning",
+        title: userErrorBannerTitle(validationErrors),
+        errors: validationErrors,
+      });
+      return;
+    }
+
     if (onSubmit) onSubmit({ cartSubtotal, paymentMethod });
   };
 

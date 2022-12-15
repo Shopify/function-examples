@@ -100,6 +100,7 @@ export default function PaymentCustomizationDetailPage() {
               onSubmit={handleSubmit}
               onInputChange={handleInputChange}
               hasChanged={hasChanged}
+              setErrorBanner={setErrorBanner}
             />
           </Card.Section>
         </Card>
