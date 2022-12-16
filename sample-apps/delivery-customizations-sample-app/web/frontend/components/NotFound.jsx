@@ -2,7 +2,6 @@ import { Card, EmptyState, Page } from "@shopify/polaris";
 import { notFoundImage } from "../assets";
 
 export function NotFound() {
-  console.log("Heyooo");
   return (
     <Page>
       <Card>

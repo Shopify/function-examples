@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 
-const INITIAL_DATA = { value: "Express" };
-
 export function useCustomizationForm(props) {
   const initialData = {
     deliveryOptionName: "Express",
