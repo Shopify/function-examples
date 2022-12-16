@@ -7,9 +7,10 @@ import {
   useIndexResourceState,
   Link,
 } from "@shopify/polaris";
-
-import { PlusMinor } from "@shopify/polaris-icons";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 import { useIsMutating } from "react-query";
+
 import {
   useDeliveryCustomizations,
   useDeleteDeliveryCustomization,
@@ -49,7 +50,7 @@ export default function HomePage() {
   };
 
   const rowMarkup = deliveryCustomizations.map(
-    ({ id, enabled, title, value: deliveryOptionName, operation }, index) => {
+    ({ functionId, id, enabled, title, value: deliveryOptionName }, index) => {
       return (
         <IndexTable.Row
           id={id}
@@ -58,7 +59,7 @@ export default function HomePage() {
           position={index}
         >
           <IndexTable.Cell>
-            <Link dataPrimaryLink url={`/${operation}/${id}`}>
+            <Link dataPrimaryLink url={`/${title}/${functionId}/${id}`}>
               <TextStyle variation="strong">{title}</TextStyle>
             </Link>
           </IndexTable.Cell>
@@ -84,14 +85,8 @@ export default function HomePage() {
     },
   ];
 
-  const primaryAction = {
-    content: "Create customization",
-    icon: PlusMinor,
-    url: "/new",
-  };
-
   return (
-    <Page title="Customizations" primaryAction={primaryAction}>
+    <Page title="Customizations">
       <Card>
         <IndexTable
           resourceName={resourceName}
@@ -105,7 +100,7 @@ export default function HomePage() {
           ]}
           promotedBulkActions={tableActions}
           loading={isLoading}
-          emptyState={<EmptyTable action={primaryAction} />}
+          emptyState={<EmptyTable />}
         >
           {rowMarkup}
         </IndexTable>
@@ -115,11 +110,24 @@ export default function HomePage() {
 }
 
 function EmptyTable(props) {
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
+
+  const handleRedirectToShippingCustomizations = () => {
+    redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+      path: "/settings/shipping/customizations",
+    });
+  };
+
   return (
-    <EmptyState heading="Hello world! 🎉" {...props}>
+    <EmptyState heading="Hello world! 🎉">
       <p>
         Welcome to the <b>Delivery Customizations Sample App</b>! To get
-        started, create a new customization.
+        started, create a new customization from the{" "}
+        <Link onClick={handleRedirectToShippingCustomizations}>
+          delivery customizations page
+        </Link>
+        .
       </p>
     </EmptyState>
   );
