@@ -1,4 +1,4 @@
 # This file stores configurations for your Shopify app.
 
 name = "Payment Customization Functions Sample App"
-scopes = "write_products,read_payment_customizations,write_payment_customizations"
+scopes = "read_payment_customizations,write_payment_customizations"
