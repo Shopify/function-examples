@@ -125,7 +125,7 @@ function EmptyTable(props) {
         Welcome to the <b>Delivery Customizations Sample App</b>! To get
         started, create a new customization from the{" "}
         <Link onClick={handleRedirectToShippingCustomizations}>
-          shipping customizations page
+          delivery customizations page
         </Link>
         .
       </p>
