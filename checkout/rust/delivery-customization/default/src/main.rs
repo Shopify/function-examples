@@ -1,9 +1,7 @@
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use graphql_client;
 use serde::{Deserialize, Serialize};
-use serde_json;
 
 generate_types!(
     query_path = "./input.graphql",
@@ -11,18 +9,27 @@ generate_types!(
 );
 
 #[derive(Serialize, Deserialize, Default, PartialEq)]
-struct Config {}
+#[serde(rename_all(deserialize = "camelCase"))]
+struct Configuration {
+
+}
+
+impl Configuration {
+    fn from_str(value: &str) -> Self {
+        serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
+    }
+}
 
 #[shopify_function]
 fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
-    let _config: Config = input
-        .delivery_customization
-        .metafield
-        .as_ref()
-        .map(|m| serde_json::from_str::<Config>(m.value.as_str()))
-        .transpose()?
-        .unwrap_or_default();
+    let no_changes = output::FunctionResult { operations: vec![] };
 
+    let _config = match input.delivery_customization.metafield {
+        Some(input::InputDeliveryCustomizationMetafield { value }) =>
+            Configuration::from_str(&value),
+        None => return Ok(no_changes),
+    };
+    
     Ok(output::FunctionResult { operations: vec![] })
 }
 
