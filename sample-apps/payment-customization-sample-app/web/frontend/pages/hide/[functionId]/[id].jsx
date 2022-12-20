@@ -26,7 +26,7 @@ export default function PaymentCustomizationDetailPage() {
     const payload = {
       ...data,
       functionId,
-      title: `Hide ${data.paymentMethod} if cart subtotal is $${data.cartSubtotal}`,
+      title: `Hide ${data.paymentMethod} if cart subtotal is at least $${data.cartSubtotal}`,
     };
 
     try {
