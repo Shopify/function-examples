@@ -1594,7 +1594,10 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+  BYR
+    @deprecated(
+      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
+    )
 
   """
   Belize Dollar (BZD).
@@ -2119,7 +2122,10 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+  STD
+    @deprecated(
+      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
+    )
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2214,7 +2220,10 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+  VEF
+    @deprecated(
+      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
+    )
 
   """
   Venezuelan Bolivares (VES).

@@ -22,22 +22,26 @@ export const useAppMutation = ({
 }) => {
   const authenticatedFetch = useAuthenticatedFetch();
 
-  const fetch = useCallback(async ({ payload, params }) => {
-    const fetchUrl = params ? url.replace(/:(\w+)/g, (_, key) => params[key]) : url;
+  const fetch = useCallback(
+    async ({ payload, params }) => {
+      const fetchUrl = params
+        ? url.replace(/:(\w+)/g, (_, key) => params[key])
+        : url;
 
-    const response = await authenticatedFetch(fetchUrl, {
-      method: "POST",
-      ...fetchOptions,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      ...payload ? { body: JSON.stringify(payload) } : {},
-    });
+      const response = await authenticatedFetch(fetchUrl, {
+        method: "POST",
+        ...fetchOptions,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        ...(payload ? { body: JSON.stringify(payload) } : {}),
+      });
 
-    return response.json();
-
-  }, [url, JSON.stringify(fetchOptions)]);
+      return response.json();
+    },
+    [url, JSON.stringify(fetchOptions)]
+  );
 
   return useMutation(fetch, {
     ...reactQueryOptions,
