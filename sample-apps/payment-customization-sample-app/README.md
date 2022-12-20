@@ -18,6 +18,7 @@ It also provides a [Shopify Function](https://shopify.dev/api/functions) that al
   - `cargo install cargo-wasi`
 
 ### Before you start
+
 - Enable the **Bogus Gateway** payment method in your development store's admin.
 
 When testing this sample app make sure you use the full name of the payment method, which is **(for testing) Bogus Gateway**.
