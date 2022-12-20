@@ -14,12 +14,7 @@ import { useField, useForm } from "@shopify/react-form";
 
 import { ErrorsBanner } from "./ErrorsBanner";
 
-export default function CustomizationPage({
-  title,
-  subtitle,
-  initialData,
-  onSave,
-}) {
+export function CustomizationPage({ title, subtitle, initialData, onSave }) {
   const app = useAppBridge();
   const redirect = Redirect.create(app);
   const {
