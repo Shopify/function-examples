@@ -139,7 +139,6 @@ export async function createServer(
 
       return { status: 200, data };
     } catch (err) {
-      console.log("error from here", err);
       const data =
         err instanceof Shopify.Errors.GraphqlQueryError
           ? err.response
