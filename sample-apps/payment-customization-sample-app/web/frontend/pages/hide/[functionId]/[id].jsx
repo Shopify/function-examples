@@ -56,6 +56,8 @@ export default function PaymentCustomizationDetailPage() {
       subtitle="Hide a payment method for cart subtotal's greater than or equal to the specified subtotal."
       initialData={data}
       onSave={handleSave}
+      customizationId={id}
+      allowDeletion
     />
   );
 }

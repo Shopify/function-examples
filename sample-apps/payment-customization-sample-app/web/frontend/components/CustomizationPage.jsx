@@ -11,12 +11,24 @@ import {
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { useField, useForm } from "@shopify/react-form";
+import { useIsMutating } from "react-query";
 
 import { ErrorsBanner } from "./ErrorsBanner";
+import { useDeletePaymentCustomization } from "../hooks";
 
-export function CustomizationPage({ title, subtitle, initialData, onSave }) {
+export function CustomizationPage({
+  title,
+  subtitle,
+  initialData,
+  onSave,
+  customizationId,
+  allowDeletion = false,
+}) {
   const app = useAppBridge();
   const redirect = Redirect.create(app);
+  const { mutateAsync: deleteCustomization } = useDeletePaymentCustomization();
+  const deleting = useIsMutating(["deleteCustomization"]);
+
   const {
     fields: { paymentMethod, cartSubtotal },
     submit,
@@ -61,6 +73,17 @@ export function CustomizationPage({ title, subtitle, initialData, onSave }) {
     });
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteCustomization({ params: { id: customizationId } });
+      redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+        path: "/settings/payments/customizations",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   let errorMarkup;
   if (submitErrors.length > 0) {
     const title =
@@ -74,6 +97,18 @@ export function CustomizationPage({ title, subtitle, initialData, onSave }) {
       </Layout.Section>
     );
   }
+
+  const secondaryActions = allowDeletion
+    ? [
+        {
+          content: "Delete",
+          onAction: handleDelete,
+          destructive: true,
+          loading: deleting,
+          disabled: submitting,
+        },
+      ]
+    : [];
 
   return (
     <Page
@@ -95,7 +130,7 @@ export function CustomizationPage({ title, subtitle, initialData, onSave }) {
                       autoComplete="off"
                       value={paymentMethod.value}
                       onChange={paymentMethod.onChange}
-                      disabled={submitting}
+                      disabled={deleting || submitting}
                       error={paymentMethod.error}
                       requiredIndicator
                     />
@@ -105,7 +140,7 @@ export function CustomizationPage({ title, subtitle, initialData, onSave }) {
                       autoComplete="off"
                       value={cartSubtotal.value}
                       onChange={cartSubtotal.onChange}
-                      disabled={submitting}
+                      disabled={deleting || submitting}
                       error={cartSubtotal.error}
                       requiredIndicator
                     />
@@ -120,9 +155,10 @@ export function CustomizationPage({ title, subtitle, initialData, onSave }) {
             primaryAction={{
               content: "Save",
               onAction: submit,
-              disabled: !dirty,
+              disabled: deleting || !dirty,
               loading: submitting,
             }}
+            secondaryActions={secondaryActions}
           />
         </Layout.Section>
       </Layout>
