@@ -105,7 +105,7 @@ function TableRow({
   return (
     <IndexTable.Row id={id} selected={selected} position={index}>
       <IndexTable.Cell>
-        <Link dataPrimaryLink url={`/${title}/${functionId}/${id}`}>
+        <Link dataPrimaryLink url={`/hide/${functionId}/${id}`}>
           <TextStyle variation="strong">{title}</TextStyle>
         </Link>
       </IndexTable.Cell>

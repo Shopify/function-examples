@@ -3,3 +3,4 @@ export { CustomizationPageLayout } from "./CustomizationPageLayout";
 export { NotFound } from "./NotFound";
 export { ErrorsBanner } from "./ErrorsBanner";
 export * from "./providers";
+export { default as CustomizationPage } from "./CustomizationPage";

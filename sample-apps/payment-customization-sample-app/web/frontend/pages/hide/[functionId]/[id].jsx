@@ -1,110 +1,61 @@
-import { useState, useEffect } from "react";
+import { Loading } from "@shopify/polaris";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "@shopify/app-bridge-react";
-import { Layout, Card } from "@shopify/polaris";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 
+import { CustomizationPage } from "../../../components";
 import {
-  CustomizationPageLayout,
-  CustomizationForm,
-  ErrorsBanner,
-} from "../../../components";
-import {
-  useCustomizationForm,
   usePaymentCustomization,
   useUpdatePaymentCustomization,
 } from "../../../hooks";
 
-import { userErrorBannerTitle } from "../../../utilities/helpers";
-
 export default function PaymentCustomizationDetailPage() {
-  const navigate = useNavigate();
   const { id, functionId } = useParams();
-  const [errorBanner, setErrorBanner] = useState(null);
+  const app = useAppBridge();
+  const redirect = Redirect.create(app);
 
   const { data, isFetching } = usePaymentCustomization({
     id,
   });
 
-  const {
-    handleInputChange,
-    setData,
-    data: formData,
-    hasChanged,
-  } = useCustomizationForm({
-    functionId,
+  const { mutateAsync: updateCustomization } = useUpdatePaymentCustomization({
+    id,
   });
 
-  const { mutateAsync: updateCustomization, isLoading } =
-    useUpdatePaymentCustomization({
-      id,
-    });
-
-  const disabled = isFetching || isLoading;
-
-  const handleSubmit = async () => {
-    if (disabled) return;
-    setErrorBanner(null);
+  const handleSave = async (data) => {
+    const payload = {
+      ...data,
+      functionId,
+      title: `Hide ${data.paymentMethod} if cart subtotal is $${data.cartSubtotal}`,
+    };
 
     try {
-      const data = await updateCustomization({ payload: formData });
+      const data = await updateCustomization({ payload });
       if (data?.userErrors?.length > 0) {
-        setErrorBanner({
-          status: "warning",
-          title: userErrorBannerTitle(data.userErrors),
-          errors: data.userErrors,
-        });
-      } else {
-        navigate("/");
+        return { status: "fail", errors: data.userErrors };
       }
-    } catch (error) {
-      setErrorBanner({
-        status: "critical",
-        title: "Something went wrong. Please try again.",
-        errors: [error],
+
+      redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+        path: "/settings/payments/customizations",
       });
+    } catch {
+      return {
+        status: "fail",
+        errors: [
+          { message: "An unexpected error occurred. Please try again later." },
+        ],
+      };
     }
   };
 
-  useEffect(() => {
-    if (!data) return;
-
-    const { cartSubtotal, paymentMethod, title } = data;
-
-    setData({
-      cartSubtotal,
-      paymentMethod,
-      functionId,
-      title,
-    });
-  }, [data]);
-
-  const primaryAction = {
-    disabled: disabled || !hasChanged,
-    onAction: handleSubmit,
-  };
+  if (isFetching || !data) return <Loading />;
 
   return (
-    <CustomizationPageLayout loading={isLoading} actionProps={primaryAction}>
-      {errorBanner && (
-        <Layout.Section>
-          <ErrorsBanner {...errorBanner} />
-        </Layout.Section>
-      )}
-      <Layout.Section>
-        <Card>
-          <Card.Section>
-            <CustomizationForm
-              {...formData}
-              loading={disabled}
-              disabled={disabled}
-              onSubmit={handleSubmit}
-              onInputChange={handleInputChange}
-              hasChanged={hasChanged}
-              setErrorBanner={setErrorBanner}
-            />
-          </Card.Section>
-        </Card>
-      </Layout.Section>
-    </CustomizationPageLayout>
+    <CustomizationPage
+      title="Hide Payment Method"
+      subtitle="Hide a payment method for cart subtotal's greater than or equal to the specified subtotal."
+      initialData={data}
+      onSave={handleSave}
+    />
   );
 }

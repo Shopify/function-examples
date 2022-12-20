@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@shopify/app": "3.25.0",
-    "@shopify/cli": "3.25.0"
+    "@shopify/cli": "3.25.0",
+    "@shopify/react-form": "^2.4.1"
   },
   "author": "marlonmarcello"
 }

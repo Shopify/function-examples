@@ -69,15 +69,6 @@ export function CustomizationForm({
             requiredIndicator
           />
         </FormLayout.Group>
-
-        <Button
-          submit
-          primary
-          loading={loading}
-          disabled={!isNewCustomization && !hasChanged}
-        >
-          Save Customization
-        </Button>
       </FormLayout>
     </Form>
   );

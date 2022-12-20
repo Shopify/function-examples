@@ -4,7 +4,6 @@ export function useCustomizationForm(props) {
   const initialData = {
     cartSubtotal: 0,
     paymentMethod: "Credit Card",
-    title: "HIDE",
     ...props,
   };
 
@@ -15,13 +14,19 @@ export function useCustomizationForm(props) {
   };
 
   const hasChanged = useMemo(() => {
+    console.log(initialData, data)
     return Object.keys(initialData).some(
       (key) => data[key] !== initialData[key]
     );
   }, [data]);
 
+  const mergedData = {
+    ...data,
+    title: `Hide ${data.paymentMethod} for orders over $${data.cartSubtotal}`,
+  };
+
   return {
-    data,
+    data: mergedData,
     handleInputChange,
     hasChanged,
     setData,
