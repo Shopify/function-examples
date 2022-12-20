@@ -330,7 +330,6 @@ export async function createServer(
 
     const { functionId, title, paymentMethod, cartSubtotal } = payload;
 
-    // update metafield
     let query = {
       data: {
         query: `
