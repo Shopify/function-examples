@@ -12,8 +12,8 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
-    "@shopify/app": "3.25.0",
-    "@shopify/cli": "3.25.0",
+    "@shopify/app": "^3.29.0",
+    "@shopify/cli": "^3.29.0",
     "@shopify/react-form": "^2.4.1"
   },
   "author": "marlonmarcello"
