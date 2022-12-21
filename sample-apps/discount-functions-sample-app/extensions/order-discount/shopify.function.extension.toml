@@ -1,6 +1,6 @@
 name = "Order Discount"
 type = "order_discounts"
-api_version = "2022-07"
+api_version = "2023-01"
 
 [ui.paths]
 create = "/order-discount/new"
