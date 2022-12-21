@@ -41,6 +41,11 @@ type BuyerIdentity {
   The phone number of the buyer that is interacting with the cart.
   """
   phone: String
+
+  """
+  The purchasing company associated with the cart.
+  """
+  purchasingCompany: PurchasingCompany
 }
 
 """
@@ -223,6 +228,135 @@ type CartLineCost {
   The total cost of the merchandise line.
   """
   totalAmount: MoneyV2!
+}
+
+"""
+Represents information about a company which is also a customer of the shop.
+"""
+type Company implements HasMetafields {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601)) at which the company was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  A unique externally-supplied identifier for the company.
+  """
+  externalId: String
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+
+  """
+  The name of the company.
+  """
+  name: String!
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601)) at which the company was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A company's main point of contact.
+"""
+type CompanyContact {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company contact was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  The company contact's locale (language).
+  """
+  locale: String
+
+  """
+  The company contact's job title.
+  """
+  title: String
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company contact was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A company's location.
+"""
+type CompanyLocation implements HasMetafields {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company location was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  A unique externally-supplied identifier for the company.
+  """
+  externalId: String
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  The preferred locale of the company location.
+  """
+  locale: String
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+
+  """
+  The name of the company location.
+  """
+  name: String!
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company location was last modified.
+  """
+  updatedAt: DateTime!
 }
 
 """
@@ -1597,10 +1731,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR
-    @deprecated(
-      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
-    )
+  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
 
   """
   Belize Dollar (BZD).
@@ -2125,10 +2256,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD
-    @deprecated(
-      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
-    )
+  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2223,10 +2351,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF
-    @deprecated(
-      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
-    )
+  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
   Venezuelan Bolivares (VES).
@@ -2369,6 +2494,13 @@ type Customer implements HasMetafields {
   """
   numberOfOrders: Int!
 }
+
+"""
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
+For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
+represented as `"2019-09-07T15:50:00Z`".
+"""
+scalar DateTime
 
 """
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
@@ -3529,6 +3661,26 @@ input ProductVariantTarget {
   The value is validated against: > 0.
   """
   quantity: Int
+}
+
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
+type PurchasingCompany {
+  """
+  The company associated to the order or draft order.
+  """
+  company: Company!
+
+  """
+  The company contact associated to the order or draft order.
+  """
+  contact: CompanyContact
+
+  """
+  The company location associated to the order or draft order.
+  """
+  location: CompanyLocation!
 }
 
 """

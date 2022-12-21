@@ -1,6 +1,6 @@
 name = "Fixed Amount Off Order"
 type = "order_discounts"
-api_version = "2022-07"
+api_version = "2023-01"
 
 [build]
 command = "cargo wasi build --release"
