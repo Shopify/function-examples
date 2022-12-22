@@ -53,7 +53,7 @@ export default function PaymentCustomizationDetailPage() {
   return (
     <CustomizationPage
       title="Hide Payment Method"
-      subtitle="Hide a payment method for cart subtotal's greater than or equal to the specified subtotal."
+      subtitle="Hide a payment method for cart subtotals greater than or equal to the specified subtotal."
       initialData={data}
       onSave={handleSave}
       customizationId={id}
