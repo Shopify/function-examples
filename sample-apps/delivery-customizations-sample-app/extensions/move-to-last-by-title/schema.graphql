@@ -1,10 +1,3 @@
-# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
-# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
-#
-# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
-# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
-# Check out the "Docs" tab in the top right.
-
 schema {
   query: Input
   mutation: MutationRoot
@@ -48,6 +41,11 @@ type BuyerIdentity {
   The phone number of the buyer that is interacting with the cart.
   """
   phone: String
+
+  """
+  The purchasing company associated with the cart.
+  """
+  purchasingCompany: PurchasingCompany
 }
 
 """
@@ -235,6 +233,145 @@ type CartLineCost {
   The total cost of the merchandise line.
   """
   totalAmount: MoneyV2!
+}
+
+"""
+Represents information about a company which is also a customer of the shop.
+"""
+type Company implements HasMetafields {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601)) at which the company was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  A unique externally-supplied identifier for the company.
+  """
+  externalId: String
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+
+  """
+  The name of the company.
+  """
+  name: String!
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601)) at which the company was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A company's main point of contact.
+"""
+type CompanyContact {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company contact was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  The company contact's locale (language).
+  """
+  locale: String
+
+  """
+  The company contact's job title.
+  """
+  title: String
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company contact was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A company's location.
+"""
+type CompanyLocation implements HasMetafields {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company location was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  A unique externally-supplied identifier for the company.
+  """
+  externalId: String
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  The preferred locale of the company location.
+  """
+  locale: String
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+
+  """
+  The name of the company location.
+  """
+  name: String!
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company location was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A country.
+"""
+type Country {
+  """
+  The ISO code of the country.
+  """
+  isoCode: CountryCode!
 }
 
 """
@@ -2364,6 +2501,13 @@ type Customer implements HasMetafields {
 }
 
 """
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
+For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
+represented as `"2019-09-07T15:50:00Z`".
+"""
+scalar DateTime
+
+"""
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
 
 Example values: `"29.99"`, `"29.999"`.
@@ -2455,6 +2599,9 @@ interface HasMetafields {
   ): Metafield
 }
 
+"""
+Request to hide a delivery option.
+"""
 input HideOperation {
   """
   The handle of the delivery option to hide.
@@ -2480,6 +2627,731 @@ type Input {
   The delivery customization that owns the current function.
   """
   deliveryCustomization: DeliveryCustomization!
+
+  """
+  The localization of the function execution context.
+  """
+  localization: Localization!
+
+  """
+  The conversion rate between the shop's currency and the currency of the cart.
+  """
+  presentmentCurrencyRate: Decimal!
+}
+
+"""
+A language.
+"""
+type Language {
+  """
+  The ISO code.
+  """
+  isoCode: LanguageCode!
+}
+
+"""
+ISO 639-1 language codes supported by Shopify.
+"""
+enum LanguageCode {
+  """
+  Afrikaans.
+  """
+  AF
+
+  """
+  Akan.
+  """
+  AK
+
+  """
+  Amharic.
+  """
+  AM
+
+  """
+  Arabic.
+  """
+  AR
+
+  """
+  Assamese.
+  """
+  AS
+
+  """
+  Azerbaijani.
+  """
+  AZ
+
+  """
+  Belarusian.
+  """
+  BE
+
+  """
+  Bulgarian.
+  """
+  BG
+
+  """
+  Bambara.
+  """
+  BM
+
+  """
+  Bangla.
+  """
+  BN
+
+  """
+  Tibetan.
+  """
+  BO
+
+  """
+  Breton.
+  """
+  BR
+
+  """
+  Bosnian.
+  """
+  BS
+
+  """
+  Catalan.
+  """
+  CA
+
+  """
+  Chechen.
+  """
+  CE
+
+  """
+  Czech.
+  """
+  CS
+
+  """
+  Church Slavic.
+  """
+  CU
+
+  """
+  Welsh.
+  """
+  CY
+
+  """
+  Danish.
+  """
+  DA
+
+  """
+  German.
+  """
+  DE
+
+  """
+  Dzongkha.
+  """
+  DZ
+
+  """
+  Ewe.
+  """
+  EE
+
+  """
+  Greek.
+  """
+  EL
+
+  """
+  English.
+  """
+  EN
+
+  """
+  Esperanto.
+  """
+  EO
+
+  """
+  Spanish.
+  """
+  ES
+
+  """
+  Estonian.
+  """
+  ET
+
+  """
+  Basque.
+  """
+  EU
+
+  """
+  Persian.
+  """
+  FA
+
+  """
+  Fulah.
+  """
+  FF
+
+  """
+  Finnish.
+  """
+  FI
+
+  """
+  Faroese.
+  """
+  FO
+
+  """
+  French.
+  """
+  FR
+
+  """
+  Western Frisian.
+  """
+  FY
+
+  """
+  Irish.
+  """
+  GA
+
+  """
+  Scottish Gaelic.
+  """
+  GD
+
+  """
+  Galician.
+  """
+  GL
+
+  """
+  Gujarati.
+  """
+  GU
+
+  """
+  Manx.
+  """
+  GV
+
+  """
+  Hausa.
+  """
+  HA
+
+  """
+  Hebrew.
+  """
+  HE
+
+  """
+  Hindi.
+  """
+  HI
+
+  """
+  Croatian.
+  """
+  HR
+
+  """
+  Hungarian.
+  """
+  HU
+
+  """
+  Armenian.
+  """
+  HY
+
+  """
+  Interlingua.
+  """
+  IA
+
+  """
+  Indonesian.
+  """
+  ID
+
+  """
+  Igbo.
+  """
+  IG
+
+  """
+  Sichuan Yi.
+  """
+  II
+
+  """
+  Icelandic.
+  """
+  IS
+
+  """
+  Italian.
+  """
+  IT
+
+  """
+  Japanese.
+  """
+  JA
+
+  """
+  Javanese.
+  """
+  JV
+
+  """
+  Georgian.
+  """
+  KA
+
+  """
+  Kikuyu.
+  """
+  KI
+
+  """
+  Kazakh.
+  """
+  KK
+
+  """
+  Kalaallisut.
+  """
+  KL
+
+  """
+  Khmer.
+  """
+  KM
+
+  """
+  Kannada.
+  """
+  KN
+
+  """
+  Korean.
+  """
+  KO
+
+  """
+  Kashmiri.
+  """
+  KS
+
+  """
+  Kurdish.
+  """
+  KU
+
+  """
+  Cornish.
+  """
+  KW
+
+  """
+  Kyrgyz.
+  """
+  KY
+
+  """
+  Luxembourgish.
+  """
+  LB
+
+  """
+  Ganda.
+  """
+  LG
+
+  """
+  Lingala.
+  """
+  LN
+
+  """
+  Lao.
+  """
+  LO
+
+  """
+  Lithuanian.
+  """
+  LT
+
+  """
+  Luba-Katanga.
+  """
+  LU
+
+  """
+  Latvian.
+  """
+  LV
+
+  """
+  Malagasy.
+  """
+  MG
+
+  """
+  Māori.
+  """
+  MI
+
+  """
+  Macedonian.
+  """
+  MK
+
+  """
+  Malayalam.
+  """
+  ML
+
+  """
+  Mongolian.
+  """
+  MN
+
+  """
+  Marathi.
+  """
+  MR
+
+  """
+  Malay.
+  """
+  MS
+
+  """
+  Maltese.
+  """
+  MT
+
+  """
+  Burmese.
+  """
+  MY
+
+  """
+  Norwegian (Bokmål).
+  """
+  NB
+
+  """
+  North Ndebele.
+  """
+  ND
+
+  """
+  Nepali.
+  """
+  NE
+
+  """
+  Dutch.
+  """
+  NL
+
+  """
+  Norwegian Nynorsk.
+  """
+  NN
+
+  """
+  Norwegian.
+  """
+  NO
+
+  """
+  Oromo.
+  """
+  OM
+
+  """
+  Odia.
+  """
+  OR
+
+  """
+  Ossetic.
+  """
+  OS
+
+  """
+  Punjabi.
+  """
+  PA
+
+  """
+  Polish.
+  """
+  PL
+
+  """
+  Pashto.
+  """
+  PS
+
+  """
+  Portuguese.
+  """
+  PT
+
+  """
+  Portuguese (Brazil).
+  """
+  PT_BR
+
+  """
+  Portuguese (Portugal).
+  """
+  PT_PT
+
+  """
+  Quechua.
+  """
+  QU
+
+  """
+  Romansh.
+  """
+  RM
+
+  """
+  Rundi.
+  """
+  RN
+
+  """
+  Romanian.
+  """
+  RO
+
+  """
+  Russian.
+  """
+  RU
+
+  """
+  Kinyarwanda.
+  """
+  RW
+
+  """
+  Sindhi.
+  """
+  SD
+
+  """
+  Northern Sami.
+  """
+  SE
+
+  """
+  Sango.
+  """
+  SG
+
+  """
+  Sinhala.
+  """
+  SI
+
+  """
+  Slovak.
+  """
+  SK
+
+  """
+  Slovenian.
+  """
+  SL
+
+  """
+  Shona.
+  """
+  SN
+
+  """
+  Somali.
+  """
+  SO
+
+  """
+  Albanian.
+  """
+  SQ
+
+  """
+  Serbian.
+  """
+  SR
+
+  """
+  Sundanese.
+  """
+  SU
+
+  """
+  Swedish.
+  """
+  SV
+
+  """
+  Swahili.
+  """
+  SW
+
+  """
+  Tamil.
+  """
+  TA
+
+  """
+  Telugu.
+  """
+  TE
+
+  """
+  Tajik.
+  """
+  TG
+
+  """
+  Thai.
+  """
+  TH
+
+  """
+  Tigrinya.
+  """
+  TI
+
+  """
+  Turkmen.
+  """
+  TK
+
+  """
+  Tongan.
+  """
+  TO
+
+  """
+  Turkish.
+  """
+  TR
+
+  """
+  Tatar.
+  """
+  TT
+
+  """
+  Uyghur.
+  """
+  UG
+
+  """
+  Ukrainian.
+  """
+  UK
+
+  """
+  Urdu.
+  """
+  UR
+
+  """
+  Uzbek.
+  """
+  UZ
+
+  """
+  Vietnamese.
+  """
+  VI
+
+  """
+  Volapük.
+  """
+  VO
+
+  """
+  Wolof.
+  """
+  WO
+
+  """
+  Xhosa.
+  """
+  XH
+
+  """
+  Yiddish.
+  """
+  YI
+
+  """
+  Yoruba.
+  """
+  YO
+
+  """
+  Chinese.
+  """
+  ZH
+
+  """
+  Chinese (Simplified).
+  """
+  ZH_CN
+
+  """
+  Chinese (Traditional).
+  """
+  ZH_TW
+
+  """
+  Zulu.
+  """
+  ZU
+}
+
+"""
+Information about the localized experiences configured for the shop.
+"""
+type Localization {
+  """
+  The country of the active localized experience.
+  """
+  country: Country!
+
+  """
+  The language of the active localized experience.
+  """
+  language: Language!
 }
 
 """
@@ -2583,6 +3455,9 @@ type MoneyV2 {
   currencyCode: CurrencyCode!
 }
 
+"""
+Request to move a delivery option to a new index.
+"""
 input MoveOperation {
   """
   The handle of the delivery option to move.
@@ -2610,9 +3485,23 @@ type MutationRoot {
   ): Void!
 }
 
+"""
+An operation to apply to the list of delivery options.
+"""
 input Operation @oneOf {
+  """
+  Request to hide a delivery option.
+  """
   hide: HideOperation
+
+  """
+  Request to move a delivery option to a new index.
+  """
   move: MoveOperation
+
+  """
+  Request to rename a delivery option.
+  """
   rename: RenameOperation
 }
 
@@ -2731,6 +3620,29 @@ type ProductVariant implements HasMetafields {
   weightUnit: WeightUnit!
 }
 
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
+type PurchasingCompany {
+  """
+  The company associated to the order or draft order.
+  """
+  company: Company!
+
+  """
+  The company contact associated to the order or draft order.
+  """
+  contact: CompanyContact
+
+  """
+  The company location associated to the order or draft order.
+  """
+  location: CompanyLocation!
+}
+
+"""
+Request to rename a delivery option.
+"""
 input RenameOperation {
   """
   The handle of the delivery option to rename.
