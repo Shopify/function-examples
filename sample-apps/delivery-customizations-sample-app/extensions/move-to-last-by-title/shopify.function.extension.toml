@@ -1,7 +1,7 @@
 name = "move to last delivery option by title"
 type = "delivery_customization"
 title = "move to last delivery option by title"
-api_version = "unstable"
+api_version = "2023-04"
 
 [build]
 command = "cargo wasi build --release"
