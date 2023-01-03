@@ -1,6 +1,6 @@
 name = "Hide Payment By Name and Cart Subtotal"
 type = "payment_customization"
-api_version = "unstable"
+api_version = "2023-04"
 
 [build]
 command = "cargo wasi build --release"
