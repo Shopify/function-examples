@@ -35,7 +35,7 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
             }
         })
         .collect();
-
+    panic!();
     Ok(output::FunctionResult { operations })
 }
 
