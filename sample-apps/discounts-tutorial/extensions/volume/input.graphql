@@ -3,6 +3,7 @@ query Input {
     lines {
       quantity
       merchandise {
+        __typename
         ...on ProductVariant {
           id
         }
