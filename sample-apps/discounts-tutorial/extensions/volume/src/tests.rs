@@ -7,21 +7,21 @@ fn test_discount_with_no_configuration() -> Result<()> {
         function,
         r#"
         {
-            "cart": {
-              "lines": [
-                {
-                  "quantity": 5,
-                  "merchandise": {
-                    "__typename": "ProductVariant",
-                    "id": "gid://shopify/ProductVariant/0"
-                  }
+          "cart": {
+            "lines": [
+              {
+                "quantity": 5,
+                "merchandise": {
+                  "__typename": "ProductVariant",
+                  "id": "gid://shopify/ProductVariant/0"
                 }
-              ]
-            },
-            "discountNode": {
-              "metafield": null
-            }
+              }
+            ]
+          },
+          "discountNode": {
+            "metafield": null
           }
+        }
         "#,
     )?;
     let expected = 0;
@@ -36,39 +36,55 @@ fn test_discount_with_configuration() -> Result<()> {
         function,
         r#"
         {
-            "cart": {
-              "lines": [
-                {
-                  "quantity": 5,
-                  "merchandise": {
-                    "__typename": "ProductVariant",
-                    "id": "gid://shopify/ProductVariant/0"
-                  }
-                },
-                {
-                  "quantity": 1,
-                  "merchandise": {
-                    "__typename": "ProductVariant",
-                    "id": "gid://shopify/ProductVariant/1"
-                  }
+          "cart": {
+            "lines": [
+              {
+                "quantity": 5,
+                "merchandise": {
+                  "__typename": "ProductVariant",
+                  "id": "gid://shopify/ProductVariant/0"
                 }
-              ]
-            },
-            "discountNode": {
-              "metafield": {
-                "value": "{\"quantity\":5,\"percentage\":10.0}"
+              },
+              {
+                "quantity": 1,
+                "merchandise": {
+                  "__typename": "ProductVariant",
+                  "id": "gid://shopify/ProductVariant/1"
+                }
               }
+            ]
+          },
+          "discountNode": {
+            "metafield": {
+              "value": "{\"quantity\":5,\"percentage\":10.0}"
             }
           }
+        }
         "#,
     )?;
-    let expected = output::Target {
-        product_variant: Some(output::ProductVariantTarget {
-            id: "gid://shopify/ProductVariant/0".to_string(),
-            quantity: None
-        })
+    let expected = output::FunctionResult {
+      discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
+      discounts: vec![
+        output::Discount {
+          message: None,
+          value: output::Value {
+            fixed_amount: None,
+            percentage: Some(output::Percentage {
+              value: "10".to_string()
+            })
+          },
+          targets: vec![
+            output::Target {
+              product_variant: Some(output::ProductVariantTarget {
+                  id: "gid://shopify/ProductVariant/0".to_string(),
+                  quantity: None
+              })
+            }
+          ]
+        }
+      ]
     };
 
-    assert_eq!(result.discounts.first().unwrap().targets.first().unwrap(), &expected);
+    assert_eq!(result, expected);
     Ok(())
 }
