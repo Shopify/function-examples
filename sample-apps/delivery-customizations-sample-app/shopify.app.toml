@@ -1,4 +1,0 @@
-# This file stores configurations for your Shopify app.
-
-name = "Delivery Customizations Sample App"
-scopes = "write_delivery_customizations,read_delivery_customizations"
