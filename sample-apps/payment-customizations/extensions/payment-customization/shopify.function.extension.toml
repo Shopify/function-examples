@@ -1,0 +1,11 @@
+name = "payment-customization"
+type = "payment_customization"
+api_version = "2023-04"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/payment-customization.wasm"
+
+[ui.paths]
+create = "/"
+details = "/"

@@ -1,0 +1,13 @@
+query Input {
+  cart {
+    cost {
+      totalAmount {
+        amount
+      }
+    }
+  }
+  paymentMethods {
+    id
+    name
+  }
+}
