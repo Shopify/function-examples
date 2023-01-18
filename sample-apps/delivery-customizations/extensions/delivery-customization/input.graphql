@@ -10,4 +10,12 @@ query Input {
       }
     }
   }
+  deliveryCustomization {
+    metafield(
+      namespace: "delivery-customization"
+      key: "function-configuration"
+    ) {
+      value
+    }
+  }
 }
