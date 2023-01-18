@@ -1,0 +1,11 @@
+name = "delivery-customization"
+type = "delivery_customization"
+api_version = "2023-04"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/delivery-customization.wasm"
+
+[ui.paths]
+create = "/"
+details = "/"
