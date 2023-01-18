@@ -7,6 +7,7 @@ import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
+import { GraphqlQueryError } from "@shopify/shopify-api";
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -33,6 +34,97 @@ app.post(
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
+
+// Helper function for handling any user-facing errors in GraphQL responses
+function handleUserError(userErrors, res) {
+  if (userErrors && userErrors.length > 0) {
+    const message = userErrors.map((error) => error.message).join(" ");
+    res.status(500).send({ error: message });
+    return true;
+  }
+  return false;
+}
+
+// Endpoint for the delivery customization UI to invoke
+app.post("/api/deliveryCustomization/create", async (req, res) => {
+  const payload = req.body;
+  const graphqlClient = new shopify.api.clients.Graphql({
+    session: res.locals.shopify.session,
+  });
+
+  try {
+    // Create the delivery customization for the provided function ID
+    const createResponse = await graphqlClient.query({
+      data: {
+        query: `mutation DeliveryCustomizationCreate($input: DeliveryCustomizationInput!) {
+          deliveryCustomizationCreate(deliveryCustomization: $input) {
+            deliveryCustomization {
+              id
+            }
+            userErrors {
+              message
+            }
+          }
+        }`,
+        variables: {
+          input: {
+            functionId: payload.functionId,
+            title: `Display message for ${payload.stateProvinceCode}`,
+            enabled: true,
+          },
+        },
+      },
+    });
+    let createResult = createResponse.body.data.deliveryCustomizationCreate;
+    if (handleUserError(createResult.userErrors, res)) {
+      return;
+    }
+
+    // Populate the function configuration metafield for the delivery customization
+    const customizationId = createResult.deliveryCustomization.id;
+    const metafieldResponse = await graphqlClient.query({
+      data: {
+        query: `mutation MetafieldsSet($customizationId: ID!, $configurationValue: String!) {
+          metafieldsSet(metafields: [
+            {
+              ownerId: $customizationId
+              namespace: "delivery-customization"
+              key: "function-configuration"
+              value: $configurationValue
+              type: "json"
+            }
+          ]) {
+            metafields {
+              id
+            }
+            userErrors {
+              message
+            }
+          }
+        }`,
+        variables: {
+          customizationId,
+          configurationValue: JSON.stringify({
+            stateProvinceCode: payload.stateProvinceCode,
+            message: payload.message,
+          }),
+        },
+      },
+    });
+    let metafieldResult = metafieldResponse.body.data.metafieldsSet;
+    if (handleUserError(metafieldResult, res)) {
+      return;
+    }
+  } catch (error) {
+    // Handle errors thrown by the graphql client
+    if (!(error instanceof GraphqlQueryError)) {
+      throw error;
+    }
+    return res.status(500).send({ error: error.response });
+  }
+
+  return res.status(200).send();
+});
 
 app.get("/api/products/count", async (_req, res) => {
   const countData = await shopify.api.rest.Product.count({
