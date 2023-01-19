@@ -12,7 +12,7 @@ query Input {
   }
   deliveryCustomization {
     metafield(
-      namespace: "delivery-customization"
+      namespace: "{{ app_name | replace: " ", "-" | downcase }}"
       key: "function-configuration"
     ) {
       value
