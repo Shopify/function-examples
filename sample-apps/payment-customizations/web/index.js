@@ -45,6 +45,133 @@ function handleUserError(userErrors, res) {
   return false;
 }
 
+// Endpoint for fetching a payment customization
+app.get("/api/paymentCustomization/:id", async (req, res) => {
+  const id = `gid://shopify/PaymentCustomization/${req.params.id}`;
+  const graphqlClient = new shopify.api.clients.Graphql({
+    session: res.locals.shopify.session,
+  });
+
+  try {
+    const response = await graphqlClient.query({
+      data: {
+        query: `query PaymentCustomization($id: ID!) {
+          paymentCustomization(id: $id) {
+            id
+            metafield(namespace: "payment-customization", key: "function-configuration") {
+              value
+            }
+          }
+        }`,
+        variables: {
+          id,
+        },
+      },
+    });
+
+    if (!response.body.data || !response.body.data.paymentCustomization) {
+      res.status(404).send({ error: "Payment customization not found" });
+    }
+
+    const metafieldValue = response.body.data.paymentCustomization.metafield
+      ? JSON.parse(response.body.data.paymentCustomization.metafield.value)
+      : {};
+    const { paymentMethodName, cartTotal } = metafieldValue;
+
+    const paymentCustomization = {
+      id,
+      paymentMethod: paymentMethodName,
+      cartTotal,
+    };
+
+    res.status(200).send(paymentCustomization);
+  } catch (error) {
+    console.error(`Failed to fetch payment customization ${id}`, error);
+    res.status(500).send();
+  }
+});
+
+app.put("/api/paymentCustomization/update", async (req, res) => {
+  const payload = req.body;
+  const graphqlClient = new shopify.api.clients.Graphql({
+    session: res.locals.shopify.session,
+  });
+
+  try {
+    // Create the payment customization for the provided function ID
+    const updateResponse = await graphqlClient.query({
+      data: {
+        query: `mutation PaymentCustomizationUpdate($id: ID!, $input: PaymentCustomizationInput!) {
+          paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
+            paymentCustomization {
+              id
+            }
+            userErrors {
+              message
+            }
+          }
+        }`,
+        variables: {
+          input: {
+            functionId: payload.functionId,
+            title: `Hide ${payload.paymentMethod} if cart total is larger than ${payload.cartTotal}`,
+            enabled: true,
+          },
+          id: payload.id,
+        },
+      },
+    });
+    let updateResult = updateResponse.body.data.paymentCustomizationUpdate;
+    if (handleUserError(updateResult.userErrors, res)) {
+      return;
+    }
+
+    // Populate the function configuration metafield for the payment customization
+    const customizationId = updateResult.paymentCustomization.id;
+    const metafieldResponse = await graphqlClient.query({
+      data: {
+        query: `mutation MetafieldsSet($customizationId: ID!, $configurationValue: String!) {
+          metafieldsSet(metafields: [
+            {
+              ownerId: $customizationId
+              namespace: "payment-customization"
+              key: "function-configuration"
+              value: $configurationValue
+              type: "json"
+            }
+          ]) {
+            metafields {
+              id
+            }
+            userErrors {
+              message
+            }
+          }
+        }`,
+        variables: {
+          customizationId,
+          configurationValue: JSON.stringify({
+            paymentMethodName: payload.paymentMethod,
+            cartTotal: payload.cartTotal,
+          }),
+        },
+      },
+    });
+    let metafieldResult = metafieldResponse.body.data.metafieldsSet;
+    if (handleUserError(metafieldResult, res)) {
+      return;
+    }
+  } catch (error) {
+    // Handle errors thrown by the graphql client
+    if (!(error instanceof GraphqlQueryError)) {
+      throw error;
+    }
+    return res.status(500).send({ error: error.response });
+  }
+
+  return res.status(200).send();
+});
+
 // Endpoint for the payment customization UI to invoke
 app.post("/api/paymentCustomization/create", async (req, res) => {
   const payload = req.body;
