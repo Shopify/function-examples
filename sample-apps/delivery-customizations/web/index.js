@@ -45,6 +45,133 @@ function handleUserError(userErrors, res) {
   return false;
 }
 
+// Endpoint for fetching a delivery customization
+app.get("/api/deliveryCustomization/:id", async (req, res) => {
+  const id = `gid://shopify/DeliveryCustomization/${req.params.id}`;
+  const graphqlClient = new shopify.api.clients.Graphql({
+    session: res.locals.shopify.session,
+  });
+
+  try {
+    const response = await graphqlClient.query({
+      data: {
+        query: `query DeliveryCustomization($id: ID!) {
+          deliveryCustomization(id: $id) {
+            id
+            metafield(namespace: "delivery-customization", key: "function-configuration") {
+              value
+            }
+          }
+        }`,
+        variables: {
+          id,
+        },
+      },
+    });
+
+    if (!response.body.data || !response.body.data.deliveryCustomization) {
+      res.status(404).send({ error: "Delivery customization not found" });
+    }
+
+    const metafieldValue = response.body.data.deliveryCustomization.metafield
+      ? JSON.parse(response.body.data.deliveryCustomization.metafield.value)
+      : {};
+    const { stateProvinceCode, message } = metafieldValue;
+
+    const deliveryCustomization = {
+      id,
+      stateProvinceCode,
+      message,
+    };
+
+    res.status(200).send(deliveryCustomization);
+  } catch (error) {
+    console.error(`Failed to fetch delivery customization ${id}`, error);
+    res.status(500).send();
+  }
+});
+
+app.put("/api/deliveryCustomization/update", async (req, res) => {
+  const payload = req.body;
+  const graphqlClient = new shopify.api.clients.Graphql({
+    session: res.locals.shopify.session,
+  });
+
+  try {
+    // Create the delivery customization for the provided function ID
+    const updateResponse = await graphqlClient.query({
+      data: {
+        query: `mutation DeliveryCustomizationUpdate($id: ID!, $input: DeliveryCustomizationInput!) {
+          deliveryCustomizationUpdate(id: $id, deliveryCustomization: $input) {
+            deliveryCustomization {
+              id
+            }
+            userErrors {
+              message
+            }
+          }
+        }`,
+        variables: {
+          input: {
+            functionId: payload.functionId,
+            title: `Display message for ${payload.stateProvinceCode}`,
+            enabled: true,
+          },
+          id: payload.id,
+        },
+      },
+    });
+    let updateResult = updateResponse.body.data.deliveryCustomizationUpdate;
+    if (handleUserError(updateResult.userErrors, res)) {
+      return;
+    }
+
+    // Populate the function configuration metafield for the delivery customization
+    const customizationId = updateResult.deliveryCustomization.id;
+    const metafieldResponse = await graphqlClient.query({
+      data: {
+        query: `mutation MetafieldsSet($customizationId: ID!, $configurationValue: String!) {
+          metafieldsSet(metafields: [
+            {
+              ownerId: $customizationId
+              namespace: "delivery-customization"
+              key: "function-configuration"
+              value: $configurationValue
+              type: "json"
+            }
+          ]) {
+            metafields {
+              id
+            }
+            userErrors {
+              message
+            }
+          }
+        }`,
+        variables: {
+          customizationId,
+          configurationValue: JSON.stringify({
+            stateProvinceCode: payload.stateProvinceCode,
+            message: payload.message,
+          }),
+        },
+      },
+    });
+    let metafieldResult = metafieldResponse.body.data.metafieldsSet;
+    if (handleUserError(metafieldResult, res)) {
+      return;
+    }
+  } catch (error) {
+    // Handle errors thrown by the graphql client
+    if (!(error instanceof GraphqlQueryError)) {
+      throw error;
+    }
+    return res.status(500).send({ error: error.response });
+  }
+
+  return res.status(200).send();
+});
+
 // Endpoint for the delivery customization UI to invoke
 app.post("/api/deliveryCustomization/create", async (req, res) => {
   const payload = req.body;
