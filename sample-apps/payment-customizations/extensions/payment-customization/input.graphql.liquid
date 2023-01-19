@@ -12,7 +12,7 @@ query Input {
   }
   paymentCustomization {
     metafield(
-      namespace: "payment-customization"
+      namespace: "{{ app_name | replace: " ", "-" | downcase }}"
       key: "function-configuration"
     ) {
       value
