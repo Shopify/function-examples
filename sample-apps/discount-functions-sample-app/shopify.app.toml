@@ -1,4 +1,0 @@
-# This file stores configurations for your Shopify app.
-
-name = "Discount Functions Sample App"
-scopes = "write_products,read_discounts,write_discounts,read_price_rules,write_price_rules"
