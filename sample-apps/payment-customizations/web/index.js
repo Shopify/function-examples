@@ -8,6 +8,7 @@ import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import { GraphqlQueryError } from "@shopify/shopify-api";
+import metafields from "./metafields.js";
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -58,7 +59,7 @@ app.get("/api/paymentCustomization/:id", async (req, res) => {
         query: `query PaymentCustomization($id: ID!) {
           paymentCustomization(id: $id) {
             id
-            metafield(namespace: "payment-customization", key: "function-configuration") {
+            metafield(namespace: "${metafields.namespace}", key: "${metafields.key}") {
               value
             }
           }
@@ -134,8 +135,8 @@ app.put("/api/paymentCustomization/update", async (req, res) => {
           metafieldsSet(metafields: [
             {
               ownerId: $customizationId
-              namespace: "payment-customization"
-              key: "function-configuration"
+              namespace: "${metafields.namespace}"
+              key: "${metafields.key}"
               value: $configurationValue
               type: "json"
             }
@@ -215,8 +216,8 @@ app.post("/api/paymentCustomization/create", async (req, res) => {
           metafieldsSet(metafields: [
             {
               ownerId: $customizationId
-              namespace: "payment-customization"
-              key: "function-configuration"
+              namespace: "${metafields.namespace}"
+              key: "${metafields.key}"
               value: $configurationValue
               type: "json"
             }
