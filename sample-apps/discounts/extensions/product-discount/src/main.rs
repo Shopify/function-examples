@@ -37,6 +37,8 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
         .collect::<Vec<output::Target>>();
 
     if targets.is_empty() {
+        // You can use STDERR for debug logs in your function
+        eprintln!("No cart lines qualify for volume discount.");
         return Ok(no_discount);
     }
 
@@ -44,7 +46,9 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
     Ok(output::FunctionResult {
         discounts: vec![output::Discount {
             message: None,
+            // Apply the discount to the collected targets
             targets,
+            // Define a percentage-based discount
             value: output::Value {
                 fixed_amount: None,
                 percentage: Some(output::Percentage {
