@@ -10,4 +10,9 @@ query Input {
       }
     }
   }
+  discountNode {
+    metafield(namespace: "discounts-tutorial", key: "function-configuration") {
+      value
+    }
+  }
 }
