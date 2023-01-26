@@ -8,6 +8,34 @@ import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 
+import { GraphqlQueryError } from '@shopify/shopify-api';
+
+const CREATE_CODE_MUTATION = `
+mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
+  discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
+    userErrors {
+      code
+      message
+      field
+    }
+  }
+}
+`;
+
+const CREATE_AUTOMATIC_MUTATION = `
+mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
+  discountCreate: discountAutomaticAppCreate(
+    automaticAppDiscount: $discount
+  ) {
+    userErrors {
+      code
+      message
+      field
+    }
+  }
+}
+`;
+
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 const STATIC_PATH =
@@ -33,6 +61,48 @@ app.post(
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
+
+// Helper function for handling any user-facing errors in GraphQL responses
+function handleUserError(userErrors, res) {
+  if (userErrors && userErrors.length > 0) {
+    const message = userErrors.map((error) => error.message).join(' ');
+    res.status(500).send({ error: message });
+    return true;
+  }
+  return false;
+}
+
+const runDiscountMutation = async (req, res, mutation) => {
+  const payload = req.body;
+  const graphqlClient = new shopify.api.clients.Graphql({
+    session: res.locals.shopify.session
+  });
+
+  try {
+    const data = await graphqlClient.query({
+      data: {
+        query: mutation,
+        variables: { discount: req.body },
+      },
+    });
+
+    res.send(data.body);
+  } catch (error) {
+    // Handle errors thrown by the graphql client
+    if (!(error instanceof GraphqlQueryError)) {
+      throw error;
+    }
+    return res.status(500).send({ error: error.response });
+  }  
+};
+
+app.post("/api/discounts/code", async (req, res) => {
+  await runDiscountMutation(req, res, CREATE_CODE_MUTATION);
+});
+
+app.post("/api/discounts/automatic", async (req, res) => {
+  await runDiscountMutation(req, res, CREATE_AUTOMATIC_MUTATION);
+});
 
 app.get("/api/products/count", async (_req, res) => {
   const countData = await shopify.api.rest.Product.count({
