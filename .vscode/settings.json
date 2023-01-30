@@ -1,0 +1,13 @@
+{
+    "rust-analyzer.linkedProjects": [
+      "checkout/rust/delivery-customization/default/Cargo.toml",
+      "checkout/rust/payment-customization/default/Cargo.toml",
+      "discounts/rust/order-discounts/default/Cargo.toml",
+      "discounts/rust/order-discounts/fixed-amount/Cargo.toml",
+      "discounts/rust/product-discounts/default/Cargo.toml",
+      "discounts/rust/product-discounts/fixed-amount/Cargo.toml",
+      "discounts/rust/shipping-discounts/default/Cargo.toml",
+      "discounts/rust/shipping-discounts/fixed-amount/Cargo.toml",
+      "sample-apps/discounts-tutorial/extensions/volume/Cargo.toml"
+    ]
+  }

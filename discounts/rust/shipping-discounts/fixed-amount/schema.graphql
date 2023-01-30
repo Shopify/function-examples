@@ -41,6 +41,11 @@ type BuyerIdentity {
   The phone number of the buyer that is interacting with the cart.
   """
   phone: String
+
+  """
+  The purchasing company associated with the cart.
+  """
+  purchasingCompany: PurchasingCompany
 }
 
 """
@@ -169,6 +174,8 @@ Represents information about the merchandise in the cart.
 type CartLine {
   """
   Retrieve a cart line attribute by key.
+
+  Cart line attributes are also known as line item properties in Liquid.
   """
   attribute(
     """
@@ -224,6 +231,135 @@ type CartLineCost {
 }
 
 """
+Represents information about a company which is also a customer of the shop.
+"""
+type Company implements HasMetafields {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601)) at which the company was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  A unique externally-supplied identifier for the company.
+  """
+  externalId: String
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+
+  """
+  The name of the company.
+  """
+  name: String!
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601)) at which the company was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A company's main point of contact.
+"""
+type CompanyContact {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company contact was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  The company contact's locale (language).
+  """
+  locale: String
+
+  """
+  The company contact's job title.
+  """
+  title: String
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company contact was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A company's location.
+"""
+type CompanyLocation implements HasMetafields {
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company location was created in Shopify.
+  """
+  createdAt: DateTime!
+
+  """
+  A unique externally-supplied identifier for the company.
+  """
+  externalId: String
+
+  """
+  The ID of the company.
+  """
+  id: ID!
+
+  """
+  The preferred locale of the company location.
+  """
+  locale: String
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+
+  """
+  The name of the company location.
+  """
+  name: String!
+
+  """
+  The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
+  at which the company location was last modified.
+  """
+  updatedAt: DateTime!
+}
+
+"""
 A country.
 """
 type Country {
@@ -235,7 +371,7 @@ type Country {
 
 """
 The code designating a country/region, which generally follows ISO 3166-1 alpha-2 guidelines.
-If a territory doesn't have a country code value in the `CountryCode` enum, it might be considered a subdivision
+If a territory doesn't have a country code value in the `CountryCode` enum, then it might be considered a subdivision
 of another country. For example, the territories associated with Spain are represented by the country code `ES`,
 and the territories associated with the United States of America are represented by the country code `US`.
 """
@@ -2308,7 +2444,8 @@ Represents a customer with the shop.
 """
 type Customer implements HasMetafields {
   """
-  The total amount of money spent by the customer.
+  The total amount of money spent by the customer. Converted from the shop's
+  currency to the currency of the cart using a market rate.
   """
   amountSpent: MoneyV2!
 
@@ -2357,6 +2494,13 @@ type Customer implements HasMetafields {
   """
   numberOfOrders: Int!
 }
+
+"""
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
+For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
+represented as `"2019-09-07T15:50:00Z`".
+"""
+scalar DateTime
 
 """
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
@@ -2513,11 +2657,10 @@ interface HasMetafields {
 }
 
 """
-Represents a unique identifier that is Base64 obfuscated. It is often used to
-refetch an object or as key for a cache. The ID type appears in a JSON response
-as a String; however, it is not intended to be human-readable. When expected as
-an input type, any string (such as `"VXNlci0xMA=="`) or integer (such as `4`)
-input value will be accepted as an ID.
+Represents a unique identifier, often used to refetch an object.
+The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
+
+Example value: `"gid://shopify/Product/10079785100"`
 """
 scalar ID
 
@@ -2543,7 +2686,7 @@ type Input {
   """
   The conversion rate between the shop's currency and the currency of the cart.
   """
-  presentmentCurrencyRate: Decimal
+  presentmentCurrencyRate: Decimal!
 }
 
 """
@@ -2921,7 +3064,7 @@ enum LanguageCode {
   MG
 
   """
-  Maori.
+  Māori.
   """
   MI
 
@@ -3502,6 +3645,26 @@ type ProductVariant implements HasMetafields {
   Unit of measurement for weight.
   """
   weightUnit: WeightUnit!
+}
+
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
+type PurchasingCompany {
+  """
+  The company associated to the order or draft order.
+  """
+  company: Company!
+
+  """
+  The company contact associated to the order or draft order.
+  """
+  contact: CompanyContact
+
+  """
+  The company location associated to the order or draft order.
+  """
+  location: CompanyLocation!
 }
 
 """
