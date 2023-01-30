@@ -23,17 +23,16 @@ The Node app template comes with the following out-of-the-box functionality:
 This template combines a number of third party open-source tools:
 
 - [Express](https://expressjs.com/) builds the backend.
-- [Vitest](https://vitest.dev/) tests the express backend.
 - [Vite](https://vitejs.dev/) builds the [React](https://reactjs.org/) frontend.
 - [React Router](https://reactrouter.com/) is used for routing. We wrap this with file-based routing.
-- [React Query](https://react-query.tanstack.com/) queries the GraphQL Admin API.
+- [React Query](https://react-query.tanstack.com/) queries the Admin API.
 
 The following Shopify tools complement these third-party tools to ease app development:
 
 - [Shopify API library](https://github.com/Shopify/shopify-api-node) adds OAuth to the Express backend. This lets users install the app and grant scope permissions.
-- [App Bridge React](https://shopify.dev/tools/app-bridge/react-components) adds authentication to API requests in the frontend and renders components outside of the App’s iFrame.
+- [App Bridge React](https://shopify.dev/apps/tools/app-bridge/getting-started/using-react) adds authentication to API requests in the frontend and renders components outside of the App’s iFrame.
 - [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
-- [Custom hooks](https://github.com/Shopify/shopify-frontend-template-react/tree/main/hooks) make authenticated requests to the GraphQL Admin API.
+- [Custom hooks](https://github.com/Shopify/shopify-frontend-template-react/tree/main/hooks) make authenticated requests to the Admin API.
 - [File-based routing](https://github.com/Shopify/shopify-frontend-template-react/blob/main/Routes.jsx) makes creating new pages easier.
 
 ## Getting started
@@ -94,50 +93,6 @@ pnpm run dev
 
 Open the URL generated in your console. Once you grant permission to the app, you can start development.
 
-### Testing backend code
-
-Unit tests exist for the backend. First, build the [frontend](#build) and then run them using your preferred package manager:
-
-Using yarn:
-
-```shell
-cd web && yarn test
-```
-
-Using npm:
-
-```shell
-cd web && npm run test
-```
-
-Using pnpm:
-
-```shell
-cd web && pnpm run test
-```
-
-### Testing frontend code
-
-Unit tests exist for the frontend. Run these using your preferred package manager:
-
-Using yarn:
-
-```shell
-cd web/frontend/ && yarn test
-```
-
-Using npm:
-
-```shell
-cd web/frontend/ && npm run test
-```
-
-Using pnpm:
-
-```shell
-cd web/frontend/ && pnpm run test
-```
-
 ## Deployment
 
 ### Application Storage
@@ -153,7 +108,7 @@ The database that works best for you depends on the data your app needs and how 
 | Redis      | Key-value        | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-redis), [Amazon MemoryDB](https://aws.amazon.com/memorydb/)                                                                                                        |
 | MongoDB    | NoSQL / Document | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-mongodb), [MongoDB Atlas](https://www.mongodb.com/atlas/database)                                                                                                  |
 
-To use one of these, you need to change your session storage configuration. To help, here’s a list of [SessionStorage adapters](https://github.com/Shopify/shopify-api-node/tree/main/src/auth/session/storage).
+To use one of these, you need to change your session storage configuration. To help, here’s a list of [SessionStorage adapters](https://github.com/Shopify/shopify-api-node/blob/main/docs/usage/session-storage.md).
 
 ### Build
 
@@ -181,10 +136,9 @@ You do not need to build the backend.
 
 ## Hosting
 
-The following pages document the basic steps to host and deploy your application to a few popular cloud providers:
+When you're ready to set up your app in production, you can follow [our deployment documentation](https://shopify.dev/apps/deployment/web) to host your app on a cloud provider like [Heroku](https://www.heroku.com/) or [Fly.io](https://fly.io/).
 
-- [fly.io](/web/docs/fly-io.md)
-- [Heroku](/web/docs/heroku.md)
+When you reach the step for [setting up environment variables](https://shopify.dev/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
 
 ## Known issues
 
