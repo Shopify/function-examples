@@ -19,7 +19,7 @@ fn test_result_contains_no_operations() -> Result<()> {
     )?;
     let mut errors = Vec::new();
     errors.push(FunctionError {
-        message: "Not possible to order more than one of each".to_owned(),
+        localized_message: "Not possible to order more than one of each".to_owned(),
         target: "cart".to_owned(),
     });
     let expected = crate::output::FunctionResult { errors: errors };
