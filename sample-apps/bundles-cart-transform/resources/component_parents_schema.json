@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bundle component parents",
+  "description": "A definition of the bundle a child belongs to",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "ID of bundle parent product variant: gid://shopify/ProductVariant/<id number>",
+        "type": "string"
+      },
+      "component_reference": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "Array of product variant IDs: [gid://shopify/ProductVariant/<id number>]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [ "value" ]
+      },
+      "component_quantities": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "Array of quantities of product variants defined in component_reference: [1]",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [ "value" ]
+      }
+    },
+    "required": [
+      "id",
+      "component_reference",
+      "component_quantities"
+    ]
+  }
+}

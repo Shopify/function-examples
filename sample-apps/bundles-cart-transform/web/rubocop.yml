@@ -1,0 +1,19 @@
+inherit_gem:
+  rubocop-shopify: rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 3.1
+  Exclude:
+    - "db/**/*"
+    - "bin/**/*"
+    - "test/tmp/**/*"
+    - "vendor/bundle/**/*"
+
+Style/MethodCallWithArgsParentheses:
+  Exclude:
+    - "**/Gemfile"
+    - "test/**/*"
+
+Style/ClassAndModuleChildren:
+  Exclude:
+    - "test/**/*"

@@ -1,0 +1,10 @@
+web/frontend/node_modules
+web/frontend/dist
+
+web/Gemfile.lock
+web/db/*.sqlite3
+web/config/master.key
+
+web/public/api/assets
+web/public/assets
+web/public/index.html
