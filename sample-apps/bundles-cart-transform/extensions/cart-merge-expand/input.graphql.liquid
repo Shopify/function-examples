@@ -1,0 +1,37 @@
+query Input {
+  cart {
+    lines {
+      id
+      quantity
+      merchandise {
+        ... on ProductVariant {
+          id
+          component_parents: metafield(
+            namespace: "custom"
+            key: "component_parents"
+          ) {
+            value
+          }
+          component_reference: metafield(
+            namespace: "custom"
+            key: "component_reference"
+          ) {
+            value
+          }
+          component_quantities: metafield(
+            namespace: "custom"
+            key: "component_quantities"
+          ) {
+            value
+          }
+          price_adjustment: metafield(
+            namespace: "custom"
+            key: "price_adjustment"
+          ) {
+            value
+          }
+        }
+      }
+    }
+  }
+}
