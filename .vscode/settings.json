@@ -2,6 +2,7 @@
     "rust-analyzer.linkedProjects": [
       "checkout/rust/delivery-customization/default/Cargo.toml",
       "checkout/rust/payment-customization/default/Cargo.toml",
+      "checkout/rust/cart-transform/bundles/Cargo.toml",
       "discounts/rust/order-discounts/default/Cargo.toml",
       "discounts/rust/order-discounts/fixed-amount/Cargo.toml",
       "discounts/rust/product-discounts/default/Cargo.toml",

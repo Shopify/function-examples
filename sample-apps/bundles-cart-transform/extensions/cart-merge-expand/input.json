@@ -1,0 +1,53 @@
+{
+  "cart": {
+    "lines": [
+      {
+        "id": "gid://shopify/CartLine/1",
+        "quantity": 1,
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/1099",
+          "title": "Something not bundled"
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/2",
+        "quantity": 5,
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/456",
+          "title": "Something cool in bundle",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/123\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/456\",\"gid://shopify/ProductVariant/789\"]},\"component_quantities\":{\"value\":[2,3]},\"price_adjustment\":{\"value\":10.5}}]"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/3",
+        "quantity": 9,
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/789",
+          "title": "Something also cool in bundle",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/123\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/456\",\"gid://shopify/ProductVariant/789\"]},\"component_quantities\":{\"value\":[2,3]},\"price_adjustment\":{\"value\":10.5}}]"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/4",
+        "quantity": 9,
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/1111",
+          "title": "A neat bundle",
+          "component_reference": {
+            "value": "[\"gid://shopify/ProductVariant/111\",\"gid://shopify/ProductVariant/222\"]"
+          },
+          "component_quantities": {
+            "value": "[2,3]"
+          },
+          "price_adjustment": {
+            "value": "10.5"
+          }
+        }
+      }
+    ]
+  }
+}
