@@ -110,7 +110,7 @@ export default function VolumeNew() {
                     body: JSON.stringify({
                         discount: {
                           ...discount,
-                          title: form.discountCode,
+                          title: form.discountTitle,
                         },
                       }),
                 });
