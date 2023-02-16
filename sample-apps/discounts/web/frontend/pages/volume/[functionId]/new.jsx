@@ -29,8 +29,8 @@ import { data } from "@shopify/app-bridge/actions/Modal";
 import { useAuthenticatedFetch } from "../../../hooks";
 
 const todaysDate = new Date();
-const METAFIELD_NAMESPACE = "discounts-tutorial";
-const METAFIELD_CONFIGURATION_KEY = "volume-config";
+const METAFIELD_NAMESPACE = "$app:discounts-tutorial";
+const METAFIELD_CONFIGURATION_KEY = "function-configuration";
 
 export default function VolumeNew() {
     // Read the function ID from the URL
@@ -79,7 +79,10 @@ export default function VolumeNew() {
             usageOncePerCustomer: useField(false),
             startDate: useField(todaysDate),
             endDate: useField(null),
-            configuration: {},
+            configuration: { // Add quantity and percentage configuration to form data
+                quantity: useField('1'),
+                percentage: useField('0'),
+            },
         },
         onSubmit: async (form) => {
             const discount = {
@@ -92,7 +95,10 @@ export default function VolumeNew() {
                         namespace: METAFIELD_NAMESPACE,
                         key: METAFIELD_CONFIGURATION_KEY,
                         type: "json",
-                        value: JSON.stringify({}),
+                        value: JSON.stringify({ // Populate metafield from form data
+                            quantity: parseInt(form.configuration.quantity),
+                            percentage: parseFloat(form.configuration.percentage),
+                        }),
                     },
                 ],
             };
@@ -174,6 +180,15 @@ export default function VolumeNew() {
                             discountCode={discountCode}
                             discountMethod={discountMethod}
                         />
+                        { /* Collect data for the configuration metafield. */ }
+                        <Card title="Volume">
+                            <Card.Section>
+                                <Stack>
+                                    <TextField label="Minimum quantity" {...configuration.quantity} />
+                                    <TextField label="Discount percentage" {...configuration.percentage} suffix="%" />
+                                </Stack>
+                            </Card.Section>
+                        </Card>
                         {discountMethod.value === DiscountMethod.Code && (
                             <UsageLimitsCard
                                 totalUsageLimit={usageTotalLimit}
