@@ -29,7 +29,7 @@ import { data } from "@shopify/app-bridge/actions/Modal";
 import { useAuthenticatedFetch } from "../../../hooks";
 
 const todaysDate = new Date();
-const METAFIELD_NAMESPACE = "$app:discounts-tutorial";
+const METAFIELD_NAMESPACE = "$app:volume-discount";
 const METAFIELD_CONFIGURATION_KEY = "function-configuration";
 
 export default function VolumeNew() {
