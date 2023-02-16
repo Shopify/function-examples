@@ -19,3 +19,4 @@ node_modules
 
 ## Sample Apps
 sample-apps/*/web/frontend/metafields.js
+!sample-apps/discounts/web/frontend/metafields.js

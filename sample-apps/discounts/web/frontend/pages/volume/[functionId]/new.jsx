@@ -25,12 +25,11 @@ import {
     Stack,
     PageActions,
 } from "@shopify/polaris";
-import { data } from "@shopify/app-bridge/actions/Modal";
+
+import metafields from '../../../metafields'
 import { useAuthenticatedFetch } from "../../../hooks";
 
 const todaysDate = new Date();
-const METAFIELD_NAMESPACE = "$app:volume-discount";
-const METAFIELD_CONFIGURATION_KEY = "function-configuration";
 
 export default function VolumeNew() {
     // Read the function ID from the URL
@@ -92,8 +91,8 @@ export default function VolumeNew() {
                 endsAt: form.endDate,
                 metafields: [
                     {
-                        namespace: METAFIELD_NAMESPACE,
-                        key: METAFIELD_CONFIGURATION_KEY,
+                        namespace: metafields.namespace,
+                        key: metafields.key,
                         type: "json",
                         value: JSON.stringify({ // Populate metafield from form data
                             quantity: parseInt(form.configuration.quantity),
@@ -108,17 +107,24 @@ export default function VolumeNew() {
                 response = await authenticatedFetch("/api/discounts/automatic", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...discount, title: form.discountTitle }),
+                    body: JSON.stringify({
+                        discount: {
+                          ...discount,
+                          title: form.discountCode,
+                        },
+                      }),
                 });
             } else {
                 response = await authenticatedFetch("/api/discounts/code", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        ...discount,
-                        title: form.discountCode,
-                        code: form.discountCode,
-                    }),
+                        discount: {
+                          ...discount,
+                          title: form.discountCode,
+                          code: form.discountCode,
+                        },
+                      }),
                 });
             }
 
