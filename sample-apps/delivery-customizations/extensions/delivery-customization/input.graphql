@@ -11,10 +11,7 @@ query Input {
     }
   }
   deliveryCustomization {
-    metafield(
-      namespace: "{{ app_name | replace: " ", "-" | downcase }}"
-      key: "function-configuration"
-    ) {
+    metafield(namespace: "$app:delivery-customization", key: "function-configuration") {
       value
     }
   }
