@@ -3,13 +3,11 @@ use shopify_function::Result;
 
 use serde::{Deserialize, Serialize};
 
-// Use the shopify_function crate to generate structs for the function input and output
 generate_types!(
     query_path = "./input.graphql",
     schema_path = "./schema.graphql"
 );
 
-// Create a structure that matches the JSON structure that you'll use for your configuration
 #[derive(Serialize, Deserialize, PartialEq)]
 #[serde(rename_all(deserialize = "camelCase"))]
 struct Configuration {
@@ -21,7 +19,6 @@ impl Configuration {
     const DEFAULT_QUANTITY: i64 = 999;
     const DEFAULT_PERCENTAGE: f64 = 0.0;
 
-    // Parse the JSON metafield value using serde
     fn from_str(value: &str) -> Self {
         serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
     }
@@ -43,7 +40,6 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
         discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
     };
 
-    // Get the configuration from the metafield on your function owner
     let config = match input.discount_node.metafield {
         Some(input::InputDiscountNodeMetafield { value }) =>
             Configuration::from_str(&value),
@@ -52,7 +48,6 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
 
     let targets = input.cart.lines
         .iter()
-        // Use the configured quantity instead of a hardcoded value
         .filter(|line| line.quantity >= config.quantity)
         .filter_map(|line| match &line.merchandise {
             input::InputCartLinesMerchandise::ProductVariant(variant) => Some(variant),
@@ -75,7 +70,6 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
         discounts: vec![output::Discount {
             message: None,
             targets,
-            // Use the configured percentage instead of a hardcoded value
             value: output::Value {
                 fixed_amount: None,
                 percentage: Some(output::Percentage {
