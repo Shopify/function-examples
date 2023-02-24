@@ -25,7 +25,7 @@ function getProjects(path) {
 }
 
 const projects = {
-    ...getProjects("sample-apps/discounts-tutorial/extensions"),
+    ...getProjects("sample-apps/discounts/extensions"),
     ...getProjects("checkout/rust/delivery-customization"),
     ...getProjects("checkout/rust/payment-customization"),
     ...getProjects("discounts/rust/order-discounts"),
