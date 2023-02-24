@@ -2603,6 +2603,61 @@ input FunctionResult {
 }
 
 """
+Represents a gate configuration.
+"""
+type GateConfiguration implements HasMetafields {
+  """
+  An optional string identifier.
+  """
+  appId: String
+
+  """
+  The ID of the gate configuration.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+}
+
+"""
+Represents a connection from a subject to a gate configuration.
+"""
+type GateSubject {
+  """
+  The bound gate configuration.
+  """
+  configuration: GateConfiguration!
+
+  """
+  The ID of the gate subject.
+  """
+  id: ID!
+}
+
+"""
+Gate subjects associated to the specified resource.
+"""
+interface HasGates {
+  """
+  Returns active gate subjects bound to the resource.
+  """
+  gates: [GateSubject!]!
+}
+
+"""
 Represents information about the metafields associated to the specified resource.
 """
 interface HasMetafields {
@@ -2742,6 +2797,11 @@ enum LanguageCode {
   CE
 
   """
+  Central Kurdish.
+  """
+  CKB
+
+  """
   Czech.
   """
   CS
@@ -2820,6 +2880,11 @@ enum LanguageCode {
   Finnish.
   """
   FI
+
+  """
+  Filipino.
+  """
+  FIL
 
   """
   Faroese.
@@ -3172,6 +3237,16 @@ enum LanguageCode {
   RW
 
   """
+  Sanskrit.
+  """
+  SA
+
+  """
+  Sardinian.
+  """
+  SC
+
+  """
   Sindhi.
   """
   SD
@@ -3486,7 +3561,12 @@ type MutationRoot {
 """
 Represents a product.
 """
-type Product implements HasMetafields {
+type Product implements HasGates & HasMetafields {
+  """
+  Returns active gate subjects bound to the resource.
+  """
+  gates: [GateSubject!]!
+
   """
   A unique human-friendly string of the product's title.
   """
