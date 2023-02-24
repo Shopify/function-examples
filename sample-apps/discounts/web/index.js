@@ -161,18 +161,7 @@ app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
 
-// Helper function for handling any user-facing errors in GraphQL responses
-function handleUserError(userErrors, res) {
-  if (userErrors && userErrors.length > 0) {
-    const message = userErrors.map((error) => error.message).join(' ');
-    res.status(500).send({ error: message });
-    return true;
-  }
-  return false;
-}
-
 const runDiscountMutation = async (req, res, mutation) => {
-  const payload = req.body;
   const graphqlClient = new shopify.api.clients.Graphql({
     session: res.locals.shopify.session
   });
