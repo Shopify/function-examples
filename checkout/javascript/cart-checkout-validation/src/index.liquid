@@ -1,0 +1,56 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+/**
+ * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+/**
+ * @type {FunctionResult}
+ */
+export default /**
+ * @param {InputQuery} input
+ * @returns {FunctionResult}
+ */
+function cartCheckoutValidation(input) {
+  const errors = []
+
+  cart.lines.forEach(({ quantity }) => {
+    if (quantity > 1) {
+      errors.push({
+        localizedMessage: "Not possible to order more than one of each",
+        target: "cart",
+      })
+    }
+  });
+
+  return {
+    errors
+  }
+};
+{%- elsif flavor contains "typescript" -%}
+import {
+  InputQuery,
+  FunctionResult,
+  FunctionError,
+} from "../generated/api";
+
+export default function cartCheckoutValidation(input: InputQuery): FunctionResult {
+  const errors: FunctionError = []
+
+  cart.lines.forEach(({ quantity }) => {
+    if (quantity > 1) {
+      errors.push({
+        localizedMessage: "Not possible to order more than one of each",
+        target: "cart",
+      })
+    }
+  });
+
+  return {
+    errors
+  }
+
+};
+{%- endif -%}

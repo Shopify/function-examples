@@ -20,7 +20,7 @@ function getProjects(path) {
             documents: `${extensionPath}/input.graphql`
         }
     }
-    
+
     return projects;
 }
 
@@ -30,6 +30,7 @@ const projects = {
     ...getProjects("checkout/rust/payment-customization"),
     ...getProjects("checkout/javascript/delivery-customization"),
     ...getProjects("checkout/javascript/payment-customization"),
+    ...getProjects("checkout/javascript/cart-checkout-validation"),
     ...getProjects("discounts/rust/order-discounts"),
     ...getProjects("discounts/rust/product-discounts"),
     ...getProjects("discounts/rust/shipping-discounts"),
