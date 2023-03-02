@@ -1,4 +1,4 @@
-name = "product-discount"
+name = "product-discount-rust"
 type = "product_discounts"
 api_version = "2023-01"
 
