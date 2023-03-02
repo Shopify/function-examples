@@ -9,11 +9,17 @@
     "dev": "shopify app dev",
     "info": "shopify app info",
     "generate": "shopify app generate",
-    "deploy": "shopify app deploy"
+    "deploy": "shopify app deploy",
+    "test": "vitest"
   },
   "dependencies": {
     "@shopify/app": "^3.44.1",
-    "@shopify/cli": "^3.44.1"
+    "@shopify/cli": "^3.44.1",
+    "@shopify/shopify_function": "0.0.3",
+    "javy": "0.0.3"
   },
-  "author": "nickwesselman"
+  "author": "nickwesselman",
+  "devDependencies": {
+    "vitest": "^0.29.2"
+  }
 }
