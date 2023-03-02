@@ -28,6 +28,8 @@ const projects = {
     ...getProjects("sample-apps/discounts/extensions"),
     ...getProjects("checkout/rust/delivery-customization"),
     ...getProjects("checkout/rust/payment-customization"),
+    ...getProjects("checkout/javascript/delivery-customization"),
+    ...getProjects("checkout/javascript/payment-customization"),
     ...getProjects("discounts/rust/order-discounts"),
     ...getProjects("discounts/rust/product-discounts"),
     ...getProjects("discounts/rust/shipping-discounts"),
