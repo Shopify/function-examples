@@ -27,6 +27,9 @@ export default /**
   const configuration = JSON.parse(
     input?.paymentCustomization?.metafield?.value ?? "{}"
   );
+  if (!configuration.paymentMethodName || !configuration.cartTotal) {
+    return NO_CHANGES;
+  }
 
   const cartTotal = parseFloat(input.cart.cost.totalAmount.amount ?? "0.0");
   if (cartTotal < configuration.cartTotal) {
