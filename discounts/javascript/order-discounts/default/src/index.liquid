@@ -1,0 +1,49 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+import { DiscountApplicationStrategy } from "../generated/api";
+
+/**
+ * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+/**
+ * @type {FunctionResult}
+ */
+const EMPTY_DISCOUNT = {
+  discountApplicationStrategy: DiscountApplicationStrategy.First,
+  discounts: [],
+};
+
+export default /**
+ * @param {InputQuery} input
+ * @returns {FunctionResult}
+ */
+(input) => {
+  const configuration = JSON.parse(
+    input?.discountNode?.metafield?.value ?? "{}"
+  );
+
+  return EMPTY_DISCOUNT;
+};
+{%- elsif flavor contains "typescript" -%}
+import {
+  InputQuery,
+  FunctionResult,
+  DiscountApplicationStrategy,
+} from "../generated/api";
+
+const EMPTY_DISCOUNT: FunctionResult = {
+  discountApplicationStrategy: DiscountApplicationStrategy.First,
+  discounts: [],
+};
+
+type Configuration = {};
+
+export default (input: InputQuery): FunctionResult => {
+  const configuration: Configuration = JSON.parse(
+    input?.discountNode?.metafield?.value ?? "{}"
+  );
+  return EMPTY_DISCOUNT;
+};
+{%- endif -%}
