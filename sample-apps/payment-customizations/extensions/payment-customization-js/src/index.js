@@ -35,7 +35,7 @@ export default /**
   }
 
   const hidePaymentMethod = input.paymentMethods
-    .find(method => method.name.indexOf(configuration.paymentMethodName) != -1);
+    .find(method => method.name.includes(configuration.paymentMethodName));
 
   if (!hidePaymentMethod) {
     return NO_CHANGES;
