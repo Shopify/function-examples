@@ -5,6 +5,7 @@
         "id": "gid://shopify/CartLine/1",
         "quantity": 1,
         "merchandise": {
+          "__typename": "ProductVariant",
           "id": "gid://shopify/ProductVariant/1099",
           "title": "Something not bundled"
         }
@@ -13,6 +14,7 @@
         "id": "gid://shopify/CartLine/2",
         "quantity": 5,
         "merchandise": {
+          "__typename": "ProductVariant",
           "id": "gid://shopify/ProductVariant/456",
           "title": "Something cool in bundle",
           "component_parents": {
@@ -24,6 +26,7 @@
         "id": "gid://shopify/CartLine/3",
         "quantity": 9,
         "merchandise": {
+          "__typename": "ProductVariant",
           "id": "gid://shopify/ProductVariant/789",
           "title": "Something also cool in bundle",
           "component_parents": {
@@ -35,6 +38,7 @@
         "id": "gid://shopify/CartLine/4",
         "quantity": 9,
         "merchandise": {
+          "__typename": "ProductVariant",
           "id": "gid://shopify/ProductVariant/1111",
           "title": "A neat bundle",
           "component_reference": {

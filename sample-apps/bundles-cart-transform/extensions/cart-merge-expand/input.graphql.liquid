@@ -4,6 +4,7 @@ query Input {
       id
       quantity
       merchandise {
+        __typename
         ... on ProductVariant {
           id
           component_parents: metafield(

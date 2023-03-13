@@ -4,6 +4,7 @@ query Input {
       id
       quantity
       merchandise {
+        __typename
         ... on ProductVariant {
           id
           component_parents: metafield(
@@ -21,6 +22,12 @@ query Input {
           component_quantities: metafield(
             namespace: "custom"
             key: "component_quantities"
+          ) {
+            value
+          }
+          price_adjustment: metafield(
+            namespace: "custom"
+            key: "price_adjustment"
           ) {
             value
           }
