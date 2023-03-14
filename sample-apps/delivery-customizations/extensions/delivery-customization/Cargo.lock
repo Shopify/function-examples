@@ -52,7 +52,8 @@ checksum = "90e5c1c8368803113bf0c9584fc495a58b86dc8a29edbf8fe877d21d9507e797"
 [[package]]
 name = "graphql-introspection-query"
 version = "0.2.0"
-source = "git+https://github.com/graphql-rust/graphql-client?rev=0776197ad7cfde2c658490e7c7e627a21ed622cb#0776197ad7cfde2c658490e7c7e627a21ed622cb"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f2a4732cf5140bd6c082434494f785a19cfb566ab07d1382c3671f5812fed6d"
 dependencies = [
  "serde",
 ]
@@ -69,8 +70,9 @@ dependencies = [
 
 [[package]]
 name = "graphql_client"
-version = "0.11.0"
-source = "git+https://github.com/graphql-rust/graphql-client?rev=0776197ad7cfde2c658490e7c7e627a21ed622cb#0776197ad7cfde2c658490e7c7e627a21ed622cb"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa61bb9dc6d373a8b465a5da17b62809483e8527a34b0e9034dc0915b09e160a"
 dependencies = [
  "graphql_query_derive",
  "serde",
@@ -79,8 +81,9 @@ dependencies = [
 
 [[package]]
 name = "graphql_client_codegen"
-version = "0.11.0"
-source = "git+https://github.com/graphql-rust/graphql-client?rev=0776197ad7cfde2c658490e7c7e627a21ed622cb#0776197ad7cfde2c658490e7c7e627a21ed622cb"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e55df64cc702c4ad6647f8df13a799ad11688a3781fadf5045f7ba12733fa9b"
 dependencies = [
  "graphql-introspection-query",
  "graphql-parser",
@@ -95,8 +98,9 @@ dependencies = [
 
 [[package]]
 name = "graphql_query_derive"
-version = "0.11.0"
-source = "git+https://github.com/graphql-rust/graphql-client?rev=0776197ad7cfde2c658490e7c7e627a21ed622cb#0776197ad7cfde2c658490e7c7e627a21ed622cb"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d52fc9cde811f44b15ec0692b31e56a3067f6f431c5ace712f286e47c1dacc98"
 dependencies = [
  "graphql_client_codegen",
  "proc-macro2",
