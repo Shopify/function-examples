@@ -52,19 +52,19 @@ Different steps in the buyer journey.
 """
 enum BuyerJourneyStep {
   """
-  Buyer is in cart.
+  Buyer is interacting with the cart.
   """
-  CART
+  CART_INTERACTION
 
   """
-  Buyer completed checkout.
+  Buyer is completing the checkout.
   """
-  CHECKOUT_COMPLETE
+  CHECKOUT_COMPLETION
 
   """
-  Buyer is in the process of checking out.
+  Buyer is interacting with the checkout.
   """
-  CHECKOUT_PROGRESS
+  CHECKOUT_INTERACTION
 }
 
 """
@@ -1755,10 +1755,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR
-    @deprecated(
-      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
-    )
+  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
 
   """
   Belize Dollar (BZD).
@@ -2283,10 +2280,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD
-    @deprecated(
-      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
-    )
+  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2381,10 +2375,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF
-    @deprecated(
-      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
-    )
+  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
   Venezuelan Bolivares (VES).
@@ -2603,61 +2594,6 @@ input FunctionResult {
 }
 
 """
-Represents a gate configuration.
-"""
-type GateConfiguration implements HasMetafields {
-  """
-  An optional string identifier.
-  """
-  appId: String
-
-  """
-  The ID of the gate configuration.
-  """
-  id: ID!
-
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The namespace for the metafield.
-    """
-    namespace: String!
-  ): Metafield
-}
-
-"""
-Represents a connection from a subject to a gate configuration.
-"""
-type GateSubject {
-  """
-  The bound gate configuration.
-  """
-  configuration: GateConfiguration!
-
-  """
-  The ID of the gate subject.
-  """
-  id: ID!
-}
-
-"""
-Gate subjects associated to the specified resource.
-"""
-interface HasGates {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates: [GateSubject!]!
-}
-
-"""
 Represents information about the metafields associated to the specified resource.
 """
 interface HasMetafields {
@@ -2689,7 +2625,7 @@ type Input {
   """
   The buyer journey step.
   """
-  buyerJourney: BuyerJourney
+  buyerJourney: BuyerJourney!
 
   """
   The cart.
@@ -2797,11 +2733,6 @@ enum LanguageCode {
   CE
 
   """
-  Central Kurdish.
-  """
-  CKB
-
-  """
   Czech.
   """
   CS
@@ -2880,11 +2811,6 @@ enum LanguageCode {
   Finnish.
   """
   FI
-
-  """
-  Filipino.
-  """
-  FIL
 
   """
   Faroese.
@@ -3237,16 +3163,6 @@ enum LanguageCode {
   RW
 
   """
-  Sanskrit.
-  """
-  SA
-
-  """
-  Sardinian.
-  """
-  SC
-
-  """
   Sindhi.
   """
   SD
@@ -3561,12 +3477,7 @@ type MutationRoot {
 """
 Represents a product.
 """
-type Product implements HasGates & HasMetafields {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates: [GateSubject!]!
-
+type Product implements HasMetafields {
   """
   A unique human-friendly string of the product's title.
   """
