@@ -81,7 +81,7 @@ fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
             if let Some(price_adjustment) = &definition.price_adjustment {
                 price = Some(PriceAdjustment {
                     percentage_decrease: Some(PriceAdjustmentValue {
-                        value: *price_adjustment
+                        value: (*price_adjustment).to_string()
                     })
                 });
             }

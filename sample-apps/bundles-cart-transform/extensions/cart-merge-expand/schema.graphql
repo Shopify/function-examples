@@ -2866,7 +2866,7 @@ input PriceAdjustmentValue {
   """
   The value of the price adjustment.
   """
-  value: Float!
+  value: Decimal!
 }
 
 """
