@@ -16,7 +16,7 @@ To publish versions of the extensions, we will need to use the [Shopify CLI](htt
 
 [Shopify.dev docs](https://shopify.dev/apps/deployment/extension) cover how to deploy extensions.
 
-NOTE: publishing an extension using the `cart_transform` function must register the extension with ever shop that installs it. In this app, we set `config.after_authenticate_job = { job: "Shopify::AfterAuthenticateJob", inline: false }` in `web/config/initializers/shopify_app.rb`. This job sends the following mutation query to `ShopifyAPI` which registers the app's extension with the shop.
+NOTE: publishing an extension using the `cart_transform` function must register the extension with every shop that installs it. In this app, we set `config.after_authenticate_job = { job: "Shopify::AfterAuthenticateJob", inline: false }` in `web/config/initializers/shopify_app.rb`. This job sends the following mutation query to `ShopifyAPI` which registers the app's extension with the shop.
 
 ```graphql
 mutation cartTransformCreate($functionId: String!) {
