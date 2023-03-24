@@ -1,0 +1,12 @@
+query Input {
+  cart {
+    deliverableLines {
+      id
+    }
+  }
+  fulfillmentConstraintRule {
+    metafield(namespace: "$app:fulfillment-constraints", key: "function-configuration") {
+      value
+    }
+  }
+}
