@@ -132,7 +132,8 @@ fn get_components_in_cart(
                   } else {
                       0
                   };
-                  maximum_available_component.push(maximum_available)
+                  maximum_available_component.push(maximum_available);
+                  break;
               }
             }
         }
