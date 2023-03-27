@@ -76,7 +76,6 @@ async function expandExtensionLiquidTemplates(domainName) {
         const templatePath = path.join(extensionTypePath, templateName);
         const liquidData = {
           name: templateName,
-          extensionType: extensionTypeName.replaceAll('-', '_'),
         };
 
         await expandLiquidTemplates(templatePath, liquidData);
