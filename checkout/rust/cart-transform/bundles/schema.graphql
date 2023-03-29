@@ -24,7 +24,7 @@ type Attribute {
 }
 
 """
-Represents information about the buyer that is interacting with the cart.
+Represents information about the buyer that is interacting with the cart. Only set when the buyer is logged in.
 """
 type BuyerIdentity {
   """
@@ -71,6 +71,11 @@ type Cart {
   The costs that the buyer will pay at checkout.
   """
   cost: CartCost!
+
+  """
+  A list of lines containing information about the items that can be delivered.
+  """
+  deliverableLines: [DeliverableCartLine!]!
 
   """
   The delivery groups available for the cart based on the buyer's shipping address.
@@ -253,6 +258,26 @@ An operation to apply to the Cart.
 input CartOperation @oneOf {
   expand: ExpandOperation
   merge: MergeOperation
+}
+
+"""
+A customization which applies cart transformations to the merchandise lines.
+"""
+type CartTransform implements HasMetafields {
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
 }
 
 """
@@ -2534,6 +2559,38 @@ Example values: `"29.99"`, `"29.999"`.
 scalar Decimal
 
 """
+Represents information about the merchandise in the cart.
+"""
+type DeliverableCartLine {
+  """
+  Retrieve a cart line attribute by key.
+
+  Cart line attributes are also known as line item properties in Liquid.
+  """
+  attribute(
+    """
+    The key of the attribute to retrieve.
+    """
+    key: String
+  ): Attribute
+
+  """
+  The ID of the cart line.
+  """
+  id: ID!
+
+  """
+  The merchandise that the buyer intends to purchase.
+  """
+  merchandise: Merchandise!
+
+  """
+  The quantity of the merchandise that the customer intends to purchase.
+  """
+  quantity: Int!
+}
+
+"""
 List of different delivery method types.
 """
 enum DeliveryMethod {
@@ -2710,6 +2767,11 @@ type Input {
   The cart.
   """
   cart: Cart!
+
+  """
+  The CartTransform containing the function.
+  """
+  cartTransform: CartTransform!
 }
 
 """
