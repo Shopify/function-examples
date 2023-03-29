@@ -6,7 +6,8 @@
     "shopify": "npm exec -- shopify",
     "typegen": "npm exec -- shopify app function typegen",
     "build": "npm exec -- shopify app function build",
-    "preview": "npm exec -- shopify app function run"
+    "preview": "npm exec -- shopify app function run",
+    "test": "vitest"
   },
   "codegen": {
     "schema": "schema.graphql",
@@ -19,5 +20,8 @@
         ]
       }
     }
+  },
+  "devDependencies": {
+    "vitest": "^0.29.8"
   }
 }
