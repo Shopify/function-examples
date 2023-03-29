@@ -9,12 +9,13 @@ node_modules
 ## Extensions
 **/.output.graphql
 **/input.graphql
-**/Cargo.lock
-**/Cargo.toml
+*/rust/**/Cargo.lock
+*/rust/**/Cargo.toml
 **/shopify.function.extension.toml
+*/javascript/**/package.json
+*/javascript/**/src/*
+!*/javascript/**/src/*.liquid
 !sample-apps/**/input.graphql
-!sample-apps/**/Cargo.lock
-!sample-apps/**/Cargo.toml
 !sample-apps/**/shopify.function.extension.toml
 
 ## Sample Apps
