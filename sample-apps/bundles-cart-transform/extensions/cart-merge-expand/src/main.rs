@@ -1,16 +1,16 @@
-use shopify_function::prelude::*;
-use shopify_function::Result;
+use crate::input::InputCart as Cart;
+use crate::input::InputCartLinesMerchandise::ProductVariant;
+use crate::input::InputCartLinesMerchandiseOnProductVariant;
 use crate::output::CartLineInput;
-use crate::output::PriceAdjustment;
-use crate::output::PriceAdjustmentValue;
 use crate::output::CartOperation;
 use crate::output::ExpandOperation;
 use crate::output::ExpandedItem;
 use crate::output::MergeOperation;
-use crate::input::InputCart as Cart;
-use crate::input::InputCartLinesMerchandiseOnProductVariant;
-use crate::input::InputCartLinesMerchandise::ProductVariant as ProductVariant;
+use crate::output::PriceAdjustment;
+use crate::output::PriceAdjustmentValue;
 use serde::{Deserialize, Serialize};
+use shopify_function::prelude::*;
+use shopify_function::Result;
 
 generate_types!(
     query_path = "./input.graphql",
@@ -55,10 +55,12 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
     let mut cart_operations: Vec<CartOperation> = get_merge_cart_operations(&input.cart);
     cart_operations.extend(get_expand_cart_operations(&input.cart));
 
-    Ok(output::FunctionResult { operations: Some(cart_operations) })
- }
+    Ok(output::FunctionResult {
+        operations: Some(cart_operations),
+    })
+}
 
- // merge operation logic
+// merge operation logic
 
 fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
     let merge_parent_defintions: Vec<ComponentParent> = get_merge_parent_definitions(cart);
@@ -80,8 +82,8 @@ fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
             if let Some(price_adjustment) = &definition.price_adjustment {
                 price = Some(PriceAdjustment {
                     percentage_decrease: Some(PriceAdjustmentValue {
-                        value: (*price_adjustment).to_string()
-                    })
+                        value: (*price_adjustment).to_string(),
+                    }),
                 });
             }
 
@@ -93,17 +95,17 @@ fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
                 price: price,
             };
 
-            result.push(CartOperation {merge: Some(merge_operation), expand: None});
+            result.push(CartOperation {
+                merge: Some(merge_operation),
+                expand: None,
+            });
         }
     }
 
     return result;
 }
 
-fn get_components_in_cart(
-    cart: &Cart,
-    definition: &ComponentParent,
-) -> Vec<CartLineInput> {
+fn get_components_in_cart(cart: &Cart, definition: &ComponentParent) -> Vec<CartLineInput> {
     let mut line_results: Vec<CartLineInput> = Vec::new();
     for (reference, quantity) in definition
         .component_reference
@@ -120,13 +122,13 @@ fn get_components_in_cart(
             }
 
             if let Some(merchandise) = &variant {
-              if reference == &merchandise.id && &line.quantity >= quantity {
-                  line_results.push(CartLineInput {
-                      cart_line_id: line.id.clone(),
-                      quantity: quantity.clone(),
-                  });
-                  break;
-              }
+                if reference == &merchandise.id && &line.quantity >= quantity {
+                    line_results.push(CartLineInput {
+                        cart_line_id: line.id.clone(),
+                        quantity: quantity.clone(),
+                    });
+                    break;
+                }
             }
         }
     }
@@ -154,7 +156,9 @@ fn get_merge_parent_definitions(cart: &Cart) -> Vec<ComponentParent> {
     return merge_parent_defintions;
 }
 
-fn get_component_parents(variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<ComponentParent> {
+fn get_component_parents(
+    variant: &InputCartLinesMerchandiseOnProductVariant,
+) -> Vec<ComponentParent> {
     let mut component_parents: Vec<ComponentParent> = Vec::new();
     if let Some(component_parents_metafield) = &variant.component_parents {
         let value: Vec<ComponentParentMetafield> =
@@ -196,13 +200,17 @@ fn get_expand_cart_operations(cart: &Cart) -> Vec<CartOperation> {
             let component_references: Vec<ID> = get_component_references(&merchandise);
             let component_quantities: Vec<i64> = get_component_quantities(&merchandise);
 
-            if component_references.is_empty() || component_references.len() != component_quantities.len() {
+            if component_references.is_empty()
+                || component_references.len() != component_quantities.len()
+            {
                 continue;
             }
 
             let mut expand_relationships: Vec<ExpandedItem> = Vec::new();
 
-            for (reference, quantity) in component_references.iter().zip(component_quantities.iter()) {
+            for (reference, quantity) in
+                component_references.iter().zip(component_quantities.iter())
+            {
                 let expand_relationship: ExpandedItem = ExpandedItem {
                     merchandise_id: reference.clone(),
                     quantity: quantity.clone(),
@@ -213,13 +221,16 @@ fn get_expand_cart_operations(cart: &Cart) -> Vec<CartOperation> {
 
             let price: Option<PriceAdjustment> = get_price_adjustment(&merchandise);
 
-            let expand_operation: ExpandOperation = ExpandOperation{
+            let expand_operation: ExpandOperation = ExpandOperation {
                 cart_line_id: line.id.clone(),
                 expanded_cart_items: expand_relationships,
                 price: price,
             };
 
-            result.push(CartOperation {expand: Some(expand_operation), merge: None});
+            result.push(CartOperation {
+                expand: Some(expand_operation),
+                merge: None,
+            });
         }
     }
 
@@ -242,13 +253,15 @@ fn get_component_references(variant: &InputCartLinesMerchandiseOnProductVariant)
     return Vec::new();
 }
 
-fn get_price_adjustment(variant: &InputCartLinesMerchandiseOnProductVariant) -> Option<PriceAdjustment> {
+fn get_price_adjustment(
+    variant: &InputCartLinesMerchandiseOnProductVariant,
+) -> Option<PriceAdjustment> {
     if let Some(price_adjustment) = &variant.price_adjustment {
-      return Some(PriceAdjustment {
-        percentage_decrease: Some(PriceAdjustmentValue {
-          value: price_adjustment.value.parse().unwrap()
-        })
-      });
+        return Some(PriceAdjustment {
+            percentage_decrease: Some(PriceAdjustmentValue {
+                value: price_adjustment.value.parse().unwrap(),
+            }),
+        });
     }
 
     return None;

@@ -8,12 +8,9 @@ generate_types!(
     schema_path = "./schema.graphql"
 );
 
-
 #[derive(Serialize, Deserialize, Default, PartialEq)]
 #[serde(rename_all(deserialize = "camelCase"))]
-struct Configuration {
-
-}
+struct Configuration {}
 
 impl Configuration {
     fn from_str(value: &str) -> Self {
@@ -29,8 +26,7 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
     };
 
     let _config = match input.discount_node.metafield {
-        Some(input::InputDiscountNodeMetafield { value }) => 
-            Configuration::from_str(&value),
+        Some(input::InputDiscountNodeMetafield { value }) => Configuration::from_str(&value),
         None => return Ok(no_discount),
     };
 

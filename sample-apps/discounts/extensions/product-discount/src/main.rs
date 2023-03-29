@@ -41,12 +41,13 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
     };
 
     let config = match input.discount_node.metafield {
-        Some(input::InputDiscountNodeMetafield { value }) =>
-            Configuration::from_str(&value),
+        Some(input::InputDiscountNodeMetafield { value }) => Configuration::from_str(&value),
         None => return Ok(no_discount),
     };
 
-    let targets = input.cart.lines
+    let targets = input
+        .cart
+        .lines
         .iter()
         .filter(|line| line.quantity >= config.quantity)
         .filter_map(|line| match &line.merchandise {
@@ -57,7 +58,7 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
             product_variant: Some(output::ProductVariantTarget {
                 id: variant.id.to_string(),
                 quantity: None,
-           })
+            }),
         })
         .collect::<Vec<output::Target>>();
 
@@ -73,9 +74,9 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
             value: output::Value {
                 fixed_amount: None,
                 percentage: Some(output::Percentage {
-                    value: config.percentage.to_string()
-                })
-            }
+                    value: config.percentage.to_string(),
+                }),
+            },
         }],
         discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
     })

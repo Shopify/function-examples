@@ -54,7 +54,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "checkout--cart-checkout-validation--default"
+name = "checkout-cart-checkout-validation-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client 0.12.0 (git+https://github.com/graphql-rust/graphql-client)",
@@ -64,7 +64,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "checkout--delivery-customization--default"
+name = "checkout-delivery-customization-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -74,7 +74,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "checkout--payment-customization--default"
+name = "checkout-payment-customization-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -142,32 +142,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "discounts--order-discounts--default"
-version = "1.0.0"
-dependencies = [
- "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
 name = "discounts--order-discounts--fixed-amount"
 version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
  "serde_with",
-]
-
-[[package]]
-name = "discounts--product-discounts--default"
-version = "1.0.0"
-dependencies = [
- "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde",
- "serde_json",
- "shopify_function",
 ]
 
 [[package]]
@@ -180,7 +160,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "discounts--shipping-discounts--default"
+name = "discounts-order-discounts-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "discounts-product-discounts-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "discounts-shipping-discounts-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -343,7 +343,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
-name = "order-routing--fulfillment-constraints--default"
+name = "order-routing-fulfillment-constraints-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",

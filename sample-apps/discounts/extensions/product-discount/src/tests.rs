@@ -95,31 +95,29 @@ fn test_quantity_met_discounts_variants() -> Result<()> {
     )?;
     let expected = output::FunctionResult {
         discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
-        discounts: vec![
-            output::Discount {
-                message: None,
-                targets: vec![
-                    output::Target {
-                        product_variant: Some(output::ProductVariantTarget {
-                            id: "gid://shopify/ProductVariant/123456789".to_string(),
-                            quantity: None
-                        })
-                    },
-                    output::Target {
-                        product_variant: Some(output::ProductVariantTarget {
-                            id: "gid://shopify/ProductVariant/987654321".to_string(),
-                            quantity: None
-                        })
-                    },
-                ],
-                value: output::Value {
-                    fixed_amount: None,
-                    percentage: Some(output::Percentage {
-                        value: "5".to_string()
-                    })
-                }
-            }
-        ]
+        discounts: vec![output::Discount {
+            message: None,
+            targets: vec![
+                output::Target {
+                    product_variant: Some(output::ProductVariantTarget {
+                        id: "gid://shopify/ProductVariant/123456789".to_string(),
+                        quantity: None,
+                    }),
+                },
+                output::Target {
+                    product_variant: Some(output::ProductVariantTarget {
+                        id: "gid://shopify/ProductVariant/987654321".to_string(),
+                        quantity: None,
+                    }),
+                },
+            ],
+            value: output::Value {
+                fixed_amount: None,
+                percentage: Some(output::Percentage {
+                    value: "5".to_string(),
+                }),
+            },
+        }],
     };
 
     assert_eq!(result, expected);
