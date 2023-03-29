@@ -65,14 +65,13 @@ fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
     let mut result: Vec<CartOperation> = Vec::new();
 
     for definition in merge_parent_defintions.iter() {
-        let (components_in_cart, parent_variant_quantity) =
-            get_components_in_cart(cart, definition);
+        let components_in_cart = get_components_in_cart(cart, definition);
         if components_in_cart.len() == definition.component_reference.len() {
             let cart_lines: Vec<CartLineInput> = components_in_cart
                 .iter()
                 .map(|component| CartLineInput {
                     cart_line_id: component.cart_line_id.clone(),
-                    quantity: parent_variant_quantity * component.quantity,
+                    quantity: component.quantity.clone(),
                 })
                 .collect();
 
@@ -104,9 +103,8 @@ fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
 fn get_components_in_cart(
     cart: &Cart,
     definition: &ComponentParent,
-) -> (Vec<CartLineInput>, i64) {
+) -> Vec<CartLineInput> {
     let mut line_results: Vec<CartLineInput> = Vec::new();
-    let mut maximum_available_component: Vec<i64> = Vec::new();
     for (reference, quantity) in definition
         .component_reference
         .iter()
@@ -127,23 +125,13 @@ fn get_components_in_cart(
                       cart_line_id: line.id.clone(),
                       quantity: quantity.clone(),
                   });
-                  let maximum_available = if quantity > &0 {
-                      line.quantity / quantity
-                  } else {
-                      0
-                  };
-                  maximum_available_component.push(maximum_available);
                   break;
               }
             }
         }
     }
-    let parent_variant_quantity: i64 = match maximum_available_component.iter().min() {
-        Some(available) => available.clone(),
-        None => 0,
-    };
 
-    return (line_results, parent_variant_quantity);
+    return line_results;
 }
 
 fn get_merge_parent_definitions(cart: &Cart) -> Vec<ComponentParent> {
