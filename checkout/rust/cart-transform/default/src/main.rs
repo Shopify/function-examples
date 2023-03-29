@@ -1,8 +1,9 @@
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
+#[allow(clippy::upper_case_acronyms)]
 type URL = String;
 
 generate_types!(
@@ -11,7 +12,7 @@ generate_types!(
 );
 
 #[shopify_function]
-fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
+fn function(_input: input::ResponseData) -> Result<output::FunctionResult> {
     let no_changes = output::FunctionResult {
         operations: Some(vec![]),
     };

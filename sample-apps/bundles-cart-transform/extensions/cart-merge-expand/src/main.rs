@@ -17,6 +17,7 @@ generate_types!(
     schema_path = "./schema.graphql"
 );
 
+#[allow(clippy::upper_case_acronyms)]
 type URL = String;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -52,8 +53,9 @@ pub struct ComponentParentMetafieldPriceAdjustment {
 
 #[shopify_function]
 fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
-    let mut cart_operations: Vec<CartOperation> = get_merge_cart_operations(&input.cart);
-    cart_operations.extend(get_expand_cart_operations(&input.cart));
+    let cart_operations: Vec<CartOperation> = get_merge_cart_operations(&input.cart)
+        .chain(get_expand_cart_operations(&input.cart))
+        .collect();
 
     Ok(output::FunctionResult {
         operations: Some(cart_operations),
@@ -62,207 +64,167 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
 
 // merge operation logic
 
-fn get_merge_cart_operations(cart: &Cart) -> Vec<CartOperation> {
-    let merge_parent_defintions: Vec<ComponentParent> = get_merge_parent_definitions(cart);
-    let mut result: Vec<CartOperation> = Vec::new();
+fn get_merge_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation> + '_ {
+    let merge_parent_defintions = get_merge_parent_definitions(cart);
+    merge_parent_defintions
+        .into_iter()
+        .filter_map(|definition| {
+            let components_in_cart = get_components_in_cart(cart, &definition);
+            (components_in_cart.len() == definition.component_reference.len()).then(|| {
+                let cart_lines: Vec<CartLineInput> = components_in_cart
+                    .into_iter()
+                    .map(|component| CartLineInput {
+                        cart_line_id: component.cart_line_id,
+                        quantity: component.quantity,
+                    })
+                    .collect();
 
-    for definition in merge_parent_defintions.iter() {
-        let components_in_cart = get_components_in_cart(cart, definition);
-        if components_in_cart.len() == definition.component_reference.len() {
-            let cart_lines: Vec<CartLineInput> = components_in_cart
-                .iter()
-                .map(|component| CartLineInput {
-                    cart_line_id: component.cart_line_id.clone(),
-                    quantity: component.quantity.clone(),
-                })
-                .collect();
+                let price = definition
+                    .price_adjustment
+                    .map(|price_adjustment| PriceAdjustment {
+                        percentage_decrease: Some(PriceAdjustmentValue {
+                            value: price_adjustment.to_string(),
+                        }),
+                    });
 
-            let mut price: Option<PriceAdjustment> = None;
+                let merge_operation = MergeOperation {
+                    parent_variant_id: definition.id,
+                    title: None,
+                    cart_lines,
+                    image: None,
+                    price,
+                };
 
-            if let Some(price_adjustment) = &definition.price_adjustment {
-                price = Some(PriceAdjustment {
-                    percentage_decrease: Some(PriceAdjustmentValue {
-                        value: (*price_adjustment).to_string(),
-                    }),
-                });
-            }
-
-            let merge_operation: MergeOperation = MergeOperation {
-                parent_variant_id: definition.id.clone(),
-                title: None,
-                cart_lines: cart_lines.clone(),
-                image: None,
-                price: price,
-            };
-
-            result.push(CartOperation {
-                merge: Some(merge_operation),
-                expand: None,
-            });
-        }
-    }
-
-    return result;
+                CartOperation {
+                    merge: Some(merge_operation),
+                    expand: None,
+                }
+            })
+        })
 }
 
 fn get_components_in_cart(cart: &Cart, definition: &ComponentParent) -> Vec<CartLineInput> {
-    let mut line_results: Vec<CartLineInput> = Vec::new();
-    for (reference, quantity) in definition
+    definition
         .component_reference
         .iter()
         .zip(definition.component_quantities.iter())
-    {
-        for line in cart.lines.iter() {
-            let variant = match &line.merchandise {
-                ProductVariant(variant) => Some(variant),
-                _ => None,
-            };
-            if variant == None {
-                continue;
-            }
-
-            if let Some(merchandise) = &variant {
-                if reference == &merchandise.id && &line.quantity >= quantity {
-                    line_results.push(CartLineInput {
-                        cart_line_id: line.id.clone(),
-                        quantity: quantity.clone(),
-                    });
-                    break;
-                }
-            }
-        }
-    }
-
-    return line_results;
+        .filter_map(|(reference, &quantity)| {
+            cart.lines.iter().find_map(move |line| {
+                matches!(
+                    &line.merchandise,
+                    ProductVariant(merchandise) if reference == &merchandise.id && line.quantity >= quantity,
+                ).then(|| CartLineInput { cart_line_id: line.id.clone(), quantity })
+            })
+        })
+        .collect()
 }
 
 fn get_merge_parent_definitions(cart: &Cart) -> Vec<ComponentParent> {
     let mut merge_parent_defintions: Vec<ComponentParent> = Vec::new();
 
     for line in cart.lines.iter() {
-        let variant = match &line.merchandise {
-            ProductVariant(variant) => Some(variant),
-            _ => None,
-        };
-        if variant == None {
-            continue;
-        }
-
-        if let Some(merchandise) = &variant {
-            merge_parent_defintions.append(&mut get_component_parents(&merchandise));
+        if let ProductVariant(merchandise) = &line.merchandise {
+            merge_parent_defintions.extend(get_component_parents(merchandise));
         }
     }
+
     merge_parent_defintions.dedup_by(|a, b| a.id == b.id);
-    return merge_parent_defintions;
+    merge_parent_defintions
 }
 
 fn get_component_parents(
     variant: &InputCartLinesMerchandiseOnProductVariant,
-) -> Vec<ComponentParent> {
-    let mut component_parents: Vec<ComponentParent> = Vec::new();
-    if let Some(component_parents_metafield) = &variant.component_parents {
-        let value: Vec<ComponentParentMetafield> =
-            serde_json::from_str(&component_parents_metafield.value).unwrap();
-        for parent_definition in value.iter() {
-            let mut price: Option<f64> = None;
+) -> impl Iterator<Item = ComponentParent> {
+    variant
+        .component_parents
+        .as_ref()
+        .map(|component_parents_metafield| {
+            let value: Vec<ComponentParentMetafield> =
+                serde_json::from_str(&component_parents_metafield.value).unwrap();
+            value.into_iter().map(|parent_definition| {
+                let price = parent_definition
+                    .price_adjustment
+                    .as_ref()
+                    .map(|price_adjustment| price_adjustment.value);
 
-            if let Some(price_adjustment) = &parent_definition.price_adjustment {
-                price = Some(price_adjustment.value.clone());
-            }
-
-            component_parents.push(ComponentParent {
-                id: parent_definition.id.clone(),
-                component_reference: parent_definition.component_reference.value.clone(),
-                component_quantities: parent_definition.component_quantities.value.clone(),
-                price_adjustment: price,
-            });
-        }
-    }
-
-    return component_parents;
+                ComponentParent {
+                    id: parent_definition.id,
+                    component_reference: parent_definition.component_reference.value,
+                    component_quantities: parent_definition.component_quantities.value,
+                    price_adjustment: price,
+                }
+            })
+        })
+        .into_iter()
+        .flatten()
 }
 
 // expand operation logic
 
-fn get_expand_cart_operations(cart: &Cart) -> Vec<CartOperation> {
-    let mut result: Vec<CartOperation> = Vec::new();
-
-    for line in cart.lines.iter() {
-        let variant = match &line.merchandise {
-            ProductVariant(variant) => Some(variant),
-            _ => None,
-        };
-        if variant == None {
-            continue;
-        }
-
-        if let Some(merchandise) = &variant {
-            let component_references: Vec<ID> = get_component_references(&merchandise);
-            let component_quantities: Vec<i64> = get_component_quantities(&merchandise);
+fn get_expand_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation> + '_ {
+    cart.lines.iter().filter_map(|line| {
+        if let ProductVariant(merchandise) = &line.merchandise {
+            let component_references: Vec<ID> = get_component_references(merchandise);
+            let component_quantities: Vec<i64> = get_component_quantities(merchandise);
 
             if component_references.is_empty()
                 || component_references.len() != component_quantities.len()
             {
-                continue;
-            }
+                None
+            } else {
+                let expand_relationships: Vec<ExpandedItem> = component_references
+                    .into_iter()
+                    .zip(component_quantities.iter())
+                    .map(|(reference, &quantity)| ExpandedItem {
+                        merchandise_id: reference,
+                        quantity,
+                    })
+                    .collect();
 
-            let mut expand_relationships: Vec<ExpandedItem> = Vec::new();
+                let price = get_price_adjustment(merchandise);
 
-            for (reference, quantity) in
-                component_references.iter().zip(component_quantities.iter())
-            {
-                let expand_relationship: ExpandedItem = ExpandedItem {
-                    merchandise_id: reference.clone(),
-                    quantity: quantity.clone(),
+                let expand_operation = ExpandOperation {
+                    cart_line_id: line.id.clone(),
+                    expanded_cart_items: expand_relationships,
+                    price,
                 };
 
-                expand_relationships.push(expand_relationship);
+                Some(CartOperation {
+                    expand: Some(expand_operation),
+                    merge: None,
+                })
             }
-
-            let price: Option<PriceAdjustment> = get_price_adjustment(&merchandise);
-
-            let expand_operation: ExpandOperation = ExpandOperation {
-                cart_line_id: line.id.clone(),
-                expanded_cart_items: expand_relationships,
-                price: price,
-            };
-
-            result.push(CartOperation {
-                expand: Some(expand_operation),
-                merge: None,
-            });
+        } else {
+            None
         }
-    }
-
-    return result;
+    })
 }
 
 fn get_component_quantities(variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<i64> {
     if let Some(component_quantities_metafield) = &variant.component_quantities {
-        return serde_json::from_str(&component_quantities_metafield.value).unwrap();
+        serde_json::from_str(&component_quantities_metafield.value).unwrap()
+    } else {
+        Vec::new()
     }
-
-    return Vec::new();
 }
 
 fn get_component_references(variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<ID> {
     if let Some(component_reference_metafield) = &variant.component_reference {
-        return serde_json::from_str(&component_reference_metafield.value).unwrap();
+        serde_json::from_str(&component_reference_metafield.value).unwrap()
+    } else {
+        Vec::new()
     }
-
-    return Vec::new();
 }
 
 fn get_price_adjustment(
     variant: &InputCartLinesMerchandiseOnProductVariant,
 ) -> Option<PriceAdjustment> {
-    if let Some(price_adjustment) = &variant.price_adjustment {
-        return Some(PriceAdjustment {
+    variant
+        .price_adjustment
+        .as_ref()
+        .map(|price_adjustment| PriceAdjustment {
             percentage_decrease: Some(PriceAdjustmentValue {
                 value: price_adjustment.value.parse().unwrap(),
             }),
-        });
-    }
-
-    return None;
+        })
 }

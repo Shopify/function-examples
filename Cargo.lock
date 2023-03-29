@@ -142,24 +142,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "discounts--order-discounts--fixed-amount"
-version = "1.0.0"
-dependencies = [
- "serde",
- "serde_json",
- "serde_with",
-]
-
-[[package]]
-name = "discounts--product-discounts--fixed-amount"
-version = "1.0.0"
-dependencies = [
- "serde",
- "serde_json",
- "serde_with",
-]
-
-[[package]]
 name = "discounts-order-discounts-default"
 version = "1.0.0"
 dependencies = [
@@ -170,6 +152,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "discounts-order-discounts-fixed-amount"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "serde_with",
+]
+
+[[package]]
 name = "discounts-product-discounts-default"
 version = "1.0.0"
 dependencies = [
@@ -177,6 +168,15 @@ dependencies = [
  "serde",
  "serde_json",
  "shopify_function",
+]
+
+[[package]]
+name = "discounts-product-discounts-fixed-amount"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "serde_with",
 ]
 
 [[package]]
