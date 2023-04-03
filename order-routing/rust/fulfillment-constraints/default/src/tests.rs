@@ -16,6 +16,9 @@ fn test_result_contains_no_operations() -> Result<()> {
                   "id": "gid://shopify/DeliverableCartLine/2"
                 }
               ]
+            },
+            "fulfillmentConstraintRule": {
+              "metafield": null
             }
           }
         "#,

@@ -88,16 +88,20 @@ mod tests {
         presentment_currency_rate: Option<Decimal>,
         delivery_groups: Option<Vec<input::CartDeliveryGroup>>,
     ) -> input::Input {
-        let delivery_groups = delivery_groups.unwrap_or_else(||
+        let delivery_groups = delivery_groups.unwrap_or_else(|| {
             vec![
-                input::CartDeliveryGroup { id: "gid://shopify/CartDeliveryGroup/0".to_string() },
-                input::CartDeliveryGroup { id: "gid://shopify/CartDeliveryGroup/1".to_string() },
+                input::CartDeliveryGroup {
+                    id: "gid://shopify/CartDeliveryGroup/0".to_string(),
+                },
+                input::CartDeliveryGroup {
+                    id: "gid://shopify/CartDeliveryGroup/1".to_string(),
+                },
             ]
-        );
+        });
         input::Input {
             discount_node: input::DiscountNode {
                 metafield: Some(input::Metafield {
-                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap()
+                    value: serde_json::to_string(&config.unwrap_or_default()).unwrap(),
                 }),
             },
             presentment_currency_rate: presentment_currency_rate.unwrap_or(1.00),
@@ -167,11 +171,7 @@ mod tests {
 
     #[test]
     fn test_discount_with_empty_cart_delivery_groups() {
-        let input = input(
-            None,
-            None,
-            Some(vec![]),
-        );
+        let input = input(None, None, Some(vec![]));
         let handle_result = serde_json::json!(function(input).unwrap());
 
         let expected_handle_result = serde_json::json!({
@@ -196,8 +196,13 @@ mod tests {
         let expected_input = input(
             Some(Configuration { value: 10.00 }),
             Some(2.00),
-            Some(vec![input::CartDeliveryGroup { id: "gid://shopify/CartDeliveryGroup/0".to_string() }])
+            Some(vec![input::CartDeliveryGroup {
+                id: "gid://shopify/CartDeliveryGroup/0".to_string(),
+            }]),
         );
-        assert_eq!(expected_input, serde_json::from_str::<input::Input>(input_json).unwrap());
+        assert_eq!(
+            expected_input,
+            serde_json::from_str::<input::Input>(input_json).unwrap()
+        );
     }
 }

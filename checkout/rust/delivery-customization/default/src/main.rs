@@ -10,9 +10,7 @@ generate_types!(
 
 #[derive(Serialize, Deserialize, Default, PartialEq)]
 #[serde(rename_all(deserialize = "camelCase"))]
-struct Configuration {
-
-}
+struct Configuration {}
 
 impl Configuration {
     fn from_str(value: &str) -> Self {
@@ -25,11 +23,12 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
     let no_changes = output::FunctionResult { operations: vec![] };
 
     let _config = match input.delivery_customization.metafield {
-        Some(input::InputDeliveryCustomizationMetafield { value }) =>
-            Configuration::from_str(&value),
+        Some(input::InputDeliveryCustomizationMetafield { value }) => {
+            Configuration::from_str(&value)
+        }
         None => return Ok(no_changes),
     };
-    
+
     Ok(output::FunctionResult { operations: vec![] })
 }
 

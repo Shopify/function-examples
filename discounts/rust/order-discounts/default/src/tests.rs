@@ -13,8 +13,11 @@ fn test_result_contains_no_discounts() -> Result<()> {
             }
         "#,
     )?;
-    let expected = 0;
+    let expected = output::FunctionResult {
+        discounts: vec![],
+        discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
+    };
 
-    assert_eq!(result.discounts.len(), expected);
+    assert_eq!(result, expected);
     Ok(())
 }

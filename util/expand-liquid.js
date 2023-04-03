@@ -18,7 +18,6 @@ async function expandLiquidTemplates(template, liquidData) {
 
   for (const entry of entries) {
     const engine = new Liquid();
-    const content = await fs.readFile(entry, "utf8");
     const rendered = await engine.renderFile(entry, liquidData);
     const outputPath = entry.replace(".liquid", "");
     await fs.writeFile(outputPath, rendered);
@@ -59,7 +58,7 @@ async function directoryNames(parentPath) {
     .map(dirent => dirent.name);
 }
 
-async function expandExtensionLiquidTemplates(domainName) {
+async function expandExtensionLiquidTemplates(domainName, flavor) {
   console.log(`Expanding liquid templates for ${domainName}`);
   const domainPath = path.join(process.cwd(), domainName);
 
@@ -74,23 +73,46 @@ async function expandExtensionLiquidTemplates(domainName) {
 
       for (const templateName of templateNames) {
         const templatePath = path.join(extensionTypePath, templateName);
+
+        if (langName === "javascript") {
+          await (await glob(path.join(templatePath, 'src', '!(*.liquid)'))).forEach(async (path) => await fs.rm(path));
+        }
+
         const liquidData = {
-          name: templateName,
+          name: `${domainName}-${extensionTypeName}-${templateName}`,
+          flavor,
         };
 
         await expandLiquidTemplates(templatePath, liquidData);
+
+        if (langName === "javascript") {
+          const srcFilePaths = await glob(path.join(templatePath, 'src', '!(*.liquid)'))
+          const srcFileExtensionsToChange = []
+
+          const fileExtension = flavor === "typescript" ? "ts" : "js";
+
+          for (const srcFilePath of srcFilePaths) {
+            srcFileExtensionsToChange.push(fs.rename(srcFilePath, `${srcFilePath}.${fileExtension}`, (err) => {
+              if (err) throw err;
+            }));
+          }
+
+          await Promise.all(srcFileExtensionsToChange)
+        }
       }
     }
   }
   console.log();
 }
 
+const flavor = process.argv[2] || "vanilla-js";
+
 const SAMPLE_APP_DIR = 'sample-apps';
 await expandAppLiquidTemplates(SAMPLE_APP_DIR);
 
-const DOMAINS = ['checkout', 'discounts'];
+const DOMAINS = ['checkout', 'discounts', 'order-routing'];
 for (const domain of DOMAINS) {
-  await expandExtensionLiquidTemplates(domain);
+  await expandExtensionLiquidTemplates(domain, flavor);
 }
 
 console.log('The above files should be added to .gitignore if they have not already been added.');

@@ -2,7 +2,6 @@ use output::FunctionError;
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use graphql_client;
 use serde::{Deserialize, Serialize};
 
 generate_types!(

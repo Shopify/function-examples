@@ -1,7 +1,6 @@
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use graphql_client;
 use serde::{Deserialize, Serialize};
 
 generate_types!(
@@ -13,12 +12,12 @@ generate_types!(
 struct Config {}
 
 #[shopify_function]
-fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
+fn function(_input: input::ResponseData) -> Result<output::FunctionResult> {
     let operations = vec![];
 
     // Build operations based on the input query response here.
 
-    return Ok(output::FunctionResult { operations });
+    Ok(output::FunctionResult { operations })
 }
 
 #[cfg(test)]

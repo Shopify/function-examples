@@ -1,0 +1,44 @@
+{%- if flavor contains "vanilla-js" -%}
+import { describe, it, expect } from 'vitest';
+import orderDiscounts from './index';
+
+/**
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+describe('order discounts function', () => {
+  it('returns no discounts without configuration', () => {
+    const result = orderDiscounts({
+      discountNode: {
+        metafield: null
+      }
+    });
+    const expected = /** @type {FunctionResult} */ ({
+      discounts: [],
+      discountApplicationStrategy: "FIRST",
+    });
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- elsif flavor contains "typescript" -%}
+import { describe, it, expect } from 'vitest';
+import orderDiscounts from './index';
+import { FunctionResult, DiscountApplicationStrategy } from '../generated/api';
+
+describe('order discounts function', () => {
+  it('returns no discounts without configuration', () => {
+    const result = orderDiscounts({
+      discountNode: {
+        metafield: null
+      }
+    });
+    const expected: FunctionResult = {
+      discounts: [],
+      discountApplicationStrategy: DiscountApplicationStrategy.First,
+    };
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- endif -%}

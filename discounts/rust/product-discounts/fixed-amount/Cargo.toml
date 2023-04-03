@@ -1,5 +1,5 @@
 [package]
-name = "fixed-amount"
+name = "discounts-product-discounts-fixed-amount"
 version = "1.0.0"
 edition = "2021"
 
