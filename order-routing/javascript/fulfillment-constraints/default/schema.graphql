@@ -31,7 +31,7 @@ type Attribute {
 }
 
 """
-Represents information about the buyer that is interacting with the cart.
+Represents information about the buyer that is interacting with the cart. Only set when the buyer is logged in.
 """
 type BuyerIdentity {
   """
@@ -2623,6 +2623,11 @@ type GateConfiguration implements HasMetafields {
   appId: String
 
   """
+  A non-unique string used to group gate configurations.
+  """
+  handle: String
+
+  """
   The ID of the gate configuration.
   """
   id: ID!
@@ -2654,7 +2659,7 @@ type GateSubject {
     """
     The appId of the gate configurations to search for.
     """
-    appId: String
+    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
   ): GateConfiguration!
 
   """
@@ -2670,7 +2675,12 @@ interface HasGates {
   """
   Returns active gate subjects bound to the resource.
   """
-  gates: [GateSubject!]!
+  gates(
+    """
+    The handle of the gate configurations to search for.
+    """
+    handle: String
+  ): [GateSubject!]!
 }
 
 """
@@ -2701,6 +2711,9 @@ Example value: `"gid://shopify/Product/10079785100"`
 """
 scalar ID
 
+"""
+The input object for the function.
+"""
 type Input {
   """
   The cart.
@@ -2715,7 +2728,17 @@ type Input {
   """
   The locations where the inventory items on this cart are stocked.
   """
-  locations: [Location!]!
+  locations(
+    """
+    The list of location identifiers to search for.
+    """
+    identifiers: [String!]
+
+    """
+    The list of location names to search for.
+    """
+    names: [String!]
+  ): [Location!]!
 }
 
 """
@@ -2930,7 +2953,9 @@ type MoneyV2 {
 }
 
 """
-MustFulfillFrom constraints force a set of items to be fulfilled from a specified location.
+Force a set of items to be fulfilled from a specified location.
+If the cart item isn't stocked at the specified location, then checkout won't return any shipping rates and
+completing checkout will be blocked.
 """
 input MustFulfillFrom {
   """
@@ -2945,7 +2970,9 @@ input MustFulfillFrom {
 }
 
 """
-MustFulfillFromSameLocation constraints force a set of items to be fulfilled from the same location.
+Force a set of items to be fulfilled from the same location.
+If the cart items with constraints aren't stocked at the same location,
+then checkout won't return any shipping rates and completing checkout will be blocked.
 """
 input MustFulfillFromSameLocation {
   """
@@ -2974,12 +3001,16 @@ An operation to apply fulfillment constraints.
 """
 input Operation @oneOf {
   """
-  MustFulfillFrom constraints force a set of items to be fulfilled from a specified location.
+  Force a set of items to be fulfilled from a specified location.
+  If the cart item isn't stocked at the specified location, then checkout won't return any shipping rates and
+  completing checkout will be blocked.
   """
   mustFulfillFrom: MustFulfillFrom
 
   """
-  MustFulfillFromSameLocation constraints force a set of items to be fulfilled from the same location.
+  Force a set of items to be fulfilled from the same location.
+  If the cart items with constraints aren't stocked at the same location,
+  then checkout won't return any shipping rates and completing checkout will be blocked.
   """
   mustFulfillFromSameLocation: MustFulfillFromSameLocation
 }
@@ -2991,7 +3022,12 @@ type Product implements HasGates & HasMetafields {
   """
   Returns active gate subjects bound to the resource.
   """
-  gates: [GateSubject!]!
+  gates(
+    """
+    The handle of the gate configurations to search for.
+    """
+    handle: String
+  ): [GateSubject!]!
 
   """
   A unique human-friendly string of the product's title.
