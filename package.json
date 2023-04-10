@@ -19,6 +19,7 @@
   },
   "private": true,
   "workspaces": [
-    "*/javascript/**"
+    "*/javascript/**",
+    "sample-apps/*/extensions/*-js"
   ]
 }

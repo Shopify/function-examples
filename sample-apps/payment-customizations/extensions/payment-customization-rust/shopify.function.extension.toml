@@ -1,5 +1,5 @@
 api_version = "2023-04"
-name = "payment-customization"
+name = "payment-customization-rust"
 type = "payment_customization"
 
 [build]

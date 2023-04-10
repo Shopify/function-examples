@@ -12,8 +12,10 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
-    "@shopify/app": "3.44.1",
-    "@shopify/cli": "3.44.1"
+    "@shopify/app": "^3.45.0",
+    "@shopify/cli": "^3.45.0",
+    "@shopify/shopify_function": "0.0.3",
+    "javy": "0.0.3"
   },
   "author": "andrewhassan"
 }

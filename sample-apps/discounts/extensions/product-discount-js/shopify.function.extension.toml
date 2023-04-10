@@ -1,0 +1,11 @@
+name = "product-discount-js"
+type = "product_discounts"
+api_version = "2022-07"
+
+[build]
+command = ""
+path = "dist/function.wasm"
+
+[ui.paths]
+create = "/volume/:functionId/new"
+details = "/volume/:functionId/:id"

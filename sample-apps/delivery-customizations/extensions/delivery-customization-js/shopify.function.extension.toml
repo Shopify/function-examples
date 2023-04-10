@@ -1,0 +1,11 @@
+name = "delivery-customization-js"
+type = "delivery_customization"
+api_version = "2023-04"
+
+[build]
+command = ""
+path = "dist/function.wasm"
+
+[ui.paths]
+create = "/delivery-customization/:functionId/new"
+details = "/delivery-customization/:functionId/:id"

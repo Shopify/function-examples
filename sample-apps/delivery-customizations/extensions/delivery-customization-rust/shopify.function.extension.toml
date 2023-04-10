@@ -1,5 +1,5 @@
 api_version = "2023-04"
-name = "delivery-customization"
+name = "delivery-customization-rust"
 type = "delivery_customization"
 
 [build]

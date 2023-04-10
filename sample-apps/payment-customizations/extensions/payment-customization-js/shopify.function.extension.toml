@@ -1,0 +1,11 @@
+name = "payment-customization-js"
+type = "payment_customization"
+api_version = "2023-04"
+
+[build]
+command = ""
+path = "dist/function.wasm"
+
+[ui.paths]
+create = "/payment-customization/:functionId/new"
+details = "/payment-customization/:functionId/:id"
