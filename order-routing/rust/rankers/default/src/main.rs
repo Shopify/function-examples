@@ -17,26 +17,25 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
         .fulfillment_groups
         .iter()
         .map(|group| {
-            let fulfillment_group_id = group.id.clone();
             let rankings = group
                 .inventory_locations
-                .clone()
-                .unwrap()
-                .iter()
-                .map(|inventory_location| {
-                    let location_id = inventory_location.location.id.clone();
-                    output::RankedLocation {
-                        location_id,
-                        rank: 0,
-                    }
+                .as_ref()
+                .map(|locations| {
+                    locations
+                        .iter()
+                        .map(|location| output::RankedLocation {
+                            location_id: location.location.id.clone(),
+                            rank: 0,
+                        })
+                        .collect()
                 })
-                .collect();
-            let rank_operation = output::FulfillmentGroupRankedLocations {
-                fulfillment_group_id,
-                rankings,
-            };
+                .unwrap_or_else(Vec::new);
+
             output::Operation {
-                rank: rank_operation,
+                rank: output::FulfillmentGroupRankedLocations {
+                    fulfillment_group_id: group.id.clone(),
+                    rankings,
+                },
             }
         })
         .collect();
