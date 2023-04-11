@@ -1,3 +1,10 @@
+# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
+# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
+#
+# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
+# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
+# Check out the "Docs" tab in the top right.
+
 schema {
   query: Input
   mutation: MutationRoot
@@ -19,7 +26,7 @@ type Attribute {
 }
 
 """
-Represents information about the buyer that is interacting with the cart.
+Represents information about the buyer that is interacting with the cart. Only set when the buyer is logged in.
 """
 type BuyerIdentity {
   """
@@ -66,6 +73,11 @@ type Cart {
   The costs that the buyer will pay at checkout.
   """
   cost: CartCost!
+
+  """
+  A list of lines containing information about the items that can be delivered.
+  """
+  deliverableLines: [DeliverableCartLine!]!
 
   """
   The delivery groups available for the cart based on the buyer's shipping address.
@@ -357,21 +369,6 @@ type CompanyLocation implements HasMetafields {
   at which the company location was last modified.
   """
   updatedAt: DateTime!
-}
-
-"""
-A country which comprises a market.
-"""
-type Country implements Region {
-  """
-  The two-letter code for the country.
-  """
-  code: CountryCode!
-
-  """
-  The country name.
-  """
-  name: String!
 }
 
 """
@@ -2515,6 +2512,38 @@ Example values: `"29.99"`, `"29.999"`.
 scalar Decimal
 
 """
+Represents information about the merchandise in the cart.
+"""
+type DeliverableCartLine {
+  """
+  Retrieve a cart line attribute by key.
+
+  Cart line attributes are also known as line item properties in Liquid.
+  """
+  attribute(
+    """
+    The key of the attribute to retrieve.
+    """
+    key: String
+  ): Attribute
+
+  """
+  The ID of the cart line.
+  """
+  id: ID!
+
+  """
+  The merchandise that the buyer intends to purchase.
+  """
+  merchandise: Merchandise!
+
+  """
+  The quantity of the merchandise that the customer intends to purchase.
+  """
+  quantity: Int!
+}
+
+"""
 List of different delivery method types.
 """
 enum DeliveryMethod {
@@ -2576,7 +2605,7 @@ input FulfillmentGroupRankedLocations {
   """
   The identifier for the fulfillment group.
   """
-  fulfillmentGroupId: String!
+  fulfillmentGroupId: ID!
 
   """
   The ranked locations for this fulfillment group.
@@ -2592,6 +2621,76 @@ input FunctionResult {
   The ranked locations for each fulfillment group.
   """
   operations: [Operation!]!
+}
+
+"""
+Represents a gate configuration.
+"""
+type GateConfiguration implements HasMetafields {
+  """
+  An optional string identifier.
+  """
+  appId: String
+
+  """
+  A non-unique string used to group gate configurations.
+  """
+  handle: String
+
+  """
+  The ID of the gate configuration.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield.
+    """
+    namespace: String!
+  ): Metafield
+}
+
+"""
+Represents a connection from a subject to a gate configuration.
+"""
+type GateSubject {
+  """
+  The bound gate configuration.
+  """
+  configuration(
+    """
+    The appId of the gate configurations to search for.
+    """
+    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
+  ): GateConfiguration!
+
+  """
+  The ID of the gate subject.
+  """
+  id: ID!
+}
+
+"""
+Gate subjects associated to the specified resource.
+"""
+interface HasGates {
+  """
+  Returns active gate subjects bound to the resource.
+  """
+  gates(
+    """
+    The handle of the gate configurations to search for.
+    """
+    handle: String
+  ): [GateSubject!]!
 }
 
 """
@@ -2622,6 +2721,9 @@ Example value: `"gid://shopify/Product/10079785100"`
 """
 scalar ID
 
+"""
+The input object for the function.
+"""
 type Input {
   """
   Cart.
@@ -2660,7 +2762,7 @@ type InventoryLocation {
 }
 
 """
-Represents the location where the physical good resides.
+Represents the location where the inventory resides.
 """
 type Location implements HasMetafields {
   """
@@ -2799,6 +2901,16 @@ type MailingAddress {
   lastName: String
 
   """
+  The approximate latitude of the address.
+  """
+  latitude: Float
+
+  """
+  The approximate longitude of the address.
+  """
+  longitude: Float
+
+  """
   The full name of the customer, based on firstName and lastName.
   """
   name: String
@@ -2832,6 +2944,21 @@ type Market {
   A geographic region which comprises a market.
   """
   regions: [Region!]!
+}
+
+"""
+A country which comprises a market.
+"""
+type MarketRegionCountry implements Region {
+  """
+  The two-letter code for the country.
+  """
+  code: CountryCode!
+
+  """
+  The country name.
+  """
+  name: String!
 }
 
 """
@@ -2891,11 +3018,11 @@ type MutationRoot {
 }
 
 """
-A list of ranked locations for a fulfillment group.
+An operation to apply to the fulfillment group inventory locations.
 """
 input Operation {
   """
-  The ranked locations for a fulfillment group.
+  Request to rank a fulfillment group's inventory locations.
   """
   rank: FulfillmentGroupRankedLocations!
 }
@@ -2923,7 +3050,17 @@ type OrderRoutingLocationRule implements HasMetafields {
 """
 Represents a product.
 """
-type Product implements HasMetafields {
+type Product implements HasGates & HasMetafields {
+  """
+  Returns active gate subjects bound to the resource.
+  """
+  gates(
+    """
+    The handle of the gate configurations to search for.
+    """
+    handle: String
+  ): [GateSubject!]!
+
   """
   A unique human-friendly string of the product's title.
   """

@@ -2,7 +2,7 @@ use super::*;
 use shopify_function::{run_function_with_input, Result};
 
 #[test]
-fn test_result_contains_no_operations() -> Result<()> {
+fn test_result_ranks_all_locations_zero() -> Result<()> {
     let result = run_function_with_input(
         function,
         r#"
@@ -18,19 +18,17 @@ fn test_result_contains_no_operations() -> Result<()> {
             }
         "#,
     )?;
-    let expected = crate::output::FunctionResult { operations: vec![
-        crate::output::Operation {
-            rank: crate::output::FulfillmentGroupRankedLocations {
+    let expected = output::FunctionResult {
+        operations: vec![output::Operation {
+            rank: output::FulfillmentGroupRankedLocations {
                 fulfillment_group_id: "gid://shopify/FulfillmentGroup/123".to_string(),
-                rankings: vec![
-                    crate::output::RankedLocation {
-                        location_id: "gid://shopify/Location/456".to_string(),
-                        rank: 0,
-                    }
-                ]
-            }
-        }
-    ]};
+                rankings: vec![output::RankedLocation {
+                    location_id: "gid://shopify/Location/456".to_string(),
+                    rank: 0,
+                }],
+            },
+        }],
+    };
 
     assert_eq!(result, expected);
     Ok(())
