@@ -1,0 +1,55 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+/**
+ * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+export default /**
+ * @param {InputQuery} input
+ * @returns {FunctionResult}
+ */
+(input) => {
+  let operations = input.fulfillmentGroups.map(group => {
+    let rankings = group.inventoryLocations.map(inventoryLocation => ({
+      locationId: inventoryLocation.location.id,
+      rank: 0,
+    }));
+
+    return {
+      rank: {
+        fulfillmentGroupId: group.id,
+        rankings: rankings,
+      }
+    };
+  });
+
+  return { operations: operations };
+};
+{%- elsif flavor contains "typescript" -%}
+import {
+  InputQuery,
+  FunctionResult,
+  Operation,
+  RankedLocation,
+} from "../generated/api";
+
+export default (input: InputQuery): FunctionResult => {
+  let operations: Operation[] = input.fulfillmentGroups.map(group => {
+    let rankings: RankedLocation[] = group.inventoryLocations.map(inventoryLocation => ({
+      locationId: inventoryLocation.location.id,
+      rank: 0,
+    }));
+
+    return {
+      rank: {
+        fulfillmentGroupId: group.id,
+        rankings: rankings,
+      }
+    };
+  });
+
+  return { operations: operations };
+};
+{%- endif -%}
