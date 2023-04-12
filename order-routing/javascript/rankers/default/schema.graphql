@@ -2595,7 +2595,7 @@ type FulfillmentGroup {
   """
   A list of inventory locations for the fulfillment group.
   """
-  inventoryLocations: [InventoryLocation!]
+  inventoryLocations: [InventoryLocation!]!
 }
 
 """
@@ -2943,13 +2943,23 @@ type Market {
   """
   A geographic region which comprises a market.
   """
-  regions: [Region!]!
+  regions: [MarketRegion!]!
+}
+
+"""
+Represents a region.
+"""
+interface MarketRegion {
+  """
+  The name of the region.
+  """
+  name: String
 }
 
 """
 A country which comprises a market.
 """
-type MarketRegionCountry implements Region {
+type MarketRegionCountry implements MarketRegion {
   """
   The two-letter code for the country.
   """
@@ -3205,21 +3215,6 @@ input RankedLocation {
   The location's rank.
   """
   rank: Int!
-}
-
-"""
-Represents a region.
-"""
-interface Region {
-  """
-  The code of the region.
-  """
-  code: String
-
-  """
-  The name of the region.
-  """
-  name: String
 }
 
 """
