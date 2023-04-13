@@ -11,8 +11,8 @@ export default /**
  * @returns {FunctionResult}
  */
 (input) => {
-  let operations = input.fulfillmentGroups.map(group => {
-    let rankings = group.inventoryLocations.map(inventoryLocation => ({
+  const operations = input.fulfillmentGroups.map((group) => {
+    const rankings = group.inventoryLocations.map((inventoryLocation) => ({
       locationId: inventoryLocation.location.id,
       rank: 0,
     }));
@@ -20,12 +20,12 @@ export default /**
     return {
       rank: {
         fulfillmentGroupId: group.id,
-        rankings: rankings,
-      }
+        rankings,
+      },
     };
   });
 
-  return { operations: operations };
+  return {operations};
 };
 {%- elsif flavor contains "typescript" -%}
 import {
@@ -36,20 +36,22 @@ import {
 } from "../generated/api";
 
 export default (input: InputQuery): FunctionResult => {
-  let operations: Operation[] = input.fulfillmentGroups.map(group => {
-    let rankings: RankedLocation[] = group.inventoryLocations.map(inventoryLocation => ({
-      locationId: inventoryLocation.location.id,
-      rank: 0,
-    }));
+  const operations: Operation[] = input.fulfillmentGroups.map((group) => {
+    const rankings: RankedLocation[] = group.inventoryLocations.map(
+      (inventoryLocation) => ({
+        locationId: inventoryLocation.location.id,
+        rank: 0,
+      }),
+    );
 
     return {
       rank: {
         fulfillmentGroupId: group.id,
-        rankings: rankings,
-      }
+        rankings,
+      },
     };
   });
 
-  return { operations: operations };
+  return {operations};
 };
 {%- endif -%}
