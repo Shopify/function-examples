@@ -51,18 +51,15 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
             }
         })
         .flat_map(|group| &group.delivery_options)
-        .map(|option| output::RenameOperation {
-            delivery_option_handle: option.handle.to_string(),
-            title: match &option.title {
-                // Use the configured message, instead of a hardcoded value
-                Some(title) => format!("{} - {}", title, config.message),
-                None => config.message.to_string(),
-            },
-        })
-        .map(|rename| output::Operation {
-            rename: Some(rename),
-            hide: None,
-            move_: None,
+        .map(|option| {
+            output::Operation::Rename(output::RenameOperation {
+                delivery_option_handle: option.handle.to_string(),
+                title: match &option.title {
+                    // Use the configured message, instead of a hardcoded value
+                    Some(title) => format!("{} - {}", title, config.message),
+                    None => config.message.to_string(),
+                },
+            })
         })
         .collect();
 

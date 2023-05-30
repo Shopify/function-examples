@@ -52,22 +52,14 @@ fn test_renames_delivery_options_if_province_matches() -> Result<()> {
     )?;
     let expected = crate::output::FunctionResult {
         operations: vec![
-            output::Operation {
-                rename: Some(output::RenameOperation {
-                    delivery_option_handle: "test_delivery_option".to_string(),
-                    title: "Test Delivery Option - Test Message".to_string(),
-                }),
-                hide: None,
-                move_: None,
-            },
-            output::Operation {
-                rename: Some(output::RenameOperation {
-                    delivery_option_handle: "test_delivery_option_2".to_string(),
-                    title: "Test Delivery Option 2 - Test Message".to_string(),
-                }),
-                hide: None,
-                move_: None,
-            },
+            output::Operation::Rename(output::RenameOperation {
+                delivery_option_handle: "test_delivery_option".to_string(),
+                title: "Test Delivery Option - Test Message".to_string(),
+            }),
+            output::Operation::Rename(output::RenameOperation {
+                delivery_option_handle: "test_delivery_option_2".to_string(),
+                title: "Test Delivery Option 2 - Test Message".to_string(),
+            }),
         ],
     };
 

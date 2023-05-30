@@ -54,11 +54,11 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
             input::InputCartLinesMerchandise::ProductVariant(variant) => Some(variant),
             input::InputCartLinesMerchandise::CustomProduct => None,
         })
-        .map(|variant| output::Target {
-            product_variant: Some(output::ProductVariantTarget {
+        .map(|variant| {
+            output::Target::ProductVariant(output::ProductVariantTarget {
                 id: variant.id.to_string(),
                 quantity: None,
-            }),
+            })
         })
         .collect::<Vec<output::Target>>();
 
@@ -71,12 +71,9 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
         discounts: vec![output::Discount {
             message: None,
             targets,
-            value: output::Value {
-                fixed_amount: None,
-                percentage: Some(output::Percentage {
-                    value: config.percentage.to_string(),
-                }),
-            },
+            value: output::Value::Percentage(output::Percentage {
+                value: config.percentage.to_string(),
+            }),
         }],
         discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
     })
