@@ -83,13 +83,7 @@ fn test_returns_no_operations_if_no_payment_method_matches_configured_name() -> 
             }
         "#,
     )?;
-    let expected = crate::output::FunctionResult {
-        operations: vec![crate::output::Operation {
-            hide: None,
-            move_: None,
-            rename: None,
-        }],
-    };
+    let expected = crate::output::FunctionResult { operations: vec![] };
 
     assert_eq!(result, expected);
     Ok(())
@@ -121,13 +115,11 @@ fn test_hides_matching_payment_method() -> Result<()> {
         "#,
     )?;
     let expected = crate::output::FunctionResult {
-        operations: vec![crate::output::Operation {
-            hide: Some(crate::output::HideOperation {
+        operations: vec![crate::output::Operation::Hide(
+            crate::output::HideOperation {
                 payment_method_id: "1".to_string(),
-            }),
-            move_: None,
-            rename: None,
-        }],
+            },
+        )],
     };
 
     assert_eq!(result, expected);

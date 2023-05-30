@@ -43,7 +43,7 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
     }
 
     // Use the configured payment method name instead of a hardcoded value
-    let hide_payment_method = input
+    let operations = input
         .payment_methods
         .iter()
         .find(|&method| {
@@ -51,17 +51,14 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
                 .name
                 .contains(&config.payment_method_name.to_string())
         })
-        .map(|method| output::HideOperation {
-            payment_method_id: method.id.to_string(),
-        });
+        .map(|method| {
+            vec![output::Operation::Hide(output::HideOperation {
+                payment_method_id: method.id.to_string(),
+            })]
+        })
+        .unwrap_or_default();
 
-    Ok(output::FunctionResult {
-        operations: vec![output::Operation {
-            hide: hide_payment_method,
-            move_: None,
-            rename: None,
-        }],
-    })
+    Ok(output::FunctionResult { operations })
 }
 
 #[cfg(test)]

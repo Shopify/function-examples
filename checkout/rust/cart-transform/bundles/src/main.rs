@@ -87,18 +87,13 @@ fn get_merge_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation>
                         }),
                     });
 
-                let merge_operation = MergeOperation {
+                CartOperation::Merge(MergeOperation {
                     parent_variant_id: definition.id,
                     title: None,
                     cart_lines,
                     image: None,
                     price,
-                };
-
-                CartOperation {
-                    merge: Some(merge_operation),
-                    expand: None,
-                }
+                })
             })
         })
 }
@@ -183,16 +178,12 @@ fn get_expand_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation
 
                 let price = get_price_adjustment(merchandise);
 
-                let expand_operation = ExpandOperation {
+                CartOperation::Expand(ExpandOperation {
                     cart_line_id: line.id.clone(),
                     expanded_cart_items: expand_relationships,
                     price,
-                };
-
-                Some(CartOperation {
-                    expand: Some(expand_operation),
-                    merge: None,
                 })
+                .into()
             }
         } else {
             None
