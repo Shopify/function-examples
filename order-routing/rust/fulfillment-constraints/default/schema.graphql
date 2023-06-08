@@ -31,7 +31,7 @@ type Attribute {
 }
 
 """
-Represents information about the buyer that is interacting with the cart. Only set when the buyer is logged in.
+Represents information about the buyer that is interacting with the cart.
 """
 type BuyerIdentity {
   """
@@ -248,6 +248,21 @@ type CartLineCost {
 }
 
 """
+Represents whether the product is a member of the given collection.
+"""
+type CollectionMembership {
+  """
+  The ID of the collection.
+  """
+  collectionId: ID!
+
+  """
+  Whether the product is a member of the collection.
+  """
+  isMember: Boolean!
+}
+
+"""
 Represents information about a company which is also a customer of the shop.
 """
 type Company implements HasMetafields {
@@ -257,7 +272,7 @@ type Company implements HasMetafields {
   createdAt: DateTime!
 
   """
-  A unique externally-supplied identifier for the company.
+  A unique externally-supplied ID for the company.
   """
   externalId: String
 
@@ -335,7 +350,7 @@ type CompanyLocation implements HasMetafields {
   createdAt: DateTime!
 
   """
-  A unique externally-supplied identifier for the company.
+  A unique externally-supplied ID for the company.
   """
   externalId: String
 
@@ -2704,6 +2719,21 @@ interface HasMetafields {
 }
 
 """
+Represents whether the current object has the given tag.
+"""
+type HasTagResponse {
+  """
+  Whether the current object has the tag.
+  """
+  hasTag: Boolean!
+
+  """
+  The tag.
+  """
+  tag: String!
+}
+
+"""
 Represents a unique identifier, often used to refetch an object.
 The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
 
@@ -2964,9 +2994,9 @@ input MustFulfillFrom {
   deliverableLineIds: [ID!]!
 
   """
-  Id of the location for which the cart lines must ship from.
+  Ids of the locations for which the cart lines must fulfill from.
   """
-  locationId: ID!
+  locationIds: [ID!]!
 }
 
 """
@@ -3039,10 +3069,20 @@ type Product implements HasGates & HasMetafields {
   """
   hasAnyTag(
     """
-    The tags to search for.
+    The tags to check.
     """
     tags: [String!]! = []
   ): Boolean!
+
+  """
+  Whether the product has the given tags.
+  """
+  hasTags(
+    """
+    The tags to check.
+    """
+    tags: [String!]! = []
+  ): [HasTagResponse!]!
 
   """
   A globally-unique identifier.
@@ -3050,14 +3090,24 @@ type Product implements HasGates & HasMetafields {
   id: ID!
 
   """
-  Whether the product has any of the given collection.
+  Whether the product is in any of the given collections.
   """
   inAnyCollection(
     """
-    The collections to search for.
+    The IDs of the collections to check.
     """
     ids: [ID!]! = []
   ): Boolean!
+
+  """
+  Whether the product is in the given collections.
+  """
+  inCollections(
+    """
+    The IDs of the collections to check.
+    """
+    ids: [ID!]! = []
+  ): [CollectionMembership!]!
 
   """
   Whether the product is a gift card.
