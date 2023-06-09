@@ -1,18 +1,14 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import paymentCustomization from './index';
+import cartTransform from './index';
 
 /**
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
-describe('payment customization function', () => {
-  it('returns no operations without configuration', () => {
-    const result = paymentCustomization({
-      paymentCustomization: {
-        metafield: null
-      }
-    });
+describe('cart transform function', () => {
+  it('returns no operations', () => {
+    const result = cartTransform({});
     const expected = /** @type {FunctionResult} */ ({ operations: [] });
 
     expect(result).toEqual(expected);
@@ -20,14 +16,14 @@ describe('payment customization function', () => {
 });
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import paymentCustomization from './index';
+import cartTransform from './index';
 import { FunctionResult } from '../generated/api';
 
-describe('payment customization function', () => {
-  it('returns no operations without configuration', () => {
-    const result = paymentCustomization({
-      paymentCustomization: {
-        metafield: null
+describe('cart transform function', () => {
+  it('returns no operations', () => {
+    const result = cartTransform({
+      cart: {
+        lines: []
       }
     });
     const expected: FunctionResult = { operations: [] };

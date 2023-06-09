@@ -18,10 +18,6 @@ export default /**
  * @returns {FunctionResult}
  */
 (input) => {
-  const configuration = JSON.parse(
-    input?.paymentCustomization?.metafield?.value ?? "{}"
-  );
-
   return NO_CHANGES;
 };
 {%- elsif flavor contains "typescript" -%}
@@ -34,12 +30,7 @@ const NO_CHANGES: FunctionResult = {
   operations: [],
 };
 
-type Configuration = {};
-
 export default (input: InputQuery): FunctionResult => {
-  const configuration: Configuration = JSON.parse(
-    input?.paymentCustomization?.metafield?.value ?? "{}"
-  );
   return NO_CHANGES;
 };
 {%- endif -%}
