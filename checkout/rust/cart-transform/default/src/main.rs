@@ -13,9 +13,7 @@ generate_types!(
 
 #[shopify_function]
 fn function(_input: input::ResponseData) -> Result<output::FunctionResult> {
-    let no_changes = output::FunctionResult {
-        operations: Some(vec![]),
-    };
+    let no_changes = output::FunctionResult { operations: vec![] };
 
     Ok(no_changes)
 }
