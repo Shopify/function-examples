@@ -5,6 +5,7 @@ api_version = "unstable"
 [build]
 command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/{{name | replace: " ", "-" | downcase}}.wasm"
+watch = [ "src/**/*.rs" ]
 
 [ui.paths]
 create = "/"
