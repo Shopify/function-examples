@@ -5,7 +5,6 @@ type = "delivery_customization"
 [build]
 command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/delivery-customization.wasm"
-watch = [ "src/**/*.rs" ]
 
 [ui.paths]
 create = "/delivery-customization/:functionId/new"
