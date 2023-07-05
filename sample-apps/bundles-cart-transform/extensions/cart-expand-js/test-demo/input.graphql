@@ -8,8 +8,16 @@ query Input {
         ... on ProductVariant {
           id
           title
-          expandedBundleMetafield: metafield(namespace: "bundles", key: "ExpandTestingIgnacio") {
-            type
+          componentReferences: metafield(
+            namespace: "bundles"
+            key: "component_references"
+          ) {
+            value
+          }
+          componentQuantities: metafield(
+            namespace: "bundles"
+            key: "component_quantities"
+          ) {
             value
           }
         }

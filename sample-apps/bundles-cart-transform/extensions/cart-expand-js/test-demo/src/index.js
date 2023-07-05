@@ -14,14 +14,6 @@ will return an Expand operation containing the parts.
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
-/**
- * @type {FunctionResult}
- */
-const NO_CHANGES = {
-  operations: [],
-};
-
-const METAFIELD_DELIMITER = "___";
 
 export default /**
  * @param {InputQuery} input
@@ -30,33 +22,8 @@ export default /**
 (input) => {
   let operations = [];
 
-  let cartExpandFromMetafieldLine = (lineItem) => {
-    if (lineItem.merchandise.__typename === "ProductVariant") {
-      const init = []
-
-      const values = lineItem.merchandise.expandedBundleMetafield?.value?.split(",") ?? []
-
-      const expandedCartItems = values
-        .reduce((acc, current) => {
-          const [merchandiseId, quantity] = current.split(METAFIELD_DELIMITER)
-          if (!merchandiseId || !quantity) {
-            return acc;
-          }
-          return [...acc, { merchandiseId, quantity: Number(quantity) }]
-        },
-        init
-      )
-
-      if (values.length > 0 && values.length === expandedCartItems.length) {
-        return { cartLineId: lineItem.id, expandedCartItems }
-      }
-
-      return null;
-    }
-  };
-
   input.cart.lines.forEach((line) => {
-    const expandOperation = cartExpandFromMetafieldLine(line);
+    const expandOperation = optionallyBuildExpandOperation(line);
 
     if (expandOperation) {
       operations.push({expand: expandOperation});
@@ -65,3 +32,37 @@ export default /**
 
   return { operations };
 };
+
+function optionallyBuildExpandOperation({id: cartLineId, merchandise}) {
+  if (merchandise.__typename === "ProductVariant") {
+    const componentReferences = JSON.parse(
+      merchandise.componentReferences.value
+    );
+    const componentQuantities = JSON.parse(
+      merchandise.componentQuantities.value
+    );
+
+    if (!validateMetafields(componentReferences, componentQuantities)) {
+      throw new Error("Invalid bundle composition");
+    }
+
+    const expandedCartItems = componentReferences.map((merchandiseId, index) => ({
+      merchandiseId: merchandiseId,
+      quantity: componentQuantities[index],
+    }));
+
+    if (expandedCartItems.length > 0) {
+      return { cartLineId, expandedCartItems }
+    }
+  }
+
+  return null;
+}
+
+
+/**
+ * Returns true if component references have matching quantities and there is at least one component.
+ */
+function validateMetafields(componentReferences, componentQuantities) {
+  return componentReferences.length !== componentQuantities.length && componentReferences.length > 0;
+}
