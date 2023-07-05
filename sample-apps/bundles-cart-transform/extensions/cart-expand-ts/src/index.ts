@@ -18,14 +18,14 @@ export default (input: InputQuery): FunctionResult => {
   const operations = input.cart.lines.reduce<Array<CartOperation>>(
     (acc, {id: cartLineId, merchandise}) => {
       if (canExpand(merchandise)) {
-        const componentIds: Scalars["ID"][] = JSON.parse(
-          merchandise.expandBundleComponents.value
+        const componentReferences: Scalars["ID"][] = JSON.parse(
+          merchandise.componentReferences.value
         );
         const componentQuantities: Scalars["Int"][] = JSON.parse(
-          merchandise.expandBundleComponentQuantities.value
+          merchandise.componentQuantities.value
         );
 
-        if (!validateMetafields(componentIds, componentQuantities)) {
+        if (!validateMetafields(componentReferences, componentQuantities)) {
           throw new Error("Invalid bundle composition");
         }
 
@@ -34,7 +34,7 @@ export default (input: InputQuery): FunctionResult => {
           {
             expand: {
               cartLineId,
-              expandedCartItems: componentIds.map((merchandiseId, index) => ({
+              expandedCartItems: componentReferences.map((merchandiseId, index) => ({
                 merchandiseId,
                 quantity: componentQuantities[index],
               })),
@@ -56,11 +56,11 @@ export default (input: InputQuery): FunctionResult => {
 function canExpand(merchandise: Merchandise): merchandise is ProductVariant {
   return (
     merchandise.__typename === "ProductVariant" &&
-    !!merchandise.expandBundleComponentQuantities &&
-    !!merchandise.expandBundleComponents
+    !!merchandise.componentQuantities &&
+    !!merchandise.componentReferences
   );
 }
 
-function validateMetafields(componentIds: Scalars["ID"][], componentQuantities: Scalars["Int"][], ) {
-  return componentIds.length !== componentQuantities.length && componentIds.length > 0;
+function validateMetafields(componentReferences: Scalars["ID"][], componentQuantities: Scalars["Int"][], ) {
+  return componentReferences.length !== componentQuantities.length && componentReferences.length > 0;
 }

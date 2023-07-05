@@ -973,4 +973,4 @@ export enum WeightUnit {
 export type InputQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type InputQuery = { __typename?: 'Input', cart: { __typename?: 'Cart', lines: Array<{ __typename?: 'CartLine', id: string, quantity: number, merchandise: { __typename: 'CustomProduct' } | { __typename: 'ProductVariant', id: string, title?: string | null, expandBundleComponents?: { __typename?: 'Metafield', value: string } | null, expandBundleComponentQuantities?: { __typename?: 'Metafield', value: string } | null } }> } };
+export type InputQuery = { __typename?: 'Input', cart: { __typename?: 'Cart', lines: Array<{ __typename?: 'CartLine', id: string, quantity: number, merchandise: { __typename: 'CustomProduct' } | { __typename: 'ProductVariant', id: string, title?: string | null, componentReferences?: { __typename?: 'Metafield', value: string } | null, componentQuantities?: { __typename?: 'Metafield', value: string } | null } }> } };
