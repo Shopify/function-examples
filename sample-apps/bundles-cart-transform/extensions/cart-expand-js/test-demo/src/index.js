@@ -45,7 +45,9 @@ export default /**
 };
 
 function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
-  if (merchandise.__typename === "ProductVariant") {
+  const hasExpandMetafields =
+    !!merchandise.componentQuantities && !!merchandise.componentReferences;
+  if (merchandise.__typename === "ProductVariant" && hasExpandMetafields) {
     const componentReferences = JSON.parse(
       merchandise.componentReferences.value
     );
@@ -54,8 +56,8 @@ function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
     );
 
     if (
-      componentReferences.length === componentQuantities.length &&
-      componentReferences.length > 0
+      componentReferences.length !== componentQuantities.length ||
+      componentReferences.length === 0
     ) {
       throw new Error("Invalid bundle composition");
     }
