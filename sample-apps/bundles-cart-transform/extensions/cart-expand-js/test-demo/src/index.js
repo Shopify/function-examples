@@ -14,26 +14,32 @@ will return an Expand operation containing the parts.
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
+/**
+ * @type {FunctionResult}
+ */
+const NO_CHANGES = {
+  operations: [],
+};
 
 export default /**
  * @param {InputQuery} input
  * @returns {FunctionResult}
  */
 (input) => {
-  let operations = [];
-
-  input.cart.lines.forEach((line) => {
-    const expandOperation = optionallyBuildExpandOperation(line);
+  const operations = input.cart.lines.reduce((acc, cartLine) => {
+    const expandOperation = optionallyBuildExpandOperation(cartLine);
 
     if (expandOperation) {
-      operations.push({expand: expandOperation});
+      return [...acc, { expand: expandOperation }];
     }
-  });
 
-  return { operations };
+    return acc;
+  }, []);
+
+  return operations.length > 0 ? { operations } : NO_CHANGES;
 };
 
-function optionallyBuildExpandOperation({id: cartLineId, merchandise}) {
+function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
   if (merchandise.__typename === "ProductVariant") {
     const componentReferences = JSON.parse(
       merchandise.componentReferences.value
@@ -46,23 +52,27 @@ function optionallyBuildExpandOperation({id: cartLineId, merchandise}) {
       throw new Error("Invalid bundle composition");
     }
 
-    const expandedCartItems = componentReferences.map((merchandiseId, index) => ({
-      merchandiseId: merchandiseId,
-      quantity: componentQuantities[index],
-    }));
+    const expandedCartItems = componentReferences.map(
+      (merchandiseId, index) => ({
+        merchandiseId: merchandiseId,
+        quantity: componentQuantities[index],
+      })
+    );
 
     if (expandedCartItems.length > 0) {
-      return { cartLineId, expandedCartItems }
+      return { cartLineId, expandedCartItems };
     }
   }
 
   return null;
 }
 
-
 /**
  * Returns true if component references have matching quantities and there is at least one component.
  */
 function validateMetafields(componentReferences, componentQuantities) {
-  return componentReferences.length !== componentQuantities.length && componentReferences.length > 0;
+  return (
+    componentReferences.length !== componentQuantities.length &&
+    componentReferences.length > 0
+  );
 }
