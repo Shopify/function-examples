@@ -12,6 +12,7 @@ will return an Expand operation containing the parts.
 /**
  * @typedef {import("../generated/api").InputQuery} InputQuery
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").CartOperation} CartOperation
  */
 
 /**
@@ -26,15 +27,19 @@ export default /**
  * @returns {FunctionResult}
  */
 (input) => {
-  const operations = input.cart.lines.reduce((acc, cartLine) => {
-    const expandOperation = optionallyBuildExpandOperation(cartLine);
+  const operations = input.cart.lines.reduce(
+    /** @param {CartOperation[]} acc */
+    (acc, cartLine) => {
+      const expandOperation = optionallyBuildExpandOperation(cartLine);
 
-    if (expandOperation) {
-      return [...acc, { expand: expandOperation }];
-    }
+      if (expandOperation) {
+        return [...acc, { expand: expandOperation }];
+      }
 
-    return acc;
-  }, []);
+      return acc;
+    },
+    []
+  );
 
   return operations.length > 0 ? { operations } : NO_CHANGES;
 };
@@ -48,7 +53,10 @@ function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
       merchandise.componentQuantities.value
     );
 
-    if (!validateMetafields(componentReferences, componentQuantities)) {
+    if (
+      componentReferences.length === componentQuantities.length &&
+      componentReferences.length > 0
+    ) {
       throw new Error("Invalid bundle composition");
     }
 
@@ -65,14 +73,4 @@ function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
   }
 
   return null;
-}
-
-/**
- * Returns true if component references have matching quantities and there is at least one component.
- */
-function validateMetafields(componentReferences, componentQuantities) {
-  return (
-    componentReferences.length !== componentQuantities.length &&
-    componentReferences.length > 0
-  );
 }
