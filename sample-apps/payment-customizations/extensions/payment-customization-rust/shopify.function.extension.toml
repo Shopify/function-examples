@@ -1,0 +1,11 @@
+name = "payment-customization-rust"
+type = "payment_customization"
+api_version = "2023-07"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/payment-customization.wasm"
+
+[ui.paths]
+create = "/app/payment-customization/:functionId/new"
+details = "/app/payment-customization/:functionId/:id"
