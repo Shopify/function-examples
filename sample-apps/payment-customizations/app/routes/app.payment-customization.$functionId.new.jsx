@@ -26,7 +26,7 @@ export const action = async ({ params, request }) => {
   const formData = await request.formData();
 
   const paymentMethodName = formData.get("paymentMethodName");
-  const cartTotal = formData.get("cartTotal");
+  const cartTotal = parseFloat(formData.get("cartTotal"));
 
   const paymentCustomizationInput = {
     functionId,
