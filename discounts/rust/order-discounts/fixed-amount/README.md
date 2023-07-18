@@ -15,4 +15,4 @@ You can build this individual function using `cargo wasi`.
 cargo wasi build --release
 ```
 
-The Shopify CLI `build` command will also execute this, based on the configuration in `shopify.function.extension.toml`.
+The Shopify CLI `build` command will also execute this, based on the configuration in `shopify.extension.toml`.
