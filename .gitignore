@@ -11,12 +11,12 @@ node_modules
 **/input.graphql
 */rust/**/Cargo.lock
 */rust/**/Cargo.toml
-**/shopify.function.extension.toml
+**/shopify.extension.toml
 */javascript/**/package.json
 */javascript/**/src/*
 !*/javascript/**/src/*.liquid
 !sample-apps/**/input.graphql
-!sample-apps/**/shopify.function.extension.toml
+!sample-apps/**/shopify.extension.toml
 
 ## Sample Apps
 sample-apps/*/web/frontend/metafields.js
