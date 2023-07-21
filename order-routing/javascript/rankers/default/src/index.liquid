@@ -12,10 +12,10 @@ export default /**
  */
 (input) => {
   const operations = input.fulfillmentGroups.map((group) => {
-    const rankings = group.inventoryLocations.map((inventoryLocation) => ({
+    const rankings = group.inventoryLocations?.map((inventoryLocation) => ({
       locationId: inventoryLocation.location.id,
       rank: 0,
-    }));
+    })) || [];
 
     return {
       rank: {
@@ -37,12 +37,12 @@ import {
 
 export default (input: InputQuery): FunctionResult => {
   const operations: Operation[] = input.fulfillmentGroups.map((group) => {
-    const rankings: RankedLocation[] = group.inventoryLocations.map(
+    const rankings: RankedLocation[] = group.inventoryLocations?.map(
       (inventoryLocation) => ({
         locationId: inventoryLocation.location.id,
         rank: 0,
       }),
-    );
+    ) || [];
 
     return {
       rank: {

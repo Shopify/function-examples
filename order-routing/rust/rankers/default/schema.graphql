@@ -26,7 +26,7 @@ type Attribute {
 }
 
 """
-Represents information about the buyer that is interacting with the cart. Only set when the buyer is logged in.
+Represents information about the buyer that is interacting with the cart.
 """
 type BuyerIdentity {
   """
@@ -38,6 +38,11 @@ type BuyerIdentity {
   The email address of the buyer that is interacting with the cart.
   """
   email: String
+
+  """
+  Whether the buyer authenticated with a customer account.
+  """
+  isAuthenticated: Boolean!
 
   """
   The phone number of the buyer that is interacting with the cart.
@@ -215,6 +220,12 @@ type CartLine {
   The quantity of the merchandise that the customer intends to purchase.
   """
   quantity: Int!
+
+  """
+  The selling plan associated with the cart line and the effect that each
+  selling plan has on variants when they're purchased.
+  """
+  sellingPlanAllocation: SellingPlanAllocation
 }
 
 """
@@ -243,6 +254,21 @@ type CartLineCost {
 }
 
 """
+Represents whether the product is a member of the given collection.
+"""
+type CollectionMembership {
+  """
+  The ID of the collection.
+  """
+  collectionId: ID!
+
+  """
+  Whether the product is a member of the collection.
+  """
+  isMember: Boolean!
+}
+
+"""
 Represents information about a company which is also a customer of the shop.
 """
 type Company implements HasMetafields {
@@ -252,7 +278,7 @@ type Company implements HasMetafields {
   createdAt: DateTime!
 
   """
-  A unique externally-supplied identifier for the company.
+  A unique externally-supplied ID for the company.
   """
   externalId: String
 
@@ -271,9 +297,9 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -330,7 +356,7 @@ type CompanyLocation implements HasMetafields {
   createdAt: DateTime!
 
   """
-  A unique externally-supplied identifier for the company.
+  A unique externally-supplied ID for the company.
   """
   externalId: String
 
@@ -354,9 +380,9 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2431,6 +2457,11 @@ type CustomProduct {
   requiresShipping: Boolean!
 
   """
+  The localized title of the product in the customer’s locale.
+  """
+  title: String!
+
+  """
   The weight of the product variant in the unit system specified with `weight_unit`.
   """
   weight: Float
@@ -2472,6 +2503,16 @@ type Customer implements HasMetafields {
   ): Boolean!
 
   """
+  Whether the customer has the given tags.
+  """
+  hasTags(
+    """
+    The tags to check.
+    """
+    tags: [String!]! = []
+  ): [HasTagResponse!]!
+
+  """
   A unique identifier for the customer.
   """
   id: ID!
@@ -2486,9 +2527,9 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2652,9 +2693,9 @@ type GateConfiguration implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -2707,10 +2748,25 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
+}
+
+"""
+Represents whether the current object has the given tag.
+"""
+type HasTagResponse {
+  """
+  Whether the current object has the tag.
+  """
+  hasTag: Boolean!
+
+  """
+  The tag.
+  """
+  tag: String!
 }
 
 """
@@ -2726,14 +2782,9 @@ The input object for the function.
 """
 type Input {
   """
-  Cart.
+  The cart.
   """
   cart: Cart!
-
-  """
-  Markets in which the buyer's delivery groups are located.
-  """
-  deliveryMarkets: [Market!]!
 
   """
   List of fulfillment groups in the context of this cart.
@@ -2785,9 +2836,9 @@ type Location implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2911,6 +2962,11 @@ type MailingAddress {
   longitude: Float
 
   """
+  The market of the address.
+  """
+  market: Market
+
+  """
   The full name of the customer, based on firstName and lastName.
   """
   name: String
@@ -2939,24 +2995,59 @@ customers from a specific area of the world. For example, you can
 [configure international pricing](https://shopify.dev/api/examples/product-price-lists),
 or [add market-specific domains or subfolders](https://shopify.dev/api/admin-graphql/current/objects/MarketWebPresence).
 """
-type Market {
+type Market implements HasMetafields {
+  """
+  A human-readable unique string for the market automatically generated from its title.
+  """
+  handle: String!
+
+  """
+  A globally-unique identifier.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+
   """
   A geographic region which comprises a market.
   """
-  regions: [Region!]!
+  regions: [MarketRegion!]!
+}
+
+"""
+Represents a region.
+"""
+interface MarketRegion {
+  """
+  The name of the region in the language of the current localization.
+  """
+  name: String
 }
 
 """
 A country which comprises a market.
 """
-type MarketRegionCountry implements Region {
+type MarketRegionCountry implements MarketRegion {
   """
   The two-letter code for the country.
   """
   code: CountryCode!
 
   """
-  The country name.
+  The country name in the language of the current localization.
   """
   name: String!
 }
@@ -3041,9 +3132,9 @@ type OrderRoutingLocationRule implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -3071,10 +3162,20 @@ type Product implements HasGates & HasMetafields {
   """
   hasAnyTag(
     """
-    The tags to search for.
+    The tags to check.
     """
     tags: [String!]! = []
   ): Boolean!
+
+  """
+  Whether the product has the given tags.
+  """
+  hasTags(
+    """
+    The tags to check.
+    """
+    tags: [String!]! = []
+  ): [HasTagResponse!]!
 
   """
   A globally-unique identifier.
@@ -3082,14 +3183,24 @@ type Product implements HasGates & HasMetafields {
   id: ID!
 
   """
-  Whether the product has any of the given collection.
+  Whether the product is in any of the given collections.
   """
   inAnyCollection(
     """
-    The collections to search for.
+    The IDs of the collections to check.
     """
     ids: [ID!]! = []
   ): Boolean!
+
+  """
+  Whether the product is in the given collections.
+  """
+  inCollections(
+    """
+    The IDs of the collections to check.
+    """
+    ids: [ID!]! = []
+  ): [CollectionMembership!]!
 
   """
   Whether the product is a gift card.
@@ -3106,15 +3217,20 @@ type Product implements HasGates & HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
   The product type specified by the merchant.
   """
   productType: String
+
+  """
+  The localized title of the product in the customer’s locale.
+  """
+  title: String!
 
   """
   The name of the product's vendor.
@@ -3141,9 +3257,9 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -3160,6 +3276,11 @@ type ProductVariant implements HasMetafields {
   An identifier for the product variant in the shop. Required in order to connect to a fulfillment service.
   """
   sku: String
+
+  """
+  The localized title of the product variant in the customer’s locale.
+  """
+  title: String
 
   """
   The weight of the product variant in the unit system specified with `weight_unit`.
@@ -3208,18 +3329,71 @@ input RankedLocation {
 }
 
 """
-Represents a region.
+Represents how products and variants can be sold and purchased.
 """
-interface Region {
+type SellingPlan {
   """
-  The code of the region.
+  The description of the selling plan.
   """
-  code: String
+  description: String
 
   """
-  The name of the region.
+  A globally-unique identifier.
   """
-  name: String
+  id: ID!
+
+  """
+  The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.
+  """
+  name: String!
+
+  """
+  Whether purchasing the selling plan will result in multiple deliveries.
+  """
+  recurringDeliveries: Boolean!
+}
+
+"""
+Represents an association between a variant and a selling plan. Selling plan
+allocations describe the options offered for each variant, and the price of the
+variant when purchased with a selling plan.
+"""
+type SellingPlanAllocation {
+  """
+  A list of price adjustments, with a maximum of two. When there are two, the
+  first price adjustment goes into effect at the time of purchase, while the
+  second one starts after a certain number of orders. A price adjustment
+  represents how a selling plan affects pricing when a variant is purchased with
+  a selling plan. Prices display in the customer's currency if the shop is
+  configured for it.
+  """
+  priceAdjustments: [SellingPlanAllocationPriceAdjustment!]!
+
+  """
+  A representation of how products and variants can be sold and purchased. For
+  example, an individual selling plan could be '6 weeks of prepaid granola,
+  delivered weekly'.
+  """
+  sellingPlan: SellingPlan!
+}
+
+"""
+The resulting prices for variants when they're purchased with a specific selling plan.
+"""
+type SellingPlanAllocationPriceAdjustment {
+  """
+  The effective price for a single delivery. For example, for a prepaid
+  subscription plan that includes 6 deliveries at the price of $48.00, the per
+  delivery price is $8.00.
+  """
+  perDeliveryPrice: MoneyV2!
+
+  """
+  The price of the variant when it's purchased with a selling plan For example,
+  for a prepaid subscription plan that includes 6 deliveries of $10.00 granola,
+  where the customer gets 20% off, the price is 6 x $10.00 x 0.80 = $48.00.
+  """
+  price: MoneyV2!
 }
 
 """
