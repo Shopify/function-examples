@@ -1,0 +1,54 @@
+/* css-side-effects-plugin-ns:.yalc/@shopify/discount-app-components/build/esm/styles.css */
+:root {
+  --discount-app-components-version-number: "1.0.7";
+}
+.DiscountAppComponents-SelectedItemsList-Item {
+  padding: var(--p-space-4) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.DiscountAppComponents-SelectedItemsList-Item:not(:last-child) {
+  border-bottom: var(--p-border-divider);
+}
+.DiscountAppComponents-SelectedItemsList-Item__Content {
+  flex: 1 1 auto;
+  padding: var(--p-space-1);
+  max-width: calc(100% - 1.25rem);
+  overflow: hidden;
+}
+.DiscountAppComponents-SelectedItemsList-Item__Actions {
+  flex: 0 0 1.25rem;
+  height: 1.25rem;
+}
+.DiscountAppComponents-SelectedItemsList {
+  padding: 0;
+  list-style: none;
+  margin: 0;
+}
+.DiscountAppComponents-CountriesAndRatesCard__ShippingRatesTextField {
+  max-width: 9.375rem;
+}
+.DiscountAppComponents-CountriesAndRatesCard__CountryModalActivator {
+  margin-top: var(--p-space-2);
+}
+.DiscountAppComponents-CustomerEligibilityCard__CustomerItem {
+  display: flex;
+  gap: var(--p-space-3);
+  align-items: center;
+}
+.DiscountAppComponents-CustomerEligibilityCard__Email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--p-text-subdued);
+}
+.DiscountAppComponents-MinimumRequirementsCard__TextField {
+  max-width: 9.375rem;
+}
+.DiscountAppComponents-UsageLimitsCard__TotalUsageLimitTextField {
+  max-width: 9.375rem;
+}
+.DiscountAppComponents-UsageLimitsCard-RecurringPayment__RecurringPaymentTextField {
+  max-width: 9.375rem;
+}
+/*# sourceMappingURL=/build/routes/app-MYAPEQNE.css.map */
