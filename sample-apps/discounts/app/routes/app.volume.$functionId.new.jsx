@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useField } from "@shopify/react-form";
+import { useForm, useField } from "@shopify/react-form";
 
 import {
   Banner,
@@ -42,79 +42,108 @@ export const action = async ({ params, request }) => {
   const { functionId } = params;
   const { admin } = await shopify.authenticate.admin(request);
   const formData = await request.formData();
-
-  const discountName = formData.get("discountName");
-  const discountMethod = formData.get("discountMethod");
-  const discountCode = formData.get("discountCode");
-  const combinesWithProductDiscounts = formData.get(
-    "combinesWithProductDiscounts"
-  );
-  const combinesWithOrderDiscounts = formData.get("combinesWithOrderDiscounts");
-  const combinesWithShippingDiscounts = formData.get(
-    "combinesWithShippingDiscounts"
-  );
-  const usageTotalLimit = Number(formData.get("usageTotalLimit"));
-  const usageOncePerCustomer = Number(formData.get("usageOncePerCustomer"));
-  const startDate = new Date(formData.get("startDate"));
-  const endDate =
-    formData.get("endDate") === "undefined"
-      ? undefined
-      : new Date(formData.get("endDate"));
-  const configuration = formData.get("configuration");
-
-  const combinesWith = {
-    orderDiscounts: combinesWithOrderDiscounts === "true",
-    productDiscounts: combinesWithProductDiscounts === "true",
-    shippingDiscounts: combinesWithShippingDiscounts === "true",
-  };
-
-  const discountCreationInput = {
-    functionId,
-    title: discountName || discountCode,
-    code: discountCode,
+  const {
+    title,
+    method,
+    code,
     combinesWith,
-    usageLimit: usageTotalLimit,
-    appliesOncePerCustomer: usageOncePerCustomer,
-    startsAt: startDate,
-    endsAt: endDate,
-    metafields: [
-      {
-        namespace: "$app:volume",
-        key: "function-configuration",
-        type: "json",
-        value: JSON.stringify({
-          quantity: parseInt(configuration.quantity),
-          percentage: parseFloat(configuration.percentage),
-        }),
-      },
-    ],
-  };
+    usageLimit,
+    appliesOncePerCustomer,
+    startsAt,
+    endsAt,
+    configuration,
+  } = JSON.parse(formData.get("discount"));
 
-  const response = await admin.graphql(
-    `#graphql
-      mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
-        discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
-          userErrors {
-            code
-            message
-            field
+  if (method === DiscountMethod.Code) {
+    const discount = {
+      functionId,
+      title,
+      code,
+      combinesWith,
+      usageLimit,
+      appliesOncePerCustomer,
+      startsAt: new Date(startsAt),
+      endsAt: new Date(endsAt),
+      metafields: [
+        {
+          namespace: "$app:volume",
+          key: "function-configuration",
+          type: "json",
+          value: JSON.stringify({
+            quantity: configuration.quantity,
+            percentage: configuration.percentage,
+          }),
+        },
+      ],
+    };
+
+    const response = await admin.graphql(
+      `#graphql
+        mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
+          discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
+            userErrors {
+              code
+              message
+              field
+            }
           }
-        }
-      }`,
-    {
-      variables: {
-        discount: discountCreationInput,
-      },
-    }
-  );
+        }`,
+      {
+        variables: {
+          discount,
+        },
+      }
+    );
 
-  const responseJson = await response.json();
-  const errors = responseJson.data.discountCreate?.userErrors;
-  return json({ errors });
+    const responseJson = await response.json();
+    const errors = responseJson.data.discountCreate?.userErrors;
+    return json({ errors });
+  } else {
+    const discount = {
+      functionId,
+      title,
+      combinesWith,
+      startsAt: new Date(startsAt),
+      endsAt: new Date(endsAt),
+      metafields: [
+        {
+          namespace: "$app:volume",
+          key: "function-configuration",
+          type: "json",
+          value: JSON.stringify({
+            quantity: configuration.quantity,
+            percentage: configuration.percentage,
+          }),
+        },
+      ],
+    };
+
+    const response = await admin.graphql(
+      `#graphql
+        mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
+          discountCreate: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
+            userErrors {
+              code
+              message
+              field
+            }
+          }
+        }`,
+      {
+        variables: {
+          discount,
+        },
+      }
+    );
+
+    const responseJson = await response.json();
+    const errors = responseJson.data.discountCreate?.userErrors;
+    return json({ errors });
+  }
 };
 
 export default function VolumeNew() {
-  const submit = useSubmit();
+  const submitForm = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
 
@@ -133,50 +162,66 @@ export default function VolumeNew() {
     }
   }, [actionData]);
 
-  const discountTitle = useField("");
-  const discountMethod = useField(DiscountMethod.Code);
-  const discountCode = useField("");
-  const combinesWith = useField({
-    orderDiscounts: false,
-    productDiscounts: false,
-    shippingDiscounts: false,
-  });
-  const requirementType = useField(RequirementType.None);
-  const requirementSubtotal = useField("0");
-  const requirementQuantity = useField("0");
-  const usageTotalLimit = useField(null);
-  const usageOncePerCustomer = useField(false);
-  const startDate = useField(todaysDate);
-  const endDate = useField(null);
-  const configuration = {
-    // Add quantity and percentage configuration to form data
-    quantity: useField("1"),
-    percentage: useField("0"),
-  };
-
-  const requestData = {
-    discountName: discountTitle.value,
-    discountMethod: discountMethod.value,
-    discountCode: discountCode.value,
-    combinesWithProductDiscounts: combinesWith.value.productDiscounts,
-    combinesWithOrderDiscounts: combinesWith.value.orderDiscounts,
-    combinesWithShippingDiscounts: combinesWith.value.shippingDiscounts,
-    requirementType: requirementType.value,
-    requirementSubtotal: requirementSubtotal.value,
-    requirementQuantity: requirementQuantity.value,
-    usageTotalLimit: usageTotalLimit.value,
-    usageOncePerCustomer: usageOncePerCustomer.value,
-    startDate: startDate.value.toISOString(),
-    endDate: endDate.value?.toISOString(),
-    configuration: {
-      quantity: configuration.quantity.value,
-      percentage: configuration.percentage.value,
+  const {
+    fields: {
+      discountTitle,
+      discountCode,
+      discountMethod,
+      combinesWith,
+      requirementType,
+      requirementSubtotal,
+      requirementQuantity,
+      usageLimit,
+      appliesOncePerCustomer,
+      startDate,
+      endDate,
+      configuration,
     },
-  };
+    submit,
+  } = useForm({
+    fields: {
+      discountTitle: useField(""),
+      discountMethod: useField(DiscountMethod.Code),
+      discountCode: useField(""),
+      combinesWith: useField({
+        orderDiscounts: false,
+        productDiscounts: false,
+        shippingDiscounts: false,
+      }),
+      requirementType: useField(RequirementType.None),
+      requirementSubtotal: useField("0"),
+      requirementQuantity: useField("0"),
+      usageLimit: useField(null),
+      appliesOncePerCustomer: useField(false),
+      startDate: useField(todaysDate),
+      endDate: useField(null),
+      configuration: {
+        // Add quantity and percentage configuration to form data
+        quantity: useField("1"),
+        percentage: useField("0"),
+      },
+    },
+    onSubmit: async (form) => {
+      const discount = {
+        title: form.discountTitle,
+        method: form.discountMethod,
+        code: form.discountCode,
+        combinesWith: form.combinesWith,
+        usageLimit: form.usageLimit,
+        appliesOncePerCustomer: form.appliesOncePerCustomer,
+        startsAt: form.startDate,
+        endsAt: form.endDate,
+        configuration: {
+          quantity: parseInt(form.configuration.quantity),
+          percentage: parseFloat(form.configuration.percentage),
+        },
+      };
 
-  const handleSubmit = () => {
-    submit(requestData, { method: "post" });
-  };
+      submitForm({ discount: JSON.stringify(discount) }, { method: "post" });
+
+      return { status: "success" };
+    },
+  });
 
   const errorBanner =
     submitErrors.length > 0 ? (
@@ -206,7 +251,7 @@ export default function VolumeNew() {
       }}
       primaryAction={{
         content: "Save",
-        onAction: handleSubmit,
+        onAction: submit,
         loading: isLoading,
       }}
     >
@@ -238,8 +283,8 @@ export default function VolumeNew() {
               </LegacyCard>
               {discountMethod.value === DiscountMethod.Code && (
                 <UsageLimitsCard
-                  totalUsageLimit={usageTotalLimit}
-                  oncePerCustomer={usageOncePerCustomer}
+                  totalUsageLimit={usageLimit}
+                  oncePerCustomer={appliesOncePerCustomer}
                 />
               )}
               <CombinationCard
@@ -278,8 +323,8 @@ export default function VolumeNew() {
               currencyCode: currencyCode,
             }}
             usageLimits={{
-              oncePerCustomer: usageOncePerCustomer.value,
-              totalUsageLimit: usageTotalLimit.value,
+              oncePerCustomer: appliesOncePerCustomer.value,
+              totalUsageLimit: usageLimit.value,
             }}
             activeDates={{
               startDate: startDate.value,
@@ -291,7 +336,7 @@ export default function VolumeNew() {
           <PageActions
             primaryAction={{
               content: "Save discount",
-              onAction: handleSubmit,
+              onAction: submit,
               loading: isLoading,
             }}
             secondaryActions={[
