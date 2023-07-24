@@ -1,7 +1,7 @@
-import React from "react";
+import { json, redirect } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
 
-import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { login } from "../../shopify.server";
 
 import indexStyles from "./style.css";
 
@@ -14,35 +14,39 @@ export async function loader({ request }) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  return null;
+  return json({ showForm: Boolean(login) });
 }
 
 export default function App() {
+  const { showForm } = useLoaderData();
+
   return (
     <div className="index">
       <div className="content">
         <h1>A short heading about [your app]</h1>
         <p>A tagline about [your app] that describes your value proposition.</p>
-        <Form method="post" action="/auth/login">
-          <label>
-            <span>Shop domain</span>
-            <input type="text" name="shop" />
-            <span>e.g: my-shop-domain.myshopify.com</span>
-          </label>
-          <button type="submit">Log in</button>
-        </Form>
+        {showForm && (
+          <Form method="post" action="/auth/login">
+            <label>
+              <span>Shop domain</span>
+              <input type="text" name="shop" />
+              <span>e.g: my-shop-domain.myshopify.com</span>
+            </label>
+            <button type="submit">Log in</button>
+          </Form>
+        )}
         <ul>
           <li>
             <strong>Product feature</strong>. Some detail about your feature and
-            it's benefit to your customer.
+            its benefit to your customer.
           </li>
           <li>
             <strong>Product feature</strong>. Some detail about your feature and
-            it's benefit to your customer.
+            its benefit to your customer.
           </li>
           <li>
             <strong>Product feature</strong>. Some detail about your feature and
-            it's benefit to your customer.
+            its benefit to your customer.
           </li>
         </ul>
       </div>
