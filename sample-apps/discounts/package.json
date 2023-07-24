@@ -1,5 +1,5 @@
 {
-  "name": "discount-functions-testing",
+  "name": "discounts",
   "private": true,
   "scripts": {
     "build": "NODE_ENV=production remix build",
@@ -22,9 +22,10 @@
     "@remix-run/node": "^1.19.0",
     "@remix-run/react": "^1.19.0",
     "@remix-run/serve": "^1.19.0",
-    "@shopify/app": "0.0.0-nightly-20230721141355",
+    "@shopify/app": "0.0.0-nightly-20230724112730",
+    "@shopify/app-bridge-react": "^3.7.8",
     "@shopify/app-bridge-types": "^0.0.2",
-    "@shopify/cli": "0.0.0-nightly-20230721141355",
+    "@shopify/cli": "0.0.0-nightly-20230724112730",
     "@shopify/discount-app-components": "file:.yalc/@shopify/discount-app-components",
     "@shopify/polaris": "^11.1.2",
     "@shopify/react-form": "^2.5.5",
@@ -52,5 +53,5 @@
     "web/frontend",
     "extensions/*"
   ],
-  "author": "mathiusjohnson"
+  "author": "andrewhassan"
 }

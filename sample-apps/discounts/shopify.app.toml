@@ -1,3 +1,27 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
+name = "discounts-jul24"
+client_id = "c22026b44b98c0ccbfb10159420aa37c"
+application_url = "https://browsing-teeth-promotional-removed.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products, write_discounts"
+
+[auth]
+redirect_urls = [
+  "https://browsing-teeth-promotional-removed.trycloudflare.com/auth/callback",
+  "https://browsing-teeth-promotional-removed.trycloudflare.com/auth/shopify/callback",
+  "https://browsing-teeth-promotional-removed.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "payments-shipping-functions-test-store.myshopify.com"

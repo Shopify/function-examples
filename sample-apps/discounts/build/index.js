@@ -192,10 +192,14 @@ __export(app_volume_functionId_new_exports, {
   action: () => action,
   default: () => VolumeNew
 });
-var import_react3 = require("react"), import_react_form = require("@shopify/react-form"), import_polaris = require("@shopify/polaris"), import_react4 = require("@remix-run/react"), import_node3 = require("@remix-run/node"), import_app_bridge_react = require("@shopify/app-bridge-react"), import_actions = require("@shopify/app-bridge/actions"), import_discount_app_components = require("@shopify/discount-app-components");
-var import_jsx_dev_runtime3 = require("react/jsx-dev-runtime"), action = async ({ params, request }) => {
+var import_react3 = require("react"), import_react_form = require("@shopify/react-form"), import_polaris = require("@shopify/polaris"), import_actions = require("@shopify/app-bridge/actions"), import_app_bridge_react = require("@shopify/app-bridge-react"), import_react4 = require("@remix-run/react"), import_node3 = require("@remix-run/node"), import_discount_app_components = require("@shopify/discount-app-components");
+var import_react_i18n = require("@shopify/react-i18n"), import_jsx_dev_runtime3 = require("react/jsx-dev-runtime"), action = async ({ params, request }) => {
   var _a2;
-  let { functionId } = params, { admin } = await shopify_server_default.authenticate.admin(request), formData = await request.formData(), discountName = formData.get("discountName"), discountCode = formData.get("discountCode"), combinesWithProductDiscounts = formData.get("combinesWithProductDiscounts"), combinesWithOrderDiscounts = formData.get("combinesWithOrderDiscounts"), combinesWithShippingDiscounts = formData.get("combinesWithShippingDiscounts"), usageTotalLimit = formData.get("usageTotalLimit"), usageOncePerCustomer = formData.get("usageOncePerCustomer"), startDate = formData.get("startDate"), endDate = formData.get("endDate"), configuration = formData.get("configuration"), discountCreationInput = {
+  let { functionId } = params, { admin } = await shopify_server_default.authenticate.admin(request), formData = await request.formData(), discountName = formData.get("discountName"), discountCode = formData.get("discountCode"), combinesWithProductDiscounts = formData.get(
+    "combinesWithProductDiscounts"
+  ), combinesWithOrderDiscounts = formData.get("combinesWithOrderDiscounts"), combinesWithShippingDiscounts = formData.get(
+    "combinesWithShippingDiscounts"
+  ), usageTotalLimit = formData.get("usageTotalLimit"), usageOncePerCustomer = formData.get("usageOncePerCustomer"), startDate = formData.get("startDate"), endDate = formData.get("endDate"), configuration = formData.get("configuration"), discountCreationInput = {
     functionId,
     title: discountName || discountCode,
     code: discountCode,
@@ -237,19 +241,14 @@ var import_jsx_dev_runtime3 = require("react/jsx-dev-runtime"), action = async (
     }
   )).json()).data.discountCreate) == null ? void 0 : _a2.userErrors;
   return (0, import_node3.json)({ errors });
-}, useRedirectToDiscounts = () => {
-  let app = (0, import_app_bridge_react.useAppBridge)(), redirect2 = import_actions.Redirect.create(app);
-  return () => {
-    redirect2.dispatch(import_actions.Redirect.Action.ADMIN_PATH, {
-      path: "/discounts"
-    });
-  };
 };
 function VolumeNew() {
-  let submit = (0, import_react4.useSubmit)(), actionData = (0, import_react4.useActionData)(), isLoading = (0, import_react4.useNavigation)().state === "submitting", redirect2 = useRedirectToDiscounts(), currencyCode = "Cad", submitErrors = (actionData == null ? void 0 : actionData.errors) || [], [todaysDate] = (0, import_react3.useState)(/* @__PURE__ */ new Date());
+  let submit = (0, import_react4.useSubmit)(), actionData = (0, import_react4.useActionData)(), isLoading = (0, import_react4.useNavigation)().state === "submitting", currencyCode = import_react_i18n.CurrencyCode.Cad, submitErrors = (actionData == null ? void 0 : actionData.errors) || [], [todaysDate] = (0, import_react3.useState)(/* @__PURE__ */ new Date()), app = (0, import_app_bridge_react.useAppBridge)(), redirect2 = import_actions.Redirect.create(app);
   (0, import_react3.useEffect)(() => {
-    (actionData == null ? void 0 : actionData.errors.length) === 0 && redirect2();
-  }, [actionData == null ? void 0 : actionData.errors, redirect2]);
+    (actionData == null ? void 0 : actionData.errors.length) === 0 && redirect2.dispatch(import_actions.Redirect.Action.ADMIN_SECTION, {
+      name: import_actions.Redirect.ResourceType.Discount
+    });
+  }, [actionData == null ? void 0 : actionData.errors]);
   let discountTitle = (0, import_react_form.useField)(""), discountMethod = (0, import_react_form.useField)(import_discount_app_components.DiscountMethod.Code), discountCode = (0, import_react_form.useField)(""), combinesWith = (0, import_react_form.useField)({
     orderDiscounts: !1,
     productDiscounts: !1,
@@ -274,11 +273,11 @@ function VolumeNew() {
     endDate: null,
     configuration
   }, handleSubmit = () => {
-    submit(requestData, { method: "post" });
+    submit(JSON.stringify(requestData), { method: "post" });
   }, errorBanner = submitErrors.length > 0 ? /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Layout.Section, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Banner, { status: "critical", children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { children: "There were some issues with your form submission:" }, void 0, !1, {
       fileName: "app/routes/app.volume.$functionId.new.jsx",
-      lineNumber: 182,
+      lineNumber: 178,
       columnNumber: 11
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("ul", { children: submitErrors.map(({ message, field }, index) => /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: [
@@ -287,20 +286,20 @@ function VolumeNew() {
       message
     ] }, `${message}${index}`, !0, {
       fileName: "app/routes/app.volume.$functionId.new.jsx",
-      lineNumber: 186,
+      lineNumber: 182,
       columnNumber: 17
     }, this)) }, void 0, !1, {
       fileName: "app/routes/app.volume.$functionId.new.jsx",
-      lineNumber: 183,
+      lineNumber: 179,
       columnNumber: 11
     }, this)
   ] }, void 0, !0, {
     fileName: "app/routes/app.volume.$functionId.new.jsx",
-    lineNumber: 181,
+    lineNumber: 177,
     columnNumber: 9
   }, this) }, void 0, !1, {
     fileName: "app/routes/app.volume.$functionId.new.jsx",
-    lineNumber: 180,
+    lineNumber: 176,
     columnNumber: 7
   }, this) : null;
   return (
@@ -309,12 +308,10 @@ function VolumeNew() {
       import_polaris.Page,
       {
         title: "Create volume discount",
-        breadcrumbs: [
-          {
-            content: "Discounts",
-            onAction: () => (0, import_discount_app_components.onBreadcrumbAction)(redirect2, !0)
-          }
-        ],
+        backAction: {
+          content: "Discounts",
+          onAction: () => (0, import_discount_app_components.onBreadcrumbAction)(redirect2, !0)
+        },
         primaryAction: {
           content: "Save",
           onAction: handleSubmit,
@@ -322,7 +319,7 @@ function VolumeNew() {
         },
         children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Layout, { children: [
           errorBanner,
-          /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Layout.Section, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_react4.Form, { method: "post", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.VerticalStack, { align: "space-around", gap: 2, children: [
+          /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Layout.Section, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_react4.Form, { method: "post", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.VerticalStack, { align: "space-around", gap: "2", children: [
             /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
               import_discount_app_components.MethodCard,
               {
@@ -336,26 +333,49 @@ function VolumeNew() {
               !1,
               {
                 fileName: "app/routes/app.volume.$functionId.new.jsx",
-                lineNumber: 218,
-                columnNumber: 11
+                lineNumber: 211,
+                columnNumber: 15
               },
               this
             ),
-            /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Card, { title: "Volume", children: [
-              /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.TextField, { label: "Minimum quantity", ...configuration.quantity }, void 0, !1, {
-                fileName: "app/routes/app.volume.$functionId.new.jsx",
-                lineNumber: 227,
-                columnNumber: 13
-              }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.TextField, { label: "Discount percentage", ...configuration.percentage, suffix: "%" }, void 0, !1, {
-                fileName: "app/routes/app.volume.$functionId.new.jsx",
-                lineNumber: 228,
-                columnNumber: 13
-              }, this)
+            /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.LegacyCard, { title: "Volume", sectioned: !0, children: [
+              /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
+                import_polaris.TextField,
+                {
+                  label: "Minimum quantity",
+                  autoComplete: "on",
+                  ...configuration.quantity
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/routes/app.volume.$functionId.new.jsx",
+                  lineNumber: 220,
+                  columnNumber: 17
+                },
+                this
+              ),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
+                import_polaris.TextField,
+                {
+                  label: "Discount percentage",
+                  autoComplete: "on",
+                  ...configuration.percentage,
+                  suffix: "%"
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/routes/app.volume.$functionId.new.jsx",
+                  lineNumber: 225,
+                  columnNumber: 17
+                },
+                this
+              )
             ] }, void 0, !0, {
               fileName: "app/routes/app.volume.$functionId.new.jsx",
-              lineNumber: 226,
-              columnNumber: 11
+              lineNumber: 219,
+              columnNumber: 15
             }, this),
             discountMethod.value === import_discount_app_components.DiscountMethod.Code && /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
               import_discount_app_components.UsageLimitsCard,
@@ -367,8 +387,8 @@ function VolumeNew() {
               !1,
               {
                 fileName: "app/routes/app.volume.$functionId.new.jsx",
-                lineNumber: 231,
-                columnNumber: 13
+                lineNumber: 233,
+                columnNumber: 17
               },
               this
             ),
@@ -383,8 +403,8 @@ function VolumeNew() {
               !1,
               {
                 fileName: "app/routes/app.volume.$functionId.new.jsx",
-                lineNumber: 236,
-                columnNumber: 11
+                lineNumber: 238,
+                columnNumber: 15
               },
               this
             ),
@@ -399,23 +419,23 @@ function VolumeNew() {
               !1,
               {
                 fileName: "app/routes/app.volume.$functionId.new.jsx",
-                lineNumber: 241,
-                columnNumber: 11
+                lineNumber: 243,
+                columnNumber: 15
               },
               this
             )
           ] }, void 0, !0, {
             fileName: "app/routes/app.volume.$functionId.new.jsx",
-            lineNumber: 217,
-            columnNumber: 9
+            lineNumber: 210,
+            columnNumber: 13
           }, this) }, void 0, !1, {
             fileName: "app/routes/app.volume.$functionId.new.jsx",
-            lineNumber: 216,
-            columnNumber: 9
+            lineNumber: 209,
+            columnNumber: 11
           }, this) }, void 0, !1, {
             fileName: "app/routes/app.volume.$functionId.new.jsx",
-            lineNumber: 215,
-            columnNumber: 7
+            lineNumber: 208,
+            columnNumber: 9
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Layout.Section, { secondary: !0, children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
             import_discount_app_components.SummaryCard,
@@ -428,7 +448,8 @@ function VolumeNew() {
               },
               performance: {
                 status: import_discount_app_components.DiscountStatus.Scheduled,
-                usageCount: 0
+                usageCount: 0,
+                isEditing: !1
               },
               minimumRequirements: {
                 requirementType: requirementType.value,
@@ -449,14 +470,14 @@ function VolumeNew() {
             !1,
             {
               fileName: "app/routes/app.volume.$functionId.new.jsx",
-              lineNumber: 251,
-              columnNumber: 9
+              lineNumber: 252,
+              columnNumber: 11
             },
             this
           ) }, void 0, !1, {
             fileName: "app/routes/app.volume.$functionId.new.jsx",
-            lineNumber: 250,
-            columnNumber: 7
+            lineNumber: 251,
+            columnNumber: 9
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(import_polaris.Layout.Section, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
             import_polaris.PageActions,
@@ -477,26 +498,26 @@ function VolumeNew() {
             !1,
             {
               fileName: "app/routes/app.volume.$functionId.new.jsx",
-              lineNumber: 282,
-              columnNumber: 9
+              lineNumber: 284,
+              columnNumber: 11
             },
             this
           ) }, void 0, !1, {
             fileName: "app/routes/app.volume.$functionId.new.jsx",
-            lineNumber: 281,
-            columnNumber: 7
+            lineNumber: 283,
+            columnNumber: 9
           }, this)
         ] }, void 0, !0, {
           fileName: "app/routes/app.volume.$functionId.new.jsx",
-          lineNumber: 213,
-          columnNumber: 5
+          lineNumber: 206,
+          columnNumber: 7
         }, this)
       },
       void 0,
       !1,
       {
         fileName: "app/routes/app.volume.$functionId.new.jsx",
-        lineNumber: 199,
+        lineNumber: 194,
         columnNumber: 5
       },
       this
@@ -509,7 +530,7 @@ var app_additional_exports = {};
 __export(app_additional_exports, {
   default: () => AdditionalPage
 });
-var import_react5 = require("@remix-run/react"), import_polaris2 = require("@shopify/polaris"), import_jsx_dev_runtime4 = require("react/jsx-dev-runtime");
+var import_polaris2 = require("@shopify/polaris"), import_jsx_dev_runtime4 = require("react/jsx-dev-runtime");
 function AdditionalPage() {
   return /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(import_polaris2.Page, { children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("ui-title-bar", { title: "Additional page" }, void 0, !1, {
@@ -523,9 +544,9 @@ function AdditionalPage() {
           "The app template comes with an additional page which demonstrates how to create multiple pages within app navigation using",
           " ",
           /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
-            import_react5.Link,
+            import_polaris2.Link,
             {
-              to: "https://shopify.dev/docs/apps/tools/app-bridge",
+              url: "https://shopify.dev/docs/apps/tools/app-bridge",
               target: "_blank",
               children: "App Bridge"
             },
@@ -589,9 +610,9 @@ function AdditionalPage() {
           columnNumber: 15
         }, this),
         /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(import_polaris2.List, { spacing: "extraTight", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(import_polaris2.List.Item, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
-          import_react5.Link,
+          import_polaris2.Link,
           {
-            to: "https://shopify.dev/docs/apps/design-guidelines/navigation#app-nav",
+            url: "https://shopify.dev/docs/apps/design-guidelines/navigation#app-nav",
             target: "_blank",
             children: "App nav best practices"
           },
@@ -672,7 +693,7 @@ __export(app_index_exports, {
   default: () => Index,
   loader: () => loader
 });
-var import_react6 = require("react"), import_node4 = require("@remix-run/node"), import_react7 = require("@remix-run/react"), import_polaris3 = require("@shopify/polaris");
+var import_react5 = require("react"), import_node4 = require("@remix-run/node"), import_react6 = require("@remix-run/react"), import_polaris3 = require("@shopify/polaris");
 var import_jsx_dev_runtime5 = require("react/jsx-dev-runtime"), loader = async ({ request }) => {
   let { session } = await authenticate.admin(request);
   return (0, import_node4.json)({ shop: session.shop.replace(".myshopify.com", "") });
@@ -715,11 +736,11 @@ async function action2({ request }) {
 }
 function Index() {
   var _a2;
-  let nav = (0, import_react7.useNavigation)(), { shop } = (0, import_react7.useLoaderData)(), actionData = (0, import_react7.useActionData)(), submit = (0, import_react7.useSubmit)(), isLoading = ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST", productId = (_a2 = actionData == null ? void 0 : actionData.product) == null ? void 0 : _a2.id.replace(
+  let nav = (0, import_react6.useNavigation)(), { shop } = (0, import_react6.useLoaderData)(), actionData = (0, import_react6.useActionData)(), submit = (0, import_react6.useSubmit)(), isLoading = ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST", productId = (_a2 = actionData == null ? void 0 : actionData.product) == null ? void 0 : _a2.id.replace(
     "gid://shopify/Product/",
     ""
   );
-  (0, import_react6.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     productId && shopify.toast.show("Product created");
   }, [productId]);
   let generateProduct = () => submit({}, { replace: !0, method: "POST" });
@@ -745,9 +766,9 @@ function Index() {
             "This embedded app template uses",
             " ",
             /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-              import_react7.Link,
+              import_polaris3.Link,
               {
-                to: "https://shopify.dev/docs/apps/tools/app-bridge",
+                url: "https://shopify.dev/docs/apps/tools/app-bridge",
                 target: "_blank",
                 children: "App Bridge"
               },
@@ -763,7 +784,7 @@ function Index() {
             " ",
             "interface examples like an",
             " ",
-            /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_react7.Link, { to: "/app/additional", children: "additional page in the app nav" }, void 0, !1, {
+            /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_polaris3.Link, { url: "/app/additional", children: "additional page in the app nav" }, void 0, !1, {
               fileName: "app/routes/app._index.jsx",
               lineNumber: 123,
               columnNumber: 21
@@ -771,9 +792,9 @@ function Index() {
             ", as well as an",
             " ",
             /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-              import_react7.Link,
+              import_polaris3.Link,
               {
-                to: "https://shopify.dev/docs/api/admin-graphql",
+                url: "https://shopify.dev/docs/api/admin-graphql",
                 target: "_blank",
                 children: "Admin GraphQL"
               },
@@ -808,9 +829,9 @@ function Index() {
             "Generate a product with GraphQL and get the JSON output for that product. Learn more about the",
             " ",
             /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-              import_react7.Link,
+              import_polaris3.Link,
               {
-                to: "https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate",
+                url: "https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate",
                 target: "_blank",
                 children: "productCreate"
               },
@@ -922,7 +943,7 @@ function Index() {
                 lineNumber: 193,
                 columnNumber: 23
               }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_react7.Link, { to: "https://remix.run", target: "_blank", children: "Remix" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_polaris3.Link, { url: "https://remix.run", target: "_blank", children: "Remix" }, void 0, !1, {
                 fileName: "app/routes/app._index.jsx",
                 lineNumber: 196,
                 columnNumber: 23
@@ -943,7 +964,7 @@ function Index() {
                 lineNumber: 202,
                 columnNumber: 23
               }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_react7.Link, { to: "https://www.prisma.io/", target: "_blank", children: "Prisma" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_polaris3.Link, { url: "https://www.prisma.io/", target: "_blank", children: "Prisma" }, void 0, !1, {
                 fileName: "app/routes/app._index.jsx",
                 lineNumber: 205,
                 columnNumber: 23
@@ -965,16 +986,16 @@ function Index() {
                 columnNumber: 23
               }, this),
               /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("span", { children: [
-                /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_react7.Link, { to: "https://polaris.shopify.com", target: "_blank", children: "Polaris" }, void 0, !1, {
+                /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(import_polaris3.Link, { url: "https://polaris.shopify.com", target: "_blank", children: "Polaris" }, void 0, !1, {
                   fileName: "app/routes/app._index.jsx",
                   lineNumber: 215,
                   columnNumber: 25
                 }, this),
                 ", ",
                 /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-                  import_react7.Link,
+                  import_polaris3.Link,
                   {
-                    to: "https://shopify.dev/docs/apps/tools/app-bridge",
+                    url: "https://shopify.dev/docs/apps/tools/app-bridge",
                     target: "_blank",
                     children: "App Bridge"
                   },
@@ -1009,9 +1030,9 @@ function Index() {
                 columnNumber: 23
               }, this),
               /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-                import_react7.Link,
+                import_polaris3.Link,
                 {
-                  to: "https://shopify.dev/docs/api/admin-graphql",
+                  url: "https://shopify.dev/docs/api/admin-graphql",
                   target: "_blank",
                   children: "GraphQL API"
                 },
@@ -1054,9 +1075,9 @@ function Index() {
               "Build an",
               " ",
               /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-                import_react7.Link,
+                import_polaris3.Link,
                 {
-                  to: "https://shopify.dev/docs/apps/getting-started/build-app-example",
+                  url: "https://shopify.dev/docs/apps/getting-started/build-app-example",
                   target: "_blank",
                   children: [
                     " ",
@@ -1083,9 +1104,9 @@ function Index() {
               "Explore Shopify\u2019s API with",
               " ",
               /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
-                import_react7.Link,
+                import_polaris3.Link,
                 {
-                  to: "https://shopify.dev/docs/apps/tools/graphiql-admin-api",
+                  url: "https://shopify.dev/docs/apps/tools/graphiql-admin-api",
                   target: "_blank",
                   children: "GraphiQL"
                 },
@@ -1150,10 +1171,10 @@ __export(route_exports, {
   links: () => links,
   loader: () => loader2
 });
-var import_react8 = require("react"), import_node5 = require("@remix-run/node"), import_polaris4 = require("@shopify/polaris"), import_react9 = require("@remix-run/react");
+var import_react7 = require("react"), import_node5 = require("@remix-run/node"), import_polaris4 = require("@shopify/polaris"), import_react8 = require("@remix-run/react");
 
 // node_modules/@shopify/polaris/build/esm/styles.css
-var styles_default = "/build/_assets/styles-RYRX3RJR.css";
+var styles_default = "/build/_assets/styles-KXW4SUSC.css";
 
 // app/routes/auth.login/error.server.jsx
 var import_shopify_app_remix2 = require("@shopify/shopify-app-remix");
@@ -1177,8 +1198,8 @@ async function action3({ request }) {
   });
 }
 function Auth() {
-  let { polarisTranslations } = (0, import_react9.useLoaderData)(), loaderData = (0, import_react9.useLoaderData)(), actionData = (0, import_react9.useActionData)(), [shop, setShop] = (0, import_react8.useState)(""), { errors } = actionData || loaderData;
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.AppProvider, { i18n: polarisTranslations, children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.Page, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.Card, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_react9.Form, { method: "post", children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.FormLayout, { children: [
+  let { polarisTranslations } = (0, import_react8.useLoaderData)(), loaderData = (0, import_react8.useLoaderData)(), actionData = (0, import_react8.useActionData)(), [shop, setShop] = (0, import_react7.useState)(""), { errors } = actionData || loaderData;
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.AppProvider, { i18n: polarisTranslations, children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.Page, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.Card, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_react8.Form, { method: "post", children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.FormLayout, { children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_polaris4.Text, { variant: "headingMd", as: "h2", children: "Log in" }, void 0, !1, {
       fileName: "app/routes/auth.login/route.jsx",
       lineNumber: 51,
@@ -1260,7 +1281,7 @@ __export(route_exports2, {
   links: () => links2,
   loader: () => loader3
 });
-var import_node6 = require("@remix-run/node"), import_react10 = require("@remix-run/react");
+var import_node6 = require("@remix-run/node"), import_react9 = require("@remix-run/react");
 
 // app/routes/_index/style.css
 var style_default = "/build/_assets/style-M2E3MJNO.css";
@@ -1274,7 +1295,7 @@ async function loader3({ request }) {
   return (0, import_node6.json)({ showForm: Boolean(login) });
 }
 function App2() {
-  let { showForm } = (0, import_react10.useLoaderData)();
+  let { showForm } = (0, import_react9.useLoaderData)();
   return /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("div", { className: "index", children: /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("div", { className: "content", children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("h1", { children: "A short heading about [your app]" }, void 0, !1, {
       fileName: "app/routes/_index/route.jsx",
@@ -1286,7 +1307,7 @@ function App2() {
       lineNumber: 27,
       columnNumber: 9
     }, this),
-    showForm && /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)(import_react10.Form, { method: "post", action: "/auth/login", children: [
+    showForm && /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)(import_react9.Form, { method: "post", action: "/auth/login", children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("label", { children: [
         /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("span", { children: "Shop domain" }, void 0, !1, {
           fileName: "app/routes/_index/route.jsx",
@@ -1389,7 +1410,7 @@ __export(app_exports, {
   links: () => links3,
   loader: () => loader5
 });
-var import_react11 = require("react"), import_node7 = require("@remix-run/node"), import_react12 = require("@remix-run/react"), import_polaris5 = require("@shopify/polaris"), import_app_bridge_react2 = require("@shopify/app-bridge-react");
+var import_react10 = require("react"), import_node7 = require("@remix-run/node"), import_react11 = require("@remix-run/react"), import_polaris5 = require("@shopify/polaris"), import_app_bridge_react2 = require("@shopify/app-bridge-react");
 
 // app/components/providers/DiscountProvider.jsx
 var import_discount_app_components2 = require("@shopify/discount-app-components");
@@ -1397,16 +1418,16 @@ var import_jsx_dev_runtime8 = require("react/jsx-dev-runtime");
 function DiscountProvider({ children }) {
   return /* @__PURE__ */ (0, import_jsx_dev_runtime8.jsxDEV)(import_discount_app_components2.AppProvider, { locale: "en-US", ianaTimezone: "America/Toronto", children }, void 0, !1, {
     fileName: "app/components/providers/DiscountProvider.jsx",
-    lineNumber: 5,
-    columnNumber: 10
+    lineNumber: 6,
+    columnNumber: 5
   }, this);
 }
 
-// app/i18n/i18next.server.js
+// app/i18n/i18nnext.server.js
 var import_remix_i18next = require("remix-i18next");
 
-// app/i18n/i18nextOptions.js
-var import_path = require("path"), i18nextOptions_default = {
+// app/i18n/i18nnextOptions.js
+var import_path = require("path"), i18nnextOptions_default = {
   backend: {
     loadPath: (0, import_path.resolve)("./app/locales/{{lng}}.json")
   },
@@ -1433,25 +1454,25 @@ var import_path = require("path"), i18nextOptions_default = {
   supportedLngs: ["de", "en", "fr"]
 };
 
-// app/i18n/i18next.server.js
+// app/i18n/i18nnext.server.js
 var import_i18next_fs_backend = __toESM(require("i18next-fs-backend")), i18next = new import_remix_i18next.RemixI18Next({
   detection: {
-    supportedLanguages: i18nextOptions_default.supportedLngs,
-    fallbackLanguage: i18nextOptions_default.fallbackLng,
+    supportedLanguages: i18nnextOptions_default.supportedLngs,
+    fallbackLanguage: i18nnextOptions_default.fallbackLng,
     searchParamKey: "locale",
     order: ["header", "searchParams"]
   },
   i18next: {
-    ...i18nextOptions_default
+    ...i18nnextOptions_default
   },
   backend: import_i18next_fs_backend.default
-}), i18next_server_default = i18next;
+}), i18nnext_server_default = i18next;
 
 // app/routes/app.jsx
 var import_jsx_dev_runtime9 = require("react/jsx-dev-runtime"), links3 = () => [{ rel: "stylesheet", href: styles_default }];
 async function loader5({ request }) {
   await authenticate.admin(request);
-  let locale = await i18next_server_default.getLocale(request), url = new URL(request.url);
+  let locale = await i18nnext_server_default.getLocale(request), url = new URL(request.url);
   return (0, import_node7.json)({
     polarisTranslations: require(`@shopify/polaris/locales/${locale}.json`),
     apiKey: process.env.SHOPIFY_API_KEY,
@@ -1459,7 +1480,7 @@ async function loader5({ request }) {
   });
 }
 function App3() {
-  let { polarisTranslations } = (0, import_react12.useLoaderData)(), { apiKey, host } = (0, import_react12.useLoaderData)(), [config] = (0, import_react11.useState)({ host, apiKey });
+  let { polarisTranslations } = (0, import_react11.useLoaderData)(), { apiKey, host } = (0, import_react11.useLoaderData)(), [config] = (0, import_react10.useState)({ host, apiKey });
   return /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_jsx_dev_runtime9.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(
       "script",
@@ -1471,36 +1492,36 @@ function App3() {
       !1,
       {
         fileName: "app/routes/app.jsx",
-        lineNumber: 35,
+        lineNumber: 33,
         columnNumber: 7
       },
       this
     ),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_polaris5.AppProvider, { i18n: polarisTranslations, children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_app_bridge_react2.Provider, { config, children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(DiscountProvider, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_react12.Outlet, {}, void 0, !1, {
+    /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_polaris5.AppProvider, { i18n: polarisTranslations, children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_app_bridge_react2.Provider, { config, children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(DiscountProvider, { children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(import_react11.Outlet, {}, void 0, !1, {
       fileName: "app/routes/app.jsx",
-      lineNumber: 42,
+      lineNumber: 40,
       columnNumber: 13
     }, this) }, void 0, !1, {
       fileName: "app/routes/app.jsx",
-      lineNumber: 41,
+      lineNumber: 39,
       columnNumber: 11
     }, this) }, void 0, !1, {
       fileName: "app/routes/app.jsx",
-      lineNumber: 40,
+      lineNumber: 38,
       columnNumber: 9
     }, this) }, void 0, !1, {
       fileName: "app/routes/app.jsx",
-      lineNumber: 39,
+      lineNumber: 37,
       columnNumber: 7
     }, this)
   ] }, void 0, !0, {
     fileName: "app/routes/app.jsx",
-    lineNumber: 34,
+    lineNumber: 32,
     columnNumber: 5
   }, this);
 }
 function ErrorBoundary() {
-  throw (0, import_react12.useRouteError)();
+  throw (0, import_react11.useRouteError)();
 }
 var headers = ({
   loaderHeaders,
@@ -1517,10 +1538,10 @@ var headers = ({
 );
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-ASW7YL36.js", imports: ["/build/_shared/chunk-ZWGWGGVF.js", "/build/_shared/chunk-GIAAE3CH.js", "/build/_shared/chunk-XU7DNSPJ.js", "/build/_shared/chunk-KCGMWV4J.js", "/build/_shared/chunk-5QIPLCA4.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-BOXFZXVX.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-KO5N5DUH.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-HEGG54GV.js", imports: ["/build/_shared/chunk-3GJP5LZF.js", "/build/_shared/chunk-G7CHZRZX.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/app": { id: "routes/app", parentId: "root", path: "app", index: void 0, caseSensitive: void 0, module: "/build/routes/app-QFFZDJVI.js", imports: ["/build/_shared/chunk-JY3U5FKI.js", "/build/_shared/chunk-SU66BP3D.js", "/build/_shared/chunk-6BDBBDZS.js", "/build/_shared/chunk-XAY7D6NX.js", "/build/_shared/chunk-G7CHZRZX.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !0 }, "routes/app._index": { id: "routes/app._index", parentId: "routes/app", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/app._index-Z7W33RHL.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/app.additional": { id: "routes/app.additional", parentId: "routes/app", path: "additional", index: void 0, caseSensitive: void 0, module: "/build/routes/app.additional-4WDOMM5B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/app.volume.$functionId.new": { id: "routes/app.volume.$functionId.new", parentId: "routes/app", path: "volume/:functionId/new", index: void 0, caseSensitive: void 0, module: "/build/routes/app.volume.$functionId.new-7LQUVCUO.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/auth.$": { id: "routes/auth.$", parentId: "root", path: "auth/*", index: void 0, caseSensitive: void 0, module: "/build/routes/auth.$-4B5WQABX.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/auth.login": { id: "routes/auth.login", parentId: "root", path: "auth/login", index: void 0, caseSensitive: void 0, module: "/build/routes/auth.login-PZ5DLYHK.js", imports: ["/build/_shared/chunk-6BDBBDZS.js", "/build/_shared/chunk-XAY7D6NX.js", "/build/_shared/chunk-3GJP5LZF.js", "/build/_shared/chunk-G7CHZRZX.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/webhooks": { id: "routes/webhooks", parentId: "root", path: "webhooks", index: void 0, caseSensitive: void 0, module: "/build/routes/webhooks-JFV2P4HI.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, version: "1033e95d", hmr: { runtime: "/build/_shared/chunk-5QIPLCA4.js", timestamp: 1690003116436 }, url: "/build/manifest-1033E95D.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-7MUKRU4V.js", imports: ["/build/_shared/chunk-ZWGWGGVF.js", "/build/_shared/chunk-GIAAE3CH.js", "/build/_shared/chunk-MKU6O3DZ.js", "/build/_shared/chunk-XU7DNSPJ.js", "/build/_shared/chunk-2DEUZW4H.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-BOXFZXVX.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-ZA6OCSCB.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-XLNYNLUI.js", imports: ["/build/_shared/chunk-3GJP5LZF.js", "/build/_shared/chunk-G7CHZRZX.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/app": { id: "routes/app", parentId: "root", path: "app", index: void 0, caseSensitive: void 0, module: "/build/routes/app-6RECZALT.js", imports: ["/build/_shared/chunk-BZGQOCDG.js", "/build/_shared/chunk-SU66BP3D.js", "/build/_shared/chunk-MHU3KDXZ.js", "/build/_shared/chunk-LBG56FFN.js", "/build/_shared/chunk-G7CHZRZX.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !0 }, "routes/app._index": { id: "routes/app._index", parentId: "routes/app", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/app._index-SIZ523FP.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/app.additional": { id: "routes/app.additional", parentId: "routes/app", path: "additional", index: void 0, caseSensitive: void 0, module: "/build/routes/app.additional-LYQIYNQX.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/app.volume.$functionId.new": { id: "routes/app.volume.$functionId.new", parentId: "routes/app", path: "volume/:functionId/new", index: void 0, caseSensitive: void 0, module: "/build/routes/app.volume.$functionId.new-YUR6PPYV.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/auth.$": { id: "routes/auth.$", parentId: "root", path: "auth/*", index: void 0, caseSensitive: void 0, module: "/build/routes/auth.$-4B5WQABX.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/auth.login": { id: "routes/auth.login", parentId: "root", path: "auth/login", index: void 0, caseSensitive: void 0, module: "/build/routes/auth.login-U5FG6TOE.js", imports: ["/build/_shared/chunk-MHU3KDXZ.js", "/build/_shared/chunk-LBG56FFN.js", "/build/_shared/chunk-3GJP5LZF.js", "/build/_shared/chunk-G7CHZRZX.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/webhooks": { id: "routes/webhooks", parentId: "root", path: "webhooks", index: void 0, caseSensitive: void 0, module: "/build/routes/webhooks-JFV2P4HI.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, version: "2cb98a7e", hmr: { runtime: "/build/_shared/chunk-2DEUZW4H.js", timestamp: 1690232034980 }, url: "/build/manifest-2CB98A7E.js" };
 
 // server-entry-module:@remix-run/dev/server-build
-var assetsBuildDirectory = "public/build", future = { v2_dev: { port: "53408" }, unstable_postcss: !1, unstable_tailwind: !1, v2_errorBoundary: !0, v2_headers: !0, v2_meta: !0, v2_normalizeFormMethod: !0, v2_routeConvention: !0 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
+var assetsBuildDirectory = "public/build", future = { v2_dev: { port: "64718" }, unstable_postcss: !1, unstable_tailwind: !1, v2_errorBoundary: !0, v2_headers: !0, v2_meta: !0, v2_normalizeFormMethod: !0, v2_routeConvention: !0 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
   root: {
     id: "root",
     parentId: void 0,

@@ -3,6 +3,7 @@ node_modules
 *.wasm
 .env
 .DS_Store
+.yalc
 
 # These files are generated from Shopify CLI templating and should not be committed to this repo
 
@@ -21,3 +22,5 @@ node_modules
 ## Sample Apps
 sample-apps/*/web/frontend/metafields.js
 !sample-apps/discounts/web/frontend/metafields.js
+sample-apps/*/build/*
+sample-apps/*/public/build/*

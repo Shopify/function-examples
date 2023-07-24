@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "@shopify/discount-app-components": {
-      "signature": "eda0229a552469828f0ec64f180e0773",
+      "signature": "3e58434d005b165bf3605fdd6b213b6a",
       "file": true
     }
   }

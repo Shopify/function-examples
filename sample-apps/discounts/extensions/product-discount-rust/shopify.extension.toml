@@ -1,0 +1,12 @@
+name = "product-discount-rust"
+type = "product_discounts"
+api_version = "2023-01"
+
+[build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/product-discount-rust.wasm"
+watch = [ "src/**/*.rs" ]
+
+[ui.paths]
+create = "/app/volume/:functionId/new"
+details = "/app/volume/:functionId/:id"
