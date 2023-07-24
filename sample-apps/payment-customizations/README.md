@@ -1,46 +1,13 @@
 # Shopify App Template - Remix
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework. It contains the basics for building a Shopify app.
+This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
 
 <!-- TODO: Uncomment this after we've started using the template in the CLI -->
 <!-- Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template). -->
 
-## Benefits
+## Quick start
 
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience.
-
-<!-- TODO: Uncomment this after we've updated the docs -->
-<!-- The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template. -->
-
-The Remix app template comes with the following out-of-the-box functionality:
-
-- [OAuth](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#authenticating-admin-requests): Installing the app and granting permissions
-- [GraphQL Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-graphql-api): Querying or mutating Shopify admin data
-- [REST Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-rest-api): Resource classes to interact with the API
-- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [AppBridge](https://shopify.dev/docs/apps/tools/app-bridge): This template uses the next generation of the Shopify App Bridge library.
-  - This library is currently in development and works in unison with the current Shopify App Bridge library.
-- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
-
-## Tech Stack
-
-This template combines a number of third party open-source tools:
-
-- [Remix](https://remix.run) sets up both the backend and frontend of the app, using [React](https://reactjs.org/). Using App Bridge, Remix automatically sets up:
-- [`i18next`](https://www.i18next.com/) and related libraries are used to internationalize the frontend.
-  - [`remix-i18next`](https://github.com/sergiodxa/remix-i18next) is used to set up i18n for Remix apps.
-  - [`react-i18next`](https://react.i18next.com/) is used for React-specific i18n functionality.
-  - [`@formatjs/intl-pluralrules`](https://formatjs.io/docs/polyfills/intl-pluralrules) is used as a polyfill for [`Intl.PluralRules`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules) if necessary.
-
-The following Shopify tools complement these third-party tools to ease app development:
-
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/main/packages/shopify-app-remix/README.md) provides the tooling required to authenticate and interact with Shopify APIs.
-- [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
-- [`@shopify/i18next-shopify`](https://github.com/Shopify/i18next-shopify) is a plugin for [`i18next`](https://www.i18next.com/) that allows translation files to follow the same JSON schema used by Shopify [app extensions](https://shopify.dev/docs/apps/checkout/best-practices/localizing-ui-extensions#how-it-works) and [themes](https://shopify.dev/docs/themes/architecture/locales/storefront-locale-files#usage).
-
-## Getting started
-
-### Requirements
+### Prerequisites
 
 1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
 1. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
@@ -48,36 +15,29 @@ The following Shopify tools complement these third-party tools to ease app devel
 
 <!-- TODO Make this section about using @shopify/app once it's added to the CLI. -->
 
-### Installing the template
+### Setup
 
-To run this template, you can clone the repository, and then run this with your preferred package manager:
+If you used the CLI to create the template, you can skip this section.
 
 Using yarn:
 
 ```shell
 yarn install
-yarn setup
 ```
 
 Using npm:
 
 ```shell
 npm install
-npm run setup
 ```
 
 Using pnpm:
 
 ```shell
 pnpm install
-pnpm run setup
 ```
 
 ### Local Development
-
-[The Shopify CLI](https://shopify.dev/docs/apps/tools/cli) connects to an app in your Partners dashboard. It provides environment variables, runs commands in parallel, and updates application URLs for easier development.
-
-You can develop locally using your preferred package manager. Run one of the following commands from the root of your app.
 
 Using yarn:
 
@@ -94,10 +54,49 @@ npm run dev
 Using pnpm:
 
 ```shell
+pnpm run setup
 pnpm run dev
 ```
 
-Open the URL generated in your console. Once you grant permission to the app, you can start development.
+Press P to open the URL to your app. Once you click install, you can start development.
+
+Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
+
+### Authenticating and querying data
+
+To authenticate and query data you can use the `shopify` const that is exported from `/app/shopify.server.js`:
+
+```js
+export async function loader({ request }) {
+  const { admin } = await shopify.authenticate.admin(request);
+
+  const response = await admin.graphql(`
+    {
+      products(first: 25) {
+        nodes {
+          title
+          description
+        }
+      }
+    }`);
+
+  const {
+    data: {
+      products: { nodes },
+    },
+  } = await response.json();
+
+  return json(nodes);
+}
+```
+
+This template come preconfigured with examples of:
+
+1. Setting up your Shopify app in [/app/shopify.server.js](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/shopify.server.js)
+2. Querying data using Graphql. Please see: [/app/routes/app.\_index.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/app._index.jsx).
+3. Responding to mandatory webhooks in [/app/routes/webhooks.jsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/webhooks.jsx)
+
+Please read the [documentation for @shopify/shopify-app-remix](https://www.npmjs.com/package/@shopify/shopify-app-remix#authenticating-admin-requests) to understand what other API's are available.
 
 ## Deployment
 
@@ -148,20 +147,70 @@ When you're ready to set up your app in production, you can follow [our deployme
 
 When you reach the step for [setting up environment variables](https://shopify.dev/docs/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
 
+## Gotchas / Troubleshooting
+
+### Database tables don't exist
+
+If you run the app right after creating it, you'll get this error:
+
+```
+The table `main.Session` does not exist in the current database.
+```
+
+This will happen when the Prisma database hasn't been created.
+You can solve this by running the `setup` script in your app.
+
+### Navigating to other pages breaks
+
+In Remix apps, you can navigate to a different page either by adding an `<a>` tag, or using the `<Link>` component from `@remix-run/react`.
+
+In Shopify Remix apps you should avoid using `<a>`. Use `<Link> `from `@remix-run/react` instead. This ensures that your user remains authenticated.
+
+### Non Embedded
+
+Shopify apps are best when they are embedded into the Shopify Admin. This template is configured that way. If you have a reason to not embed your please make 2 changes:
+
+1. Remove the `<script/>` tag to App Bridge in `/app/routes/app.jsx`
+2. Remove any use of App Bridge APIs (`window.shopify`) from your code. By default, the only place that happens is in `/app/routes/app._index.jsx`
+3. Update the config for shopifyApp in `app/shopify.server.js`. Pass `isEmbedded: false`
+
+## Benefits
+
+Shopify apps are built on a variety of Shopify tools to create a great merchant experience.
+
+<!-- TODO: Uncomment this after we've updated the docs -->
+<!-- The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template. -->
+
+The Remix app template comes with the following out-of-the-box functionality:
+
+- [OAuth](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#authenticating-admin-requests): Installing the app and granting permissions
+- [GraphQL Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-graphql-api): Querying or mutating Shopify admin data
+- [REST Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-rest-api): Resource classes to interact with the API
+- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
+- [AppBridge](https://shopify.dev/docs/apps/tools/app-bridge): This template uses the next generation of the Shopify App Bridge library.
+  - This library is currently in development and works in unison with the current Shopify App Bridge library.
+- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
+
+## Tech Stack
+
+This template uses [Remix](https://remix.run). The following Shopify tools are also included to ease app development:
+
+- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/main/packages/shopify-app-remix/README.md) provides authentication and methods for interacting with Shopify APIs.
+- [Shopify App Bridge](https://shopify.dev/docs/apps/tools/app-bridge) allows your app to seamlessly integrate your app within Shopify's Admin.
+- [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
+- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
+- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
+
+> **Note**: This template runs on JavaScript, but it's fully set up for [TypeScript](https://www.typescriptlang.org/).
+> If you want to create your routes using TypeScript, we recommend removing the `noImplicitAny` config from [`tsconfig.json`](/tsconfig.json)
+
 ## Resources
 
 - [Remix Docs](https://remix.run/docs/en/v1)
+- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/release-candidate/packages/shopify-app-remix/README.md)
 - [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
 - [App authentication](https://shopify.dev/docs/apps/auth)
 - [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
-- [Shopify App Remix]('./shopify-app-remix/README.md)
 - [App extensions](https://shopify.dev/docs/apps/app-extensions/list)
 - [Shopify Functions](https://shopify.dev/docs/api/functions)
 - [Getting started with internationalizing your app](https://shopify.dev/docs/apps/best-practices/internationalization/getting-started)
-  - [`i18next` Docs](https://www.i18next.com/)
-    - [Configuration options](https://www.i18next.com/overview/configuration-options)
-  - [`react-i18next` Docs](https://react.i18next.com/)
-    - [`useTranslation` hook](https://react.i18next.com/latest/usetranslation-hook)
-  - [`remix-i18next`](https://github.com/sergiodxa/remix-i18next)
-  - [`@shopify/i18next-shopify`](https://github.com/Shopify/i18next-shopify), a plugin for `i18next` that allows translation files to follow the same JSON schema used by Shopify [app extensions](https://shopify.dev/docs/apps/checkout/best-practices/localizing-ui-extensions#how-it-works) and [themes](https://shopify.dev/docs/themes/architecture/locales/storefront-locale-files#usage)
-  - [`FormatJS Intl API Polyfills`](https://formatjs.io/docs/polyfills/)

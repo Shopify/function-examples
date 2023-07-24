@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Banner,
+  Button,
   Card,
   FormLayout,
   Layout,
@@ -10,20 +11,27 @@ import {
 import {
   Form,
   useActionData,
-  useLoaderData,
   useNavigation,
   useSubmit,
+  useLoaderData,
 } from "@remix-run/react";
-import { json } from "@remix-run/node";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
+import { json, redirect } from "@remix-run/node";
 
-import { shopify } from "../shopify.server";
+import { authenticate } from "../shopify.server";
 
+// This is a server-side function that provides data to the component when rendering.
 export const loader = async ({ params, request }) => {
   const { id } = params;
-  const { admin } = await shopify.authenticate.admin(request);
 
+  // If the ID is `new`, then we are creating a new customization and there's no data to load.
+  if (id === "new") {
+    return {
+      paymentMethodName: "",
+      cartTotal: "0",
+    };
+  }
+
+  const { admin } = await authenticate.admin(request);
   const response = await admin.graphql(
     `#graphql
       query getPaymentCustomization($id: ID!) {
@@ -45,18 +53,18 @@ export const loader = async ({ params, request }) => {
   const metafield =
     responseJson.data.paymentCustomization?.metafield?.value &&
     JSON.parse(responseJson.data.paymentCustomization.metafield.value);
-  const paymentCustomization = {
-    id,
+
+  return json({
     paymentMethodName: metafield?.paymentMethodName ?? "",
     cartTotal: metafield?.cartTotal ?? "0",
-  };
-
-  return json({ paymentCustomization });
+  });
 };
 
+// This is a server-side action that is invoked when the form is submitted.
+// It makes an admin GraphQL request to create a payment customization.
 export const action = async ({ params, request }) => {
-  const { id, functionId } = params;
-  const { admin } = await shopify.authenticate.admin(request);
+  const { functionId, id } = params;
+  const { admin } = await authenticate.admin(request);
   const formData = await request.formData();
 
   const paymentMethodName = formData.get("paymentMethodName");
@@ -79,65 +87,76 @@ export const action = async ({ params, request }) => {
     ],
   };
 
-  const response = await admin.graphql(
-    `#graphql
-      mutation updatePaymentCustomization($id: ID!, $input: PaymentCustomizationInput!) {
-        paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
-          paymentCustomization {
-            id
+  // If the ID is `new`, then we're creating a new customization. Otherwise, we will use the update mutation.
+  if (id === "new") {
+    const response = await admin.graphql(
+      `#graphql
+        mutation createPaymentCustomization($input: PaymentCustomizationInput!) {
+          paymentCustomizationCreate(paymentCustomization: $input) {
+            paymentCustomization {
+              id
+            }
+            userErrors {
+              message
+            }
           }
-          userErrors {
-            message
+        }`,
+      {
+        variables: {
+          input: paymentCustomizationInput,
+        },
+      }
+    );
+
+    const responseJson = await response.json();
+    const errors = responseJson.data.paymentCustomizationCreate?.userErrors;
+
+    return json({ errors });
+  } else {
+    const response = await admin.graphql(
+      `#graphql
+        mutation updatePaymentCustomization($id: ID!, $input: PaymentCustomizationInput!) {
+          paymentCustomizationUpdate(id: $id, paymentCustomization: $input) {
+            paymentCustomization {
+              id
+            }
+            userErrors {
+              message
+            }
           }
-        }
-      }`,
-    {
-      variables: {
-        id: `gid://shopify/PaymentCustomization/${id}`,
-        input: paymentCustomizationInput,
-      },
-    }
-  );
+        }`,
+      {
+        variables: {
+          id: `gid://shopify/PaymentCustomization/${id}`,
+          input: paymentCustomizationInput,
+        },
+      }
+    );
 
-  const responseJson = await response.json();
-  const errors = responseJson.data.paymentCustomizationUpdate?.userErrors;
+    const responseJson = await response.json();
+    const errors = responseJson.data.paymentCustomizationUpdate?.userErrors;
 
-  return json({ errors });
+    return json({ errors });
+  }
 };
 
-const useRedirectToSettings = () => {
-  const app = useAppBridge();
-  const redirect = Redirect.create(app);
-  return () => {
-    redirect.dispatch(Redirect.Action.ADMIN_PATH, {
-      path: "/settings/payments/customizations",
-    });
-  };
-};
-
+// This is the client-side component that renders the form.
 export default function PaymentCustomization() {
   const submit = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
-  const redirect = useRedirectToSettings();
-  const { paymentCustomization } = useLoaderData();
+  const loaderData = useLoaderData();
   const [paymentMethodName, setPaymentMethodName] = useState(
-    paymentCustomization.paymentMethodName
+    loaderData.stateProvinceCode
   );
-  const [cartTotal, setCartTotal] = useState(paymentCustomization.cartTotal);
+  const [cartTotal, setCartTotal] = useState(loaderData.cartTotal);
 
   const isLoading = navigation.state === "submitting";
-
-  useEffect(() => {
-    if (actionData?.errors.length === 0) {
-      redirect();
-    }
-  }, [actionData?.errors]);
 
   const errorBanner = actionData?.errors.length ? (
     <Layout.Section>
       <Banner
-        title="There was an error updating the customization."
+        title="There was an error creating the customization."
         status="critical"
       >
         <ul>
@@ -153,10 +172,20 @@ export default function PaymentCustomization() {
     submit({ paymentMethodName, cartTotal }, { method: "post" });
   };
 
+  useEffect(() => {
+    if (actionData?.errors.length === 0) {
+      open("shopify:admin/settings/payments/customizations", "_top");
+    }
+  }, [actionData?.errors]);
+
   return (
     <Page
       title="Hide payment method"
-      backAction={{ content: "Payment customizations", onAction: redirect }}
+      backAction={{
+        content: "Payment customizations",
+        onAction: () =>
+          open("shopify:admin/settings/payments/customizations", "_top"),
+      }}
       primaryAction={{
         content: "Save",
         loading: isLoading,
@@ -177,6 +206,7 @@ export default function PaymentCustomization() {
                     value={paymentMethodName}
                     onChange={setPaymentMethodName}
                     disabled={isLoading}
+                    autoComplete="on"
                     requiredIndicator
                   />
                   <TextField
@@ -186,6 +216,7 @@ export default function PaymentCustomization() {
                     value={cartTotal}
                     onChange={setCartTotal}
                     disabled={isLoading}
+                    autoComplete="on"
                     requiredIndicator
                   />
                 </FormLayout.Group>
