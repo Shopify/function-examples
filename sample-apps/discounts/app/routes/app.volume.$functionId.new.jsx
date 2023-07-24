@@ -57,13 +57,13 @@ export const action = async ({ params, request }) => {
   if (method === DiscountMethod.Code) {
     const discount = {
       functionId,
-      title,
+      title: code,
       code,
       combinesWith,
       usageLimit,
       appliesOncePerCustomer,
       startsAt: new Date(startsAt),
-      endsAt: new Date(endsAt),
+      endsAt: endsAt && new Date(endsAt),
       metafields: [
         {
           namespace: "$app:volume",
@@ -104,10 +104,10 @@ export const action = async ({ params, request }) => {
       title,
       combinesWith,
       startsAt: new Date(startsAt),
-      endsAt: new Date(endsAt),
+      endsAt: endsAt && new Date(endsAt),
       metafields: [
         {
-          namespace: "$app:volume",
+          namespace: "$app:volume-discount",
           key: "function-configuration",
           type: "json",
           value: JSON.stringify({
@@ -207,7 +207,7 @@ export default function VolumeNew() {
         method: form.discountMethod,
         code: form.discountCode,
         combinesWith: form.combinesWith,
-        usageLimit: form.usageLimit,
+        usageLimit: form.usageLimit == null ? null : parseInt(form.usageLimit),
         appliesOncePerCustomer: form.appliesOncePerCustomer,
         startsAt: form.startDate,
         endsAt: form.endDate,
