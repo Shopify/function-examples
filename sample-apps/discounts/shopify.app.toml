@@ -2,18 +2,18 @@
 
 name = "discounts-jul24"
 client_id = "c22026b44b98c0ccbfb10159420aa37c"
-application_url = "https://browsing-teeth-promotional-removed.trycloudflare.com"
+application_url = "https://purple-posts-amount-power.trycloudflare.com"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products, write_discounts"
+scopes = "write_products,write_discounts"
 
 [auth]
 redirect_urls = [
-  "https://browsing-teeth-promotional-removed.trycloudflare.com/auth/callback",
-  "https://browsing-teeth-promotional-removed.trycloudflare.com/auth/shopify/callback",
-  "https://browsing-teeth-promotional-removed.trycloudflare.com/api/auth/callback"
+  "https://purple-posts-amount-power.trycloudflare.com/auth/callback",
+  "https://purple-posts-amount-power.trycloudflare.com/auth/shopify/callback",
+  "https://purple-posts-amount-power.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

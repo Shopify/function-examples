@@ -44,6 +44,7 @@ export const action = async ({ params, request }) => {
   const formData = await request.formData();
 
   const discountName = formData.get("discountName");
+  const discountMethod = formData.get("discountMethod");
   const discountCode = formData.get("discountCode");
   const combinesWithProductDiscounts = formData.get(
     "combinesWithProductDiscounts"
@@ -52,10 +53,13 @@ export const action = async ({ params, request }) => {
   const combinesWithShippingDiscounts = formData.get(
     "combinesWithShippingDiscounts"
   );
-  const usageTotalLimit = formData.get("usageTotalLimit");
-  const usageOncePerCustomer = formData.get("usageOncePerCustomer");
-  const startDate = formData.get("startDate");
-  const endDate = formData.get("endDate");
+  const usageTotalLimit = Number(formData.get("usageTotalLimit"));
+  const usageOncePerCustomer = Number(formData.get("usageOncePerCustomer"));
+  const startDate = new Date(formData.get("startDate"));
+  const endDate =
+    formData.get("endDate") === "undefined"
+      ? undefined
+      : new Date(formData.get("endDate"));
   const configuration = formData.get("configuration");
 
   const combinesWith = {
@@ -69,8 +73,8 @@ export const action = async ({ params, request }) => {
     title: discountName || discountCode,
     code: discountCode,
     combinesWith,
-    usageLimit: Number(usageTotalLimit),
-    appliesOncePerCustomer: Number(usageOncePerCustomer),
+    usageLimit: usageTotalLimit,
+    appliesOncePerCustomer: usageOncePerCustomer,
     startsAt: startDate,
     endsAt: endDate,
     metafields: [
@@ -127,7 +131,7 @@ export default function VolumeNew() {
         name: Redirect.ResourceType.Discount,
       });
     }
-  }, [actionData?.errors]);
+  }, [actionData]);
 
   const discountTitle = useField("");
   const discountMethod = useField(DiscountMethod.Code);
@@ -162,13 +166,16 @@ export default function VolumeNew() {
     requirementQuantity: requirementQuantity.value,
     usageTotalLimit: usageTotalLimit.value,
     usageOncePerCustomer: usageOncePerCustomer.value,
-    startDate: new Date(),
-    endDate: null,
-    configuration,
+    startDate: startDate.value.toISOString(),
+    endDate: endDate.value?.toISOString(),
+    configuration: {
+      quantity: configuration.quantity.value,
+      percentage: configuration.percentage.value,
+    },
   };
 
   const handleSubmit = () => {
-    submit(JSON.stringify(requestData), { method: "post" });
+    submit(requestData, { method: "post" });
   };
 
   const errorBanner =
