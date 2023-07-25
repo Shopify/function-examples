@@ -29,16 +29,13 @@
     "@shopify/discount-app-components": "file:.yalc/@shopify/discount-app-components",
     "@shopify/polaris": "^11.1.2",
     "@shopify/react-form": "^2.5.5",
-    "@shopify/react-i18n": "^7.8.0",
     "@shopify/shopify-app-remix": "^1.0.0",
     "@shopify/shopify-app-session-storage-prisma": "^1.0.0",
     "cross-env": "^7.0.3",
-    "i18next-fs-backend": "^2.1.5",
     "isbot": "latest",
     "prisma": "^4.13.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "remix-i18next": "^5.3.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.19.0",

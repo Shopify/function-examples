@@ -6,18 +6,16 @@ import { Provider as AppBridgeReactProvider } from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css";
 import { DiscountProvider } from "../components/providers/DiscountProvider";
 import { authenticate } from "../shopify.server";
-import remixI18n from "../i18n/i18nnext.server";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export async function loader({ request }) {
   await authenticate.admin(request);
 
-  const locale = await remixI18n.getLocale(request);
   const url = new URL(request.url);
 
   return json({
-    polarisTranslations: require(`@shopify/polaris/locales/${locale}.json`),
+    polarisTranslations: require(`@shopify/polaris/locales/en.json`),
     apiKey: process.env.SHOPIFY_API_KEY,
     host: url.searchParams.get("host"),
   });
