@@ -43,8 +43,6 @@
     "prettier": "^2.8.8"
   },
   "workspaces": [
-    "web",
-    "web/frontend",
     "extensions/*"
   ]
 }
