@@ -1,5 +1,5 @@
 {
-  "name": "delivery-customization",
+  "name": "delivery-customization-js",
   "version": "0.0.1",
   "license": "UNLICENSED",
   "scripts": {
@@ -22,6 +22,10 @@
     }
   },
   "devDependencies": {
-    "vitest": "^0.29.2"
+    "vitest": "^0.29.8"
+  },
+  "dependencies": {
+    "@shopify/shopify_function": "0.1.0",
+    "javy": "0.1.1"
   }
 }

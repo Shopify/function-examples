@@ -1,77 +1,43 @@
-# Shopify App Template - Node
+# Shopify App Template - Remix
 
-This is a template for building a [Shopify app](https://shopify.dev/apps/getting-started) using Node and React. It contains the basics for building a Shopify app.
+This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
 
-Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template).
+<!-- TODO: Uncomment this after we've started using the template in the CLI -->
+<!-- Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template). -->
 
-## Benefits
+## Quick start
 
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience. The [create an app](https://shopify.dev/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template.
-
-The Node app template comes with the following out-of-the-box functionality:
-
-- OAuth: Installing the app and granting permissions
-- GraphQL Admin API: Querying or mutating Shopify admin data
-- REST Admin API: Resource classes to interact with the API
-- Shopify-specific tooling:
-  - AppBridge
-  - Polaris
-  - Webhooks
-
-## Tech Stack
-
-This template combines a number of third party open-source tools:
-
-- [Express](https://expressjs.com/) builds the backend.
-- [Vite](https://vitejs.dev/) builds the [React](https://reactjs.org/) frontend.
-- [React Router](https://reactrouter.com/) is used for routing. We wrap this with file-based routing.
-- [React Query](https://react-query.tanstack.com/) queries the Admin API.
-
-The following Shopify tools complement these third-party tools to ease app development:
-
-- [Shopify API library](https://github.com/Shopify/shopify-node-api) adds OAuth to the Express backend. This lets users install the app and grant scope permissions.
-- [App Bridge React](https://shopify.dev/apps/tools/app-bridge/getting-started/using-react) adds authentication to API requests in the frontend and renders components outside of the App’s iFrame.
-- [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
-- [Custom hooks](https://github.com/Shopify/shopify-frontend-template-react/tree/main/hooks) make authenticated requests to the Admin API.
-- [File-based routing](https://github.com/Shopify/shopify-frontend-template-react/blob/main/Routes.jsx) makes creating new pages easier.
-
-## Getting started
-
-### Requirements
+### Prerequisites
 
 1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
 1. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
-1. You must [create a development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) if you don’t have one.
+1. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
 
-### Installing the template
+<!-- TODO Make this section about using @shopify/app once it's added to the CLI. -->
 
-This template can be installed using your preferred package manager:
+### Setup
+
+If you used the CLI to create the template, you can skip this section.
 
 Using yarn:
 
 ```shell
-yarn create @shopify/app
+yarn install
 ```
 
 Using npm:
 
 ```shell
-npm init @shopify/app@latest
+npm install
 ```
 
 Using pnpm:
 
 ```shell
-pnpm create @shopify/app@latest
+pnpm install
 ```
 
-This will clone the template and install the required dependencies.
-
-#### Local Development
-
-[The Shopify CLI](https://shopify.dev/apps/tools/cli) connects to an app in your Partners dashboard. It provides environment variables, runs commands in parallel, and updates application URLs for easier development.
-
-You can develop locally using your preferred package manager. Run one of the following commands from the root of your app.
+### Local Development
 
 Using yarn:
 
@@ -88,18 +54,61 @@ npm run dev
 Using pnpm:
 
 ```shell
+pnpm run setup
 pnpm run dev
 ```
 
-Open the URL generated in your console. Once you grant permission to the app, you can start development.
+Press P to open the URL to your app. Once you click install, you can start development.
+
+Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
+
+### Authenticating and querying data
+
+To authenticate and query data you can use the `shopify` const that is exported from `/app/shopify.server.js`:
+
+```js
+export async function loader({ request }) {
+  const { admin } = await shopify.authenticate.admin(request);
+
+  const response = await admin.graphql(`
+    {
+      products(first: 25) {
+        nodes {
+          title
+          description
+        }
+      }
+    }`);
+
+  const {
+    data: {
+      products: { nodes },
+    },
+  } = await response.json();
+
+  return json(nodes);
+}
+```
+
+This template come preconfigured with examples of:
+
+1. Setting up your Shopify app in [/app/shopify.server.js](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/shopify.server.js)
+2. Querying data using Graphql. Please see: [/app/routes/app.\_index.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/app._index.jsx).
+3. Responding to mandatory webhooks in [/app/routes/webhooks.jsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/webhooks.jsx)
+
+Please read the [documentation for @shopify/shopify-app-remix](https://www.npmjs.com/package/@shopify/shopify-app-remix#authenticating-admin-requests) to understand what other API's are available.
 
 ## Deployment
 
 ### Application Storage
 
-This template uses [SQLite](https://www.sqlite.org/index.html) to store session data. The database is a file called `database.sqlite` which is automatically created in the root. This use of SQLite works in production if your app runs as a single instance.
+This template uses [Prisma](https://www.prisma.io/) to store session data, by default using an [SQLite](https://www.sqlite.org/index.html) database.
+The database is defined as a Prisma schema in `prisma/schema.prisma`.
 
-The database that works best for you depends on the data your app needs and how it is queried. You can run your database of choice on a server yourself or host it with a SaaS company. Here’s a short list of databases providers that provide a free tier to get started:
+This use of SQLite works in production if your app runs as a single instance.
+The database that works best for you depends on the data your app needs and how it is queried.
+You can run your database of choice on a server yourself or host it with a SaaS company.
+Here’s a short list of databases providers that provide a free tier to get started:
 
 | Database   | Type             | Hosters                                                                                                                                                                                                                               |
 | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -108,122 +117,100 @@ The database that works best for you depends on the data your app needs and how 
 | Redis      | Key-value        | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-redis), [Amazon MemoryDB](https://aws.amazon.com/memorydb/)                                                                                                        |
 | MongoDB    | NoSQL / Document | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-mongodb), [MongoDB Atlas](https://www.mongodb.com/atlas/database)                                                                                                  |
 
-To use one of these, you need to change your session storage configuration. To help, here’s a list of [SessionStorage adapter packages](https://github.com/Shopify/shopify-api-js/tree/main/docs/usage/session-storage.md).
+To use one of these, you can use a different [datasource provider](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#datasource) in your `schema.prisma` file, or a different [SessionStorage adapter package](https://github.com/Shopify/shopify-api-js/tree/main/docs/guides/session-storage.md).
 
 ### Build
 
-The frontend is a single page app. It requires the `SHOPIFY_API_KEY`, which you can find on the page for your app in your partners dashboard. Paste your app’s key in the command for the package manager of your choice:
+Remix handles building the app for you, by running the command below with the package manager of your choice:
 
 Using yarn:
 
 ```shell
-cd web/frontend/ && SHOPIFY_API_KEY=REPLACE_ME yarn build
+yarn build
 ```
 
 Using npm:
 
 ```shell
-cd web/frontend/ && SHOPIFY_API_KEY=REPLACE_ME npm run build
+npm run build
 ```
 
 Using pnpm:
 
 ```shell
-cd web/frontend/ && SHOPIFY_API_KEY=REPLACE_ME pnpm run build
+pnpm run build
 ```
-
-You do not need to build the backend.
 
 ## Hosting
 
-When you're ready to set up your app in production, you can follow [our deployment documentation](https://shopify.dev/apps/deployment/web) to host your app on a cloud provider like [Heroku](https://www.heroku.com/) or [Fly.io](https://fly.io/).
+When you're ready to set up your app in production, you can follow [our deployment documentation](https://shopify.dev/docs/apps/deployment/web) to host your app on a cloud provider like [Heroku](https://www.heroku.com/) or [Fly.io](https://fly.io/).
 
-When you reach the step for [setting up environment variables](https://shopify.dev/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
+When you reach the step for [setting up environment variables](https://shopify.dev/docs/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
 
-## Known issues
+## Gotchas / Troubleshooting
 
-### Hot module replacement and Firefox
+### Database tables don't exist
 
-When running the app with the CLI in development mode on Firefox, you might see your app constantly reloading when you access it.
-That happened in previous versions of the CLI, because of the way HMR websocket requests work.
+If you run the app right after creating it, you'll get this error:
 
-We fixed this issue with v3.4.0 of the CLI, so after updating it, you can make the following changes to your app's `web/frontend/vite.config.js` file:
-
-1. Change the definition `hmrConfig` object to be:
-
-   ```js
-   const host = process.env.HOST
-     ? process.env.HOST.replace(/https?:\/\//, "")
-     : "localhost";
-
-   let hmrConfig;
-   if (host === "localhost") {
-     hmrConfig = {
-       protocol: "ws",
-       host: "localhost",
-       port: 64999,
-       clientPort: 64999,
-     };
-   } else {
-     hmrConfig = {
-       protocol: "wss",
-       host: host,
-       port: process.env.FRONTEND_PORT,
-       clientPort: 443,
-     };
-   }
-   ```
-
-1. Change the `server.host` setting in the configs to `"localhost"`:
-
-   ```js
-   server: {
-     host: "localhost",
-     ...
-   ```
-
-### I can't get past the ngrok "Visit site" page
-
-When you’re previewing your app or extension, you might see an ngrok interstitial page with a warning:
-
-```text
-You are about to visit <id>.ngrok.io: Visit Site
+```
+The table `main.Session` does not exist in the current database.
 ```
 
-If you click the `Visit Site` button, but continue to see this page, then you should run dev using an alternate tunnel URL that you run using tunneling software.
-We've validated that [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/run-tunnel/trycloudflare/) works with this template.
+This will happen when the Prisma database hasn't been created.
+You can solve this by running the `setup` script in your app.
 
-To do that, you can [install the `cloudflared` CLI tool](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/), and run:
+### Navigating to other pages breaks
 
-```shell
-# Note that you can also use a different port
-cloudflared tunnel --url http://localhost:3000
-```
+In Remix apps, you can navigate to a different page either by adding an `<a>` tag, or using the `<Link>` component from `@remix-run/react`.
 
-Out of the logs produced by cloudflare you will notice a https URL where the domain ends with `trycloudflare.com`. This is your tunnel URL. You need to copy this URL as you will need it in the next step.
+In Shopify Remix apps you should avoid using `<a>`. Use `<Link> `from `@remix-run/react` instead. This ensures that your user remains authenticated.
 
-```shell
-2022-11-11T19:57:55Z INF Requesting new quick Tunnel on trycloudflare.com...
-2022-11-11T19:57:58Z INF +--------------------------------------------------------------------------------------------+
-2022-11-11T19:57:58Z INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
-2022-11-11T19:57:58Z INF |  https://randomly-generated-hostname.trycloudflare.com                                     |
-2022-11-11T19:57:58Z INF +--------------------------------------------------------------------------------------------+
-```
+### Non Embedded
 
-Below you would replace `randomly-generated-hostname` with what you have copied from the terminal. In a different terminal window, navigate to your app's root and with the URL from above you would call:
+Shopify apps are best when they are embedded into the Shopify Admin. This template is configured that way. If you have a reason to not embed your please make 2 changes:
 
-```shell
-# Using yarn
-yarn dev --tunnel-url https://randomly-generated-hostname.trycloudflare.com:3000
-# or using npm
-npm run dev --tunnel-url https://randomly-generated-hostname.trycloudflare.com:3000
-# or using pnpm
-pnpm dev --tunnel-url https://randomly-generated-hostname.trycloudflare.com:3000
-```
+1. Remove the `<script/>` tag to App Bridge in `/app/routes/app.jsx`
+2. Remove any use of App Bridge APIs (`window.shopify`) from your code. By default, the only place that happens is in `/app/routes/app._index.jsx`
+3. Update the config for shopifyApp in `app/shopify.server.js`. Pass `isEmbedded: false`
 
-## Developer resources
+## Benefits
 
-- [Introduction to Shopify apps](https://shopify.dev/apps/getting-started)
-- [App authentication](https://shopify.dev/apps/auth)
-- [Shopify CLI](https://shopify.dev/apps/tools/cli)
-- [Shopify API Library documentation](https://github.com/Shopify/shopify-api-js#readme)
+Shopify apps are built on a variety of Shopify tools to create a great merchant experience.
+
+<!-- TODO: Uncomment this after we've updated the docs -->
+<!-- The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template. -->
+
+The Remix app template comes with the following out-of-the-box functionality:
+
+- [OAuth](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#authenticating-admin-requests): Installing the app and granting permissions
+- [GraphQL Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-graphql-api): Querying or mutating Shopify admin data
+- [REST Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-rest-api): Resource classes to interact with the API
+- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
+- [AppBridge](https://shopify.dev/docs/apps/tools/app-bridge): This template uses the next generation of the Shopify App Bridge library.
+  - This library is currently in development and works in unison with the current Shopify App Bridge library.
+- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
+
+## Tech Stack
+
+This template uses [Remix](https://remix.run). The following Shopify tools are also included to ease app development:
+
+- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/main/packages/shopify-app-remix/README.md) provides authentication and methods for interacting with Shopify APIs.
+- [Shopify App Bridge](https://shopify.dev/docs/apps/tools/app-bridge) allows your app to seamlessly integrate your app within Shopify's Admin.
+- [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
+- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
+- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
+
+> **Note**: This template runs on JavaScript, but it's fully set up for [TypeScript](https://www.typescriptlang.org/).
+> If you want to create your routes using TypeScript, we recommend removing the `noImplicitAny` config from [`tsconfig.json`](/tsconfig.json)
+
+## Resources
+
+- [Remix Docs](https://remix.run/docs/en/v1)
+- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/release-candidate/packages/shopify-app-remix/README.md)
+- [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
+- [App authentication](https://shopify.dev/docs/apps/auth)
+- [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
+- [App extensions](https://shopify.dev/docs/apps/app-extensions/list)
+- [Shopify Functions](https://shopify.dev/docs/api/functions)
+- [Getting started with internationalizing your app](https://shopify.dev/docs/apps/best-practices/internationalization/getting-started)
