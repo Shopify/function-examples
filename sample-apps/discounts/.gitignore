@@ -12,4 +12,3 @@ database.sqlite
 .env
 package-lock.json
 yarn.lock
-shopify.app.toml
