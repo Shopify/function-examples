@@ -4,6 +4,15 @@ node_modules
 .env
 .DS_Store
 
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # These files are generated from Shopify CLI templating and should not be committed to this repo
 
 ## Extensions

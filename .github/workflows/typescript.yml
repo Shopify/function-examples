@@ -2,9 +2,12 @@ name: TypeScript
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "*" ]
   pull_request:
     branches: [ "main" ]
+
+env:
+  YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
 jobs:
   test:
@@ -12,11 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
-        run: yarn
+        run: yarn install
       - name: Expand liquid
         run: yarn expand-liquid typescript
       - name: Install workspace dependencies
-        run: yarn
+        run: yarn install
       - name: Generate types
         run: yarn typegen
       - name: Test

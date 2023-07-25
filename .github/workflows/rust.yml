@@ -2,12 +2,14 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "*" ]
   pull_request:
     branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
+  YARN_ENABLE_IMMUTABLE_INSTALLS: false
+
 
 jobs:
   checks:
@@ -17,7 +19,7 @@ jobs:
       - name: Add rustfmt and clippy
         run: rustup component add rustfmt clippy
       - name: Install node dependencies
-        run: yarn
+        run: yarn install
       - name: Expand liquid
         run: yarn expand-liquid rust
       - name: Run cargo fmt
