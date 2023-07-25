@@ -19,7 +19,6 @@
   },
   "private": true,
   "workspaces": [
-    "*/javascript/**",
-    "sample-apps/*/extensions/*-js"
+    "*/javascript/**"
   ]
 }
