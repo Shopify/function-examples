@@ -24,7 +24,8 @@ import {
 } from "@shopify/discount-app-components";
 import {
   Banner,
-  LegacyCard,
+  Card,
+  Text,
   Layout,
   Page,
   PageActions,
@@ -267,19 +268,24 @@ export default function VolumeNew() {
                 discountMethod={discountMethod}
               />
               {/* Collect data for the configuration metafield. */}
-              <LegacyCard title="Volume" sectioned>
-                <TextField
-                  label="Minimum quantity"
-                  autoComplete="on"
-                  {...configuration.quantity}
-                />
-                <TextField
-                  label="Discount percentage"
-                  autoComplete="on"
-                  {...configuration.percentage}
-                  suffix="%"
-                />
-              </LegacyCard>
+              <Card>
+                <VerticalStack gap="3">
+                  <Text variant="headingMd" as="h2">
+                    Volume
+                  </Text>
+                  <TextField
+                    label="Minimum quantity"
+                    autoComplete="on"
+                    {...configuration.quantity}
+                  />
+                  <TextField
+                    label="Discount percentage"
+                    autoComplete="on"
+                    {...configuration.percentage}
+                    suffix="%"
+                  />
+                </VerticalStack>
+              </Card>
               {discountMethod.value === DiscountMethod.Code && (
                 <UsageLimitsCard
                   totalUsageLimit={usageLimit}
