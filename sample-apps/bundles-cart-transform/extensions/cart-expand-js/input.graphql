@@ -9,13 +9,13 @@ query Input {
           id
           title
           componentReferences: metafield(
-            namespace: "bundles"
-            key: "component_references"
+            namespace: "custom"
+            key: "component_reference"
           ) {
             value
           }
           componentQuantities: metafield(
-            namespace: "bundles"
+            namespace: "custom"
             key: "component_quantities"
           ) {
             value
