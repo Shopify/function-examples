@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "@shopify/discount-app-components": {
-      "signature": "3e58434d005b165bf3605fdd6b213b6a",
-      "file": true
-    }
-  }
-}
