@@ -1,0 +1,68 @@
+{%- if flavor contains "vanilla-js" -%}
+import { describe, it, expect } from 'vitest';
+import orderRoutingLocationRule from './index';
+
+/**
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+describe('order routing location rule function', () => {
+  it('returns rank operations with all locations rank 0', () => {
+    const result = orderRoutingLocationRule({
+      "fulfillmentGroups": [{
+          "id": "gid://shopify/FulfillmentGroup/123",
+          "inventoryLocations": [{
+              "location": {
+                  "id": "gid://shopify/Location/456",
+              }
+          }]
+      }]
+    });
+    const expected = /** @type {FunctionResult} */ ({
+      operations: [{
+        rank: {
+          fulfillmentGroupId: "gid://shopify/FulfillmentGroup/123",
+          rankings: [{
+            locationId: "gid://shopify/Location/456",
+            rank: 0
+          }]
+        }
+      }]
+    });
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- elsif flavor contains "typescript" -%}
+import { describe, it, expect } from 'vitest';
+import orderRoutingLocationRule from './index';
+import { FunctionResult } from '../generated/api';
+
+describe('order routing location rule function', () => {
+  it('returns rank operations with all locations rank 0', () => {
+    const result = orderRoutingLocationRule({
+      fulfillmentGroups: [{
+          id: "gid://shopify/FulfillmentGroup/123",
+          inventoryLocations: [{
+              location: {
+                  id: "gid://shopify/Location/456",
+              }
+          }]
+      }]
+    });
+    const expected: FunctionResult = {
+      operations: [{
+        rank: {
+          fulfillmentGroupId: "gid://shopify/FulfillmentGroup/123",
+          rankings: [{
+            locationId: "gid://shopify/Location/456",
+            rank: 0
+          }]
+        }
+      }]
+    };
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- endif -%}
