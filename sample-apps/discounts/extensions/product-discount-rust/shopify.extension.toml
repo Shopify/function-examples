@@ -8,5 +8,5 @@ path = "target/wasm32-wasi/release/product-discount-rust.wasm"
 watch = [ "src/**/*.rs" ]
 
 [ui.paths]
-create = "/app/volume/:functionId/new"
-details = "/app/volume/:functionId/:id"
+create = "/app/volume-discount/:functionId/new"
+details = "/app/volume-discount/:functionId/:id"
