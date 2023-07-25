@@ -146,13 +146,13 @@ export default function VolumeNew() {
   const submitForm = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
+  const app = useAppBridge();
+  const todaysDate = useMemo(() => new Date(), []);
 
   const isLoading = navigation.state === "submitting";
   const currencyCode = CurrencyCode.Cad;
   const submitErrors = actionData?.errors || [];
-  const app = useAppBridge();
   const redirect = Redirect.create(app);
-  const today = useMemo(() => new Date(), []);
 
   useEffect(() => {
     if (actionData?.errors.length === 0) {
@@ -193,10 +193,9 @@ export default function VolumeNew() {
       requirementQuantity: useField("0"),
       usageLimit: useField(null),
       appliesOncePerCustomer: useField(false),
-      startDate: useField(today),
+      startDate: useField(todaysDate),
       endDate: useField(null),
       configuration: {
-        // Add quantity and percentage configuration to form data
         quantity: useField("0"),
         percentage: useField("0"),
       },
