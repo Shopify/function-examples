@@ -267,7 +267,6 @@ export default function VolumeNew() {
                 discountCode={discountCode}
                 discountMethod={discountMethod}
               />
-              {/* Collect data for the configuration metafield. */}
               <Card>
                 <VerticalStack gap="3">
                   <Text variant="headingMd" as="h2">
