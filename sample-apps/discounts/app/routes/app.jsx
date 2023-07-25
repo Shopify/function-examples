@@ -24,8 +24,7 @@ export async function loader({ request }) {
 }
 
 export default function App() {
-  const { polarisTranslations } = useLoaderData();
-  const { apiKey, host } = useLoaderData();
+  const { apiKey, host, polarisTranslations } = useLoaderData();
   const [config] = useState({ host, apiKey });
 
   return (
