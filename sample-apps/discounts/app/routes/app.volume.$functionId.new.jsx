@@ -1,25 +1,15 @@
 import { useEffect, useMemo } from "react";
+import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
-
-import {
-  Banner,
-  LegacyCard,
-  Layout,
-  Page,
-  PageActions,
-  TextField,
-  VerticalStack,
-} from "@shopify/polaris";
-import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "@shopify/app-bridge-react";
-
+import { Redirect } from "@shopify/app-bridge/actions";
+import { CurrencyCode } from "@shopify/react-i18n";
 import {
   Form,
   useActionData,
   useNavigation,
   useSubmit,
 } from "@remix-run/react";
-import { json } from "@remix-run/node";
 import {
   ActiveDatesCard,
   CombinationCard,
@@ -32,9 +22,17 @@ import {
   UsageLimitsCard,
   onBreadcrumbAction,
 } from "@shopify/discount-app-components";
+import {
+  Banner,
+  LegacyCard,
+  Layout,
+  Page,
+  PageActions,
+  TextField,
+  VerticalStack,
+} from "@shopify/polaris";
 
 import shopify from "../shopify.server";
-import { CurrencyCode } from "@shopify/react-i18n";
 
 // This is a server-side action that is invoked when the form is submitted.
 // It makes an admin GraphQL request to create a discount.
