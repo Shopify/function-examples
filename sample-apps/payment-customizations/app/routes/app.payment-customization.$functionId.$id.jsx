@@ -147,7 +147,7 @@ export default function PaymentCustomization() {
   const navigation = useNavigation();
   const loaderData = useLoaderData();
   const [paymentMethodName, setPaymentMethodName] = useState(
-    loaderData.stateProvinceCode
+    loaderData.paymentMethodName
   );
   const [cartTotal, setCartTotal] = useState(loaderData.cartTotal);
 
