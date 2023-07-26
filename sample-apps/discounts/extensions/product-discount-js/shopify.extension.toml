@@ -7,5 +7,5 @@ command = ""
 path = "dist/function.wasm"
 
 [ui.paths]
-create = "/volume/:functionId/new"
-details = "/volume/:functionId/:id"
+create = "/app/volume-discount/:functionId/new"
+details = "/app/volume-discount/:functionId/:id"

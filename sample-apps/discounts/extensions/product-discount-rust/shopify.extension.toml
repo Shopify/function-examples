@@ -4,8 +4,9 @@ api_version = "2023-01"
 
 [build]
 command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/product-discount.wasm"
+path = "target/wasm32-wasi/release/product-discount-rust.wasm"
+watch = [ "src/**/*.rs" ]
 
 [ui.paths]
-create = "/volume/:functionId/new"
-details = "/volume/:functionId/:id"
+create = "/app/volume-discount/:functionId/new"
+details = "/app/volume-discount/:functionId/:id"

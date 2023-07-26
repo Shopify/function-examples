@@ -338,7 +338,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "product-discount"
+name = "product-discount-rust"
 version = "1.0.0"
 dependencies = [
  "graphql_client",

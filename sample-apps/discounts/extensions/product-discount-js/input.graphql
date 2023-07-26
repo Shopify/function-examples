@@ -4,14 +4,17 @@ query Input {
       quantity
       merchandise {
         __typename
-        ...on ProductVariant {
+        ... on ProductVariant {
           id
         }
       }
     }
   }
   discountNode {
-    metafield(namespace: "$app:volume-discount", key: "function-configuration") {
+    metafield(
+      namespace: "$app:volume-discount"
+      key: "function-configuration"
+    ) {
       value
     }
   }
