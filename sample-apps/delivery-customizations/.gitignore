@@ -1,28 +1,14 @@
-# Environment Configuration
-.env
-.env.*
-
-# Dependency directory
 node_modules
 
-# Test coverage directory
-coverage
+/.cache
+/build
+/app/build
+/public/build/
+/app/public/build
+/prisma/dev.sqlite
+/prisma/dev.sqlite-journal
+database.sqlite
 
-# Ignore Apple macOS Desktop Services Store
-.DS_Store
-
-# Logs
-logs
-*.log
-
-# ngrok tunnel file
-config/tunnel.pid
-
-# vite build output
-dist/
-
-# extensions build output
-extensions/*/build
-
-# Node library SQLite database
-web/database.sqlite
+.env
+package-lock.json
+yarn.lock
