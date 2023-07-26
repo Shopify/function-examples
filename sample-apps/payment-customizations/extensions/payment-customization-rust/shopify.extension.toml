@@ -7,5 +7,5 @@ command = "cargo wasi build --release"
 path = "target/wasm32-wasi/release/payment-customization.wasm"
 
 [ui.paths]
-create = "/payment-customization/:functionId/new"
-details = "/payment-customization/:functionId/:id"
+create = "/app/payment-customization/:functionId/new"
+details = "/app/payment-customization/:functionId/:id"
