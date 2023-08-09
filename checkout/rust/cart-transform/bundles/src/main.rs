@@ -8,7 +8,7 @@ use crate::output::ExpandedItem;
 use crate::output::MergeOperation;
 use crate::output::PriceAdjustment;
 use crate::output::PriceAdjustmentValue;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
