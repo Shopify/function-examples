@@ -3,7 +3,7 @@
 import { DiscountApplicationStrategy } from "../generated/api";
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
@@ -16,7 +16,7 @@ const EMPTY_DISCOUNT = {
 };
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
 (input) => {
@@ -28,7 +28,7 @@ export default /**
 };
 {%- elsif flavor contains "typescript" -%}
 import {
-  InputQuery,
+  Input,
   FunctionResult,
   DiscountApplicationStrategy,
 } from "../generated/api";
@@ -40,7 +40,7 @@ const EMPTY_DISCOUNT: FunctionResult = {
 
 type Configuration = {};
 
-export default (input: InputQuery): FunctionResult => {
+export default (input: Input): FunctionResult => {
   const configuration: Configuration = JSON.parse(
     input?.discountNode?.metafield?.value ?? "{}"
   );

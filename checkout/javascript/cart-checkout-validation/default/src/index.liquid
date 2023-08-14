@@ -2,12 +2,12 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
 (input) => {
@@ -24,12 +24,12 @@ export default /**
 };
 {%- elsif flavor contains "typescript" -%}
 import {
-  InputQuery,
+  Input,
   FunctionResult,
   FunctionError,
 } from "../generated/api";
 
-export default (input: InputQuery): FunctionResult => {
+export default (input: Input): FunctionResult => {
   const errors: FunctionError[] = input.cart.lines
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({

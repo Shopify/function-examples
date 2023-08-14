@@ -10,7 +10,7 @@ will return an Expand operation containing the parts.
 */
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  * @typedef {import("../generated/api").CartOperation} CartOperation
  */
@@ -23,7 +23,7 @@ const NO_CHANGES = {
 };
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
 (input) => {

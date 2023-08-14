@@ -2,7 +2,7 @@
 import { DiscountApplicationStrategy } from "../generated/api";
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  * @typedef {import("../generated/api").Target} Target
  * @typedef {import("../generated/api").ProductVariant} ProductVariant
@@ -17,7 +17,7 @@ const EMPTY_DISCOUNT = {
 };
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
   (input) => {

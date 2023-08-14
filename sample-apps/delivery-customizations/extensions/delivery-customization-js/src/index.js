@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  * @typedef {import("../generated/api").Operation} Operation
  */
@@ -14,7 +14,7 @@ const NO_CHANGES = {
 };
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
   (input) => {

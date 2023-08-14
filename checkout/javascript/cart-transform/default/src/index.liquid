@@ -2,7 +2,7 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
@@ -14,7 +14,7 @@ const NO_CHANGES = {
 };
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
 (input) => {
@@ -22,7 +22,7 @@ export default /**
 };
 {%- elsif flavor contains "typescript" -%}
 import type {
-  InputQuery,
+  Input,
   FunctionResult,
 } from "../generated/api";
 
@@ -30,7 +30,7 @@ const NO_CHANGES: FunctionResult = {
   operations: [],
 };
 
-export default (input: InputQuery): FunctionResult => {
+export default (input: Input): FunctionResult => {
   return NO_CHANGES;
 };
 {%- endif -%}

@@ -2,12 +2,12 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").Input} Input
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
 export default /**
- * @param {InputQuery} input
+ * @param {Input} input
  * @returns {FunctionResult}
  */
 (input) => {
@@ -29,13 +29,13 @@ export default /**
 };
 {%- elsif flavor contains "typescript" -%}
 import {
-  InputQuery,
+  Input,
   FunctionResult,
   Operation,
   RankedLocation,
 } from "../generated/api";
 
-export default (input: InputQuery): FunctionResult => {
+export default (input: Input): FunctionResult => {
   const operations: Operation[] = input.fulfillmentGroups.map((group) => {
     const rankings: RankedLocation[] = group.inventoryLocations?.map(
       (inventoryLocation) => ({
