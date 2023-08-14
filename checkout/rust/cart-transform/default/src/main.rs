@@ -1,8 +1,6 @@
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use serde::Serialize;
-
 #[allow(clippy::upper_case_acronyms)]
 type URL = String;
 
