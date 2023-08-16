@@ -33,7 +33,7 @@ type BuyerIdentity {
   customer: Customer
 
   """
-  The email address of the buyer that is interacting with the cart.
+  The email address of the buyer that's interacting with the cart.
   """
   email: String
 
@@ -43,7 +43,7 @@ type BuyerIdentity {
   isAuthenticated: Boolean!
 
   """
-  The phone number of the buyer that is interacting with the cart.
+  The phone number of the buyer that's interacting with the cart.
   """
   phone: String
 
@@ -153,7 +153,7 @@ input CartLineInput {
   cartLineId: ID!
 
   """
-  The quantity of the cart line to be merged.The max quantity is 50.
+  The quantity of the cart line to be merged.The max quantity is 2000.
   """
   quantity: Int!
 }
@@ -1276,7 +1276,7 @@ input ExpandedItem {
   merchandiseId: ID!
 
   """
-  The quantity of the expanded item.The max quantity is 50.
+  The quantity of the expanded item.The max quantity is 2000.
   """
   quantity: Int!
 }
@@ -1429,11 +1429,11 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the function result.
+  Handles the Function result.
   """
   handleResult(
     """
-    The result of the function.
+    The result of the Function.
     """
     result: FunctionResult!
   ): Void!

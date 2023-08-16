@@ -1,10 +1,3 @@
-# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
-# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
-#
-# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
-# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
-# Check out the "Docs" tab in the top right.
-
 schema {
   query: Input
   mutation: MutationRoot
@@ -40,12 +33,17 @@ type BuyerIdentity {
   customer: Customer
 
   """
-  The email address of the buyer that is interacting with the cart.
+  The email address of the buyer that's interacting with the cart.
   """
   email: String
 
   """
-  The phone number of the buyer that is interacting with the cart.
+  Whether the buyer authenticated with a customer account.
+  """
+  isAuthenticated: Boolean!
+
+  """
+  The phone number of the buyer that's interacting with the cart.
   """
   phone: String
 
@@ -220,6 +218,12 @@ type CartLine {
   The quantity of the merchandise that the customer intends to purchase.
   """
   quantity: Int!
+
+  """
+  The selling plan associated with the cart line and the effect that each
+  selling plan has on variants when they're purchased.
+  """
+  sellingPlanAllocation: SellingPlanAllocation
 }
 
 """
@@ -291,9 +295,9 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -374,9 +378,9 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -389,6 +393,16 @@ type CompanyLocation implements HasMetafields {
   at which the company location was last modified.
   """
   updatedAt: DateTime!
+}
+
+"""
+A country.
+"""
+type Country {
+  """
+  The ISO code of the country.
+  """
+  isoCode: CountryCode!
 }
 
 """
@@ -2451,6 +2465,11 @@ type CustomProduct {
   requiresShipping: Boolean!
 
   """
+  The localized title of the product in the customer’s locale.
+  """
+  title: String!
+
+  """
   The weight of the product variant in the unit system specified with `weight_unit`.
   """
   weight: Float
@@ -2492,6 +2511,16 @@ type Customer implements HasMetafields {
   ): Boolean!
 
   """
+  Whether the customer has the given tags.
+  """
+  hasTags(
+    """
+    The tags to check.
+    """
+    tags: [String!]! = []
+  ): [HasTagResponse!]!
+
+  """
   A unique identifier for the customer.
   """
   id: ID!
@@ -2506,9 +2535,9 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2612,9 +2641,9 @@ type FulfillmentConstraintRule implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -2657,9 +2686,9 @@ type GateConfiguration implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -2712,9 +2741,9 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -2756,6 +2785,11 @@ type Input {
   fulfillmentConstraintRule: FulfillmentConstraintRule!
 
   """
+  The localization of the Function execution context.
+  """
+  localization: Localization!
+
+  """
   The locations where the inventory items on this cart are stocked.
   """
   locations(
@@ -2769,6 +2803,746 @@ type Input {
     """
     names: [String!]
   ): [Location!]!
+}
+
+"""
+A language.
+"""
+type Language {
+  """
+  The ISO code.
+  """
+  isoCode: LanguageCode!
+}
+
+"""
+ISO 639-1 language codes supported by Shopify.
+"""
+enum LanguageCode {
+  """
+  Afrikaans.
+  """
+  AF
+
+  """
+  Akan.
+  """
+  AK
+
+  """
+  Amharic.
+  """
+  AM
+
+  """
+  Arabic.
+  """
+  AR
+
+  """
+  Assamese.
+  """
+  AS
+
+  """
+  Azerbaijani.
+  """
+  AZ
+
+  """
+  Belarusian.
+  """
+  BE
+
+  """
+  Bulgarian.
+  """
+  BG
+
+  """
+  Bambara.
+  """
+  BM
+
+  """
+  Bangla.
+  """
+  BN
+
+  """
+  Tibetan.
+  """
+  BO
+
+  """
+  Breton.
+  """
+  BR
+
+  """
+  Bosnian.
+  """
+  BS
+
+  """
+  Catalan.
+  """
+  CA
+
+  """
+  Chechen.
+  """
+  CE
+
+  """
+  Central Kurdish.
+  """
+  CKB
+
+  """
+  Czech.
+  """
+  CS
+
+  """
+  Church Slavic.
+  """
+  CU
+
+  """
+  Welsh.
+  """
+  CY
+
+  """
+  Danish.
+  """
+  DA
+
+  """
+  German.
+  """
+  DE
+
+  """
+  Dzongkha.
+  """
+  DZ
+
+  """
+  Ewe.
+  """
+  EE
+
+  """
+  Greek.
+  """
+  EL
+
+  """
+  English.
+  """
+  EN
+
+  """
+  Esperanto.
+  """
+  EO
+
+  """
+  Spanish.
+  """
+  ES
+
+  """
+  Estonian.
+  """
+  ET
+
+  """
+  Basque.
+  """
+  EU
+
+  """
+  Persian.
+  """
+  FA
+
+  """
+  Fulah.
+  """
+  FF
+
+  """
+  Finnish.
+  """
+  FI
+
+  """
+  Filipino.
+  """
+  FIL
+
+  """
+  Faroese.
+  """
+  FO
+
+  """
+  French.
+  """
+  FR
+
+  """
+  Western Frisian.
+  """
+  FY
+
+  """
+  Irish.
+  """
+  GA
+
+  """
+  Scottish Gaelic.
+  """
+  GD
+
+  """
+  Galician.
+  """
+  GL
+
+  """
+  Gujarati.
+  """
+  GU
+
+  """
+  Manx.
+  """
+  GV
+
+  """
+  Hausa.
+  """
+  HA
+
+  """
+  Hebrew.
+  """
+  HE
+
+  """
+  Hindi.
+  """
+  HI
+
+  """
+  Croatian.
+  """
+  HR
+
+  """
+  Hungarian.
+  """
+  HU
+
+  """
+  Armenian.
+  """
+  HY
+
+  """
+  Interlingua.
+  """
+  IA
+
+  """
+  Indonesian.
+  """
+  ID
+
+  """
+  Igbo.
+  """
+  IG
+
+  """
+  Sichuan Yi.
+  """
+  II
+
+  """
+  Icelandic.
+  """
+  IS
+
+  """
+  Italian.
+  """
+  IT
+
+  """
+  Japanese.
+  """
+  JA
+
+  """
+  Javanese.
+  """
+  JV
+
+  """
+  Georgian.
+  """
+  KA
+
+  """
+  Kikuyu.
+  """
+  KI
+
+  """
+  Kazakh.
+  """
+  KK
+
+  """
+  Kalaallisut.
+  """
+  KL
+
+  """
+  Khmer.
+  """
+  KM
+
+  """
+  Kannada.
+  """
+  KN
+
+  """
+  Korean.
+  """
+  KO
+
+  """
+  Kashmiri.
+  """
+  KS
+
+  """
+  Kurdish.
+  """
+  KU
+
+  """
+  Cornish.
+  """
+  KW
+
+  """
+  Kyrgyz.
+  """
+  KY
+
+  """
+  Luxembourgish.
+  """
+  LB
+
+  """
+  Ganda.
+  """
+  LG
+
+  """
+  Lingala.
+  """
+  LN
+
+  """
+  Lao.
+  """
+  LO
+
+  """
+  Lithuanian.
+  """
+  LT
+
+  """
+  Luba-Katanga.
+  """
+  LU
+
+  """
+  Latvian.
+  """
+  LV
+
+  """
+  Malagasy.
+  """
+  MG
+
+  """
+  Māori.
+  """
+  MI
+
+  """
+  Macedonian.
+  """
+  MK
+
+  """
+  Malayalam.
+  """
+  ML
+
+  """
+  Mongolian.
+  """
+  MN
+
+  """
+  Marathi.
+  """
+  MR
+
+  """
+  Malay.
+  """
+  MS
+
+  """
+  Maltese.
+  """
+  MT
+
+  """
+  Burmese.
+  """
+  MY
+
+  """
+  Norwegian (Bokmål).
+  """
+  NB
+
+  """
+  North Ndebele.
+  """
+  ND
+
+  """
+  Nepali.
+  """
+  NE
+
+  """
+  Dutch.
+  """
+  NL
+
+  """
+  Norwegian Nynorsk.
+  """
+  NN
+
+  """
+  Norwegian.
+  """
+  NO
+
+  """
+  Oromo.
+  """
+  OM
+
+  """
+  Odia.
+  """
+  OR
+
+  """
+  Ossetic.
+  """
+  OS
+
+  """
+  Punjabi.
+  """
+  PA
+
+  """
+  Polish.
+  """
+  PL
+
+  """
+  Pashto.
+  """
+  PS
+
+  """
+  Portuguese.
+  """
+  PT
+
+  """
+  Portuguese (Brazil).
+  """
+  PT_BR
+
+  """
+  Portuguese (Portugal).
+  """
+  PT_PT
+
+  """
+  Quechua.
+  """
+  QU
+
+  """
+  Romansh.
+  """
+  RM
+
+  """
+  Rundi.
+  """
+  RN
+
+  """
+  Romanian.
+  """
+  RO
+
+  """
+  Russian.
+  """
+  RU
+
+  """
+  Kinyarwanda.
+  """
+  RW
+
+  """
+  Sanskrit.
+  """
+  SA
+
+  """
+  Sardinian.
+  """
+  SC
+
+  """
+  Sindhi.
+  """
+  SD
+
+  """
+  Northern Sami.
+  """
+  SE
+
+  """
+  Sango.
+  """
+  SG
+
+  """
+  Sinhala.
+  """
+  SI
+
+  """
+  Slovak.
+  """
+  SK
+
+  """
+  Slovenian.
+  """
+  SL
+
+  """
+  Shona.
+  """
+  SN
+
+  """
+  Somali.
+  """
+  SO
+
+  """
+  Albanian.
+  """
+  SQ
+
+  """
+  Serbian.
+  """
+  SR
+
+  """
+  Sundanese.
+  """
+  SU
+
+  """
+  Swedish.
+  """
+  SV
+
+  """
+  Swahili.
+  """
+  SW
+
+  """
+  Tamil.
+  """
+  TA
+
+  """
+  Telugu.
+  """
+  TE
+
+  """
+  Tajik.
+  """
+  TG
+
+  """
+  Thai.
+  """
+  TH
+
+  """
+  Tigrinya.
+  """
+  TI
+
+  """
+  Turkmen.
+  """
+  TK
+
+  """
+  Tongan.
+  """
+  TO
+
+  """
+  Turkish.
+  """
+  TR
+
+  """
+  Tatar.
+  """
+  TT
+
+  """
+  Uyghur.
+  """
+  UG
+
+  """
+  Ukrainian.
+  """
+  UK
+
+  """
+  Urdu.
+  """
+  UR
+
+  """
+  Uzbek.
+  """
+  UZ
+
+  """
+  Vietnamese.
+  """
+  VI
+
+  """
+  Volapük.
+  """
+  VO
+
+  """
+  Wolof.
+  """
+  WO
+
+  """
+  Xhosa.
+  """
+  XH
+
+  """
+  Yiddish.
+  """
+  YI
+
+  """
+  Yoruba.
+  """
+  YO
+
+  """
+  Chinese.
+  """
+  ZH
+
+  """
+  Chinese (Simplified).
+  """
+  ZH_CN
+
+  """
+  Chinese (Traditional).
+  """
+  ZH_TW
+
+  """
+  Zulu.
+  """
+  ZU
+}
+
+"""
+Information about the localized experiences configured for the shop.
+"""
+type Localization {
+  """
+  The country of the active localized experience.
+  """
+  country: Country!
+
+  """
+  The language of the active localized experience.
+  """
+  language: Language!
+
+  """
+  The market of the active localized experience.
+  """
+  market: Market!
 }
 
 """
@@ -2795,9 +3569,9 @@ type Location implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2921,6 +3695,11 @@ type MailingAddress {
   longitude: Float
 
   """
+  The market of the address.
+  """
+  market: Market
+
+  """
   The full name of the customer, based on firstName and lastName.
   """
   name: String
@@ -2939,6 +3718,71 @@ type MailingAddress {
   The zip or postal code of the address.
   """
   zip: String
+}
+
+"""
+A market is a group of one or more regions that you want to target for international sales.
+By creating a market, you can configure a distinct, localized shopping experience for
+customers from a specific area of the world. For example, you can
+[change currency](https://shopify.dev/api/admin-graphql/current/mutations/marketCurrencySettingsUpdate),
+[configure international pricing](https://shopify.dev/api/examples/product-price-lists),
+or [add market-specific domains or subfolders](https://shopify.dev/api/admin-graphql/current/objects/MarketWebPresence).
+"""
+type Market implements HasMetafields {
+  """
+  A human-readable unique string for the market automatically generated from its title.
+  """
+  handle: String!
+
+  """
+  A globally-unique identifier.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+
+  """
+  A geographic region which comprises a market.
+  """
+  regions: [MarketRegion!]!
+}
+
+"""
+Represents a region.
+"""
+interface MarketRegion {
+  """
+  The name of the region in the language of the current localization.
+  """
+  name: String
+}
+
+"""
+A country which comprises a market.
+"""
+type MarketRegionCountry implements MarketRegion {
+  """
+  The two-letter code for the country.
+  """
+  code: CountryCode!
+
+  """
+  The country name in the language of the current localization.
+  """
+  name: String!
 }
 
 """
@@ -2989,12 +3833,12 @@ completing checkout will be blocked.
 """
 input MustFulfillFrom {
   """
-  Ids of the deliverable lines for which the constraint is applied.
+  The IDs of the deliverable lines for which the constraint is applied.
   """
   deliverableLineIds: [ID!]!
 
   """
-  Ids of the locations for which the cart lines must fulfill from.
+  The IDs of the locations for which the cart lines must fulfill from.
   """
   locationIds: [ID!]!
 }
@@ -3006,7 +3850,7 @@ then checkout won't return any shipping rates and completing checkout will be bl
 """
 input MustFulfillFromSameLocation {
   """
-  Ids of the deliverable lines for which the constraint is applied.
+  The IDs of the deliverable lines for which the constraint is applied.
   """
   deliverableLineIds: [ID!]!
 }
@@ -3016,11 +3860,11 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the function result.
+  Handles the Function result.
   """
   handleResult(
     """
-    The result of the function.
+    The result of the Function.
     """
     result: FunctionResult!
   ): Void!
@@ -3124,15 +3968,20 @@ type Product implements HasGates & HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
   The product type specified by the merchant.
   """
   productType: String
+
+  """
+  The localized title of the product in the customer’s locale.
+  """
+  title: String!
 
   """
   The name of the product's vendor.
@@ -3159,9 +4008,9 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -3178,6 +4027,11 @@ type ProductVariant implements HasMetafields {
   An identifier for the product variant in the shop. Required in order to connect to a fulfillment service.
   """
   sku: String
+
+  """
+  The localized title of the product variant in the customer’s locale.
+  """
+  title: String
 
   """
   The weight of the product variant in the unit system specified with `weight_unit`.
@@ -3208,6 +4062,74 @@ type PurchasingCompany {
   The company location associated to the order or draft order.
   """
   location: CompanyLocation!
+}
+
+"""
+Represents how products and variants can be sold and purchased.
+"""
+type SellingPlan {
+  """
+  The description of the selling plan.
+  """
+  description: String
+
+  """
+  A globally-unique identifier.
+  """
+  id: ID!
+
+  """
+  The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.
+  """
+  name: String!
+
+  """
+  Whether purchasing the selling plan will result in multiple deliveries.
+  """
+  recurringDeliveries: Boolean!
+}
+
+"""
+Represents an association between a variant and a selling plan. Selling plan
+allocations describe the options offered for each variant, and the price of the
+variant when purchased with a selling plan.
+"""
+type SellingPlanAllocation {
+  """
+  A list of price adjustments, with a maximum of two. When there are two, the
+  first price adjustment goes into effect at the time of purchase, while the
+  second one starts after a certain number of orders. A price adjustment
+  represents how a selling plan affects pricing when a variant is purchased with
+  a selling plan. Prices display in the customer's currency if the shop is
+  configured for it.
+  """
+  priceAdjustments: [SellingPlanAllocationPriceAdjustment!]!
+
+  """
+  A representation of how products and variants can be sold and purchased. For
+  example, an individual selling plan could be '6 weeks of prepaid granola,
+  delivered weekly'.
+  """
+  sellingPlan: SellingPlan!
+}
+
+"""
+The resulting prices for variants when they're purchased with a specific selling plan.
+"""
+type SellingPlanAllocationPriceAdjustment {
+  """
+  The effective price for a single delivery. For example, for a prepaid
+  subscription plan that includes 6 deliveries at the price of $48.00, the per
+  delivery price is $8.00.
+  """
+  perDeliveryPrice: MoneyV2!
+
+  """
+  The price of the variant when it's purchased with a selling plan For example,
+  for a prepaid subscription plan that includes 6 deliveries of $10.00 granola,
+  where the customer gets 20% off, the price is 6 x $10.00 x 0.80 = $48.00.
+  """
+  price: MoneyV2!
 }
 
 """
