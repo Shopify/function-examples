@@ -58,7 +58,7 @@ fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
         .collect();
 
     Ok(output::FunctionResult {
-        operations: Some(cart_operations),
+        operations: cart_operations,
     })
 }
 
