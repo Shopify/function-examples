@@ -1,0 +1,29 @@
+query Input {
+  cart {
+    lines {
+      id
+    }
+  }
+  fulfillmentGroups {
+    id
+    locationHandles
+    lines {
+      id
+    }
+    deliveryGroup {
+      id
+    }
+  }
+  locations {
+    handle
+    name
+    address {
+      address1
+    }
+  }
+  deliveryOptionGenerator {
+    metafield: metafield(namespace: "$app:local-pickup-options-generator", key: "pickup-ids") {
+      value
+    }
+  }
+}
