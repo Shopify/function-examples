@@ -1,4 +1,4 @@
-api_version = "2023-04"
+api_version = "2023-07"
 name = "payment-customization-rust"
 type = "payment_customization"
 
