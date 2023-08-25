@@ -1,7 +1,7 @@
 name = "cart merge expand"
 type = "cart_transform"
 title = "cart merge expand"
-api_version = "unstable"
+api_version = "2023-07"
 
 [build]
 command = "cargo wasi build --release"
