@@ -290,7 +290,7 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -373,7 +373,7 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -382,6 +382,11 @@ type CompanyLocation implements HasMetafields {
   The name of the company location.
   """
   name: String!
+
+  """
+  The number of orders placed at this company location.
+  """
+  orderCount: Int!
 
   """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
@@ -2520,7 +2525,7 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2622,9 +2627,19 @@ type FulfillmentGroup {
   deliveryGroup: CartDeliveryGroup!
 
   """
+  The fulfillment group handle.
+  """
+  handle: Handle!
+
+  """
   The ID of the fulfillment group.
   """
   id: ID!
+
+  """
+  A list of inventory location handles for the fulfillment group.
+  """
+  inventoryLocationHandles: [Handle!]!
 
   """
   A list of inventory locations for the fulfillment group.
@@ -2639,7 +2654,12 @@ input FulfillmentGroupRankedLocations {
   """
   The identifier for the fulfillment group.
   """
-  fulfillmentGroupId: ID!
+  fulfillmentGroupHandle: Handle
+
+  """
+  The identifier for the fulfillment group.
+  """
+  fulfillmentGroupId: ID
 
   """
   The ranked locations for this fulfillment group.
@@ -2686,7 +2706,7 @@ type GateConfiguration implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2711,6 +2731,13 @@ type GateSubject {
   """
   id: ID!
 }
+
+"""
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
 
 """
 Gate subjects associated to the specified resource.
@@ -2741,7 +2768,7 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2815,6 +2842,11 @@ type Location implements HasMetafields {
   address: LocationAddress!
 
   """
+  The location handle.
+  """
+  handle: Handle!
+
+  """
   The location id.
   """
   id: ID!
@@ -2829,7 +2861,7 @@ type Location implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3009,7 +3041,7 @@ type Market implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3125,7 +3157,7 @@ type OrderRoutingLocationRule implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3210,7 +3242,7 @@ type Product implements HasGates & HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3250,7 +3282,7 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3311,9 +3343,14 @@ A location with a rank associated with it.
 """
 input RankedLocation {
   """
+  The location handle.
+  """
+  locationHandle: Handle
+
+  """
   The location ID.
   """
-  locationId: ID!
+  locationId: ID
 
   """
   The location's rank.
