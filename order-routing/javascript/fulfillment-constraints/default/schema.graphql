@@ -295,7 +295,7 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -378,7 +378,7 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -387,6 +387,11 @@ type CompanyLocation implements HasMetafields {
   The name of the company location.
   """
   name: String!
+
+  """
+  The number of orders placed at this company location.
+  """
+  orderCount: Int!
 
   """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
@@ -2535,7 +2540,7 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2641,7 +2646,7 @@ type FulfillmentConstraintRule implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2686,7 +2691,7 @@ type GateConfiguration implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2711,6 +2716,13 @@ type GateSubject {
   """
   id: ID!
 }
+
+"""
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
 
 """
 Gate subjects associated to the specified resource.
@@ -2741,7 +2753,7 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2790,7 +2802,7 @@ type Input {
   localization: Localization!
 
   """
-  The locations where the inventory items on this cart are stocked.
+  A list of all locations for the current shop.
   """
   locations(
     """
@@ -3555,6 +3567,11 @@ type Location implements HasMetafields {
   address: LocationAddress!
 
   """
+  The location handle.
+  """
+  handle: Handle!
+
+  """
   The location id.
   """
   id: ID!
@@ -3569,7 +3586,7 @@ type Location implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3749,7 +3766,7 @@ type Market implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3968,7 +3985,7 @@ type Product implements HasGates & HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -4008,7 +4025,7 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
