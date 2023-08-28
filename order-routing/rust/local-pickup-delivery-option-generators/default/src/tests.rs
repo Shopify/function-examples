@@ -16,7 +16,7 @@ fn test_result_contains_no_operations() -> Result<()> {
             },
             "fulfillmentGroups": [
               {
-                "id":  "gid://shopify/FulfillmentGroup/1",
+                "handle":  "1",
                 "lines": [
                   {
                     "id": "gid://shopify/CartLine/1"
@@ -46,7 +46,7 @@ fn test_result_contains_no_operations() -> Result<()> {
 
     let operations = vec![output::Operation {
         add: output::LocalPickupDeliveryOption {
-            fulfillment_group_ids: None,
+            fulfillment_group_handles: None,
             code: "Main St.".to_string(),
             title: "Main St.".to_string(),
             cost: Decimal(1.99),
