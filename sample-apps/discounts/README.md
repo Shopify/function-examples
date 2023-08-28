@@ -10,8 +10,8 @@ This is a template for building a [Shopify app](https://shopify.dev/docs/apps/ge
 ### Prerequisites
 
 1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
-1. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
-1. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
+2. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
+3. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
 
 <!-- TODO Make this section about using @shopify/app once it's added to the CLI. -->
 
@@ -54,7 +54,6 @@ npm run dev
 Using pnpm:
 
 ```shell
-pnpm run setup
 pnpm run dev
 ```
 
@@ -93,7 +92,7 @@ export async function loader({ request }) {
 This template come preconfigured with examples of:
 
 1. Setting up your Shopify app in [/app/shopify.server.js](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/shopify.server.js)
-2. Querying data using Graphql. Please see: [/app/routes/app.\_index.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/app._index.jsx).
+2. Querying data using Graphql. Please see: [/app/routes/app.\_index.jsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/app._index.jsx).
 3. Responding to mandatory webhooks in [/app/routes/webhooks.jsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/webhooks.jsx)
 
 Please read the [documentation for @shopify/shopify-app-remix](https://www.npmjs.com/package/@shopify/shopify-app-remix#authenticating-admin-requests) to understand what other API's are available.
@@ -172,7 +171,30 @@ Shopify apps are best when they are embedded into the Shopify Admin. This templa
 
 1. Remove the `<script/>` tag to App Bridge in `/app/routes/app.jsx`
 2. Remove any use of App Bridge APIs (`window.shopify`) from your code
-3. Update the config for shopifyApp in `app/shopify.server.js`. Pass `isEmbedded: false`
+3. Update the config for shopifyApp in `app/shopify.server.js`. Pass `isEmbeddedApp: false`
+
+### OAuth goes into a loop when I change my app's scopes
+
+If you change your app's scopes and notice that authentication goes into a loop and fails with a message from Shopify that it tried too many times, you might have forgotten to update your scopes with Shopify.
+To do that, you can run the `config push` CLI command.
+
+Using yarn:
+
+```shell
+yarn shopify app config push
+```
+
+Using npm:
+
+```shell
+npm run shopify app config push
+```
+
+Using pnpm:
+
+```shell
+pnpm run shopify app config push
+```
 
 ## Benefits
 
@@ -187,8 +209,7 @@ The Remix app template comes with the following out-of-the-box functionality:
 - [GraphQL Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-graphql-api): Querying or mutating Shopify admin data
 - [REST Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-rest-api): Resource classes to interact with the API
 - [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [AppBridge](https://shopify.dev/docs/apps/tools/app-bridge): This template uses the next generation of the Shopify App Bridge library.
-  - This library is currently in development and works in unison with the current Shopify App Bridge library.
+- [AppBridge](https://shopify.dev/docs/api/app-bridge): This template uses the next generation of the Shopify App Bridge library which works in unison with previous versions.
 - [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
 
 ## Tech Stack
