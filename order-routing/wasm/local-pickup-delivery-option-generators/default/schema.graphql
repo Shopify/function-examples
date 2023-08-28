@@ -1,3 +1,10 @@
+# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
+# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
+#
+# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
+# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
+# Check out the "Docs" tab in the top right.
+
 schema {
   query: Input
   mutation: MutationRoot
@@ -387,6 +394,11 @@ type CompanyLocation implements HasMetafields {
   The name of the company location.
   """
   name: String!
+
+  """
+  The number of orders placed at this company location.
+  """
+  orderCount: Int!
 
   """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
@@ -2663,9 +2675,9 @@ type FulfillmentGroup {
   deliveryGroup: CartDeliveryGroup!
 
   """
-  The ID of the fulfillment group.
+  The fulfillment group handle.
   """
-  id: ID!
+  handle: Handle!
 
   """
   The merchandise in the fulfillment group.
@@ -2673,7 +2685,7 @@ type FulfillmentGroup {
   lines: [CartLine!]!
 
   """
-  A list of location short IDs that can fulfill items in the fulfillment group.
+  A list of location handles that can fulfill items in the fulfillment group.
   """
   locationHandles: [Handle!]!
 }
@@ -3705,9 +3717,9 @@ input LocalPickupDeliveryOption {
   cost: Decimal!
 
   """
-  The fulfillment group IDs that this delivery option is limited to. Defaults to all groups.
+  The fulfillment group handles that this delivery option is limited to. Defaults to all groups.
   """
-  fulfillmentGroupIds: [ID!]
+  fulfillmentGroupHandles: [Handle!]
 
   """
   The additional metadata associate with a delivery option.
@@ -3976,8 +3988,7 @@ The entity that manages a particular market.
 type MarketManager {
   """
   The identity of the manager. This can either be `merchant` if the market is
-  manually managed by the merchant, `shopify` if the market is automatically
-  managed by Shopify, or an ID of the app responsible for managing the market.
+  manually managed by the merchant or an ID of the app responsible for managing the market.
   """
   identifier: String!
 }
@@ -4095,7 +4106,7 @@ input Operation {
 
 input PickupLocation {
   """
-  The location short id of the pickup in-store location.
+  The location handle of the pickup in-store location.
   """
   locationHandle: Handle!
 

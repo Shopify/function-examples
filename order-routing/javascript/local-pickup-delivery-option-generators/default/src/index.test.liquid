@@ -18,7 +18,7 @@ describe('local pickup delivery option generator function', () => {
       },
       fulfillmentGroups: [
         {
-          id:  "gid://shopify/FulfillmentGroup/1",
+          handle:  "1",
           lines: [
             {
               id: "gid://shopify/CartLine/1"
@@ -47,7 +47,7 @@ describe('local pickup delivery option generator function', () => {
       operations: [
         {
           add: {
-            fulfillmentGroupIds: [""gid://shopify/FulfillmentGroup/1""],
+            fulfillmentGroupHandles: ["1"],
             code: "pickup-1",
             title: "Main St."
             cost: 1.99,
@@ -81,7 +81,7 @@ describe('local pickup delivery option generator function', () => {
       },
       fulfillmentGroups: [
         {
-          id:  "gid://shopify/FulfillmentGroup/1",
+          handle:  "1",
           lines: [
             {
               id: "gid://shopify/CartLine/1"
@@ -110,7 +110,7 @@ describe('local pickup delivery option generator function', () => {
       operations: [
         {
           add: {
-            fulfillmentGroupIds: [""gid://shopify/FulfillmentGroup/1""],
+            fulfillmentGroupHandles: ["1"],
             code: "pickup-1",
             title: "Main St."
             cost: 1.99,
