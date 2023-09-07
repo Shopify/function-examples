@@ -1,0 +1,38 @@
+{%- if flavor contains "vanilla-js" -%}
+import { describe, it, expect } from 'vitest';
+import checkoutCompletionTargetCustomization from './index';
+
+/**
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+describe('checkout completion target customization function', () => {
+  it('returns no operations without configuration', () => {
+    const result = checkoutCompletionTargetCustomization({
+      checkoutCompletionTargetCustomization: {
+        metafield: null
+      }
+    });
+    const expected = /** @type {FunctionResult} */ ({ operations: [] });
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- elsif flavor contains "typescript" -%}
+import { describe, it, expect } from 'vitest';
+import checkoutCompletionTargetCustomization from './index';
+import { FunctionResult } from '../generated/api';
+
+describe('checkout completion target customization function', () => {
+  it('returns no operations without configuration', () => {
+    const result = checkoutCompletionTargetCustomization({
+      checkoutCompletionTargetCustomization: {
+        metafield: null
+      }
+    });
+    const expected: FunctionResult = { operations: [] };
+
+    expect(result).toEqual(expected);
+  });
+});
+{% endif -%}

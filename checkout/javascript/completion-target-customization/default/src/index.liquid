@@ -1,0 +1,45 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+/**
+ * @typedef {import("../generated/api").InputQuery} InputQuery
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+/**
+ * @type {FunctionResult}
+ */
+const NO_CHANGES = {
+  operations: [],
+};
+
+export default /**
+ * @param {InputQuery} input
+ * @returns {FunctionResult}
+ */
+(input) => {
+  const configuration = JSON.parse(
+    input?.checkoutCompletionTargetCustomization?.metafield?.value ?? "{}"
+  );
+
+  return NO_CHANGES;
+};
+{%- elsif flavor contains "typescript" -%}
+import {
+  InputQuery,
+  FunctionResult,
+} from "../generated/api";
+
+const NO_CHANGES: FunctionResult = {
+  operations: [],
+};
+
+type Configuration = {};
+
+export default (input: InputQuery): FunctionResult => {
+  const configuration: Configuration = JSON.parse(
+    input?.checkoutCompletionTargetCustomization?.metafield?.value ?? "{}"
+  );
+  return NO_CHANGES;
+};
+{%- endif -%}
