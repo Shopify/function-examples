@@ -8,12 +8,8 @@ fn test_result_ranks_all_locations_zero() -> Result<()> {
         r#"
             {
                 "fulfillmentGroups": [{
-                    "id": "gid://shopify/FulfillmentGroup/123",
-                    "inventoryLocations": [{
-                        "location": {
-                            "id": "gid://shopify/Location/456"
-                        }
-                    }]
+                    "handle": "123",
+                    "inventoryLocationHandles": ["456"]
                 }]
             }
         "#,
@@ -21,9 +17,9 @@ fn test_result_ranks_all_locations_zero() -> Result<()> {
     let expected = output::FunctionResult {
         operations: vec![output::Operation {
             rank: output::FulfillmentGroupRankedLocations {
-                fulfillment_group_id: "gid://shopify/FulfillmentGroup/123".to_string(),
+                fulfillment_group_handle: "123".to_string(),
                 rankings: vec![output::RankedLocation {
-                    location_id: "gid://shopify/Location/456".to_string(),
+                    location_handle: "456".to_string(),
                     rank: 0,
                 }],
             },
