@@ -10,20 +10,16 @@ describe('order routing location rule function', () => {
   it('returns rank operations with all locations rank 0', () => {
     const result = orderRoutingLocationRule({
       "fulfillmentGroups": [{
-          "id": "gid://shopify/FulfillmentGroup/123",
-          "inventoryLocations": [{
-              "location": {
-                  "id": "gid://shopify/Location/456",
-              }
-          }]
+          "handle": "123",
+          "inventoryLocationHandles": ["456"]
       }]
     });
     const expected = /** @type {FunctionResult} */ ({
       operations: [{
         rank: {
-          fulfillmentGroupId: "gid://shopify/FulfillmentGroup/123",
+          fulfillmentGroupHandle: "123",
           rankings: [{
-            locationId: "gid://shopify/Location/456",
+            locationHandle: "456",
             rank: 0
           }]
         }
@@ -42,20 +38,16 @@ describe('order routing location rule function', () => {
   it('returns rank operations with all locations rank 0', () => {
     const result = orderRoutingLocationRule({
       fulfillmentGroups: [{
-          id: "gid://shopify/FulfillmentGroup/123",
-          inventoryLocations: [{
-              location: {
-                  id: "gid://shopify/Location/456",
-              }
-          }]
+          handle: "123",
+          inventoryLocationHandles: ["456"]
       }]
     });
     const expected: FunctionResult = {
       operations: [{
         rank: {
-          fulfillmentGroupId: "gid://shopify/FulfillmentGroup/123",
+          fulfillmentGroupHandle: "123",
           rankings: [{
-            locationId: "gid://shopify/Location/456",
+            locationHandle: "456",
             rank: 0
           }]
         }
