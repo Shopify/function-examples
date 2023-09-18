@@ -16,14 +16,12 @@ fn function(_input: input::ResponseData) -> Result<output::FunctionResult> {
     let operations = vec![output::Operation {
         add: output::LocalPickupDeliveryOption {
             fulfillment_group_handles: None,
-            code: "Main St.".to_string(),
-            title: "Main St.".to_string(),
-            cost: Decimal(1.99),
+            title: Some("Main St.".to_string()),
+            cost: Some(Decimal(1.99)),
             pickup_location: output::PickupLocation {
                 location_handle: "2578303".to_string(),
                 pickup_instruction: Some("Usually ready in 24 hours.".to_string()),
             },
-            metadata: None,
         },
     }];
 
