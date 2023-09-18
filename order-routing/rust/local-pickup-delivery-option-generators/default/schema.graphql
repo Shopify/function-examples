@@ -1,10 +1,3 @@
-# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
-# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
-#
-# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
-# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
-# Check out the "Docs" tab in the top right.
-
 schema {
   query: Input
   mutation: MutationRoot
@@ -58,6 +51,13 @@ type BuyerIdentity {
   The purchasing company associated with the cart.
   """
   purchasingCompany: PurchasingCompany
+
+  """
+  Represents the [Shop User](https://help.shopify.com/en/manual/online-sales-channels/shop/sign-in-features)
+   corresponding to the customer within the shop, if the buyer is a Shop User. Can be used to request [Shop User
+   metafields](https://shopify.dev/docs/api/shop-user-custom-data).
+  """
+  shopUser: ShopUser
 }
 
 """
@@ -2564,11 +2564,25 @@ type Customer implements HasMetafields {
 }
 
 """
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date string.
+For example, September 7, 2019 is represented as `"2019-07-16"`.
+"""
+scalar Date
+
+"""
 Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
 For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
 represented as `"2019-09-07T15:50:00Z`".
 """
 scalar DateTime
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the date and time but not the timezone which is determined from context.
+
+For example, "2018-01-01T00:00:00".
+"""
+scalar DateTimeWithoutTimezone
 
 """
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
@@ -2701,9 +2715,9 @@ input FunctionFetchResult {
 }
 
 """
-The result of a local pickup delivery option generator function.
+The result of a local pickup delivery option generator function. This type is deprecated in favor of `FunctionRunResult`.
 """
-input FunctionGenerateResult {
+input FunctionResult {
   """
   The ordered list of operations to apply for local pickup delivery option generation.
   """
@@ -2713,7 +2727,7 @@ input FunctionGenerateResult {
 """
 The result of a local pickup delivery option generator function.
 """
-input FunctionResult {
+input FunctionRunResult {
   """
   The ordered list of operations to apply for local pickup delivery option generation.
   """
@@ -2959,7 +2973,7 @@ type Input {
   """
   The HTTP response of the HTTP request
   """
-  fetchResult: HttpResponse @restrictTarget(only: ["purchase.local-pickup-delivery-option.generate"])
+  fetchResult: HttpResponse @restrictTarget(only: ["purchase.local-pickup-delivery-option-generator.run"])
 
   """
   A list of fulfillment groups.
@@ -2980,6 +2994,11 @@ type Input {
   The conversion rate between the shop's currency and the currency of the cart.
   """
   presentmentCurrencyRate: Decimal!
+
+  """
+  Information about the shop.
+  """
+  shop: Shop!
 }
 
 """
@@ -3707,24 +3726,14 @@ A local pickup delivery option.
 """
 input LocalPickupDeliveryOption {
   """
-  The code of the delivery option.
+  The cost of the delivery option in the currency of the cart. Defaults to zero.
   """
-  code: String!
-
-  """
-  The cost of the delivery option in the currency of the cart.
-  """
-  cost: Decimal!
+  cost: Decimal
 
   """
   The fulfillment group handles that this delivery option is limited to. Defaults to all groups.
   """
   fulfillmentGroupHandles: [Handle!]
-
-  """
-  The additional metadata associate with a delivery option.
-  """
-  metadata: String
 
   """
   The pickup location.
@@ -3734,7 +3743,87 @@ input LocalPickupDeliveryOption {
   """
   The title of the delivery option.
   """
-  title: String!
+  title: String
+}
+
+"""
+Represents limited information about the current time relative to the parent object.
+"""
+type LocalTime {
+  """
+  The current date relative to the parent object.
+  """
+  date: Date!
+
+  """
+  Returns true if the current date and time is at or past the given date and time, and false otherwise.
+  """
+  dateTimeAfter(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent object.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is before the given date and time, and false otherwise.
+  """
+  dateTimeBefore(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is between the two given date and times, and false otherwise.
+  """
+  dateTimeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endDateTime: DateTimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startDateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeAfter(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeBefore(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is between the two given times, and false otherwise.
+  """
+  timeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endTime: TimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startTime: TimeWithoutTimezone!
+  ): Boolean!
 }
 
 """
@@ -3832,12 +3921,12 @@ type LocationAddress {
   formatted: [String!]!
 
   """
-  The latitude coordinates of the location.
+  The approximate latitude coordinates of the location.
   """
   latitude: Float
 
   """
-  The longitude coordinates of the location.
+  The approximate longitude coordinates of the location.
   """
   longitude: Float
 
@@ -4064,23 +4153,13 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result for the purchase.local-pickup-delivery-option.fetch target.
+  Handles the Function result for the purchase.local-pickup-delivery-option-generator.fetch target.
   """
   fetch(
     """
     The result of the Function.
     """
     result: FunctionFetchResult!
-  ): Void!
-
-  """
-  Handles the Function result for the purchase.local-pickup-delivery-option.generate target.
-  """
-  generate(
-    """
-    The result of the Function.
-    """
-    result: FunctionGenerateResult!
   ): Void!
 
   """
@@ -4091,6 +4170,16 @@ type MutationRoot {
     The result of the Function.
     """
     result: FunctionResult!
+  ): Void! @deprecated(reason: "Use the target-specific field instead.")
+
+  """
+  Handles the Function result for the purchase.local-pickup-delivery-option-generator.run target.
+  """
+  run(
+    """
+    The result of the Function.
+    """
+    result: FunctionRunResult!
   ): Void!
 }
 
@@ -4359,6 +4448,58 @@ type SellingPlanAllocationPriceAdjustment {
   """
   price: MoneyV2!
 }
+
+"""
+Information about the shop.
+"""
+type Shop implements HasMetafields {
+  """
+  Information about the current time relative to the shop's timezone setting.
+  """
+  localTime: LocalTime!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
+type ShopUser implements HasMetafields {
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the time but not the date or timezone which is determined from context.
+For example, "05:43:21".
+"""
+scalar TimeWithoutTimezone
 
 """
 Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) and
