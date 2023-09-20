@@ -2,6 +2,11 @@ name = "{{name}}"
 type = "function"
 api_version = "unstable"
 
+[[targeting]]
+target = "purchase.checkout-completion-target-customization.run"
+input_query = "input.graphql"
+export = "run"
+
 [build]
 command = "echo 'build the wasm'"
 

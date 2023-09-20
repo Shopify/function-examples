@@ -13,11 +13,11 @@ const NO_CHANGES = {
   operations: [],
 };
 
-export default /**
+/**
  * @param {InputQuery} input
  * @returns {FunctionResult}
  */
-(input) => {
+export function run(input) {
   const configuration = JSON.parse(
     input?.checkoutCompletionTargetCustomization?.metafield?.value ?? "{}"
   );
