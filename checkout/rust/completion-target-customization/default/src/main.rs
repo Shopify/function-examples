@@ -19,7 +19,7 @@ impl Configuration {
 }
 
 #[shopify_function]
-fn function(input: input::ResponseData) -> Result<output::FunctionResult> {
+fn run(input: input::ResponseData) -> Result<output::FunctionResult> {
     let no_changes = output::FunctionResult { operations: vec![] };
 
     let _config = match input.checkout_completion_target_customization.metafield {
