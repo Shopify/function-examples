@@ -1,11 +1,19 @@
-name = "product-discount-js"
-type = "product_discounts"
-api_version = "2023-07"
+api_version = "2023-10"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+[[extensions]]
+name = "Product Discount"
+handle = "product-discount-js"
+type = "function"
 
-[ui.paths]
-create = "/app/volume-discount/:functionId/new"
-details = "/app/volume-discount/:functionId/:id"
+  [[extensions.targeting]]
+  target = "purchase.product-discount.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/app/volume-discount/:functionId/new"
+  details = "/app/volume-discount/:functionId/:id"

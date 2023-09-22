@@ -1,4 +1,4 @@
-query Input {
+query Run {
   cart {
     lines {
       quantity

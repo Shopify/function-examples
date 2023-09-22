@@ -9,6 +9,6 @@
       "discounts/rust/product-discounts/fixed-amount/Cargo.toml",
       "discounts/rust/shipping-discounts/default/Cargo.toml",
       "discounts/rust/shipping-discounts/fixed-amount/Cargo.toml",
-      "sample-apps/discounts/extensions/product-discount/Cargo.toml"
+      "sample-apps/discounts/extensions/product-discount-rust/Cargo.toml"
     ]
   }

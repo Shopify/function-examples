@@ -10,3 +10,8 @@ exclude = [
     "sample-apps/payment-customizations/extensions/payment-customization-js/",
     "sample-apps/bundles-cart-transform/extensions/cart-expand-js/",
 ]
+
+[profile.release]
+lto = true
+opt-level = 'z'
+strip = true

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DiscountApplicationStrategy } from '../generated/api';
-import productDiscount from './index';
+import { run as productDiscount } from './run';
 
 /**
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
