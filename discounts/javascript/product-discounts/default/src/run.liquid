@@ -27,9 +27,11 @@ export function run(input) {
   return EMPTY_DISCOUNT;
 };
 {%- elsif flavor contains "typescript" -%}
-import {
+import type {
   Input,
-  FunctionRunResult,
+  FunctionRunResult
+} from "../generated/api";
+import {
   DiscountApplicationStrategy,
 } from "../generated/api";
 
