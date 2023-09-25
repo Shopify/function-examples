@@ -15,9 +15,11 @@ node_modules
 **/shopify.extension.toml
 */javascript/**/package.json
 */javascript/**/src/*
+**/locales/*.json
 !*/javascript/**/src/*.liquid
 !sample-apps/**/input.graphql
 !sample-apps/**/shopify.extension.toml
+!sample-apps/**/locales/*.json
 
 ## Sample Apps
 sample-apps/*/web/frontend/metafields.js

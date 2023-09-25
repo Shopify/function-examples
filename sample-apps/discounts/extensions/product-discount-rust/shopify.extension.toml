@@ -13,7 +13,7 @@ type = "function"
 
   [extensions.build]
   command = "cargo wasi build --release"
-  path = "target/wasm32-wasi/release/product-discount.wasm"
+  path = "target/wasm32-wasi/release/product-discount-rust.wasm"
   watch = ["src/**/*.rs"]
 
   [extensions.ui.paths]
