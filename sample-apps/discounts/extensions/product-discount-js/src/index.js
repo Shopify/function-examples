@@ -1,2 +1,1 @@
-import { run } from "./run";
-export { run };
+export * from './run';
