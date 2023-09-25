@@ -16,6 +16,8 @@ node_modules
 */javascript/**/package.json
 */javascript/**/src/*
 */rust/**/src/*.graphql
+*/wasm/**/*.graphql
+!*/wasm/**/schema.graphql
 **/locales/*.json
 !*/javascript/**/src/*.liquid
 !sample-apps/**/input.graphql
