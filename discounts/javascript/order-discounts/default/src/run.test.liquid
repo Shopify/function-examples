@@ -1,6 +1,6 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import orderDiscounts from './index';
+import { run } from './index';
 
 /**
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
@@ -8,7 +8,7 @@ import orderDiscounts from './index';
 
 describe('order discounts function', () => {
   it('returns no discounts without configuration', () => {
-    const result = orderDiscounts({
+    const result = run({
       discountNode: {
         metafield: null
       }
@@ -23,12 +23,12 @@ describe('order discounts function', () => {
 });
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import orderDiscounts from './index';
+import { run } from './index';
 import { FunctionResult, DiscountApplicationStrategy } from '../generated/api';
 
 describe('order discounts function', () => {
   it('returns no discounts without configuration', () => {
-    const result = orderDiscounts({
+    const result = run({
       discountNode: {
         metafield: null
       }
