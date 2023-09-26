@@ -2,7 +2,7 @@
 import { DiscountApplicationStrategy } from "../generated/api";
 
 /**
- * @typedef {import("../generated/api").Run} Input
+ * @typedef {import("../generated/api").RunInput} RunInput
  * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  * @typedef {import("../generated/api").Target} Target
  * @typedef {import("../generated/api").ProductVariant} ProductVariant
@@ -17,7 +17,7 @@ const EMPTY_DISCOUNT = {
 };
 
 /**
- * @param {Input} input
+ * @param {RunInput} input
  * @returns {FunctionRunResult}
  */
 export function run(input) {
