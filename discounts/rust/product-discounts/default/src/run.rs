@@ -14,8 +14,8 @@ impl Configuration {
 }
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::FunctionResult> {
-    let no_discount = output::FunctionResult {
+fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
+    let no_discount = output::FunctionRunResult {
         discounts: vec![],
         discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
     };
@@ -25,17 +25,38 @@ fn run(input: input::ResponseData) -> Result<output::FunctionResult> {
         None => return Ok(no_discount),
     };
 
-    Ok(output::FunctionResult {
+    Ok(output::FunctionRunResult {
         discounts: vec![],
         discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
     })
 }
 
-/*
- * unresolved module, can't find module file: run/tests.rs, or run/tests/mod.rs
- * TODO: Should we move the tests inline, since that's more standard for Rust?
-
 #[cfg(test)]
-mod tests;
+mod tests {
+    use super::*;
+    use shopify_function::{run_function_with_input, Result};
 
-*/
+    #[test]
+    fn test_result_contains_no_discounts() -> Result<()> {
+        use run::output::*;
+
+        let result = run_function_with_input(
+            run,
+            r#"
+                {
+                    "discountNode": {
+                        "metafield": null
+                    }
+                }
+            "#,
+        )?;
+        let expected = FunctionRunResult {
+            discounts: vec![],
+            discount_application_strategy: DiscountApplicationStrategy::FIRST,
+        };
+    
+        assert_eq!(result, expected);
+        Ok(())
+    }
+    
+}

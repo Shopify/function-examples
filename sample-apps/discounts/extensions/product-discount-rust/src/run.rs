@@ -74,11 +74,127 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
     })
 }
 
-/*
- * unresolved module, can't find module file: run/tests.rs, or run/tests/mod.rs
- * TODO: Should we move the tests inline, since that's more standard for Rust?
-
 #[cfg(test)]
-mod tests;
+mod tests {
+    use super::*;
+    use shopify_function::{run_function_with_input, Result};
 
-*/
+    #[test]
+    fn test_no_metafield_result_contains_no_discounts() -> Result<()> {
+        let result = run_function_with_input(
+            run,
+            r#"
+                {
+                    "cart": {
+                        "lines": [
+                            {
+                                "quantity": 10,
+                                "merchandise": {
+                                    "__typename": "ProductVariant",
+                                    "id": "gid://shopify/ProductVariant/123456789"
+                                }
+                            }
+                        ]
+                    },
+                    "discountNode": {
+                        "metafield": null
+                    }
+                }
+            "#,
+        )?;
+        let expected = 0;
+    
+        assert_eq!(result.discounts.len(), expected);
+        Ok(())
+    }
+    
+    #[test]
+    fn test_quantity_unmet_result_contains_no_discounts() -> Result<()> {
+        let result = run_function_with_input(
+            run,
+            r#"
+                {
+                    "cart": {
+                        "lines": [
+                            {
+                                "quantity": 1,
+                                "merchandise": {
+                                    "__typename": "ProductVariant",
+                                    "id": "gid://shopify/ProductVariant/123456789"
+                                }
+                            }
+                        ]
+                    },
+                    "discountNode": {
+                        "metafield": {
+                            "value": "{\"quantity\":2,\"percentage\":5}"
+                        }
+                    }
+                }
+            "#,
+        )?;
+        let expected = 0;
+    
+        assert_eq!(result.discounts.len(), expected);
+        Ok(())
+    }
+    
+    #[test]
+    fn test_quantity_met_discounts_variants() -> Result<()> {
+        use run::output::*;
+
+        let result = run_function_with_input(
+            run,
+            r#"
+                {
+                    "cart": {
+                        "lines": [
+                            {
+                                "quantity": 2,
+                                "merchandise": {
+                                    "__typename": "ProductVariant",
+                                    "id": "gid://shopify/ProductVariant/123456789"
+                                }
+                            },
+                            {
+                                "quantity": 3,
+                                "merchandise": {
+                                    "__typename": "ProductVariant",
+                                    "id": "gid://shopify/ProductVariant/987654321"
+                                }
+                            }
+                        ]
+                    },
+                    "discountNode": {
+                        "metafield": {
+                            "value": "{\"quantity\":2,\"percentage\":5}"
+                        }
+                    }
+                }
+            "#,
+        )?;
+        let expected = FunctionRunResult {
+            discount_application_strategy: DiscountApplicationStrategy::FIRST,
+            discounts: vec![Discount {
+                message: None,
+                targets: vec![
+                    Target::ProductVariant(ProductVariantTarget {
+                        id: "gid://shopify/ProductVariant/123456789".to_string(),
+                        quantity: None,
+                    }),
+                    Target::ProductVariant(ProductVariantTarget {
+                        id: "gid://shopify/ProductVariant/987654321".to_string(),
+                        quantity: None,
+                    }),
+                ],
+                value: Value::Percentage(Percentage {
+                    value: Decimal(5f64),
+                }),
+            }],
+        };
+    
+        assert_eq!(result, expected);
+        Ok(())
+    }
+    
+}
