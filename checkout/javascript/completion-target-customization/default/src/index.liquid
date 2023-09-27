@@ -36,7 +36,7 @@ const NO_CHANGES: FunctionResult = {
 
 type Configuration = {};
 
-export default (input: InputQuery): FunctionResult => {
+export function run(input: InputQuery): FunctionResult {
   const configuration: Configuration = JSON.parse(
     input?.checkoutCompletionTargetCustomization?.metafield?.value ?? "{}"
   );
