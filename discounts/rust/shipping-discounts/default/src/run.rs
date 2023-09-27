@@ -35,7 +35,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
 mod tests {
     use super::*;
     use shopify_function::{run_function_with_input, Result};
-    
+
     #[test]
     fn test_result_contains_no_discounts() -> Result<()> {
         use run::output::*;
@@ -54,7 +54,7 @@ mod tests {
             discounts: vec![],
             discount_application_strategy: DiscountApplicationStrategy::FIRST,
         };
-    
+
         assert_eq!(result, expected);
         Ok(())
     }

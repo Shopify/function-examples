@@ -103,11 +103,11 @@ mod tests {
             "#,
         )?;
         let expected = 0;
-    
+
         assert_eq!(result.discounts.len(), expected);
         Ok(())
     }
-    
+
     #[test]
     fn test_quantity_unmet_result_contains_no_discounts() -> Result<()> {
         let result = run_function_with_input(
@@ -134,11 +134,11 @@ mod tests {
             "#,
         )?;
         let expected = 0;
-    
+
         assert_eq!(result.discounts.len(), expected);
         Ok(())
     }
-    
+
     #[test]
     fn test_quantity_met_discounts_variants() -> Result<()> {
         use run::output::*;
@@ -192,9 +192,8 @@ mod tests {
                 }),
             }],
         };
-    
+
         assert_eq!(result, expected);
         Ok(())
     }
-    
 }

@@ -54,9 +54,8 @@ mod tests {
             discounts: vec![],
             discount_application_strategy: DiscountApplicationStrategy::FIRST,
         };
-    
+
         assert_eq!(result, expected);
         Ok(())
     }
-    
 }
