@@ -1,6 +1,6 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import checkoutCompletionTargetCustomization from './index';
+import { run } from './index';
 
 /**
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
@@ -8,7 +8,7 @@ import checkoutCompletionTargetCustomization from './index';
 
 describe('checkout completion target customization function', () => {
   it('returns no operations without configuration', () => {
-    const result = checkoutCompletionTargetCustomization({
+    const result = run({
       checkoutCompletionTargetCustomization: {
         metafield: null
       }
@@ -20,12 +20,12 @@ describe('checkout completion target customization function', () => {
 });
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import checkoutCompletionTargetCustomization from './index';
+import { run } from './index';
 import { FunctionResult } from '../generated/api';
 
 describe('checkout completion target customization function', () => {
   it('returns no operations without configuration', () => {
-    const result = checkoutCompletionTargetCustomization({
+    const result = run({
       checkoutCompletionTargetCustomization: {
         metafield: null
       }
