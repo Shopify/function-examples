@@ -21,47 +21,47 @@ const EMPTY_DISCOUNT = {
  * @returns {FunctionRunResult}
  */
 export function run(input) {
-    /**
-     * @type {{
-    *   quantity: number
-    *   percentage: number
-    * }}
-    */
-    const configuration = JSON.parse(
-      input?.discountNode?.metafield?.value ?? "{}"
-    );
-    if (!configuration.quantity || !configuration.percentage) {
-      return EMPTY_DISCOUNT;
-    }
+  /**
+   * @type {{
+  *   quantity: number
+  *   percentage: number
+  * }}
+  */
+  const configuration = JSON.parse(
+    input?.discountNode?.metafield?.value ?? "{}"
+  );
+  if (!configuration.quantity || !configuration.percentage) {
+    return EMPTY_DISCOUNT;
+  }
 
-    const targets = input.cart.lines
-      .filter(line => line.quantity >= configuration.quantity &&
-        line.merchandise.__typename == "ProductVariant")
-      .map(line => {
-        const variant = /** @type {ProductVariant} */ (line.merchandise);
-        return /** @type {Target} */ ({
-          productVariant: {
-            id: variant.id
-          }
-        });
+  const targets = input.cart.lines
+    .filter(line => line.quantity >= configuration.quantity &&
+      line.merchandise.__typename == "ProductVariant")
+    .map(line => {
+      const variant = /** @type {ProductVariant} */ (line.merchandise);
+      return /** @type {Target} */ ({
+        productVariant: {
+          id: variant.id
+        }
       });
+    });
 
-    if (!targets.length) {
-      console.error("No cart lines qualify for volume discount.");
-      return EMPTY_DISCOUNT;
-    }
+  if (!targets.length) {
+    console.error("No cart lines qualify for volume discount.");
+    return EMPTY_DISCOUNT;
+  }
 
-    return {
-      discounts: [
-        {
-          targets,
-          value: {
-            percentage: {
-              value: configuration.percentage.toString()
-            }
+  return {
+    discounts: [
+      {
+        targets,
+        value: {
+          percentage: {
+            value: configuration.percentage.toString()
           }
         }
-      ],
-      discountApplicationStrategy: DiscountApplicationStrategy.First
-    };
+      }
+    ],
+    discountApplicationStrategy: DiscountApplicationStrategy.First
   };
+};
