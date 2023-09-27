@@ -75,18 +75,19 @@ async function expandExtensionLiquidTemplates(domainName, flavor) {
         const templatePath = path.join(extensionTypePath, templateName);
 
         if (langName === "javascript") {
-          await (await glob(path.join(templatePath, 'src', '!(*.liquid)'))).forEach(async (path) => await fs.rm(path));
+          await (await glob(path.join(templatePath, 'src', '!(*.liquid|*.graphql)'))).forEach(async (path) => await fs.rm(path));
         }
 
         const liquidData = {
           name: `${domainName}-${extensionTypeName}-${templateName}`,
+          handle: `${domainName}-${extensionTypeName}-${templateName}`,
           flavor,
         };
 
         await expandLiquidTemplates(templatePath, liquidData);
 
         if (langName === "javascript") {
-          const srcFilePaths = await glob(path.join(templatePath, 'src', '!(*.liquid)'))
+          const srcFilePaths = await glob(path.join(templatePath, 'src', '!(*.liquid|*.graphql)'))
           const srcFileExtensionsToChange = []
 
           const fileExtension = flavor === "typescript" ? "ts" : "js";
