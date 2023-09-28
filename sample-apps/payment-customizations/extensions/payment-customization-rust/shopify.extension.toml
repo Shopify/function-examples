@@ -19,4 +19,3 @@ type = "function"
   [extensions.ui.paths]
   create = "/app/payment-customization/:functionId/new"
   details = "/app/payment-customization/:functionId/:id"
-  
