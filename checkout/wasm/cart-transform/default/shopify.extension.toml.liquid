@@ -1,7 +1,21 @@
-name = "cart transform"
-type = "cart_transform"
-title = "cart transform"
-api_version = "2023-07"
+api_version = "2023-10"
 
-[build]
-command = "echo 'build the wasm'"
+[[extensions]]
+handle = "{{handle}}"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "echo 'build the wasm'"
+  path = ""
+  watch = []
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
