@@ -1,20 +1,11 @@
-api_version = "2023-10"
+name = "{{name}}"
+type = "order_discounts"
+api_version = "2023-07"
 
-[[extensions]]
-handle = "{{handle}}"
-name = "t:name"
-description = "t:description"
-type = "function"
+[build]
+command = ""
+path = "dist/function.wasm"
 
-  [[extensions.targeting]]
-  target = "purchase.payment-customization.run"
-  input_query = "src/run.graphql"
-  export = "run"
-
-  [extensions.build]
-  command = ""
-  path = "dist/function.wasm"
-
-  [extensions.ui.paths]
-  create = "/"
-  details = "/"
+[ui.paths]
+create = "/"
+details = "/"
