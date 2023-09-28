@@ -1,11 +1,21 @@
-api_version = "2023-07"
-name = "delivery-customization-rust"
-type = "delivery_customization"
+api_version = "2023-10"
 
-[build]
-command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/delivery-customization-rust.wasm"
+[[extensions]]
+handle = "delivery-customization-rust"
+name = "t:name"
+description = "t:description"
+type = "function"
 
-[ui.paths]
-create = "/app/delivery-customization/:functionId/new"
-details = "/app/delivery-customization/:functionId/:id"
+  [[extensions.targeting]]
+  target = "purchase.delivery-customization.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/delivery-customization-rust.wasm"
+  watch = [ "src/**/*.rs" ]
+
+  [extensions.ui.paths]
+  create = "/app/delivery-customization/:functionId/new"
+  details = "/app/delivery-customization/:functionId/:id"

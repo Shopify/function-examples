@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import deliveryCustomization from './index';
+import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  */
 
 describe('delivery customization function', () => {
     it('returns no operations without configuration', () => {
-        const result = deliveryCustomization({
+        const result = run({
             "cart": {
                 "deliveryGroups": []
             },
@@ -15,13 +15,13 @@ describe('delivery customization function', () => {
                 "metafield": null
             }
         });
-        const expected = /** @type {FunctionResult} */ ({ operations: [] });
+        const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
 
         expect(result).toEqual(expected);
     });
 
     it('renames delivery options if state/province matches', () => {
-        const result = deliveryCustomization({
+        const result = run({
             "cart": {
                 "deliveryGroups": [{
                     "deliveryAddress": {
@@ -42,7 +42,7 @@ describe('delivery customization function', () => {
                 }
             }
         });
-        const expected = /** @type {FunctionResult} */ ({
+        const expected = /** @type {FunctionRunResult} */ ({
             operations: [
                 {
                     rename: {
@@ -63,7 +63,7 @@ describe('delivery customization function', () => {
     });
 
     it('returns no operations if state/province code does not match', () => {
-        const result = deliveryCustomization({
+        const result = run({
             "cart": {
                 "deliveryGroups": [{
                     "deliveryAddress": {
@@ -81,7 +81,7 @@ describe('delivery customization function', () => {
                 }
             }
         });
-        const expected = /** @type {FunctionResult} */ ({ operations: [] });
+        const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
 
         expect(result).toEqual(expected);
     });
