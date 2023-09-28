@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
-import paymentCustomization from "./index";
+import { run } from "./run";
 
 /**
- * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  */
 
 describe("payment customization function", () => {
   it("returns no operations without configuration", () => {
-    const result = paymentCustomization({
+    const result = run({
       cart: {
         cost: {
           totalAmount: {
@@ -20,13 +20,13 @@ describe("payment customization function", () => {
         metafield: null,
       },
     });
-    const expected = /** @type {FunctionResult} */ ({ operations: [] });
+    const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
 
     expect(result).toEqual(expected);
   });
 
   it("returns no operations if total is less than configured", () => {
-    const result = paymentCustomization({
+    const result = run({
       cart: {
         cost: {
           totalAmount: {
@@ -46,13 +46,13 @@ describe("payment customization function", () => {
         },
       },
     });
-    const expected = /** @type {FunctionResult} */ ({ operations: [] });
+    const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
 
     expect(result).toEqual(expected);
   });
 
   it("returns no operations if no payment method matches the configured name", () => {
-    const result = paymentCustomization({
+    const result = run({
       cart: {
         cost: {
           totalAmount: {
@@ -72,13 +72,13 @@ describe("payment customization function", () => {
         },
       },
     });
-    const expected = /** @type {FunctionResult} */ ({ operations: [] });
+    const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
 
     expect(result).toEqual(expected);
   });
 
   it("hides a matching payment method", () => {
-    const result = paymentCustomization({
+    const result = run({
       cart: {
         cost: {
           totalAmount: {
@@ -98,7 +98,7 @@ describe("payment customization function", () => {
         },
       },
     });
-    const expected = /** @type {FunctionResult} */ ({
+    const expected = /** @type {FunctionRunResult} */ ({
       operations: [
         {
           hide: {
