@@ -1,14 +1,14 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import validateCart from './index';
+import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  */
 
 describe('cart checkout validation function', () => {
   it('returns an error when quantity exceeds one', () => {
-    const result = validateCart({
+    const result = run({
       cart: {
         lines: [
           {
@@ -17,7 +17,7 @@ describe('cart checkout validation function', () => {
         ]
       }
     });
-    const expected = /** @type {FunctionResult} */ ({ errors: [
+    const expected = /** @type {FunctionRunResult} */ ({ errors: [
       {
         localizedMessage: "Not possible to order more than one of each",
         target: "cart"
@@ -28,7 +28,7 @@ describe('cart checkout validation function', () => {
   });
 
   it('returns no errors when quantity is one', () => {
-    const result = validateCart({
+    const result = run({
       cart: {
         lines: [
           {
@@ -37,19 +37,19 @@ describe('cart checkout validation function', () => {
         ]
       }
     });
-    const expected = /** @type {FunctionResult} */ ({ errors: [] });
+    const expected = /** @type {FunctionRunResult} */ ({ errors: [] });
 
     expect(result).toEqual(expected);
   });
 });
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import validateCart from './index';
-import { FunctionResult } from "../generated/api";
+import { run } from './run';
+import { FunctionRunResult } from "../generated/api";
 
 describe('cart checkout validation function', () => {
   it('returns an error when quantity exceeds one', () => {
-    const result = validateCart({
+    const result = run({
       cart: {
         lines: [
           {
@@ -58,7 +58,7 @@ describe('cart checkout validation function', () => {
         ]
       }
     });
-    const expected: FunctionResult = { errors: [
+    const expected: FunctionRunResult = { errors: [
       {
         localizedMessage: "Not possible to order more than one of each",
         target: "cart"
@@ -69,7 +69,7 @@ describe('cart checkout validation function', () => {
   });
 
   it('returns no errors when quantity is one', () => {
-    const result = validateCart({
+    const result = run({
       cart: {
         lines: [
           {
@@ -78,7 +78,7 @@ describe('cart checkout validation function', () => {
         ]
       }
     });
-    const expected: FunctionResult = { errors: [] };
+    const expected: FunctionRunResult = { errors: [] };
 
     expect(result).toEqual(expected);
   });
