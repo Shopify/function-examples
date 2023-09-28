@@ -97,6 +97,11 @@ type Cart {
   cost: CartCost!
 
   """
+  A list of lines containing information about the items that can be delivered.
+  """
+  deliverableLines: [DeliverableCartLine!]!
+
+  """
   The delivery groups available for the cart based on the buyer's shipping address.
   """
   deliveryGroups: [CartDeliveryGroup!]!
@@ -309,9 +314,9 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -392,9 +397,9 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2404,7 +2409,7 @@ enum CurrencyCode {
   VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
-  Venezuelan Bolivares (VES).
+  Venezuelan Bolivares Soberanos (VES).
   """
   VES
 
@@ -2549,9 +2554,9 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -2561,6 +2566,12 @@ type Customer implements HasMetafields {
 }
 
 """
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date string.
+For example, September 7, 2019 is represented as `"2019-07-16"`.
+"""
+scalar Date
+
+"""
 Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
 For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
 represented as `"2019-09-07T15:50:00Z`".
@@ -2568,11 +2579,51 @@ represented as `"2019-09-07T15:50:00Z`".
 scalar DateTime
 
 """
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the date and time but not the timezone which is determined from context.
+
+For example, "2018-01-01T00:00:00".
+"""
+scalar DateTimeWithoutTimezone
+
+"""
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
 
 Example values: `"29.99"`, `"29.999"`.
 """
 scalar Decimal
+
+"""
+Represents information about the merchandise in the cart.
+"""
+type DeliverableCartLine {
+  """
+  Retrieve a cart line attribute by key.
+
+  Cart line attributes are also known as line item properties in Liquid.
+  """
+  attribute(
+    """
+    The key of the attribute to retrieve.
+    """
+    key: String
+  ): Attribute
+
+  """
+  The ID of the cart line.
+  """
+  id: ID!
+
+  """
+  The merchandise that the buyer intends to purchase.
+  """
+  merchandise: Merchandise!
+
+  """
+  The quantity of the merchandise that the customer intends to purchase.
+  """
+  quantity: Int!
+}
 
 """
 List of different delivery method types.
@@ -2625,9 +2676,20 @@ input FunctionError {
 }
 
 """
-The result of a cart validation function.
+The result of a cart validation function. In API versions 2023-10 and beyond,
+this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
+  """
+  Errors.
+  """
+  errors: [FunctionError!]!
+}
+
+"""
+The result of a cart validation function.
+"""
+input FunctionRunResult {
   """
   Errors.
   """
@@ -2648,9 +2710,9 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -2697,6 +2759,11 @@ type Input {
   The conversion rate between the shop's currency and the currency of the cart.
   """
   presentmentCurrencyRate: Decimal!
+
+  """
+  Information about the shop.
+  """
+  shop: Shop!
 }
 
 """
@@ -3400,6 +3467,86 @@ enum LanguageCode {
 }
 
 """
+Represents limited information about the current time relative to the parent object.
+"""
+type LocalTime {
+  """
+  The current date relative to the parent object.
+  """
+  date: Date!
+
+  """
+  Returns true if the current date and time is at or past the given date and time, and false otherwise.
+  """
+  dateTimeAfter(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent object.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is before the given date and time, and false otherwise.
+  """
+  dateTimeBefore(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is between the two given date and times, and false otherwise.
+  """
+  dateTimeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endDateTime: DateTimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startDateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeAfter(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeBefore(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is between the two given times, and false otherwise.
+  """
+  timeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endTime: TimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startTime: TimeWithoutTimezone!
+  ): Boolean!
+}
+
+"""
 Information about the localized experiences configured for the shop.
 """
 type Localization {
@@ -3459,6 +3606,21 @@ type MailingAddress {
   lastName: String
 
   """
+  The approximate latitude of the address.
+  """
+  latitude: Float
+
+  """
+  The approximate longitude of the address.
+  """
+  longitude: Float
+
+  """
+  The market of the address.
+  """
+  market: Market
+
+  """
   The full name of the customer, based on firstName and lastName.
   """
   name: String
@@ -3508,9 +3670,9 @@ type Market implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -3597,6 +3759,16 @@ type MutationRoot {
     The result of the Function.
     """
     result: FunctionResult!
+  ): Void! @deprecated(reason: "Use the target-specific field instead.")
+
+  """
+  Handles the Function result for the purchase.validation.run target.
+  """
+  run(
+    """
+    The result of the Function.
+    """
+    result: FunctionRunResult!
   ): Void!
 }
 
@@ -3669,9 +3841,9 @@ type Product implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -3709,9 +3881,9 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -3832,6 +4004,38 @@ type SellingPlanAllocationPriceAdjustment {
   """
   price: MoneyV2!
 }
+
+"""
+Information about the shop.
+"""
+type Shop implements HasMetafields {
+  """
+  Information about the current time relative to the shop's timezone setting.
+  """
+  localTime: LocalTime!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the time but not the date or timezone which is determined from context.
+For example, "05:43:21".
+"""
+scalar TimeWithoutTimezone
 
 """
 A void type that can be used to return a null value from a mutation.
