@@ -20,13 +20,13 @@ node_modules
 !*/wasm/**/schema.graphql
 **/locales/*.json
 !*/javascript/**/src/*.liquid
-!sample-apps/**/input.graphql
-!sample-apps/**/shopify.extension.toml
-!sample-apps/**/locales/*.json
 
 ## Sample Apps
 sample-apps/*/web/frontend/metafields.js
 !sample-apps/discounts/web/frontend/metafields.js
 sample-apps/*/build/*
 sample-apps/*/public/build/*
+!sample-apps/**/input.graphql
+!sample-apps/**/shopify.extension.toml
+!sample-apps/**/locales/*.json
 dev.sqlite
