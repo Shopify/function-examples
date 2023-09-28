@@ -28,7 +28,7 @@
     "vitest": "^0.29.8"
   },
   "dependencies": {
-    "@shopify/shopify_function": "0.0.3",
-    "javy": "0.1.0"
+    "@shopify/shopify_function": "0.1.0",
+    "javy": "0.1.1"
   }
 }
