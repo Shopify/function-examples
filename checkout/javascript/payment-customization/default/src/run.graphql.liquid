@@ -1,4 +1,4 @@
-query Input {
+query RunInput {
   paymentCustomization {
     metafield(namespace: "$app:{{handle | replace: " ", "-" | downcase}}", key: "function-configuration") {
       value
