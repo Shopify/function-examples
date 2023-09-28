@@ -290,7 +290,7 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -373,7 +373,7 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -388,6 +388,16 @@ type CompanyLocation implements HasMetafields {
   at which the company location was last modified.
   """
   updatedAt: DateTime!
+}
+
+"""
+A country.
+"""
+type Country {
+  """
+  The ISO code of the country.
+  """
+  isoCode: CountryCode!
 }
 
 """
@@ -2520,7 +2530,7 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2532,11 +2542,25 @@ type Customer implements HasMetafields {
 }
 
 """
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date string.
+For example, September 7, 2019 is represented as `"2019-07-16"`.
+"""
+scalar Date
+
+"""
 Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
 For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
 represented as `"2019-09-07T15:50:00Z`".
 """
 scalar DateTime
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the date and time but not the timezone which is determined from context.
+
+For example, "2018-01-01T00:00:00".
+"""
+scalar DateTimeWithoutTimezone
 
 """
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
@@ -2622,14 +2646,19 @@ type FulfillmentGroup {
   deliveryGroup: CartDeliveryGroup!
 
   """
+  The fulfillment group handle.
+  """
+  handle: Handle!
+
+  """
   The ID of the fulfillment group.
   """
   id: ID!
 
   """
-  A list of inventory locations for the fulfillment group.
+  A list of inventory location handles for the fulfillment group.
   """
-  inventoryLocations: [InventoryLocation!]
+  inventoryLocationHandles: [Handle!]!
 }
 
 """
@@ -2639,7 +2668,7 @@ input FulfillmentGroupRankedLocations {
   """
   The identifier for the fulfillment group.
   """
-  fulfillmentGroupId: ID!
+  fulfillmentGroupHandle: Handle!
 
   """
   The ranked locations for this fulfillment group.
@@ -2686,7 +2715,7 @@ type GateConfiguration implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2711,6 +2740,13 @@ type GateSubject {
   """
   id: ID!
 }
+
+"""
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
 
 """
 Gate subjects associated to the specified resource.
@@ -2741,7 +2777,7 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2785,6 +2821,11 @@ type Input {
   fulfillmentGroups: [FulfillmentGroup!]!
 
   """
+  The localization of the Function execution context.
+  """
+  localization: Localization!
+
+  """
   The order routing location rule containing the function.
   """
   locationRule: OrderRoutingLocationRule!
@@ -2793,16 +2834,831 @@ type Input {
   The locations where the inventory items on this cart are stocked.
   """
   locations: [Location!]!
+
+  """
+  Information about the shop.
+  """
+  shop: Shop!
 }
 
 """
-An inventory location associated with a fulfillment group.
+A language.
 """
-type InventoryLocation {
+type Language {
   """
-  The location inventory is stocked at.
+  The ISO code.
   """
-  location: Location!
+  isoCode: LanguageCode!
+}
+
+"""
+ISO 639-1 language codes supported by Shopify.
+"""
+enum LanguageCode {
+  """
+  Afrikaans.
+  """
+  AF
+
+  """
+  Akan.
+  """
+  AK
+
+  """
+  Amharic.
+  """
+  AM
+
+  """
+  Arabic.
+  """
+  AR
+
+  """
+  Assamese.
+  """
+  AS
+
+  """
+  Azerbaijani.
+  """
+  AZ
+
+  """
+  Belarusian.
+  """
+  BE
+
+  """
+  Bulgarian.
+  """
+  BG
+
+  """
+  Bambara.
+  """
+  BM
+
+  """
+  Bangla.
+  """
+  BN
+
+  """
+  Tibetan.
+  """
+  BO
+
+  """
+  Breton.
+  """
+  BR
+
+  """
+  Bosnian.
+  """
+  BS
+
+  """
+  Catalan.
+  """
+  CA
+
+  """
+  Chechen.
+  """
+  CE
+
+  """
+  Central Kurdish.
+  """
+  CKB
+
+  """
+  Czech.
+  """
+  CS
+
+  """
+  Church Slavic.
+  """
+  CU
+
+  """
+  Welsh.
+  """
+  CY
+
+  """
+  Danish.
+  """
+  DA
+
+  """
+  German.
+  """
+  DE
+
+  """
+  Dzongkha.
+  """
+  DZ
+
+  """
+  Ewe.
+  """
+  EE
+
+  """
+  Greek.
+  """
+  EL
+
+  """
+  English.
+  """
+  EN
+
+  """
+  Esperanto.
+  """
+  EO
+
+  """
+  Spanish.
+  """
+  ES
+
+  """
+  Estonian.
+  """
+  ET
+
+  """
+  Basque.
+  """
+  EU
+
+  """
+  Persian.
+  """
+  FA
+
+  """
+  Fulah.
+  """
+  FF
+
+  """
+  Finnish.
+  """
+  FI
+
+  """
+  Filipino.
+  """
+  FIL
+
+  """
+  Faroese.
+  """
+  FO
+
+  """
+  French.
+  """
+  FR
+
+  """
+  Western Frisian.
+  """
+  FY
+
+  """
+  Irish.
+  """
+  GA
+
+  """
+  Scottish Gaelic.
+  """
+  GD
+
+  """
+  Galician.
+  """
+  GL
+
+  """
+  Gujarati.
+  """
+  GU
+
+  """
+  Manx.
+  """
+  GV
+
+  """
+  Hausa.
+  """
+  HA
+
+  """
+  Hebrew.
+  """
+  HE
+
+  """
+  Hindi.
+  """
+  HI
+
+  """
+  Croatian.
+  """
+  HR
+
+  """
+  Hungarian.
+  """
+  HU
+
+  """
+  Armenian.
+  """
+  HY
+
+  """
+  Interlingua.
+  """
+  IA
+
+  """
+  Indonesian.
+  """
+  ID
+
+  """
+  Igbo.
+  """
+  IG
+
+  """
+  Sichuan Yi.
+  """
+  II
+
+  """
+  Icelandic.
+  """
+  IS
+
+  """
+  Italian.
+  """
+  IT
+
+  """
+  Japanese.
+  """
+  JA
+
+  """
+  Javanese.
+  """
+  JV
+
+  """
+  Georgian.
+  """
+  KA
+
+  """
+  Kikuyu.
+  """
+  KI
+
+  """
+  Kazakh.
+  """
+  KK
+
+  """
+  Kalaallisut.
+  """
+  KL
+
+  """
+  Khmer.
+  """
+  KM
+
+  """
+  Kannada.
+  """
+  KN
+
+  """
+  Korean.
+  """
+  KO
+
+  """
+  Kashmiri.
+  """
+  KS
+
+  """
+  Kurdish.
+  """
+  KU
+
+  """
+  Cornish.
+  """
+  KW
+
+  """
+  Kyrgyz.
+  """
+  KY
+
+  """
+  Luxembourgish.
+  """
+  LB
+
+  """
+  Ganda.
+  """
+  LG
+
+  """
+  Lingala.
+  """
+  LN
+
+  """
+  Lao.
+  """
+  LO
+
+  """
+  Lithuanian.
+  """
+  LT
+
+  """
+  Luba-Katanga.
+  """
+  LU
+
+  """
+  Latvian.
+  """
+  LV
+
+  """
+  Malagasy.
+  """
+  MG
+
+  """
+  Māori.
+  """
+  MI
+
+  """
+  Macedonian.
+  """
+  MK
+
+  """
+  Malayalam.
+  """
+  ML
+
+  """
+  Mongolian.
+  """
+  MN
+
+  """
+  Marathi.
+  """
+  MR
+
+  """
+  Malay.
+  """
+  MS
+
+  """
+  Maltese.
+  """
+  MT
+
+  """
+  Burmese.
+  """
+  MY
+
+  """
+  Norwegian (Bokmål).
+  """
+  NB
+
+  """
+  North Ndebele.
+  """
+  ND
+
+  """
+  Nepali.
+  """
+  NE
+
+  """
+  Dutch.
+  """
+  NL
+
+  """
+  Norwegian Nynorsk.
+  """
+  NN
+
+  """
+  Norwegian.
+  """
+  NO
+
+  """
+  Oromo.
+  """
+  OM
+
+  """
+  Odia.
+  """
+  OR
+
+  """
+  Ossetic.
+  """
+  OS
+
+  """
+  Punjabi.
+  """
+  PA
+
+  """
+  Polish.
+  """
+  PL
+
+  """
+  Pashto.
+  """
+  PS
+
+  """
+  Portuguese.
+  """
+  PT
+
+  """
+  Portuguese (Brazil).
+  """
+  PT_BR
+
+  """
+  Portuguese (Portugal).
+  """
+  PT_PT
+
+  """
+  Quechua.
+  """
+  QU
+
+  """
+  Romansh.
+  """
+  RM
+
+  """
+  Rundi.
+  """
+  RN
+
+  """
+  Romanian.
+  """
+  RO
+
+  """
+  Russian.
+  """
+  RU
+
+  """
+  Kinyarwanda.
+  """
+  RW
+
+  """
+  Sanskrit.
+  """
+  SA
+
+  """
+  Sardinian.
+  """
+  SC
+
+  """
+  Sindhi.
+  """
+  SD
+
+  """
+  Northern Sami.
+  """
+  SE
+
+  """
+  Sango.
+  """
+  SG
+
+  """
+  Sinhala.
+  """
+  SI
+
+  """
+  Slovak.
+  """
+  SK
+
+  """
+  Slovenian.
+  """
+  SL
+
+  """
+  Shona.
+  """
+  SN
+
+  """
+  Somali.
+  """
+  SO
+
+  """
+  Albanian.
+  """
+  SQ
+
+  """
+  Serbian.
+  """
+  SR
+
+  """
+  Sundanese.
+  """
+  SU
+
+  """
+  Swedish.
+  """
+  SV
+
+  """
+  Swahili.
+  """
+  SW
+
+  """
+  Tamil.
+  """
+  TA
+
+  """
+  Telugu.
+  """
+  TE
+
+  """
+  Tajik.
+  """
+  TG
+
+  """
+  Thai.
+  """
+  TH
+
+  """
+  Tigrinya.
+  """
+  TI
+
+  """
+  Turkmen.
+  """
+  TK
+
+  """
+  Tongan.
+  """
+  TO
+
+  """
+  Turkish.
+  """
+  TR
+
+  """
+  Tatar.
+  """
+  TT
+
+  """
+  Uyghur.
+  """
+  UG
+
+  """
+  Ukrainian.
+  """
+  UK
+
+  """
+  Urdu.
+  """
+  UR
+
+  """
+  Uzbek.
+  """
+  UZ
+
+  """
+  Vietnamese.
+  """
+  VI
+
+  """
+  Volapük.
+  """
+  VO
+
+  """
+  Wolof.
+  """
+  WO
+
+  """
+  Xhosa.
+  """
+  XH
+
+  """
+  Yiddish.
+  """
+  YI
+
+  """
+  Yoruba.
+  """
+  YO
+
+  """
+  Chinese.
+  """
+  ZH
+
+  """
+  Chinese (Simplified).
+  """
+  ZH_CN
+
+  """
+  Chinese (Traditional).
+  """
+  ZH_TW
+
+  """
+  Zulu.
+  """
+  ZU
+}
+
+"""
+Represents limited information about the current time relative to the parent object.
+"""
+type LocalTime {
+  """
+  The current date relative to the parent object.
+  """
+  date: Date!
+
+  """
+  Returns true if the current date and time is at or past the given date and time, and false otherwise.
+  """
+  dateTimeAfter(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent object.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is before the given date and time, and false otherwise.
+  """
+  dateTimeBefore(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is between the two given date and times, and false otherwise.
+  """
+  dateTimeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endDateTime: DateTimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startDateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeAfter(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeBefore(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is between the two given times, and false otherwise.
+  """
+  timeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endTime: TimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startTime: TimeWithoutTimezone!
+  ): Boolean!
+}
+
+"""
+Information about the localized experiences configured for the shop.
+"""
+type Localization {
+  """
+  The country of the active localized experience.
+  """
+  country: Country!
+
+  """
+  The language of the active localized experience.
+  """
+  language: Language!
+
+  """
+  The market of the active localized experience.
+  """
+  market: Market!
 }
 
 """
@@ -2813,6 +3669,11 @@ type Location implements HasMetafields {
   The address of this location.
   """
   address: LocationAddress!
+
+  """
+  The location handle.
+  """
+  handle: Handle!
 
   """
   The location id.
@@ -2829,7 +3690,7 @@ type Location implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -2875,12 +3736,12 @@ type LocationAddress {
   formatted: [String!]!
 
   """
-  The latitude coordinates of the location.
+  The approximate latitude coordinates of the location.
   """
   latitude: Float
 
   """
-  The longitude coordinates of the location.
+  The approximate longitude coordinates of the location.
   """
   longitude: Float
 
@@ -3009,7 +3870,7 @@ type Market implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3125,7 +3986,7 @@ type OrderRoutingLocationRule implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3210,7 +4071,7 @@ type Product implements HasGates & HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3250,7 +4111,7 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield. If omitted, the app-reserved namespace will be used.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
     namespace: String
   ): Metafield
@@ -3311,9 +4172,9 @@ A location with a rank associated with it.
 """
 input RankedLocation {
   """
-  The location ID.
+  The location handle.
   """
-  locationId: ID!
+  locationHandle: Handle!
 
   """
   The location's rank.
@@ -3388,6 +4249,38 @@ type SellingPlanAllocationPriceAdjustment {
   """
   price: MoneyV2!
 }
+
+"""
+Information about the shop.
+"""
+type Shop implements HasMetafields {
+  """
+  Information about the current time relative to the shop's timezone setting.
+  """
+  localTime: LocalTime!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the time but not the date or timezone which is determined from context.
+For example, "05:43:21".
+"""
+scalar TimeWithoutTimezone
 
 """
 A void type that can be used to return a null value from a mutation.
