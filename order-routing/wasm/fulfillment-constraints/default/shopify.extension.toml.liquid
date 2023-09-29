@@ -1,10 +1,21 @@
-name = "{{name}}"
-type = "fulfillment_constraints"
-api_version = "unstable"
+api_version = "2023-10"
 
-[build]
-command = "echo 'build the wasm'"
+[[extensions]]
+handle = "{{handle}}"
+name = "t:name"
+description = "t:description"
+type = "function"
 
-[ui.paths]
-create = "/"
-details = "/"
+  [[extensions.targeting]]
+  target = "purchase.fulfillment-constraint-rule.run"
+  input_query = "run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "echo 'build the wasm'"
+  path = ""
+  watch = []
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
