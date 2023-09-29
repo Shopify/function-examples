@@ -7,7 +7,7 @@ fn test_result_contains_no_operations() -> Result<()> {
         run,
         r#"
             {
-                "checkoutCompletionTargetCustomization": {
+                "orderSubmissionRule": {
                     "metafield": null
                 }
             }
