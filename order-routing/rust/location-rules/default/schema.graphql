@@ -2385,7 +2385,7 @@ enum CurrencyCode {
   VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
-  Venezuelan Bolivares (VES).
+  Venezuelan Bolivares Soberanos (VES).
   """
   VES
 
@@ -2677,9 +2677,19 @@ input FulfillmentGroupRankedLocations {
 }
 
 """
-The result of the function.
+The result of the function. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
+  """
+  The ranked locations for each fulfillment group.
+  """
+  operations: [Operation!]!
+}
+
+"""
+The result of the function.
+"""
+input FunctionRunResult {
   """
   The ranked locations for each fulfillment group.
   """
@@ -2834,6 +2844,11 @@ type Input {
   The locations where the inventory items on this cart are stocked.
   """
   locations: [Location!]!
+
+  """
+  The conversion rate between the shop's currency and the currency of the cart.
+  """
+  presentmentCurrencyRate: Decimal!
 
   """
   Information about the shop.
@@ -3959,6 +3974,16 @@ type MutationRoot {
     The result of the Function.
     """
     result: FunctionResult!
+  ): Void! @deprecated(reason: "Use the target-specific field instead.")
+
+  """
+  Handles the Function result for the purchase.order-routing-location-rule.run target.
+  """
+  run(
+    """
+    The result of the Function.
+    """
+    result: FunctionRunResult!
   ): Void!
 }
 
