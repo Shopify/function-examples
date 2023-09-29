@@ -1,0 +1,57 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+/**
+ * @typedef {import("../generated/api").RunInput} RunInput
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ */
+
+/**
+ * @param {RunInput} input
+ * @returns {FunctionRunResult}
+ */
+export function run(input) {
+  const operations = input.fulfillmentGroups.map((group) => {
+    const rankings = group.inventoryLocationHandles?.map((inventoryLocationHandle) => ({
+      locationHandle: inventoryLocationHandle,
+      rank: 0,
+    })) || [];
+
+    return {
+      rank: {
+        fulfillmentGroupHandle: group.handle,
+        rankings,
+      },
+    };
+  });
+
+  return {operations};
+};
+{%- elsif flavor contains "typescript" -%}
+import type {
+  RunInput,
+  FunctionRunResult,
+  Operation,
+  RankedLocation,
+} from "../generated/api";
+
+export function run(input: RunInput): FunctionRunResult {
+  const operations: Operation[] = input.fulfillmentGroups.map((group) => {
+    const rankings: RankedLocation[] = group.inventoryLocationHandles?.map(
+      (inventoryLocationHandle) => ({
+        locationHandle: inventoryLocationHandle,
+        rank: 0,
+      }),
+    ) || [];
+
+    return {
+      rank: {
+        fulfillmentGroupHandle: group.handle,
+        rankings,
+      },
+    };
+  });
+
+  return {operations};
+};
+{%- endif -%}
