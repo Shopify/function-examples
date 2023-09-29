@@ -389,11 +389,6 @@ type CompanyLocation implements HasMetafields {
   name: String!
 
   """
-  The number of orders placed at this company location.
-  """
-  orderCount: Int!
-
-  """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
   at which the company location was last modified.
   """
@@ -2395,7 +2390,7 @@ enum CurrencyCode {
   VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
-  Venezuelan Bolivares (VES).
+  Venezuelan Bolivares Soberanos (VES).
   """
   VES
 
@@ -2667,7 +2662,7 @@ type FulfillmentConstraintRule implements HasMetafields {
 }
 
 """
-The result of the function. This type is deprecated in favor of `FunctionRunResult`.
+The result of the function. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
