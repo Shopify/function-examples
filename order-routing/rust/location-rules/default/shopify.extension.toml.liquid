@@ -1,12 +1,21 @@
-name = "{{name}}"
-type = "order_routing_location_rule"
-api_version = "unstable"
+api_version = "2023-10"
 
-[build]
-command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/{{name | replace: " ", "-" | downcase}}.wasm"
-watch = [ "src/**/*.rs" ]
+[[extensions]]
+handle = "{{handle}}"
+name = "t:name"
+description = "t:description"
+type = "function"
 
-[ui.paths]
-create = "/"
-details = "/"
+  [[extensions.targeting]]
+  target = "purchase.order-routing-location-rule.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  watch = [ "src/**/*.rs" ]
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
