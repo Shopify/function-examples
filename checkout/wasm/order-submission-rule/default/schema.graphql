@@ -259,41 +259,6 @@ type CartLineCost {
 }
 
 """
-Whether the buyer checkout creates an order or a draft order.
-"""
-enum CheckoutCompletionTarget {
-  """
-  This setting means that the system will generate a draft order on checkout completion.
-  """
-  DRAFT_ORDER
-
-  """
-  This setting means that the system will generate an order on checkout completion.
-  """
-  ORDER
-}
-
-"""
-A customization representing how the checkout completion target will be set.
-"""
-type CheckoutCompletionTargetCustomization implements HasMetafields {
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
-}
-
-"""
 Represents whether the product is a member of the given collection.
 """
 type CollectionMembership {
@@ -2442,7 +2407,7 @@ enum CurrencyCode {
   VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
-  Venezuelan Bolivares (VES).
+  Venezuelan Bolivares Soberanos (VES).
   """
   VES
 
@@ -2599,11 +2564,25 @@ type Customer implements HasMetafields {
 }
 
 """
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date string.
+For example, September 7, 2019 is represented as `"2019-07-16"`.
+"""
+scalar Date
+
+"""
 Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
 For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
 represented as `"2019-09-07T15:50:00Z`".
 """
 scalar DateTime
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the date and time but not the timezone which is determined from context.
+
+For example, "2018-01-01T00:00:00".
+"""
+scalar DateTimeWithoutTimezone
 
 """
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
@@ -2680,11 +2659,22 @@ enum DeliveryMethod {
 }
 
 """
-The result of a checkout completion target function.
+The result of an order submission rule function. In API versions 2023-10 and
+beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
-  The ordered list of operations to apply to the checkout completion target.
+  The ordered list of operations to apply to the order submission rule.
+  """
+  operations: [Operation!]!
+}
+
+"""
+The result of an order submission rule function.
+"""
+input FunctionRunResult {
+  """
+  The ordered list of operations to apply to the order submission rule.
   """
   operations: [Operation!]!
 }
@@ -2809,14 +2799,14 @@ type Input {
   cart: Cart!
 
   """
-  The checkout completion target customization that owns the current function.
-  """
-  checkoutCompletionTargetCustomization: CheckoutCompletionTargetCustomization!
-
-  """
   The localization of the Function execution context.
   """
   localization: Localization!
+
+  """
+  The order submission rule that owns the current function.
+  """
+  orderSubmissionRule: OrderSubmissionRule!
 
   """
   The conversion rate between the shop's currency and the currency of the cart.
@@ -3550,6 +3540,86 @@ enum LanguageCode {
 }
 
 """
+Represents limited information about the current time relative to the parent object.
+"""
+type LocalTime {
+  """
+  The current date relative to the parent object.
+  """
+  date: Date!
+
+  """
+  Returns true if the current date and time is at or past the given date and time, and false otherwise.
+  """
+  dateTimeAfter(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent object.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is before the given date and time, and false otherwise.
+  """
+  dateTimeBefore(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is between the two given date and times, and false otherwise.
+  """
+  dateTimeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endDateTime: DateTimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startDateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeAfter(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeBefore(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is between the two given times, and false otherwise.
+  """
+  timeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endTime: TimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startTime: TimeWithoutTimezone!
+  ): Boolean!
+}
+
+"""
 Information about the localized experiences configured for the shop.
 """
 type Localization {
@@ -3771,16 +3841,6 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result for the purchase.completion-target.customize target.
-  """
-  customize(
-    """
-    The result of the Function.
-    """
-    result: FunctionResult!
-  ): Void!
-
-  """
   Handles the Function result.
   """
   handleResult(
@@ -3788,17 +3848,62 @@ type MutationRoot {
     The result of the Function.
     """
     result: FunctionResult!
+  ): Void! @deprecated(reason: "Use the target-specific field instead.")
+
+  """
+  Handles the Function result for the purchase.order-submission-rule.run target.
+  """
+  run(
+    """
+    The result of the Function.
+    """
+    result: FunctionRunResult!
   ): Void!
 }
 
 """
-An operation to apply to the checkout completion target.
+An operation to apply to the order submission type.
 """
 input Operation @oneOf {
   """
-  Request to set the checkout completion target with a new value.
+  Request to set the order submission type with a new value.
   """
   set: SetOperation
+}
+
+"""
+Whether the buyer checkout creates an order or a draft order.
+"""
+enum OrderSubmission {
+  """
+  This setting means that the system will generate a draft order on checkout submission.
+  """
+  DRAFT_ORDER
+
+  """
+  This setting means that the system will generate an order on checkout submission.
+  """
+  ORDER
+}
+
+"""
+A rule deciding whether a checkout creates an order or a draft order.
+"""
+type OrderSubmissionRule implements HasMetafields {
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 }
 
 """
@@ -4045,19 +4150,24 @@ type SellingPlanAllocationPriceAdjustment {
 }
 
 """
-Request to set the checkout completion target with a new value.
+Request to set the order submission type with a new value.
 """
 input SetOperation {
   """
-  The value to set the checkout completion target to.
+  The value to set the order submission type to.
   """
-  target: CheckoutCompletionTarget!
+  orderSubmissionType: OrderSubmission!
 }
 
 """
 Information about the shop.
 """
 type Shop implements HasMetafields {
+  """
+  Information about the current time relative to the shop's timezone setting.
+  """
+  localTime: LocalTime!
+
   """
   Returns a metafield by namespace and key that belongs to the resource.
   """
@@ -4093,6 +4203,13 @@ type ShopUser implements HasMetafields {
     namespace: String
   ): Metafield
 }
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the time but not the date or timezone which is determined from context.
+For example, "05:43:21".
+"""
+scalar TimeWithoutTimezone
 
 """
 A void type that can be used to return a null value from a mutation.

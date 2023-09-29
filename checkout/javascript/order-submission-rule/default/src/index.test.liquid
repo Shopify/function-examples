@@ -6,10 +6,10 @@ import { run } from './index';
  * @typedef {import("../generated/api").FunctionResult} FunctionResult
  */
 
-describe('checkout completion target customization function', () => {
+describe('order submission rule function', () => {
   it('returns no operations without configuration', () => {
     const result = run({
-      checkoutCompletionTargetCustomization: {
+      orderSubmissionRule: {
         metafield: null
       }
     });
@@ -23,10 +23,10 @@ import { describe, it, expect } from 'vitest';
 import { run } from './index';
 import { FunctionResult } from '../generated/api';
 
-describe('checkout completion target customization function', () => {
+describe('order submission rule function', () => {
   it('returns no operations without configuration', () => {
     const result = run({
-      checkoutCompletionTargetCustomization: {
+      orderSubmissionRule: {
         metafield: null
       }
     });

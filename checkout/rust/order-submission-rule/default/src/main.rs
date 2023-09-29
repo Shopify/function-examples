@@ -22,10 +22,8 @@ impl Configuration {
 fn run(input: input::ResponseData) -> Result<output::FunctionResult> {
     let no_changes = output::FunctionResult { operations: vec![] };
 
-    let _config = match input.checkout_completion_target_customization.metafield {
-        Some(input::InputCheckoutCompletionTargetCustomizationMetafield { value }) => {
-            Configuration::from_str(&value)
-        }
+    let _config = match input.order_submission_rule.metafield {
+        Some(input::InputOrderSubmissionRuleMetafield { value }) => Configuration::from_str(&value),
         None => return Ok(no_changes),
     };
 

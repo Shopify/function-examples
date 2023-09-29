@@ -19,7 +19,7 @@ const NO_CHANGES = {
  */
 export function run(input) {
   const configuration = JSON.parse(
-    input?.checkoutCompletionTargetCustomization?.metafield?.value ?? "{}"
+    input?.orderSubmissionRule?.metafield?.value ?? "{}"
   );
 
   return NO_CHANGES;
@@ -38,7 +38,7 @@ type Configuration = {};
 
 export function run(input: InputQuery): FunctionResult {
   const configuration: Configuration = JSON.parse(
-    input?.checkoutCompletionTargetCustomization?.metafield?.value ?? "{}"
+    input?.orderSubmissionRule?.metafield?.value ?? "{}"
   );
   return NO_CHANGES;
 };
