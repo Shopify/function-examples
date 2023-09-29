@@ -37,7 +37,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
 mod tests {
     use super::*;
     use shopify_function::{run_function_with_input, Result};
-    
+
     #[test]
     fn test_result_ranks_all_locations_zero() -> Result<()> {
         use run::output::*;
@@ -64,9 +64,8 @@ mod tests {
                 },
             }],
         };
-    
+
         assert_eq!(result, expected);
         Ok(())
     }
-    
 }
