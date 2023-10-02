@@ -1,9 +1,21 @@
-name = "{{name}}"
-type = "cart_transform"
-title = "cart transform"
-api_version = "2023-07"
+api_version = "2023-10"
 
-[build]
-command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/cart_transform.wasm"
-watch = [ "src/**/*.rs" ]
+[[extensions]]
+handle = "{{handle}}"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  watch = [ "src/**/*.rs" ]
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"

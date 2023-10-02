@@ -1,9 +1,21 @@
-name = "bundles cart transform"
-type = "cart_transform"
-title = "bundles cart transform"
-api_version = "2023-07"
+api_version = "2023-10"
 
-[build]
-command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/bundles_cart_transform.wasm"
-watch = [ "src/**/*.rs" ]
+[[extensions]]
+handle = "bundles_cart_transform"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/bundles_cart_transform.wasm"
+  watch = [ "src/**/*.rs" ]
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
