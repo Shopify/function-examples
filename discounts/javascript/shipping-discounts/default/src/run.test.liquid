@@ -1,0 +1,44 @@
+{%- if flavor contains "vanilla-js" -%}
+import { describe, it, expect } from 'vitest';
+import { run } from './run';
+
+/**
+ * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ */
+
+describe('shipping discounts function', () => {
+  it('returns no discounts without configuration', () => {
+    const result = run({
+      discountNode: {
+        metafield: null
+      }
+    });
+    const expected = /** @type {FunctionResult} */ ({
+      discounts: [],
+      discountApplicationStrategy: "FIRST",
+    });
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- elsif flavor contains "typescript" -%}
+import { describe, it, expect } from 'vitest';
+import { run } from './run';
+import { FunctionResult, DiscountApplicationStrategy } from '../generated/api';
+
+describe('shipping discounts function', () => {
+  it('returns no discounts without configuration', () => {
+    const result = run({
+      discountNode: {
+        metafield: null
+      }
+    });
+    const expected: FunctionResult = {
+      discounts: [],
+      discountApplicationStrategy: DiscountApplicationStrategy.First,
+    };
+
+    expect(result).toEqual(expected);
+  });
+});
+{%- endif -%}

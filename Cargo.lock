@@ -22,7 +22,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -33,7 +33,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -50,7 +50,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -60,7 +60,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -70,7 +70,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -80,7 +80,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -94,6 +94,15 @@ dependencies = [
  "either",
  "memchr",
  "unreachable",
+]
+
+[[package]]
+name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -132,13 +141,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "delivery-customization"
+name = "delivery-customization-rust"
 version = "1.0.0"
 dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -148,7 +157,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -167,7 +176,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -186,7 +195,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -305,7 +314,27 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
+]
+
+[[package]]
+name = "order-routing-local-pickup-delivery-option-generators-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function 0.4.0",
+]
+
+[[package]]
+name = "order-routing-location-rules-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -315,7 +344,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -325,7 +354,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -344,7 +373,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.3.0",
 ]
 
 [[package]]
@@ -417,22 +446,47 @@ dependencies = [
 
 [[package]]
 name = "shopify_function"
-version = "0.2.5"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae4dd760a9603cb2349088bde5a03714df41996f39605c756af71a7f63ef58f9"
+checksum = "bcc7a71e257c107f3ded8e93626fd0aa8e16c0daecfcd20556930ec28503344d"
 dependencies = [
  "anyhow",
  "serde",
  "serde_json",
- "shopify_function_macro",
+ "shopify_function_macro 0.3.0",
+]
+
+[[package]]
+name = "shopify_function"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "249273a00f7ba7e5a855aa5feae26716179ee4f685c9c664636465d99acaa998"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "shopify_function_macro 0.4.0",
 ]
 
 [[package]]
 name = "shopify_function_macro"
-version = "0.2.5"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6b44d4b7df05682677dcbe9eed6ad9073cec412419585c64c2bf63124989154"
+checksum = "08b3f3aa9afdba3a5f9b0066c3fd3d61d15c3230967d0c83a8c2483bc3a18453"
 dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "shopify_function_macro"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ff74deb26d6ade7ea3050a37be63ecfbc275a9444a20414592e319b1cd45b7e"
+dependencies = [
+ "convert_case",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -491,6 +545,12 @@ name = "unicode-ident"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b15811caf2415fb889178633e7724bad2509101cde276048e013b9def5e51fa0"
+
+[[package]]
+name = "unicode-segmentation"
+version = "1.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1dd624098567895118886609431a7c3b8f516e41d30e0643f03d94592a147e36"
 
 [[package]]
 name = "unreachable"
