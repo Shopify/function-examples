@@ -1,7 +1,20 @@
-name = "{{name}}"
-type = "order_routing_location_rule"
 api_version = "unstable"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+[[extensions]]
+handle = "{{handle}}"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.order-routing-location-rule.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"

@@ -1,20 +1,20 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import orderRoutingLocationRule from './index';
+import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  */
 
 describe('order routing location rule function', () => {
   it('returns rank operations with all locations rank 0', () => {
-    const result = orderRoutingLocationRule({
+    const result = run({
       "fulfillmentGroups": [{
           "handle": "123",
           "inventoryLocationHandles": ["456"]
       }]
     });
-    const expected = /** @type {FunctionResult} */ ({
+    const expected = /** @type {FunctionRunResult} */ ({
       operations: [{
         rank: {
           fulfillmentGroupHandle: "123",
@@ -31,18 +31,18 @@ describe('order routing location rule function', () => {
 });
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import orderRoutingLocationRule from './index';
-import { FunctionResult } from '../generated/api';
+import { run } from './run';
+import { FunctionRunResult } from '../generated/api';
 
 describe('order routing location rule function', () => {
   it('returns rank operations with all locations rank 0', () => {
-    const result = orderRoutingLocationRule({
+    const result = run({
       fulfillmentGroups: [{
           handle: "123",
           inventoryLocationHandles: ["456"]
       }]
     });
-    const expected: FunctionResult = {
+    const expected: FunctionRunResult = {
       operations: [{
         rank: {
           fulfillmentGroupHandle: "123",
