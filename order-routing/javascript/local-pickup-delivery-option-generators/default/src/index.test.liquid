@@ -47,15 +47,13 @@ describe('local pickup delivery option generator function', () => {
       operations: [
         {
           add: {
-            fulfillmentGroupIds: ["gid://shopify/FulfillmentGroup/1"],
-            code: "pickup-1",
+            fulfillmentGroupHandles: ["gid://shopify/FulfillmentGroup/1"],
             title: "Main St.",
             cost: 1.99,
             pickupLocation: {
               locationHandle: "2578303",
               pickupInstruction: "Usually ready in 24 hours."
             },
-            metadata: null,
           },
         },
       ]
