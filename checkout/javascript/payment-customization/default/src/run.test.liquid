@@ -1,36 +1,36 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import paymentCustomization from './index';
+import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  */
 
 describe('payment customization function', () => {
   it('returns no operations without configuration', () => {
-    const result = paymentCustomization({
+    const result = run({
       paymentCustomization: {
         metafield: null
       }
     });
-    const expected = /** @type {FunctionResult} */ ({ operations: [] });
+    const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
 
     expect(result).toEqual(expected);
   });
 });
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import paymentCustomization from './index';
-import { FunctionResult } from '../generated/api';
+import { run } from './run';
+import { FunctionRunResult } from '../generated/api';
 
 describe('payment customization function', () => {
   it('returns no operations without configuration', () => {
-    const result = paymentCustomization({
+    const result = run({
       paymentCustomization: {
         metafield: null
       }
     });
-    const expected: FunctionResult = { operations: [] };
+    const expected: FunctionRunResult = { operations: [] };
 
     expect(result).toEqual(expected);
   });

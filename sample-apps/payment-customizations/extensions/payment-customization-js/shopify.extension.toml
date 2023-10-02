@@ -1,11 +1,20 @@
-name = "payment-customization-js"
-type = "payment_customization"
-api_version = "2023-07"
+api_version = "2023-10"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+[[extensions]]
+handle = "payment-customization-js"
+name = "t:name"
+description = "t:description"
+type = "function"
 
-[ui.paths]
-create = "/app/payment-customization/:functionId/new"
-details = "/app/payment-customization/:functionId/:id"
+  [[extensions.targeting]]
+  target = "purchase.payment-customization.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/app/payment-customization/:functionId/new"
+  details = "/app/payment-customization/:functionId/:id"
