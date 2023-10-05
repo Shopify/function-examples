@@ -1,0 +1,8 @@
+name = "price-per-component-demo"
+type = "cart_transform"
+title = "cart transform"
+api_version = "unstable"
+
+[build]
+command = ""
+path = "dist/function.wasm"
