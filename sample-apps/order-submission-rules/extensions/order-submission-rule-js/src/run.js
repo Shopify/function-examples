@@ -41,7 +41,7 @@ export function run(input) {
       ]
     };
   } else {
-    console.log("Cart total is greater than configured, returning draft order")
+    console.log("Cart total has met the configured minimum, returning draft order")
     return {
       operations: [
         {

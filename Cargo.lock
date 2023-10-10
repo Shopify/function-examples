@@ -80,7 +80,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]

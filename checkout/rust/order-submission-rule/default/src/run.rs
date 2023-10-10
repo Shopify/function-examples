@@ -13,7 +13,7 @@ impl Configuration {
     }
 }
 
-#[shopify_function_target(query_path = "input.graphql", schema_path = "schema.graphql")]
+#[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
 fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
     let no_changes = output::FunctionRunResult { operations: vec![] };
 
