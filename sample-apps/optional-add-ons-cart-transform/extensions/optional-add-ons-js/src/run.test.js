@@ -110,6 +110,7 @@ describe("cart transform function", () => {
               },
               merchandise: {
                 __typename: "ProductVariant",
+                title: "Fancy Watch",
                 product: {
                   warrantyCostPercentage: {
                     type: "number_integer",
@@ -131,6 +132,7 @@ describe("cart transform function", () => {
         {
           expand: {
             cartLineId: "1",
+            title: "Fancy Watch with warranty",
             expandedCartItems: [
               {
                 merchandiseId: "gid://shopify/ProductVariant/2",
