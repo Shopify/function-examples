@@ -62,6 +62,9 @@ function optionallyBuildExpandOperation(
   ) {
     return {
       cartLineId,
+      title: `${merchandise.title} with warranty`,
+      // Optionally override the image for line item
+      // image: { url: "https://cdn.shopify.com/.../something.png" },
       expandedCartItems: [
         {
           merchandiseId: warrantyVariantID.value,
