@@ -1,4 +1,4 @@
-query Input {
+query RunInput {
   presentmentCurrencyRate
   cart {
     lines {

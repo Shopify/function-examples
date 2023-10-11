@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import cartTransform from "./index";
+import { run } from './run';
 
 describe("cart transform function", () => {
   it("returns NO_CHANGES when cart is empty", () => {
     expect(
-      cartTransform({
+      run({
+        presentmentCurrencyRate: 1,
         cart: {
           lines: [],
         },
@@ -19,7 +20,8 @@ describe("cart transform function", () => {
 
   it("returns NO_CHANGES when cart contains no add-ons", () => {
     expect(
-      cartTransform({
+      run({
+        presentmentCurrencyRate: 1,
         cart: {
           lines: [
             {
@@ -56,7 +58,8 @@ describe("cart transform function", () => {
 
   it("returns NO_CHANGES when cart contains no add-on cost", () => {
     expect(
-      cartTransform({
+      run({
+        presentmentCurrencyRate: 1,
         cart: {
           lines: [
             {
@@ -90,7 +93,8 @@ describe("cart transform function", () => {
 
   it("returns operations when cart contains an add-on", () => {
     expect(
-      cartTransform({
+      run({
+        presentmentCurrencyRate: 1,
         cart: {
           lines: [
             {
@@ -134,7 +138,7 @@ describe("cart transform function", () => {
                 price: {
                   adjustment: {
                     fixedPricePerUnit: {
-                      amount: "10",
+                      amount: "10.00",
                     },
                   },
                 },

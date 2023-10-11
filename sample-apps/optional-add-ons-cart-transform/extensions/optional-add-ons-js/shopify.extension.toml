@@ -1,8 +1,21 @@
-name = "add-ons-demo"
-type = "cart_transform"
-title = "cart transform"
 api_version = "unstable"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+[[extensions]]
+handle = "add-ons-demo"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
+
