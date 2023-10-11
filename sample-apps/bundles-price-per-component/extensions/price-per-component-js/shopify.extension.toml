@@ -1,8 +1,21 @@
-name = "price-per-component-demo"
-type = "cart_transform"
-title = "cart transform"
 api_version = "unstable"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+[[extensions]]
+handle = "price-per-component-demo"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
+
