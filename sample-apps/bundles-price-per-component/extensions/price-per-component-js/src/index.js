@@ -30,7 +30,7 @@ export default /**
   const operations = input.cart.lines.reduce(
     /** @param {CartOperation[]} acc */
     (acc, cartLine) => {
-      const expandOperation = optionallyBuildExpandOperation(cartLine);
+      const expandOperation = optionallyBuildExpandOperation(cartLine, input.presentmentCurrencyRate);
 
       if (expandOperation) {
         return [...acc, { expand: expandOperation }];
@@ -44,7 +44,7 @@ export default /**
   return operations.length > 0 ? { operations } : NO_CHANGES;
 };
 
-function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
+function optionallyBuildExpandOperation({ id: cartLineId, merchandise }, presentmentCurrencyRate) {
   const hasBundleDataMetafield = !!merchandise.product.bundledComponentData;
 
   if (merchandise.__typename === "ProductVariant" && hasBundleDataMetafield) {
@@ -58,11 +58,11 @@ function optionallyBuildExpandOperation({ id: cartLineId, merchandise }) {
 
     const expandedCartItems = bundleData.map((component) => ({
       merchandiseId: component.id,
-      quantity: 1,
+      quantity: component.quantity || 1,
       price: {
         adjustment: {
           fixedPricePerUnit: {
-            amount: component.price,
+            amount: component.price * presentmentCurrencyRate,
           },
         },
       },

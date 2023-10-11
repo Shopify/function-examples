@@ -32,7 +32,7 @@ export default /**
     (acc, cartLine) => {
       const expandOperation = optionallyBuildExpandOperation(
         cartLine,
-        input.cartTransform
+        input
       );
 
       if (expandOperation) {
@@ -49,7 +49,7 @@ export default /**
 
 function optionallyBuildExpandOperation(
   { id: cartLineId, merchandise, cost, warrantyAdded },
-  { warrantyVariantID }
+  { cartTransform: { warrantyVariantID }, presentmentCurrencyRate }
 ) {
   const hasWarrantyMetafields =
     !!merchandise.product.warrantyCostPercentage && !!warrantyVariantID;
@@ -71,7 +71,8 @@ function optionallyBuildExpandOperation(
               fixedPricePerUnit: {
                 amount: (
                   cost.amountPerQuantity.amount *
-                  (merchandise.product.warrantyCostPercentage.value / 100)
+                  (merchandise.product.warrantyCostPercentage.value / 100) *
+                  presentmentCurrencyRate
                 ).toString(),
               },
             },
