@@ -1,0 +1,49 @@
+{
+  "name": "order-submission-rules",
+  "private": true,
+  "scripts": {
+    "build": "NODE_ENV=production remix build",
+    "predev": "prisma generate && prisma migrate deploy",
+    "dev": "shopify app dev",
+    "config:link": "shopify app config link",
+    "config:push": "shopify app config push",
+    "generate": "shopify app generate",
+    "deploy": "shopify app deploy",
+    "config:use": "shopify app config use",
+    "env": "shopify app env",
+    "start": "remix-serve build",
+    "docker-start": "npm run setup && npm run start",
+    "setup": "prisma generate && prisma migrate deploy",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
+    "shopify": "shopify",
+    "prisma": "prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.13.0",
+    "@remix-run/node": "^1.19.1",
+    "@remix-run/react": "^1.19.1",
+    "@remix-run/serve": "^1.19.1",
+    "@shopify/app": "3.49.6",
+    "@shopify/app-bridge-types": "^0.0.3",
+    "@shopify/cli": "3.49.6",
+    "@shopify/polaris": "^11.1.2",
+    "@shopify/shopify-app-remix": "^1.3.0",
+    "@shopify/shopify-app-session-storage-prisma": "^1.1.1",
+    "cross-env": "^7.0.3",
+    "isbot": "latest",
+    "prisma": "^4.13.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^1.19.1",
+    "@remix-run/eslint-config": "^1.19.1",
+    "@types/eslint": "^8.40.0",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8"
+  },
+  "workspaces": [
+    "extensions/*"
+  ]
+}

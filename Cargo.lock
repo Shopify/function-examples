@@ -33,7 +33,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -43,24 +43,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
-name = "cart_transform"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "serde_with",
- "shopify_function 0.3.0",
-]
-
-[[package]]
 name = "checkout-cart-checkout-validation-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
+]
+
+[[package]]
+name = "checkout-cart-transform-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -70,7 +70,17 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
+]
+
+[[package]]
+name = "checkout-order-submission-rule-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -80,7 +90,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -147,7 +157,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -157,7 +167,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -176,7 +186,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -195,7 +205,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -314,7 +324,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -334,7 +344,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -344,7 +354,17 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
+]
+
+[[package]]
+name = "order-submission-rule-rust"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -354,7 +374,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]
@@ -373,7 +393,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function 0.3.0",
+ "shopify_function 0.4.0",
 ]
 
 [[package]]

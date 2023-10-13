@@ -1,0 +1,3 @@
+mutation Output($result: FunctionRunResult!) {
+    run(result: $result)
+}

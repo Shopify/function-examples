@@ -1,0 +1,7 @@
+query Input {
+  orderSubmissionRule {
+    metafield(namespace: "$app:{{handle | replace: " ", "-" | downcase}}", key: "function-configuration") {
+      value
+    }
+  }
+}

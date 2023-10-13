@@ -1,7 +1,7 @@
 api_version = "unstable"
 
 [[extensions]]
-handle = "{{handle}}"
+handle = "order-submission-rule-rust"
 name = "t:name"
 description = "t:description"
 type = "function"
@@ -13,7 +13,7 @@ type = "function"
 
   [extensions.build]
   command = "cargo wasi build --release"
-  path = "target/wasm32-wasi/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  path = "target/wasm32-wasi/release/order-submission-rule-rust.wasm"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]

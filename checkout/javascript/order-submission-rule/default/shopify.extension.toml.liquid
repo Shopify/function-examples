@@ -1,16 +1,20 @@
-name = "{{name}}"
-type = "function"
 api_version = "unstable"
 
-[[targeting]]
-target = "purchase.order-submission-rule.run"
-input_query = "input.graphql"
-export = "run"
+[[extensions]]
+handle = "{{handle}}"
+name = "t:name"
+description = "t:description"
+type = "function"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+  [[extensions.targeting]]
+  target = "purchase.order-submission-rule.run"
+  input_query = "src/run.graphql"
+  export = "run"
 
-[ui.paths]
-create = "/"
-details = "/"
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"

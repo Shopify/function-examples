@@ -1,0 +1,14 @@
+query RunInput {
+  cart {
+    cost {
+      totalAmount {
+        amount
+      }
+    }
+  }
+  orderSubmissionRule {
+    metafield(namespace: "$app:order-submission-rule-js", key: "function-configuration") {
+      value
+    }
+  }
+}

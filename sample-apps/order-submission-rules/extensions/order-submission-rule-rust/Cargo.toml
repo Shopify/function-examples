@@ -1,5 +1,5 @@
 [package]
-name = "{{handle | replace: " ", "-" | downcase}}"
+name = "order-submission-rule-rust"
 version = "1.0.0"
 edition = "2021"
 rust-version = "1.62"
