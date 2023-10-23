@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Functions on Shopify Community
+    url: https://community.shopify.com/c/shopify-functions/bd-p/functions
+    about: Please direct questions and issues to the Functions board on Shopify Community.
+  - name: Functions feature requests
+    url: https://github.com/Shopify/function-examples/discussions
+    about: Please post feature requests to the appropriate category in Discussions.
