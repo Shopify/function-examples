@@ -1,0 +1,21 @@
+api_version = "2023-10"
+
+[[extensions]]
+handle = "product-discount-rust"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.product-discount.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/product-discount-rust.wasm"
+  watch = ["src/**/*.rs"]
+
+  [extensions.ui.paths]
+  create = "/app/volume-discount/:functionId/new"
+  details = "/app/volume-discount/:functionId/:id"
