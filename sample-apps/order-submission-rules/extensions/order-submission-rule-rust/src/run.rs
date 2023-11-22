@@ -34,10 +34,10 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
             })],
         })
     } else {
-        eprintln!("Cart total has met the threshold, set submission to Draft Order");
+        eprintln!("Cart total has met the threshold, set submission to Review");
         Ok(output::FunctionRunResult {
             operations: vec![output::Operation::Set(output::SetOperation {
-                order_submission_type: OrderSubmission::DRAFT_ORDER,
+                order_submission_type: OrderSubmission::REVIEW,
             })],
         })
     }
@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sets_draft_order_when_total_more_than_configured() -> Result<()> {
+    fn test_sets_review_when_total_more_than_configured() -> Result<()> {
         use run::output::*;
 
         let result = run_function_with_input(
@@ -134,7 +134,7 @@ mod tests {
 
         let expected = FunctionRunResult {
             operations: vec![Operation::Set(SetOperation {
-                order_submission_type: OrderSubmission::DRAFT_ORDER,
+                order_submission_type: OrderSubmission::REVIEW,
             })],
         };
 

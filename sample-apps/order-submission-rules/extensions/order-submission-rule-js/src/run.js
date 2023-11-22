@@ -46,7 +46,7 @@ export function run(input) {
       operations: [
         {
           set: {
-            orderSubmissionType: OrderSubmission.DraftOrder
+            orderSubmissionType: OrderSubmission.Review
           },
         }
       ]

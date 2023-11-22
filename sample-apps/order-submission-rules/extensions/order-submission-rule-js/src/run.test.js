@@ -51,7 +51,7 @@ describe('order submission rule function', () => {
     expect(result).toEqual(expected);
   });
 
-  it("returns DraftOrder if total is more than configured", () => {
+  it("returns Review if total is more than configured", () => {
     const result = run({
       cart: {
         cost: {
@@ -68,7 +68,7 @@ describe('order submission rule function', () => {
     });
     const expected = /** @type {FunctionResult} */ ({ operations: [{
       set: {
-        orderSubmissionType: OrderSubmission.DraftOrder
+        orderSubmissionType: OrderSubmission.Review
       }
     }] });
 
