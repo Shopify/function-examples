@@ -3876,9 +3876,9 @@ Whether the buyer checkout creates an order or a draft order.
 """
 enum OrderSubmission {
   """
-  This setting means that the system will generate a draft order on checkout submission.
+  This setting means that the system will submit for review on checkout submission.
   """
-  DRAFT_ORDER
+  REVIEW
 
   """
   This setting means that the system will generate an order on checkout submission.
