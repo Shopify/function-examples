@@ -1,0 +1,21 @@
+api_version = "2023-10"
+
+[[extensions]]
+handle = "order-discount"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.order-discount.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/app/minimum-subtotal/:functionId/new"
+  details = "/app/minimum-subtotal/:functionId/:id"
+

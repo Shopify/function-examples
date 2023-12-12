@@ -1,0 +1,10 @@
+query RunInput {
+  discountNode {
+    metafield(
+      namespace: "$app:minimum-subtotal"
+      key: "function-configuration"
+    ) {
+      value
+    }
+  }
+}
