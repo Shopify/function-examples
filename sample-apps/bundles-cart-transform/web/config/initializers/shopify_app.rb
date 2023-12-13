@@ -61,15 +61,15 @@ Rails.application.config.after_initialize do
       user_agent_prefix: "ShopifyApp/#{ShopifyApp::VERSION}",
     )
 
-    add_gdpr_webhooks
+    add_privacy_webhooks
     ShopifyApp::WebhooksManager.add_registrations
   end
 end
 
-def add_gdpr_webhooks
-  gdpr_webhooks = [
-    # NOTE: To register the URLs for the three GDPR topics that follow, please set the appropriate
-    # webhook endpoint in the 'GDPR mandatory webhooks' section of 'App setup' in the Partners Dashboard.
+def add_privacy_webhooks
+  privacy_webhooks = [
+    # NOTE: To register the URLs for the three privacy topics that follow, please set the appropriate
+    # webhook endpoint in the 'privacy webhooks' section of 'App setup' in the Partners Dashboard.
     # The code that processes these webhooks is located in the `app/jobs` directory.
     #
     # 48 hours after a store owner uninstalls your app, Shopify invokes this SHOP_REDACT webhook.
@@ -88,8 +88,8 @@ def add_gdpr_webhooks
   ]
 
   ShopifyApp.configuration.webhooks = if ShopifyApp.configuration.has_webhooks?
-    ShopifyApp.configuration.webhooks.concat(gdpr_webhooks)
+    ShopifyApp.configuration.webhooks.concat(privacy_webhooks)
   else
-    gdpr_webhooks
+    privacy_webhooks
   end
 end
