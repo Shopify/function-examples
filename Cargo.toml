@@ -10,4 +10,7 @@ exclude = [
     "sample-apps/payment-customizations/extensions/payment-customization-js/",
     "sample-apps/bundles-cart-transform/extensions/cart-expand-js/",
     "sample-apps/order-submission-rules/extensions/order-submission-rule-js/",
+    "sample-apps/bundles-price-per-component/extensions/price-per-component-js",
+    "sample-apps/optional-add-ons-cart-transform/extensions/optional-add-ons-js",
+    "sample-apps/update-line-item/extensions/update-line-item-js",
 ]
