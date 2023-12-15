@@ -1,4 +1,4 @@
-api_version = "unstable"
+api_version = "2024-01"
 
 [[extensions]]
 handle = "price-per-component-demo"
