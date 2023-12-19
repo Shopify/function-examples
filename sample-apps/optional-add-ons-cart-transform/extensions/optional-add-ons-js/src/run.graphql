@@ -21,9 +21,9 @@ query RunInput {
           title
           product {
             # Access the metafield value to determine the cost of the warranty
-            warrantyCostPercentage: metafield(namespace: "demo", key: "warrnaty-cost-percentage") {
+            warrantyCostPercentage: metafield(namespace: "$app:optional-add-ons", key: "function-configuration") {
               type
-              value 
+              value
             }
           }
         }
@@ -32,7 +32,7 @@ query RunInput {
   }
   cartTransform {
     # Access the variant ID that represents the warranty product
-    warrantyVariantID: metafield(namespace: "demo", key: "warranty-variant-id") {
+    warrantyVariantID: metafield(namespace: "$app:optional-add-ons", key: "function-configuration") {
       value
     }
   }

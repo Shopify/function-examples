@@ -10,7 +10,7 @@ query RunInput {
           id
           title
           product {
-            bundledComponentData: metafield(namespace: "demo", key: "bundleData") {
+            bundledComponentData: metafield(namespace: "$app:bundles-price-per-component", key: "function-configuration") {
               type
               value
             }
