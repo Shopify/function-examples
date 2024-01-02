@@ -46,6 +46,9 @@ export function run(input) {
   return operations.length > 0 ? { operations } : NO_CHANGES;
 };
 
+/**
+ * @param {RunInput['cart']['lines'][number]} cartLine
+ */
 function optionallyBuildUpdateOperation(
   { id: cartLineId, merchandise, cost, fabricLength }
 ) {

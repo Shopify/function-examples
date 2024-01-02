@@ -30,10 +30,7 @@ export function run(input) {
   const operations = input.cart.lines.reduce(
     /** @param {CartOperation[]} acc */
     (acc, cartLine) => {
-      const expandOperation = optionallyBuildExpandOperation(
-        cartLine,
-        input
-      );
+      const expandOperation = optionallyBuildExpandOperation(cartLine, input);
 
       if (expandOperation) {
         return [...acc, { expand: expandOperation }];
@@ -45,15 +42,26 @@ export function run(input) {
   );
 
   return operations.length > 0 ? { operations } : NO_CHANGES;
-};
+}
 
+/**
+ * @param {RunInput['cart']['lines'][number]} cartLine
+ * @param {RunInput} input
+ */
 function optionallyBuildExpandOperation(
   { id: cartLineId, merchandise, cost, warrantyAdded },
   { cartTransform: { warrantyVariantID }, presentmentCurrencyRate }
 ) {
   const hasWarrantyMetafields =
-    !!merchandise.product.warrantyCostPercentage && !!warrantyVariantID;
+    merchandise.__typename === "ProductVariant" &&
+    !!merchandise.product.warrantyCostPercentage &&
+    !!warrantyVariantID;
   const shouldAddWarranty = warrantyAdded?.value === "Yes";
+  const warrantyCostPercentage =
+    merchandise.__typename === "ProductVariant" &&
+    merchandise.product?.warrantyCostPercentage?.value
+      ? parseFloat(merchandise.product.warrantyCostPercentage.value)
+      : 100;
 
   if (
     merchandise.__typename === "ProductVariant" &&
@@ -74,7 +82,7 @@ function optionallyBuildExpandOperation(
               fixedPricePerUnit: {
                 amount: (
                   cost.amountPerQuantity.amount *
-                  (merchandise.product.warrantyCostPercentage.value / 100) *
+                  (warrantyCostPercentage / 100) *
                   presentmentCurrencyRate
                 ).toFixed(2),
               },
