@@ -4,7 +4,7 @@ schema {
 }
 
 """
-Exactly one field of input must be provided, and all others omitted.
+Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
@@ -175,7 +175,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -2501,6 +2501,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2524,6 +2529,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2661,6 +2671,13 @@ input FunctionRunResult {
   """
   operations: [Operation!]!
 }
+
+"""
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -3634,7 +3651,7 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
@@ -3823,7 +3840,7 @@ type Product implements HasMetafields {
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
