@@ -4,7 +4,7 @@ schema {
 }
 
 """
-Exactly one field of input must be provided, and all others omitted.
+Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
@@ -164,6 +164,11 @@ An operation to apply to the Cart.
 input CartOperation @oneOf {
   expand: ExpandOperation
   merge: MergeOperation
+
+  """
+  A cart line update operation. Only stores on the Shopify Plus plan can use apps with update operations.
+  """
+  update: UpdateOperation
 }
 
 """
@@ -2436,6 +2441,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2459,6 +2469,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2521,9 +2536,19 @@ input ExpandOperation {
   expandedCartItems: [ExpandedItem!]!
 
   """
+  The image of the group.
+  """
+  image: ImageInput
+
+  """
   The price adjustment to the group.
   """
   price: PriceAdjustment
+
+  """
+  Title override. If title is not provided, variant title is used.
+  """
+  title: String
 }
 
 input ExpandedItem {
@@ -2533,9 +2558,44 @@ input ExpandedItem {
   merchandiseId: ID!
 
   """
+  The price adjustment for the expanded item.
+  """
+  price: ExpandedItemPriceAdjustment
+
+  """
   The quantity of the expanded item.The max quantity is 2000.
   """
   quantity: Int!
+}
+
+"""
+A fixed price per unit adjustment to apply to the expanded item.
+"""
+input ExpandedItemFixedPricePerUnitAdjustment {
+  """
+  The fixed price amount per quantity of the expanded item in presentment currency.
+  """
+  amount: Decimal!
+}
+
+"""
+A price adjustment to apply to the expanded item.
+"""
+input ExpandedItemPriceAdjustment {
+  """
+  The price adjustment for the expanded item.
+  """
+  adjustment: ExpandedItemPriceAdjustmentValue!
+}
+
+"""
+A price adjustment to apply to a cart line.
+"""
+input ExpandedItemPriceAdjustmentValue @oneOf {
+  """
+  A fixed price per unit adjustment to apply to the expanded item.
+  """
+  fixedPricePerUnit: ExpandedItemFixedPricePerUnitAdjustment
 }
 
 """
@@ -2558,6 +2618,13 @@ input FunctionRunResult {
   """
   operations: [CartOperation!]!
 }
+
+"""
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -3451,7 +3518,7 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
@@ -3618,7 +3685,7 @@ type Product implements HasMetafields {
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
@@ -3884,6 +3951,61 @@ For example, `"https://johns-apparel.myshopify.com"` is a valid URL. It includes
 (`johns-apparel.myshopify.com`).
 """
 scalar URL
+
+"""
+A cart line update operation. Only stores on the Shopify Plus plan can use apps with update operations.
+"""
+input UpdateOperation {
+  """
+  The ID of the cart line.
+  """
+  cartLineId: ID!
+
+  """
+  The image override for the cart line item.
+  """
+  image: ImageInput
+
+  """
+  The price adjustment for the cart line item.
+  """
+  price: UpdateOperationPriceAdjustment
+
+  """
+  The title override for the cart line item. If not provided, the variant title is used.
+  """
+  title: String
+}
+
+"""
+A fixed price per unit adjustment to apply to a cart line.
+"""
+input UpdateOperationFixedPricePerUnitAdjustment {
+  """
+  The fixed price amount per quantity of the cart line item in presentment currency.
+  """
+  amount: Decimal!
+}
+
+"""
+A price adjustment to apply to a cart line item.
+"""
+input UpdateOperationPriceAdjustment {
+  """
+  The price adjustment per unit to apply to the cart line item.
+  """
+  adjustment: UpdateOperationPriceAdjustmentValue!
+}
+
+"""
+A price adjustment to apply to a cart line item.
+"""
+input UpdateOperationPriceAdjustmentValue @oneOf {
+  """
+  A fixed price per unit adjustment to apply to a cart line.
+  """
+  fixedPricePerUnit: UpdateOperationFixedPricePerUnitAdjustment
+}
 
 """
 A void type that can be used to return a null value from a mutation.

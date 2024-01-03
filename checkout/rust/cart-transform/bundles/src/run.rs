@@ -168,6 +168,7 @@ fn get_expand_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation
                     .map(|(reference, &quantity)| ExpandedItem {
                         merchandise_id: reference,
                         quantity,
+                        price: None,
                     })
                     .collect();
 
@@ -177,6 +178,8 @@ fn get_expand_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation
                     cart_line_id: line.id.clone(),
                     expanded_cart_items: expand_relationships,
                     price,
+                    image: None,
+                    title: None,
                 })
                 .into()
             }

@@ -4,7 +4,7 @@ schema {
 }
 
 """
-Exactly one field of input must be provided, and all others omitted.
+Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
@@ -164,6 +164,11 @@ An operation to apply to the Cart.
 input CartOperation @oneOf {
   expand: ExpandOperation
   merge: MergeOperation
+
+  """
+  A cart line update operation. Only stores on the Shopify Plus plan can use apps with update operations.
+  """
+  update: UpdateOperation
 }
 
 """
@@ -180,9 +185,9 @@ type CartTransform implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -230,9 +235,9 @@ type Company implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -313,9 +318,9 @@ type CompanyLocation implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -328,6 +333,1249 @@ type CompanyLocation implements HasMetafields {
   at which the company location was last modified.
   """
   updatedAt: DateTime!
+}
+
+"""
+A country.
+"""
+type Country {
+  """
+  The ISO code of the country.
+  """
+  isoCode: CountryCode!
+}
+
+"""
+The code designating a country/region, which generally follows ISO 3166-1 alpha-2 guidelines.
+If a territory doesn't have a country code value in the `CountryCode` enum, then it might be considered a subdivision
+of another country. For example, the territories associated with Spain are represented by the country code `ES`,
+and the territories associated with the United States of America are represented by the country code `US`.
+"""
+enum CountryCode {
+  """
+  Ascension Island.
+  """
+  AC
+
+  """
+  Andorra.
+  """
+  AD
+
+  """
+  United Arab Emirates.
+  """
+  AE
+
+  """
+  Afghanistan.
+  """
+  AF
+
+  """
+  Antigua & Barbuda.
+  """
+  AG
+
+  """
+  Anguilla.
+  """
+  AI
+
+  """
+  Albania.
+  """
+  AL
+
+  """
+  Armenia.
+  """
+  AM
+
+  """
+  Netherlands Antilles.
+  """
+  AN
+
+  """
+  Angola.
+  """
+  AO
+
+  """
+  Argentina.
+  """
+  AR
+
+  """
+  Austria.
+  """
+  AT
+
+  """
+  Australia.
+  """
+  AU
+
+  """
+  Aruba.
+  """
+  AW
+
+  """
+  Åland Islands.
+  """
+  AX
+
+  """
+  Azerbaijan.
+  """
+  AZ
+
+  """
+  Bosnia & Herzegovina.
+  """
+  BA
+
+  """
+  Barbados.
+  """
+  BB
+
+  """
+  Bangladesh.
+  """
+  BD
+
+  """
+  Belgium.
+  """
+  BE
+
+  """
+  Burkina Faso.
+  """
+  BF
+
+  """
+  Bulgaria.
+  """
+  BG
+
+  """
+  Bahrain.
+  """
+  BH
+
+  """
+  Burundi.
+  """
+  BI
+
+  """
+  Benin.
+  """
+  BJ
+
+  """
+  St. Barthélemy.
+  """
+  BL
+
+  """
+  Bermuda.
+  """
+  BM
+
+  """
+  Brunei.
+  """
+  BN
+
+  """
+  Bolivia.
+  """
+  BO
+
+  """
+  Caribbean Netherlands.
+  """
+  BQ
+
+  """
+  Brazil.
+  """
+  BR
+
+  """
+  Bahamas.
+  """
+  BS
+
+  """
+  Bhutan.
+  """
+  BT
+
+  """
+  Bouvet Island.
+  """
+  BV
+
+  """
+  Botswana.
+  """
+  BW
+
+  """
+  Belarus.
+  """
+  BY
+
+  """
+  Belize.
+  """
+  BZ
+
+  """
+  Canada.
+  """
+  CA
+
+  """
+  Cocos (Keeling) Islands.
+  """
+  CC
+
+  """
+  Congo - Kinshasa.
+  """
+  CD
+
+  """
+  Central African Republic.
+  """
+  CF
+
+  """
+  Congo - Brazzaville.
+  """
+  CG
+
+  """
+  Switzerland.
+  """
+  CH
+
+  """
+  Côte d’Ivoire.
+  """
+  CI
+
+  """
+  Cook Islands.
+  """
+  CK
+
+  """
+  Chile.
+  """
+  CL
+
+  """
+  Cameroon.
+  """
+  CM
+
+  """
+  China.
+  """
+  CN
+
+  """
+  Colombia.
+  """
+  CO
+
+  """
+  Costa Rica.
+  """
+  CR
+
+  """
+  Cuba.
+  """
+  CU
+
+  """
+  Cape Verde.
+  """
+  CV
+
+  """
+  Curaçao.
+  """
+  CW
+
+  """
+  Christmas Island.
+  """
+  CX
+
+  """
+  Cyprus.
+  """
+  CY
+
+  """
+  Czechia.
+  """
+  CZ
+
+  """
+  Germany.
+  """
+  DE
+
+  """
+  Djibouti.
+  """
+  DJ
+
+  """
+  Denmark.
+  """
+  DK
+
+  """
+  Dominica.
+  """
+  DM
+
+  """
+  Dominican Republic.
+  """
+  DO
+
+  """
+  Algeria.
+  """
+  DZ
+
+  """
+  Ecuador.
+  """
+  EC
+
+  """
+  Estonia.
+  """
+  EE
+
+  """
+  Egypt.
+  """
+  EG
+
+  """
+  Western Sahara.
+  """
+  EH
+
+  """
+  Eritrea.
+  """
+  ER
+
+  """
+  Spain.
+  """
+  ES
+
+  """
+  Ethiopia.
+  """
+  ET
+
+  """
+  Finland.
+  """
+  FI
+
+  """
+  Fiji.
+  """
+  FJ
+
+  """
+  Falkland Islands.
+  """
+  FK
+
+  """
+  Faroe Islands.
+  """
+  FO
+
+  """
+  France.
+  """
+  FR
+
+  """
+  Gabon.
+  """
+  GA
+
+  """
+  United Kingdom.
+  """
+  GB
+
+  """
+  Grenada.
+  """
+  GD
+
+  """
+  Georgia.
+  """
+  GE
+
+  """
+  French Guiana.
+  """
+  GF
+
+  """
+  Guernsey.
+  """
+  GG
+
+  """
+  Ghana.
+  """
+  GH
+
+  """
+  Gibraltar.
+  """
+  GI
+
+  """
+  Greenland.
+  """
+  GL
+
+  """
+  Gambia.
+  """
+  GM
+
+  """
+  Guinea.
+  """
+  GN
+
+  """
+  Guadeloupe.
+  """
+  GP
+
+  """
+  Equatorial Guinea.
+  """
+  GQ
+
+  """
+  Greece.
+  """
+  GR
+
+  """
+  South Georgia & South Sandwich Islands.
+  """
+  GS
+
+  """
+  Guatemala.
+  """
+  GT
+
+  """
+  Guinea-Bissau.
+  """
+  GW
+
+  """
+  Guyana.
+  """
+  GY
+
+  """
+  Hong Kong SAR.
+  """
+  HK
+
+  """
+  Heard & McDonald Islands.
+  """
+  HM
+
+  """
+  Honduras.
+  """
+  HN
+
+  """
+  Croatia.
+  """
+  HR
+
+  """
+  Haiti.
+  """
+  HT
+
+  """
+  Hungary.
+  """
+  HU
+
+  """
+  Indonesia.
+  """
+  ID
+
+  """
+  Ireland.
+  """
+  IE
+
+  """
+  Israel.
+  """
+  IL
+
+  """
+  Isle of Man.
+  """
+  IM
+
+  """
+  India.
+  """
+  IN
+
+  """
+  British Indian Ocean Territory.
+  """
+  IO
+
+  """
+  Iraq.
+  """
+  IQ
+
+  """
+  Iran.
+  """
+  IR
+
+  """
+  Iceland.
+  """
+  IS
+
+  """
+  Italy.
+  """
+  IT
+
+  """
+  Jersey.
+  """
+  JE
+
+  """
+  Jamaica.
+  """
+  JM
+
+  """
+  Jordan.
+  """
+  JO
+
+  """
+  Japan.
+  """
+  JP
+
+  """
+  Kenya.
+  """
+  KE
+
+  """
+  Kyrgyzstan.
+  """
+  KG
+
+  """
+  Cambodia.
+  """
+  KH
+
+  """
+  Kiribati.
+  """
+  KI
+
+  """
+  Comoros.
+  """
+  KM
+
+  """
+  St. Kitts & Nevis.
+  """
+  KN
+
+  """
+  North Korea.
+  """
+  KP
+
+  """
+  South Korea.
+  """
+  KR
+
+  """
+  Kuwait.
+  """
+  KW
+
+  """
+  Cayman Islands.
+  """
+  KY
+
+  """
+  Kazakhstan.
+  """
+  KZ
+
+  """
+  Laos.
+  """
+  LA
+
+  """
+  Lebanon.
+  """
+  LB
+
+  """
+  St. Lucia.
+  """
+  LC
+
+  """
+  Liechtenstein.
+  """
+  LI
+
+  """
+  Sri Lanka.
+  """
+  LK
+
+  """
+  Liberia.
+  """
+  LR
+
+  """
+  Lesotho.
+  """
+  LS
+
+  """
+  Lithuania.
+  """
+  LT
+
+  """
+  Luxembourg.
+  """
+  LU
+
+  """
+  Latvia.
+  """
+  LV
+
+  """
+  Libya.
+  """
+  LY
+
+  """
+  Morocco.
+  """
+  MA
+
+  """
+  Monaco.
+  """
+  MC
+
+  """
+  Moldova.
+  """
+  MD
+
+  """
+  Montenegro.
+  """
+  ME
+
+  """
+  St. Martin.
+  """
+  MF
+
+  """
+  Madagascar.
+  """
+  MG
+
+  """
+  North Macedonia.
+  """
+  MK
+
+  """
+  Mali.
+  """
+  ML
+
+  """
+  Myanmar (Burma).
+  """
+  MM
+
+  """
+  Mongolia.
+  """
+  MN
+
+  """
+  Macao SAR.
+  """
+  MO
+
+  """
+  Martinique.
+  """
+  MQ
+
+  """
+  Mauritania.
+  """
+  MR
+
+  """
+  Montserrat.
+  """
+  MS
+
+  """
+  Malta.
+  """
+  MT
+
+  """
+  Mauritius.
+  """
+  MU
+
+  """
+  Maldives.
+  """
+  MV
+
+  """
+  Malawi.
+  """
+  MW
+
+  """
+  Mexico.
+  """
+  MX
+
+  """
+  Malaysia.
+  """
+  MY
+
+  """
+  Mozambique.
+  """
+  MZ
+
+  """
+  Namibia.
+  """
+  NA
+
+  """
+  New Caledonia.
+  """
+  NC
+
+  """
+  Niger.
+  """
+  NE
+
+  """
+  Norfolk Island.
+  """
+  NF
+
+  """
+  Nigeria.
+  """
+  NG
+
+  """
+  Nicaragua.
+  """
+  NI
+
+  """
+  Netherlands.
+  """
+  NL
+
+  """
+  Norway.
+  """
+  NO
+
+  """
+  Nepal.
+  """
+  NP
+
+  """
+  Nauru.
+  """
+  NR
+
+  """
+  Niue.
+  """
+  NU
+
+  """
+  New Zealand.
+  """
+  NZ
+
+  """
+  Oman.
+  """
+  OM
+
+  """
+  Panama.
+  """
+  PA
+
+  """
+  Peru.
+  """
+  PE
+
+  """
+  French Polynesia.
+  """
+  PF
+
+  """
+  Papua New Guinea.
+  """
+  PG
+
+  """
+  Philippines.
+  """
+  PH
+
+  """
+  Pakistan.
+  """
+  PK
+
+  """
+  Poland.
+  """
+  PL
+
+  """
+  St. Pierre & Miquelon.
+  """
+  PM
+
+  """
+  Pitcairn Islands.
+  """
+  PN
+
+  """
+  Palestinian Territories.
+  """
+  PS
+
+  """
+  Portugal.
+  """
+  PT
+
+  """
+  Paraguay.
+  """
+  PY
+
+  """
+  Qatar.
+  """
+  QA
+
+  """
+  Réunion.
+  """
+  RE
+
+  """
+  Romania.
+  """
+  RO
+
+  """
+  Serbia.
+  """
+  RS
+
+  """
+  Russia.
+  """
+  RU
+
+  """
+  Rwanda.
+  """
+  RW
+
+  """
+  Saudi Arabia.
+  """
+  SA
+
+  """
+  Solomon Islands.
+  """
+  SB
+
+  """
+  Seychelles.
+  """
+  SC
+
+  """
+  Sudan.
+  """
+  SD
+
+  """
+  Sweden.
+  """
+  SE
+
+  """
+  Singapore.
+  """
+  SG
+
+  """
+  St. Helena.
+  """
+  SH
+
+  """
+  Slovenia.
+  """
+  SI
+
+  """
+  Svalbard & Jan Mayen.
+  """
+  SJ
+
+  """
+  Slovakia.
+  """
+  SK
+
+  """
+  Sierra Leone.
+  """
+  SL
+
+  """
+  San Marino.
+  """
+  SM
+
+  """
+  Senegal.
+  """
+  SN
+
+  """
+  Somalia.
+  """
+  SO
+
+  """
+  Suriname.
+  """
+  SR
+
+  """
+  South Sudan.
+  """
+  SS
+
+  """
+  São Tomé & Príncipe.
+  """
+  ST
+
+  """
+  El Salvador.
+  """
+  SV
+
+  """
+  Sint Maarten.
+  """
+  SX
+
+  """
+  Syria.
+  """
+  SY
+
+  """
+  Eswatini.
+  """
+  SZ
+
+  """
+  Tristan da Cunha.
+  """
+  TA
+
+  """
+  Turks & Caicos Islands.
+  """
+  TC
+
+  """
+  Chad.
+  """
+  TD
+
+  """
+  French Southern Territories.
+  """
+  TF
+
+  """
+  Togo.
+  """
+  TG
+
+  """
+  Thailand.
+  """
+  TH
+
+  """
+  Tajikistan.
+  """
+  TJ
+
+  """
+  Tokelau.
+  """
+  TK
+
+  """
+  Timor-Leste.
+  """
+  TL
+
+  """
+  Turkmenistan.
+  """
+  TM
+
+  """
+  Tunisia.
+  """
+  TN
+
+  """
+  Tonga.
+  """
+  TO
+
+  """
+  Turkey.
+  """
+  TR
+
+  """
+  Trinidad & Tobago.
+  """
+  TT
+
+  """
+  Tuvalu.
+  """
+  TV
+
+  """
+  Taiwan.
+  """
+  TW
+
+  """
+  Tanzania.
+  """
+  TZ
+
+  """
+  Ukraine.
+  """
+  UA
+
+  """
+  Uganda.
+  """
+  UG
+
+  """
+  U.S. Outlying Islands.
+  """
+  UM
+
+  """
+  United States.
+  """
+  US
+
+  """
+  Uruguay.
+  """
+  UY
+
+  """
+  Uzbekistan.
+  """
+  UZ
+
+  """
+  Vatican City.
+  """
+  VA
+
+  """
+  St. Vincent & Grenadines.
+  """
+  VC
+
+  """
+  Venezuela.
+  """
+  VE
+
+  """
+  British Virgin Islands.
+  """
+  VG
+
+  """
+  Vietnam.
+  """
+  VN
+
+  """
+  Vanuatu.
+  """
+  VU
+
+  """
+  Wallis & Futuna.
+  """
+  WF
+
+  """
+  Samoa.
+  """
+  WS
+
+  """
+  Kosovo.
+  """
+  XK
+
+  """
+  Yemen.
+  """
+  YE
+
+  """
+  Mayotte.
+  """
+  YT
+
+  """
+  South Africa.
+  """
+  ZA
+
+  """
+  Zambia.
+  """
+  ZM
+
+  """
+  Zimbabwe.
+  """
+  ZW
+
+  """
+  Unknown Region.
+  """
+  ZZ
 }
 
 """
@@ -1082,7 +2330,7 @@ enum CurrencyCode {
   VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
-  Venezuelan Bolivares (VES).
+  Venezuelan Bolivares Soberanos (VES).
   """
   VES
 
@@ -1193,6 +2441,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -1218,6 +2471,11 @@ type Customer implements HasMetafields {
   id: ID!
 
   """
+  The customer's last name.
+  """
+  lastName: String
+
+  """
   Returns a metafield by namespace and key that belongs to the resource.
   """
   metafield(
@@ -1227,9 +2485,9 @@ type Customer implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -1239,11 +2497,25 @@ type Customer implements HasMetafields {
 }
 
 """
+Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date string.
+For example, September 7, 2019 is represented as `"2019-07-16"`.
+"""
+scalar Date
+
+"""
 Represents an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)-encoded date and time string.
 For example, 3:50 pm on September 7, 2019 in the time zone of UTC (Coordinated Universal Time) is
 represented as `"2019-09-07T15:50:00Z`".
 """
 scalar DateTime
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the date and time but not the timezone which is determined from context.
+
+For example, "2018-01-01T00:00:00".
+"""
+scalar DateTimeWithoutTimezone
 
 """
 A signed decimal number, which supports arbitrary precision and is serialized as a string.
@@ -1264,9 +2536,19 @@ input ExpandOperation {
   expandedCartItems: [ExpandedItem!]!
 
   """
+  The image of the group.
+  """
+  image: ImageInput
+
+  """
   The price adjustment to the group.
   """
   price: PriceAdjustment
+
+  """
+  Title override. If title is not provided, variant title is used.
+  """
+  title: String
 }
 
 input ExpandedItem {
@@ -1276,13 +2558,49 @@ input ExpandedItem {
   merchandiseId: ID!
 
   """
+  The price adjustment for the expanded item.
+  """
+  price: ExpandedItemPriceAdjustment
+
+  """
   The quantity of the expanded item.The max quantity is 2000.
   """
   quantity: Int!
 }
 
 """
-Transformations to apply to the Cart.
+A fixed price per unit adjustment to apply to the expanded item.
+"""
+input ExpandedItemFixedPricePerUnitAdjustment {
+  """
+  The fixed price amount per quantity of the expanded item in presentment currency.
+  """
+  amount: Decimal!
+}
+
+"""
+A price adjustment to apply to the expanded item.
+"""
+input ExpandedItemPriceAdjustment {
+  """
+  The price adjustment for the expanded item.
+  """
+  adjustment: ExpandedItemPriceAdjustmentValue!
+}
+
+"""
+A price adjustment to apply to a cart line.
+"""
+input ExpandedItemPriceAdjustmentValue @oneOf {
+  """
+  A fixed price per unit adjustment to apply to the expanded item.
+  """
+  fixedPricePerUnit: ExpandedItemFixedPricePerUnitAdjustment
+}
+
+"""
+Transformations to apply to the Cart. In API versions 2023-10 and beyond, this
+type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -1290,6 +2608,23 @@ input FunctionResult {
   """
   operations: [CartOperation!]!
 }
+
+"""
+Transformations to apply to the Cart.
+"""
+input FunctionRunResult {
+  """
+  Cart operations to run on Cart.
+  """
+  operations: [CartOperation!]!
+}
+
+"""
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -1305,9 +2640,9 @@ interface HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 }
 
@@ -1354,6 +2689,886 @@ type Input {
   The CartTransform containing the function.
   """
   cartTransform: CartTransform!
+
+  """
+  The localization of the Function execution context.
+  """
+  localization: Localization!
+
+  """
+  The conversion rate between the shop's currency and the currency of the cart.
+  """
+  presentmentCurrencyRate: Decimal!
+
+  """
+  Information about the shop.
+  """
+  shop: Shop!
+}
+
+"""
+A language.
+"""
+type Language {
+  """
+  The ISO code.
+  """
+  isoCode: LanguageCode!
+}
+
+"""
+ISO 639-1 language codes supported by Shopify.
+"""
+enum LanguageCode {
+  """
+  Afrikaans.
+  """
+  AF
+
+  """
+  Akan.
+  """
+  AK
+
+  """
+  Amharic.
+  """
+  AM
+
+  """
+  Arabic.
+  """
+  AR
+
+  """
+  Assamese.
+  """
+  AS
+
+  """
+  Azerbaijani.
+  """
+  AZ
+
+  """
+  Belarusian.
+  """
+  BE
+
+  """
+  Bulgarian.
+  """
+  BG
+
+  """
+  Bambara.
+  """
+  BM
+
+  """
+  Bangla.
+  """
+  BN
+
+  """
+  Tibetan.
+  """
+  BO
+
+  """
+  Breton.
+  """
+  BR
+
+  """
+  Bosnian.
+  """
+  BS
+
+  """
+  Catalan.
+  """
+  CA
+
+  """
+  Chechen.
+  """
+  CE
+
+  """
+  Czech.
+  """
+  CS
+
+  """
+  Church Slavic.
+  """
+  CU
+
+  """
+  Welsh.
+  """
+  CY
+
+  """
+  Danish.
+  """
+  DA
+
+  """
+  German.
+  """
+  DE
+
+  """
+  Dzongkha.
+  """
+  DZ
+
+  """
+  Ewe.
+  """
+  EE
+
+  """
+  Greek.
+  """
+  EL
+
+  """
+  English.
+  """
+  EN
+
+  """
+  Esperanto.
+  """
+  EO
+
+  """
+  Spanish.
+  """
+  ES
+
+  """
+  Estonian.
+  """
+  ET
+
+  """
+  Basque.
+  """
+  EU
+
+  """
+  Persian.
+  """
+  FA
+
+  """
+  Fulah.
+  """
+  FF
+
+  """
+  Finnish.
+  """
+  FI
+
+  """
+  Faroese.
+  """
+  FO
+
+  """
+  French.
+  """
+  FR
+
+  """
+  Western Frisian.
+  """
+  FY
+
+  """
+  Irish.
+  """
+  GA
+
+  """
+  Scottish Gaelic.
+  """
+  GD
+
+  """
+  Galician.
+  """
+  GL
+
+  """
+  Gujarati.
+  """
+  GU
+
+  """
+  Manx.
+  """
+  GV
+
+  """
+  Hausa.
+  """
+  HA
+
+  """
+  Hebrew.
+  """
+  HE
+
+  """
+  Hindi.
+  """
+  HI
+
+  """
+  Croatian.
+  """
+  HR
+
+  """
+  Hungarian.
+  """
+  HU
+
+  """
+  Armenian.
+  """
+  HY
+
+  """
+  Interlingua.
+  """
+  IA
+
+  """
+  Indonesian.
+  """
+  ID
+
+  """
+  Igbo.
+  """
+  IG
+
+  """
+  Sichuan Yi.
+  """
+  II
+
+  """
+  Icelandic.
+  """
+  IS
+
+  """
+  Italian.
+  """
+  IT
+
+  """
+  Japanese.
+  """
+  JA
+
+  """
+  Javanese.
+  """
+  JV
+
+  """
+  Georgian.
+  """
+  KA
+
+  """
+  Kikuyu.
+  """
+  KI
+
+  """
+  Kazakh.
+  """
+  KK
+
+  """
+  Kalaallisut.
+  """
+  KL
+
+  """
+  Khmer.
+  """
+  KM
+
+  """
+  Kannada.
+  """
+  KN
+
+  """
+  Korean.
+  """
+  KO
+
+  """
+  Kashmiri.
+  """
+  KS
+
+  """
+  Kurdish.
+  """
+  KU
+
+  """
+  Cornish.
+  """
+  KW
+
+  """
+  Kyrgyz.
+  """
+  KY
+
+  """
+  Luxembourgish.
+  """
+  LB
+
+  """
+  Ganda.
+  """
+  LG
+
+  """
+  Lingala.
+  """
+  LN
+
+  """
+  Lao.
+  """
+  LO
+
+  """
+  Lithuanian.
+  """
+  LT
+
+  """
+  Luba-Katanga.
+  """
+  LU
+
+  """
+  Latvian.
+  """
+  LV
+
+  """
+  Malagasy.
+  """
+  MG
+
+  """
+  Māori.
+  """
+  MI
+
+  """
+  Macedonian.
+  """
+  MK
+
+  """
+  Malayalam.
+  """
+  ML
+
+  """
+  Mongolian.
+  """
+  MN
+
+  """
+  Marathi.
+  """
+  MR
+
+  """
+  Malay.
+  """
+  MS
+
+  """
+  Maltese.
+  """
+  MT
+
+  """
+  Burmese.
+  """
+  MY
+
+  """
+  Norwegian (Bokmål).
+  """
+  NB
+
+  """
+  North Ndebele.
+  """
+  ND
+
+  """
+  Nepali.
+  """
+  NE
+
+  """
+  Dutch.
+  """
+  NL
+
+  """
+  Norwegian Nynorsk.
+  """
+  NN
+
+  """
+  Norwegian.
+  """
+  NO
+
+  """
+  Oromo.
+  """
+  OM
+
+  """
+  Odia.
+  """
+  OR
+
+  """
+  Ossetic.
+  """
+  OS
+
+  """
+  Punjabi.
+  """
+  PA
+
+  """
+  Polish.
+  """
+  PL
+
+  """
+  Pashto.
+  """
+  PS
+
+  """
+  Portuguese.
+  """
+  PT
+
+  """
+  Portuguese (Brazil).
+  """
+  PT_BR
+
+  """
+  Portuguese (Portugal).
+  """
+  PT_PT
+
+  """
+  Quechua.
+  """
+  QU
+
+  """
+  Romansh.
+  """
+  RM
+
+  """
+  Rundi.
+  """
+  RN
+
+  """
+  Romanian.
+  """
+  RO
+
+  """
+  Russian.
+  """
+  RU
+
+  """
+  Kinyarwanda.
+  """
+  RW
+
+  """
+  Sindhi.
+  """
+  SD
+
+  """
+  Northern Sami.
+  """
+  SE
+
+  """
+  Sango.
+  """
+  SG
+
+  """
+  Sinhala.
+  """
+  SI
+
+  """
+  Slovak.
+  """
+  SK
+
+  """
+  Slovenian.
+  """
+  SL
+
+  """
+  Shona.
+  """
+  SN
+
+  """
+  Somali.
+  """
+  SO
+
+  """
+  Albanian.
+  """
+  SQ
+
+  """
+  Serbian.
+  """
+  SR
+
+  """
+  Sundanese.
+  """
+  SU
+
+  """
+  Swedish.
+  """
+  SV
+
+  """
+  Swahili.
+  """
+  SW
+
+  """
+  Tamil.
+  """
+  TA
+
+  """
+  Telugu.
+  """
+  TE
+
+  """
+  Tajik.
+  """
+  TG
+
+  """
+  Thai.
+  """
+  TH
+
+  """
+  Tigrinya.
+  """
+  TI
+
+  """
+  Turkmen.
+  """
+  TK
+
+  """
+  Tongan.
+  """
+  TO
+
+  """
+  Turkish.
+  """
+  TR
+
+  """
+  Tatar.
+  """
+  TT
+
+  """
+  Uyghur.
+  """
+  UG
+
+  """
+  Ukrainian.
+  """
+  UK
+
+  """
+  Urdu.
+  """
+  UR
+
+  """
+  Uzbek.
+  """
+  UZ
+
+  """
+  Vietnamese.
+  """
+  VI
+
+  """
+  Volapük.
+  """
+  VO
+
+  """
+  Wolof.
+  """
+  WO
+
+  """
+  Xhosa.
+  """
+  XH
+
+  """
+  Yiddish.
+  """
+  YI
+
+  """
+  Yoruba.
+  """
+  YO
+
+  """
+  Chinese.
+  """
+  ZH
+
+  """
+  Chinese (Simplified).
+  """
+  ZH_CN
+
+  """
+  Chinese (Traditional).
+  """
+  ZH_TW
+
+  """
+  Zulu.
+  """
+  ZU
+}
+
+"""
+Represents limited information about the current time relative to the parent object.
+"""
+type LocalTime {
+  """
+  The current date relative to the parent object.
+  """
+  date: Date!
+
+  """
+  Returns true if the current date and time is at or past the given date and time, and false otherwise.
+  """
+  dateTimeAfter(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent object.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is before the given date and time, and false otherwise.
+  """
+  dateTimeBefore(
+    """
+    The date and time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    dateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current date and time is between the two given date and times, and false otherwise.
+  """
+  dateTimeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endDateTime: DateTimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startDateTime: DateTimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeAfter(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is at or past the given time, and false otherwise.
+  """
+  timeBefore(
+    """
+    The time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    time: TimeWithoutTimezone!
+  ): Boolean!
+
+  """
+  Returns true if the current time is between the two given times, and false otherwise.
+  """
+  timeBetween(
+    """
+    The upper bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    endTime: TimeWithoutTimezone!
+
+    """
+    The lower bound time to compare against, assumed to be in the timezone of the parent timezone.
+    """
+    startTime: TimeWithoutTimezone!
+  ): Boolean!
+}
+
+"""
+Information about the localized experiences configured for the shop.
+"""
+type Localization {
+  """
+  The country of the active localized experience.
+  """
+  country: Country!
+
+  """
+  The language of the active localized experience.
+  """
+  language: Language!
+
+  """
+  The market of the active localized experience.
+  """
+  market: Market!
+}
+
+"""
+A market is a group of one or more regions that you want to target for international sales.
+By creating a market, you can configure a distinct, localized shopping experience for
+customers from a specific area of the world. For example, you can
+[change currency](https://shopify.dev/api/admin-graphql/current/mutations/marketCurrencySettingsUpdate),
+[configure international pricing](https://shopify.dev/api/examples/product-price-lists),
+or [add market-specific domains or subfolders](https://shopify.dev/api/admin-graphql/current/objects/MarketWebPresence).
+"""
+type Market implements HasMetafields {
+  """
+  A human-readable unique string for the market automatically generated from its title.
+  """
+  handle: Handle!
+
+  """
+  A globally-unique identifier.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+
+  """
+  A geographic region which comprises a market.
+  """
+  regions: [MarketRegion!]!
+}
+
+"""
+Represents a region.
+"""
+interface MarketRegion {
+  """
+  The name of the region in the language of the current localization.
+  """
+  name: String
+}
+
+"""
+A country which comprises a market.
+"""
+type MarketRegionCountry implements MarketRegion {
+  """
+  The two-letter code for the country.
+  """
+  code: CountryCode!
+
+  """
+  The country name in the language of the current localization.
+  """
+  name: String!
 }
 
 """
@@ -1436,6 +3651,16 @@ type MutationRoot {
     The result of the Function.
     """
     result: FunctionResult!
+  ): Void! @deprecated(reason: "Use the target-specific field instead.")
+
+  """
+  Handles the Function result for the purchase.cart-transform.run target.
+  """
+  run(
+    """
+    The result of the Function.
+    """
+    result: FunctionRunResult!
   ): Void!
 }
 
@@ -1460,7 +3685,7 @@ type Product implements HasMetafields {
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
@@ -1522,9 +3747,9 @@ type Product implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -1562,9 +3787,9 @@ type ProductVariant implements HasMetafields {
     key: String!
 
     """
-    The namespace for the metafield.
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
     """
-    namespace: String!
+    namespace: String
   ): Metafield
 
   """
@@ -1687,6 +3912,38 @@ type SellingPlanAllocationPriceAdjustment {
 }
 
 """
+Information about the shop.
+"""
+type Shop implements HasMetafields {
+  """
+  Information about the current time relative to the shop's timezone setting.
+  """
+  localTime: LocalTime!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
+includes the time but not the date or timezone which is determined from context.
+For example, "05:43:21".
+"""
+scalar TimeWithoutTimezone
+
+"""
 Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) and
 [RFC 3987](https://datatracker.ietf.org/doc/html/rfc3987)-compliant URI string.
 
@@ -1694,6 +3951,61 @@ For example, `"https://johns-apparel.myshopify.com"` is a valid URL. It includes
 (`johns-apparel.myshopify.com`).
 """
 scalar URL
+
+"""
+A cart line update operation. Only stores on the Shopify Plus plan can use apps with update operations.
+"""
+input UpdateOperation {
+  """
+  The ID of the cart line.
+  """
+  cartLineId: ID!
+
+  """
+  The image override for the cart line item.
+  """
+  image: ImageInput
+
+  """
+  The price adjustment for the cart line item.
+  """
+  price: UpdateOperationPriceAdjustment
+
+  """
+  The title override for the cart line item. If not provided, the variant title is used.
+  """
+  title: String
+}
+
+"""
+A fixed price per unit adjustment to apply to a cart line.
+"""
+input UpdateOperationFixedPricePerUnitAdjustment {
+  """
+  The fixed price amount per quantity of the cart line item in presentment currency.
+  """
+  amount: Decimal!
+}
+
+"""
+A price adjustment to apply to a cart line item.
+"""
+input UpdateOperationPriceAdjustment {
+  """
+  The price adjustment per unit to apply to the cart line item.
+  """
+  adjustment: UpdateOperationPriceAdjustmentValue!
+}
+
+"""
+A price adjustment to apply to a cart line item.
+"""
+input UpdateOperationPriceAdjustmentValue @oneOf {
+  """
+  A fixed price per unit adjustment to apply to a cart line.
+  """
+  fixedPricePerUnit: UpdateOperationFixedPricePerUnitAdjustment
+}
 
 """
 A void type that can be used to return a null value from a mutation.

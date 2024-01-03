@@ -3,7 +3,7 @@ query RunInput {
     lines {
       id
       cost {
-        totalAmount {
+        amountPerQuantity {
           amount
           currencyCode
         }

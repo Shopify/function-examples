@@ -1,7 +1,7 @@
 name = "test-demo"
 type = "cart_transform"
 title = "cart transform"
-api_version = "2023-07"
+api_version = "2024-01"
 
 [build]
 command = ""

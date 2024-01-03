@@ -44,10 +44,12 @@ export function run(input) {
   return operations.length > 0 ? { operations } : NO_CHANGES;
 };
 
+/**
+ * @param {RunInput['cart']['lines'][number]} cartLine
+ * @param {RunInput['presentmentCurrencyRate']} presentmentCurrencyRate
+ */
 function optionallyBuildExpandOperation({ id: cartLineId, merchandise }, presentmentCurrencyRate) {
-  const hasBundleDataMetafield = !!merchandise.product.bundledComponentData;
-
-  if (merchandise.__typename === "ProductVariant" && hasBundleDataMetafield) {
+  if (merchandise.__typename === "ProductVariant" && merchandise.product.bundledComponentData) {
     const bundleData = JSON.parse(
       merchandise.product.bundledComponentData.value
     );
