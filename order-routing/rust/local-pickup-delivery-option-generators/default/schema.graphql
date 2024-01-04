@@ -4,11 +4,6 @@ schema {
 }
 
 """
-Only allow the field to be queried when targeting one of the specified targets.
-"""
-directive @restrictTarget(only: [String!]!) on FIELD_DEFINITION
-
-"""
 Represents a generic custom attribute.
 """
 type Attribute {
@@ -51,13 +46,6 @@ type BuyerIdentity {
   The purchasing company associated with the cart.
   """
   purchasingCompany: PurchasingCompany
-
-  """
-  Represents the [Shop User](https://help.shopify.com/en/manual/online-sales-channels/shop/sign-in-features)
-   corresponding to the customer within the shop, if the buyer is a Shop User. Can be used to request [Shop User
-   metafields](https://shopify.dev/docs/api/shop-user-custom-data).
-  """
-  shopUser: ShopUser
 }
 
 """
@@ -182,7 +170,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -394,11 +382,6 @@ type CompanyLocation implements HasMetafields {
   The name of the company location.
   """
   name: String!
-
-  """
-  The number of orders placed at this company location.
-  """
-  orderCount: Int!
 
   """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
@@ -1560,11 +1543,6 @@ enum CountryCode {
   UM
 
   """
-  Unknown country code.
-  """
-  UNKNOWN__
-
-  """
   United States.
   """
   US
@@ -2407,7 +2385,7 @@ enum CurrencyCode {
   VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
-  Venezuelan Bolivares (VES).
+  Venezuelan Bolivares Soberanos (VES).
   """
   VES
 
@@ -2518,6 +2496,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2541,6 +2524,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2679,8 +2667,7 @@ type DeliveryOptionGenerator implements HasMetafields {
 }
 
 """
-A group of lines that can be fulfilled from one of many possible inventory locations.
-Fulfillment constraints can impact the available inventory locations for a fulfillment group.
+A group of one or more items to be fulfilled together.
 """
 type FulfillmentGroup {
   """
@@ -2694,28 +2681,24 @@ type FulfillmentGroup {
   handle: Handle!
 
   """
+  The ID of the fulfillment group.
+  """
+  id: ID!
+
+  """
+  A list of inventory location handles for the fulfillment group.
+  """
+  inventoryLocationHandles: [Handle!]!
+
+  """
   The merchandise in the fulfillment group.
   """
   lines: [CartLine!]!
-
-  """
-  A list of location handles that can fulfill items in the fulfillment group.
-  """
-  locationHandles: [Handle!]!
 }
 
 """
-The result of a local pickup option generator fetch command.
-"""
-input FunctionFetchResult {
-  """
-  Request.
-  """
-  request: HttpRequest
-}
-
-"""
-The result of a local pickup delivery option generator function. This type is deprecated in favor of `FunctionRunResult`.
+The result of a local pickup delivery option generator function. In API versions
+2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2746,7 +2729,7 @@ type GateConfiguration implements HasMetafields {
   """
   A non-unique string used to group gate configurations.
   """
-  handle: String
+  handle: Handle
 
   """
   The ID of the gate configuration.
@@ -2807,7 +2790,7 @@ interface HasGates {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 }
 
@@ -2847,111 +2830,6 @@ type HasTagResponse {
 }
 
 """
-The attributes associated with an HTTP request.
-"""
-input HttpRequest {
-  """
-  The HTTP body.
-  """
-  body: String
-
-  """
-  The HTTP headers.
-  """
-  headers: [HttpRequestHeader!]!
-
-  """
-  The HTTP method.
-  """
-  method: HttpRequestMethod!
-
-  """
-  Policy attached to the HTTP request.
-  """
-  policy: HttpRequestPolicy!
-
-  """
-  The HTTP url (eg.: https://example.com). The scheme needs to be HTTPS.
-  """
-  url: URL!
-}
-
-"""
-The attributes associated with an HTTP request header.
-"""
-input HttpRequestHeader {
-  """
-  Header name.
-  """
-  name: String!
-
-  """
-  Header value.
-  """
-  value: String!
-}
-
-"""
-The HTTP request available methods.
-"""
-enum HttpRequestMethod {
-  """
-  Http GET.
-  """
-  GET
-
-  """
-  Http POST.
-  """
-  POST
-}
-
-"""
-The attributes associated with an HTTP request policy.
-"""
-input HttpRequestPolicy {
-  """
-  Read timeout in milliseconds.
-  """
-  readTimeoutMs: Int!
-}
-
-"""
-The attributes associated with an HTTP response.
-"""
-type HttpResponse {
-  """
-  The HTTP body.
-  """
-  body: String
-
-  """
-  The HTTP headers.
-  """
-  headers: [HttpResponseHeader!]!
-
-  """
-  The HTTP status code.
-  """
-  status: Int!
-}
-
-"""
-The attributes associated with an HTTP response header.
-"""
-type HttpResponseHeader {
-  """
-  Header name.
-  """
-  name: String!
-
-  """
-  Header value.
-  """
-  value: String!
-}
-
-"""
 Represents a unique identifier, often used to refetch an object.
 The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
 
@@ -2969,11 +2847,6 @@ type Input {
   The delivery option generator that owns the current function.
   """
   deliveryOptionGenerator: DeliveryOptionGenerator!
-
-  """
-  The HTTP response of the HTTP request
-  """
-  fetchResult: HttpResponse @restrictTarget(only: ["purchase.local-pickup-delivery-option-generator.run"])
 
   """
   A list of fulfillment groups.
@@ -3731,11 +3604,6 @@ input LocalPickupDeliveryOption {
   cost: Decimal
 
   """
-  The fulfillment group handles that this delivery option is limited to. Defaults to all groups.
-  """
-  fulfillmentGroupHandles: [Handle!]
-
-  """
   The pickup location.
   """
   pickupLocation: PickupLocation!
@@ -4038,17 +3906,12 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
   """
   id: ID!
-
-  """
-  The manager of the market, if the accessing app is the market’s manager. Otherwise, this will be null.
-  """
-  manager: MarketManager
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -4069,17 +3932,6 @@ type Market implements HasMetafields {
   A geographic region which comprises a market.
   """
   regions: [MarketRegion!]!
-}
-
-"""
-The entity that manages a particular market.
-"""
-type MarketManager {
-  """
-  The identity of the manager. This can either be `merchant` if the market is
-  manually managed by the merchant or an ID of the app responsible for managing the market.
-  """
-  identifier: String!
 }
 
 """
@@ -4153,16 +4005,6 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result for the purchase.local-pickup-delivery-option-generator.fetch target.
-  """
-  fetch(
-    """
-    The result of the Function.
-    """
-    result: FunctionFetchResult!
-  ): Void!
-
-  """
   Handles the Function result.
   """
   handleResult(
@@ -4217,13 +4059,13 @@ type Product implements HasGates & HasMetafields {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
@@ -4475,40 +4317,11 @@ type Shop implements HasMetafields {
 }
 
 """
-Represents information about the buyer that is interacting with the cart.
-"""
-type ShopUser implements HasMetafields {
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
-}
-
-"""
 A subset of the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format that
 includes the time but not the date or timezone which is determined from context.
 For example, "05:43:21".
 """
 scalar TimeWithoutTimezone
-
-"""
-Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) and
-[RFC 3987](https://datatracker.ietf.org/doc/html/rfc3987)-compliant URI string.
-
-For example, `"https://johns-apparel.myshopify.com"` is a valid URL. It includes a scheme (`https`) and a host
-(`johns-apparel.myshopify.com`).
-"""
-scalar URL
 
 """
 A void type that can be used to return a null value from a mutation.
