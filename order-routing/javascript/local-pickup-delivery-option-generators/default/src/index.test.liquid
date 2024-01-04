@@ -27,7 +27,7 @@ describe('local pickup delivery option generator function', () => {
           deliveryGroup: {
             id: "gid://shopify/CartDeliveryGroup/1"
           },
-          locationHandles: ["2578303"]
+          inventoryLocationHandles: ["2578303"]
         }
       ],
       locations: [
@@ -47,7 +47,6 @@ describe('local pickup delivery option generator function', () => {
       operations: [
         {
           add: {
-            fulfillmentGroupHandles: ["gid://shopify/FulfillmentGroup/1"],
             title: "Main St.",
             cost: 1.99,
             pickupLocation: {
@@ -88,7 +87,7 @@ describe('local pickup delivery option generator function', () => {
           deliveryGroup: {
             id: "gid://shopify/CartDeliveryGroup/1"
           },
-          locationHandles: ["2578303"]
+          inventoryLocationHandles: ["2578303"]
         }
       ],
       locations: [
@@ -108,7 +107,6 @@ describe('local pickup delivery option generator function', () => {
       operations: [
         {
           add: {
-            fulfillmentGroupHandles: ["1"],
             title: "Main St.",
             cost: 1.99,
             pickupLocation: {

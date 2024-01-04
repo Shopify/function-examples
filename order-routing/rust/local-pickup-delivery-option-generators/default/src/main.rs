@@ -15,7 +15,6 @@ struct Config {}
 fn function(_input: input::ResponseData) -> Result<output::FunctionResult> {
     let operations = vec![output::Operation {
         add: output::LocalPickupDeliveryOption {
-            fulfillment_group_handles: None,
             title: Some("Main St.".to_string()),
             cost: Some(Decimal(1.99)),
             pickup_location: output::PickupLocation {
