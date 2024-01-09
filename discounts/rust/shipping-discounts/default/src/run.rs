@@ -15,20 +15,14 @@ impl Configuration {
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
 fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
-    let no_discount = output::FunctionRunResult {
-        discounts: vec![],
-        discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
-    };
+    let no_discount = output::FunctionRunResult { discounts: vec![] };
 
     let _config = match input.discount_node.metafield {
         Some(input::InputDiscountNodeMetafield { value }) => Configuration::from_str(&value),
         None => return Ok(no_discount),
     };
 
-    Ok(output::FunctionRunResult {
-        discounts: vec![],
-        discount_application_strategy: output::DiscountApplicationStrategy::FIRST,
-    })
+    Ok(output::FunctionRunResult { discounts: vec![] })
 }
 
 #[cfg(test)]
@@ -50,10 +44,7 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult {
-            discounts: vec![],
-            discount_application_strategy: DiscountApplicationStrategy::FIRST,
-        };
+        let expected = FunctionRunResult { discounts: vec![] };
 
         assert_eq!(result, expected);
         Ok(())

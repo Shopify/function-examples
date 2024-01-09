@@ -15,7 +15,6 @@ describe('shipping discounts function', () => {
     });
     const expected = /** @type {FunctionResult} */ ({
       discounts: [],
-      discountApplicationStrategy: "FIRST",
     });
 
     expect(result).toEqual(expected);
@@ -35,7 +34,6 @@ describe('shipping discounts function', () => {
     });
     const expected: FunctionResult = {
       discounts: [],
-      discountApplicationStrategy: DiscountApplicationStrategy.First,
     };
 
     expect(result).toEqual(expected);
