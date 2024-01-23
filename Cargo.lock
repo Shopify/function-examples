@@ -161,6 +161,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "discounts-discounts-allocator-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function 0.4.0",
+]
+
+[[package]]
 name = "discounts-order-discounts-default"
 version = "1.0.0"
 dependencies = [
