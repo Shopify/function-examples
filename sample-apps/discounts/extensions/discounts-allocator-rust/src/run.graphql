@@ -1,0 +1,51 @@
+query Input {
+  discounts {
+    id
+    title
+    code
+    discountApplicationStrategy
+    discountProposals
+    {
+      handle
+      message
+      valueType
+      value
+      targets{
+        cartLineId
+        quantity
+      }
+    }
+    metafield(namespace: "testing-app-allocator", key: "single-discount-cap") {
+      value
+    }
+  }
+  presentmentCurrencyRate
+  cart {
+    lines {
+      id
+      quantity
+      cost {
+        amountPerQuantity {
+          amount
+          currencyCode
+        }
+      }
+      merchandise {
+        __typename
+        ... on ProductVariant {
+          id
+          title
+          product {
+            id
+            title
+          }
+        }
+      }
+    }
+  }
+  shop {
+    metafield(namespace: "testing-app-allocator", key: "per-cart-cap") {
+      value
+    }
+  }
+}
