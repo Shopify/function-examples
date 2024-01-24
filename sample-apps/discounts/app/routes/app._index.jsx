@@ -25,82 +25,62 @@ import { authenticate } from "../shopify.server";
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
 
-  return json({ shop: session.shop.replace(".myshopify.com", "") });
+  return json({ shop: session.shop.replace(".myshopify.com", "") }, discounts_allocator_id: process.env.SHOPIFY_DISCOUNTS_ALLOCATOR_ID);
 };
 
-export async function action({ request }) {
-  const { admin } = await authenticate.admin(request);
-
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($input: ProductInput!) {
-        productCreate(input: $input) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
+export const action = async ({params, request}: ActionArgs) => {
+  const registerDiscountsAllocatorMutation = `
+    #graphql
+      mutation registerDiscountsAllocator($functionExtensionId: String!) {
+        discountsAllocatorFunctionRegister(functionExtensionId: $functionExtensionId) {
+          userErrors {
+            code
+            message
+            field
           }
         }
-      }`,
-    {
+      }
+    `;
+
+  const formData = await request.formData();
+  const functionExtensionId = formData.get('functionExtensionId');
+
+  if (functionExtensionId !== null) {
+    const {admin} = await authenticate.admin(request);
+
+    const response = await admin.graphql(registerDiscountsAllocatorMutation, {
       variables: {
-        input: {
-          title: `${color} Snowboard`,
-          variants: [{ price: Math.random() * 100 }],
-        },
+        functionExtensionId: JSON.parse(functionExtensionId),
       },
-    }
-  );
+    });
 
-  const responseJson = await response.json();
+    const responseJson = await response.json();
+    const errors =
+      responseJson.data.discountsAllocatorFunctionRegister?.userErrors;
+    return json({errors});
+  }
 
-  return json({
-    product: responseJson.data.productCreate.product,
-  });
-}
+  return json({errors: ['No functionExtensionId provided']});
+};
 
 export default function Index() {
   const nav = useNavigation();
-  const { shop } = useLoaderData();
+  const { shop, discounts_allocator_id } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
 
   const isLoading =
     ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
 
-  const productId = actionData?.product?.id.replace(
-    "gid://shopify/Product/",
-    ""
-  );
-
   useEffect(() => {
-    if (productId) {
-      shopify.toast.show("Product created");
+    if (actionData?.errors && actionData?.errors.length === 0) {
+      shopify.toast.show('Discounts Allocator Function registered successfully!');
     }
-  }, [productId]);
-
-  const generateProduct = () => submit({}, { replace: true, method: "POST" });
+  }, [actionData]);
 
   return (
     <Page>
       <ui-title-bar title="Remix app template">
-        <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button>
       </ui-title-bar>
       <VerticalStack gap="5">
         <Layout>
@@ -135,48 +115,16 @@ export default function Index() {
                   </Text>
                 </VerticalStack>
                 <VerticalStack gap="2">
-                  <Text as="h3" variant="headingMd">
-                    Get started with products
-                  </Text>
-                  <Text as="p" variant="bodyMd">
-                    Generate a product with GraphQL and get the JSON output for
-                    that product. Learn more about the{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-                      target="_blank"
-                    >
-                      productCreate
-                    </Link>{" "}
-                    mutation in our API references.
-                  </Text>
-                </VerticalStack>
-                <HorizontalStack gap="3" align="end">
-                  {actionData?.product && (
-                    <Button
-                      url={`https://admin.shopify.com/store/${shop}/admin/products/${productId}`}
-                      target="_blank"
-                    >
-                      View product
-                    </Button>
-                  )}
-                  <Button loading={isLoading} primary onClick={generateProduct}>
-                    Generate a product
-                  </Button>
-                </HorizontalStack>
-                {actionData?.product && (
-                  <Box
-                    padding="4"
-                    background="bg-subdued"
-                    borderColor="border"
-                    borderWidth="1"
-                    borderRadius="2"
-                    overflowX="scroll"
-                  >
-                    <pre style={{ margin: 0 }}>
-                      <code>{JSON.stringify(actionData.product, null, 2)}</code>
-                    </pre>
-                  </Box>
-                )}
+                <Form
+                  onSubmit={() =>
+                    submitForm(
+                      {functionExtensionId: JSON.stringify(id)},
+                      {method: 'post'},
+                    )
+                  }
+                >
+                  <Button submit>Register Discounts Allocator Function</Button>
+                </Form>
               </VerticalStack>
             </Card>
           </Layout.Section>
