@@ -13,7 +13,7 @@ type = "function"
 
   [extensions.build]
   command = "cargo wasi build --release"
-  path = "target/wasm32-wasi/release/discounts-allocator.wasm"
+  path = "target/wasm32-wasi/release/{{handle | replace: " ", "-" | downcase}}.wasm"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]
