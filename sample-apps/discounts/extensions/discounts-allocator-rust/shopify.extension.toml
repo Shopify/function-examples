@@ -17,5 +17,5 @@ type = "function"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]
-  create = "/"
-  details = "/"
+  create = "/app/discounts-allocator/:functionId"
+  details = "/app/discounts-allocator/:functionId"
