@@ -1,0 +1,33 @@
+{%- if flavor contains "vanilla-js" -%}
+/**
+ * @typedef {import("../generated/api").RunInput} RunInput
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ */
+
+const EMPTY_RESULT = {
+  displayableErrors: [],
+  lineDiscounts: [],
+};
+
+/**
+ * @param {RunInput} input
+ * @returns {FunctionRunResult}
+ */
+export function run(input) {
+  return EMPTY_RESULT
+}
+{%- elsif flavor contains "typescript" -%}
+import type {
+  RunInput,
+  FunctionRunResult
+} from "../generated/api";
+
+const EMPTY_RESULT: FunctionRunResult = {
+  displayableErrors: [],
+  lineDiscounts: [],
+};
+
+export function run(input: RunInput): FunctionRunResult {
+  return EMPTY_RESULT
+}
+{%- endif -%}
