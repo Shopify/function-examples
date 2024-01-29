@@ -2710,6 +2710,11 @@ The strategy that's applied to the list of discounts.
 """
 enum DiscountApplicationStrategy {
   """
+  Apply all discounts with conditions that are satisfied.
+  """
+  ALL
+
+  """
   Only apply the first discount with conditions that are satisfied.
   """
   FIRST
@@ -2755,14 +2760,9 @@ type DiscountProposal {
   targets: [CartLineTarget!]!
 
   """
-  The value of the reduction.
+  The value of the discount.
   """
-  value: Decimal!
-
-  """
-  The value type of the discount.
-  """
-  valueType: Value!
+  value: Value!
 }
 
 input DisplayableError {
@@ -2775,6 +2775,22 @@ input DisplayableError {
   The error message in the user's locale.
   """
   reason: String!
+}
+
+"""
+A fixed amount value.
+"""
+type FixedAmount {
+  """
+  The fixed amount value of the discount, in the currency of the cart.
+  """
+  amount: Decimal!
+
+  """
+  Allocation method of the discount, will be allocated on each line if it's
+  true, else will be allocated across target lines.
+  """
+  appliesToEachItem: Boolean!
 }
 
 """
@@ -4026,11 +4042,16 @@ input OutputAllocations {
   The ID of the source discount proposal.
   """
   discountProposalId: Handle!
+}
 
+"""
+A percentage value.
+"""
+type Percentage {
   """
-  The sequence of this allocation display.
+  The percentage value.
   """
-  sequence: Int
+  value: Decimal!
 }
 
 """
@@ -4309,19 +4330,9 @@ For example, "05:43:21".
 scalar TimeWithoutTimezone
 
 """
-List of different types of values discounts can have.
+The value of the discount.
 """
-enum Value {
-  """
-  A discount with a fixed amount value.
-  """
-  FIXED_AMOUNT
-
-  """
-  A discount with a percentage value.
-  """
-  PERCENTAGE
-}
+union Value = FixedAmount | Percentage
 
 """
 A void type that can be used to return a null value from a mutation.
