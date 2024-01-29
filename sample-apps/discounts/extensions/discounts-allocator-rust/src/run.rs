@@ -56,10 +56,17 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
             let current_target_ratio = current_target_price / total_targets_price;
 
             let mut line_discount_amount: f64 = 0.0;
-            if proposal.value_type == input::Value::FIXED_AMOUNT {
-              line_discount_amount = f64::from(proposal.value) * current_target_ratio;
-            } else if proposal.value_type == input::Value::PERCENTAGE {
-              line_discount_amount = f64::from(proposal.value) / 100.0  * total_targets_price * current_target_ratio;
+            match &proposal.value {
+              input::InputDiscountsDiscountProposalsValue::FixedAmount(fixed_amount_proposal) => {
+                if fixed_amount_proposal.applies_to_each_item {
+                  line_discount_amount = f64::from(fixed_amount_proposal.amount) * target.quantity as f64;
+                } else {
+                  line_discount_amount = f64::from(fixed_amount_proposal.amount) * current_target_ratio;
+                }
+              },
+              input::InputDiscountsDiscountProposalsValue::Percentage(percentage_proposal) => {
+                line_discount_amount = f64::from(percentage_proposal.value) / 100.0  * total_targets_price * current_target_ratio;
+              }
             }
 
             if current_discount_cap >= 0.0 && current_discount_total + line_discount_amount > current_discount_cap {
@@ -135,8 +142,11 @@ mod tests {
                     {
                       "handle": "8d783e44-14b9-4c2c-b431-2be340f1f4e1",
                       "message": "CAPS",
-                      "valueType": "FIXED_AMOUNT",
-                      "value": "10.0",
+                      "value": {
+                        "__typename": "FixedAmount",
+                        "amount": "10.0",
+                        "appliesToEachItem": false
+                      },
                       "targets": [
                         {
                           "cartLineId": "gid:\/\/shopify\/CartLine\/0",
@@ -156,8 +166,10 @@ mod tests {
                     {
                       "handle": "a7194cec-d807-4c46-9284-4fec7a3f5fbe",
                       "message": "TIES",
-                      "valueType": "PERCENTAGE",
-                      "value": "20.0",
+                      "value": {
+                        "__typename": "Percentage",
+                        "value": "20.0"
+                      },
                       "targets": [
                         {
                           "cartLineId": "gid:\/\/shopify\/CartLine\/1",
@@ -176,8 +188,7 @@ mod tests {
                     "quantity": 5,
                     "cost": {
                       "amountPerQuantity": {
-                        "amount": "32.0",
-                        "currencyCode": "CAD"
+                        "amount": "32.0"
                       }
                     },
                     "merchandise": {
@@ -195,8 +206,7 @@ mod tests {
                     "quantity": 6,
                     "cost": {
                       "amountPerQuantity": {
-                        "amount": "20.0",
-                        "currencyCode": "CAD"
+                        "amount": "20.0"
                       }
                     },
                     "merchandise": {
@@ -248,7 +258,7 @@ mod tests {
     }
 
     #[test]
-    fn test_result_with_10_cart_max() -> Result<()> {
+    fn test_result_with_each_and_across_allocations() -> Result<()> {
       let result = run_function_with_input(
           run,
           r#"
@@ -264,8 +274,11 @@ mod tests {
                   {
                     "handle": "8d783e44-14b9-4c2c-b431-2be340f1f4e1",
                     "message": "CAPS",
-                    "valueType": "PERCENTAGE",
-                    "value": "5.0",
+                    "value": {
+                      "__typename": "FixedAmount",
+                      "amount": "5.0",
+                      "appliesToEachItem": true
+                    },
                     "targets": [
                       {
                         "cartLineId": "gid:\/\/shopify\/CartLine\/0",
@@ -285,8 +298,11 @@ mod tests {
                   {
                     "handle": "a7194cec-d807-4c46-9284-4fec7a3f5fbe",
                     "message": "TIES",
-                    "valueType": "PERCENTAGE",
-                    "value": "10.0",
+                    "value": {
+                      "__typename": "FixedAmount",
+                      "amount": "10.0",
+                      "appliesToEachItem": false
+                    },
                     "targets": [
                       {
                         "cartLineId": "gid:\/\/shopify\/CartLine\/1",
@@ -305,8 +321,7 @@ mod tests {
                   "quantity": 5,
                   "cost": {
                     "amountPerQuantity": {
-                      "amount": "32.0",
-                      "currencyCode": "CAD"
+                      "amount": "32.0"
                     }
                   },
                   "merchandise": {
@@ -324,8 +339,138 @@ mod tests {
                   "quantity": 6,
                   "cost": {
                     "amountPerQuantity": {
-                      "amount": "20.0",
-                      "currencyCode": "CAD"
+                      "amount": "20.0"
+                    }
+                  },
+                  "merchandise": {
+                    "__typename": "ProductVariant",
+                    "id": "gid:\/\/shopify\/ProductVariant\/17",
+                    "title": "Shorts",
+                    "product": {
+                      "id": "gid:\/\/shopify\/Product\/9",
+                      "title": "Shorts"
+                    }
+                  }
+                }
+              ]
+            },
+            "shop": {
+              "metafield": null
+            }
+          }
+          "#,
+      )?;
+      let expected = output::FunctionRunResult {
+          line_discounts: Some(vec![
+            output::LineDiscount {
+              cart_line_id: String::from("gid://shopify/CartLine/0"),
+              quantity: 5,
+              allocations: vec![
+                output::OutputAllocations{
+                  discount_proposal_id: String::from("8d783e44-14b9-4c2c-b431-2be340f1f4e1"),
+                  amount: shopify_function::prelude::Decimal(25.0), // $5 (each) * 5 (qty)
+                }
+              ]
+            },
+            output::LineDiscount {
+              cart_line_id: String::from("gid://shopify/CartLine/1"),
+              quantity: 6,
+              allocations: vec![
+                output::OutputAllocations{
+                  discount_proposal_id: String::from("a7194cec-d807-4c46-9284-4fec7a3f5fbe"),
+                  amount: shopify_function::prelude::Decimal(10.0),  // $10 (across)
+                }
+              ]
+            }
+          ]),
+          displayable_errors: Some(vec![]),
+      };
+
+      assert_eq!(result, expected);
+      Ok(())
+  }
+
+    #[test]
+    fn test_result_with_10_cart_max() -> Result<()> {
+      let result = run_function_with_input(
+          run,
+          r#"
+          {
+            "discounts": [
+              {
+                "id": "gid:\/\/shopify\/DiscountNode\/13",
+                "title": "CAPS",
+                "code": "CAPS",
+                "type": "CodePriceRule",
+                "discountApplicationStrategy": "FIRST",
+                "discountProposals": [
+                  {
+                    "handle": "8d783e44-14b9-4c2c-b431-2be340f1f4e1",
+                    "message": "CAPS",
+                    "value": {
+                      "__typename": "Percentage",
+                      "value": "5.0"
+                    },
+                    "targets": [
+                      {
+                        "cartLineId": "gid:\/\/shopify\/CartLine\/0",
+                        "quantity": 5
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "gid:\/\/shopify\/DiscountNode\/8",
+                "title": "TIES",
+                "code": "TIES",
+                "type": "CodePriceRule",
+                "discountApplicationStrategy": "FIRST",
+                "discountProposals": [
+                  {
+                    "handle": "a7194cec-d807-4c46-9284-4fec7a3f5fbe",
+                    "message": "TIES",
+                    "value": {
+                      "__typename": "Percentage",
+                      "value": "10.0"
+                    },
+                    "targets": [
+                      {
+                        "cartLineId": "gid:\/\/shopify\/CartLine\/1",
+                        "quantity": 6
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "presentmentCurrencyRate": "1.2706752",
+            "cart": {
+              "lines": [
+                {
+                  "id": "gid:\/\/shopify\/CartLine\/0",
+                  "quantity": 5,
+                  "cost": {
+                    "amountPerQuantity": {
+                      "amount": "32.0"
+                    }
+                  },
+                  "merchandise": {
+                    "__typename": "ProductVariant",
+                    "id": "gid:\/\/shopify\/ProductVariant\/17",
+                    "title": "Shorts",
+                    "product": {
+                      "id": "gid:\/\/shopify\/Product\/9",
+                      "title": "Shorts"
+                    }
+                  }
+                },
+                {
+                  "id": "gid:\/\/shopify\/CartLine\/1",
+                  "quantity": 6,
+                  "cost": {
+                    "amountPerQuantity": {
+                      "amount": "20.0"
                     }
                   },
                   "merchandise": {

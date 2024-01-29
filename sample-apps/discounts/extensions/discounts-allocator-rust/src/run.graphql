@@ -8,8 +8,16 @@ query Input {
     {
       handle
       message
-      valueType
-      value
+      value {
+        __typename
+        ... on FixedAmount {
+          amount
+          appliesToEachItem
+        }
+        ... on Percentage {
+          value
+        }
+      }
       targets{
         cartLineId
         quantity
@@ -27,7 +35,6 @@ query Input {
       cost {
         amountPerQuantity {
           amount
-          currencyCode
         }
       }
       merchandise {

@@ -43,11 +43,14 @@ export function run(input) {
         const currentTargetRatio = currentTargetPrice / totalTargetsPrice;
 
         let lineDiscountAmount = 0.0;
-        if (proposal.valueType === 'FIXED_AMOUNT') {
-          lineDiscountAmount = proposal.value * currentTargetRatio;
-        } else if (proposal.valueType === 'PERCENTAGE') {
-          lineDiscountAmount =
-            (proposal.value / 100.0) * totalTargetsPrice * currentTargetRatio;
+        if (proposal.value.__typename == 'FixedAmount') {
+          if (proposal.value.appliesToEachItem) {
+            lineDiscountAmount = proposal.value.amount * target.quantity;
+          } else {
+            lineDiscountAmount = proposal.value.amount * currentTargetRatio;
+          }
+        } else if (proposal.value.__typename == 'Percentage') {
+          lineDiscountAmount = (proposal.value.value / 100.0) * totalTargetsPrice * currentTargetRatio;
         }
 
         if (
@@ -80,12 +83,9 @@ export function run(input) {
         currentDiscountTotal += lineDiscountAmount;
 
         const targetLineIndex = getTargetLineIndex(target);
-        const targetSequence =
-          allLinesOutputDiscounts[targetLineIndex].allocations.length;
         const targetAllocation = {
           discountProposalId: proposal.handle,
           amount: new Decimal(lineDiscountAmount),
-          sequence: targetSequence,
         };
         allLinesOutputDiscounts[targetLineIndex].allocations.push(
           targetAllocation,
