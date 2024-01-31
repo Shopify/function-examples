@@ -194,7 +194,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -1527,7 +1527,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -2520,6 +2520,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2543,6 +2548,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2697,6 +2707,13 @@ input FunctionRunResult {
 }
 
 """
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
+
+"""
 Represents information about the metafields associated to the specified resource.
 """
 interface HasMetafields {
@@ -2764,6 +2781,11 @@ type Input {
   Information about the shop.
   """
   shop: Shop!
+
+  """
+  The validation rule that owns the current function.
+  """
+  validation: Validation!
 }
 
 """
@@ -3653,7 +3675,7 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
@@ -3779,7 +3801,7 @@ type Product implements HasMetafields {
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
@@ -4036,6 +4058,26 @@ includes the time but not the date or timezone which is determined from context.
 For example, "05:43:21".
 """
 scalar TimeWithoutTimezone
+
+"""
+A customization that validates a cart and/or checkout.
+"""
+type Validation implements HasMetafields {
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
 
 """
 A void type that can be used to return a null value from a mutation.
