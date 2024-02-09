@@ -1,12 +1,11 @@
 // @ts-check
 
 /*
-A straightforward example of a function that expands a bundle into its component parts.
-The parts of a bundle are stored in a metafield on the product parent value with a specific format,
-specifying each part's quantity and variant.
+A straightforward example of a function that updates a line item title and price based on attributes.
 
-The function reads the cart. Any item containing the metafield that specifies the bundle parts
-will return an Expand operation containing the parts.
+The function reads the cart. Any item with a specific line item attribute will be used
+to generate an update operation with a custom title, and price based on simple math using 
+the line item attribute value.
 */
 
 /**
