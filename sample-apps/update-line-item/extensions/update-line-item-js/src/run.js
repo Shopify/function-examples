@@ -1,7 +1,7 @@
 // @ts-check
 
 /*
-A straightforward example of a function that updates a line item price based on attributes.
+A straightforward example of a function that updates a line item title and price based on attributes.
 
 The function reads the cart. Any item with a specific line item attribute will be used
 to generate an update operation with a custom title, and price based on simple math using 
