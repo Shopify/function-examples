@@ -170,7 +170,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -1503,7 +1503,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -2496,6 +2496,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2519,6 +2524,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2641,9 +2651,14 @@ A group of one or more items to be fulfilled together.
 """
 type FulfillmentGroup {
   """
+  The delivery address for the fulfillment group.
+  """
+  deliveryAddress: MailingAddress
+
+  """
   The delivery group for the fulfillment group.
   """
-  deliveryGroup: CartDeliveryGroup!
+  deliveryGroup: CartDeliveryGroup! @deprecated(reason: "Use `deliveryAddress` instead.")
 
   """
   The fulfillment group handle.
@@ -2653,7 +2668,7 @@ type FulfillmentGroup {
   """
   The ID of the fulfillment group.
   """
-  id: ID!
+  id: ID! @deprecated(reason: "Use `handle` instead.")
 
   """
   A list of inventory location handles for the fulfillment group.
@@ -2697,81 +2712,11 @@ input FunctionRunResult {
 }
 
 """
-Represents a gate configuration.
-"""
-type GateConfiguration implements HasMetafields {
-  """
-  An optional string identifier.
-  """
-  appId: String
-
-  """
-  A non-unique string used to group gate configurations.
-  """
-  handle: String
-
-  """
-  The ID of the gate configuration.
-  """
-  id: ID!
-
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
-}
-
-"""
-Represents a connection from a subject to a gate configuration.
-"""
-type GateSubject {
-  """
-  The bound gate configuration.
-  """
-  configuration(
-    """
-    The appId of the gate configurations to search for.
-    """
-    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
-  ): GateConfiguration!
-
-  """
-  The ID of the gate subject.
-  """
-  id: ID!
-}
-
-"""
 A function-scoped handle to a refer a resource.
 The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
 Example value: `"10079785100"`
 """
 scalar Handle
-
-"""
-Gate subjects associated to the specified resource.
-"""
-interface HasGates {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates(
-    """
-    The handle of the gate configurations to search for.
-    """
-    handle: String
-  ): [GateSubject!]!
-}
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -2946,11 +2891,6 @@ enum LanguageCode {
   CE
 
   """
-  Central Kurdish.
-  """
-  CKB
-
-  """
   Czech.
   """
   CS
@@ -3029,11 +2969,6 @@ enum LanguageCode {
   Finnish.
   """
   FI
-
-  """
-  Filipino.
-  """
-  FIL
 
   """
   Faroese.
@@ -3384,16 +3319,6 @@ enum LanguageCode {
   Kinyarwanda.
   """
   RW
-
-  """
-  Sanskrit.
-  """
-  SA
-
-  """
-  Sardinian.
-  """
-  SC
 
   """
   Sindhi.
@@ -3868,7 +3793,7 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
@@ -4020,21 +3945,11 @@ type OrderRoutingLocationRule implements HasMetafields {
 """
 Represents a product.
 """
-type Product implements HasGates & HasMetafields {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates(
-    """
-    The handle of the gate configurations to search for.
-    """
-    handle: String
-  ): [GateSubject!]!
-
+type Product implements HasMetafields {
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.

@@ -358,16 +358,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "order-routing-rankers-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function 0.4.0",
-]
-
-[[package]]
 name = "order-submission-rule-rust"
 version = "1.0.0"
 dependencies = [

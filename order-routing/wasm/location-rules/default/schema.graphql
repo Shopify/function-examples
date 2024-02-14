@@ -170,7 +170,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -2496,6 +2496,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2519,6 +2524,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2637,6 +2647,26 @@ enum DeliveryMethod {
 }
 
 """
+A customization representing how delivery options are generated.
+"""
+type DeliveryOptionGenerator implements HasMetafields {
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
 A group of one or more items to be fulfilled together.
 """
 type FulfillmentGroup {
@@ -2659,39 +2689,30 @@ type FulfillmentGroup {
   A list of inventory location handles for the fulfillment group.
   """
   inventoryLocationHandles: [Handle!]!
+
+  """
+  The merchandise in the fulfillment group.
+  """
+  lines: [CartLine!]!
 }
 
 """
-A list of ranked locations for this fulfillment group.
-"""
-input FulfillmentGroupRankedLocations {
-  """
-  The identifier for the fulfillment group.
-  """
-  fulfillmentGroupHandle: Handle!
-
-  """
-  The ranked locations for this fulfillment group.
-  """
-  rankings: [RankedLocation!]!
-}
-
-"""
-The result of the function. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
+The result of a local pickup delivery option generator function. In API versions
+2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
-  The ranked locations for each fulfillment group.
+  The ordered list of operations to apply for local pickup delivery option generation.
   """
   operations: [Operation!]!
 }
 
 """
-The result of the function.
+The result of a local pickup delivery option generator function.
 """
 input FunctionRunResult {
   """
-  The ranked locations for each fulfillment group.
+  The ordered list of operations to apply for local pickup delivery option generation.
   """
   operations: [Operation!]!
 }
@@ -2708,7 +2729,7 @@ type GateConfiguration implements HasMetafields {
   """
   A non-unique string used to group gate configurations.
   """
-  handle: String
+  handle: Handle
 
   """
   The ID of the gate configuration.
@@ -2769,7 +2790,7 @@ interface HasGates {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 }
 
@@ -2816,9 +2837,6 @@ Example value: `"gid://shopify/Product/10079785100"`
 """
 scalar ID
 
-"""
-The input object for the function.
-"""
 type Input {
   """
   The cart.
@@ -2826,7 +2844,12 @@ type Input {
   cart: Cart!
 
   """
-  List of fulfillment groups in the context of this cart.
+  The delivery option generator that owns the current function.
+  """
+  deliveryOptionGenerator: DeliveryOptionGenerator!
+
+  """
+  A list of fulfillment groups.
   """
   fulfillmentGroups: [FulfillmentGroup!]!
 
@@ -2836,12 +2859,7 @@ type Input {
   localization: Localization!
 
   """
-  The order routing location rule containing the function.
-  """
-  locationRule: OrderRoutingLocationRule!
-
-  """
-  The locations where the inventory items on this cart are stocked.
+  The locations that can fulfill the items in the cart or that offer local pickup.
   """
   locations: [Location!]!
 
@@ -3577,6 +3595,26 @@ enum LanguageCode {
 }
 
 """
+A local pickup delivery option.
+"""
+input LocalPickupDeliveryOption {
+  """
+  The cost of the delivery option in the currency of the cart. Defaults to zero.
+  """
+  cost: Decimal
+
+  """
+  The pickup location.
+  """
+  pickupLocation: PickupLocation!
+
+  """
+  The title of the delivery option.
+  """
+  title: String
+}
+
+"""
 Represents limited information about the current time relative to the parent object.
 """
 type LocalTime {
@@ -3868,7 +3906,7 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
@@ -3977,7 +4015,7 @@ type MutationRoot {
   ): Void! @deprecated(reason: "Use the target-specific field instead.")
 
   """
-  Handles the Function result for the purchase.order-routing-location-rule.run target.
+  Handles the Function result for the purchase.local-pickup-delivery-option-generator.run target.
   """
   run(
     """
@@ -3988,33 +4026,26 @@ type MutationRoot {
 }
 
 """
-An operation to apply to the fulfillment group inventory locations.
+An operation to generate local pickup delivery options.
 """
 input Operation {
   """
-  Request to rank a fulfillment group's inventory locations.
+  The local pickup delivery option to add.
   """
-  rank: FulfillmentGroupRankedLocations!
+  add: LocalPickupDeliveryOption!
 }
 
-"""
-A customization which ranks inventory locations for fulfillment purposes.
-"""
-type OrderRoutingLocationRule implements HasMetafields {
+input PickupLocation {
   """
-  Returns a metafield by namespace and key that belongs to the resource.
+  The location handle of the pickup in-store location.
   """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
+  locationHandle: Handle!
 
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
+  """
+  The pickup instruction to show to customers at checkout.
+  Defaults to location's local pickup expected pickup time setting.
+  """
+  pickupInstruction: String
 }
 
 """
@@ -4028,13 +4059,13 @@ type Product implements HasGates & HasMetafields {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
@@ -4190,21 +4221,6 @@ type PurchasingCompany {
   The company location associated to the order or draft order.
   """
   location: CompanyLocation!
-}
-
-"""
-A location with a rank associated with it.
-"""
-input RankedLocation {
-  """
-  The location handle.
-  """
-  locationHandle: Handle!
-
-  """
-  The location's rank.
-  """
-  rank: Int!
 }
 
 """
