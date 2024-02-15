@@ -1,0 +1,25 @@
+api_version = "unstable"
+
+[[extensions]]
+handle = "{{name | replace: " ", "-" | downcase}}"
+name = "{{name}}"
+type = "function"
+
+[[extensions.targeting]]
+target = "purchase.pickup-point-delivery-option-generator.fetch"
+input_query = "src/fetch.graphql"
+export = "fetch"
+
+[[extensions.targeting]]
+target = "purchase.pickup-point-delivery-option-generator.run"
+input_query = "src/run.graphql"
+export = "run"
+
+[extensions.build]
+command = "cargo wasi build --release"
+path = "target/wasm32-wasi/release/{{name | replace: " ", "_" | downcase}}.wasm"
+watch = ["src/**/*.rs"]
+
+[extensions.ui.paths]
+create = "/"
+details = "/"

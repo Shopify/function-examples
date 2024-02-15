@@ -1,0 +1,9 @@
+query Input {
+  allocations {
+    deliveryAddress {
+      countryCode
+      longitude
+      latitude
+    }
+  }
+}

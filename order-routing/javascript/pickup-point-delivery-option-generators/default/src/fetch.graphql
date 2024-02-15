@@ -1,0 +1,9 @@
+query FetchInput {
+  allocations {
+    deliveryAddress {
+      countryCode
+      longitude
+      latitude
+    }
+  }
+}
