@@ -1,10 +1,23 @@
-name = "{{name}}"
-type = "function"
 api_version = "unstable"
 
-[build]
-command = "echo 'build the wasm'"
+[[extensions]]
+handle = "{{handle}}"
+name = "{{name}}"
+type = "function"
 
-[ui.paths]
-create = "/"
-details = "/"
+  [[extensions.targeting]]
+  target = "purchase.pickup-point-delivery-option-generator.fetch"
+  input_query = "src/fetch.graphql"
+  export = "fetch"
+
+  [[extensions.targeting]]
+  target = "purchase.pickup-point-delivery-option-generator.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "echo 'build the wasm'"
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
