@@ -1,0 +1,6 @@
+query Input {
+  fetchResult {
+    status
+    body
+  }
+}
