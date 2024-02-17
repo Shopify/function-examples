@@ -1,7 +1,7 @@
 api_version = "unstable"
 
 [[extensions]]
-handle = "{{name | replace: " ", "-" | downcase}}"
+handle = "{{handle}}"
 name = "{{name}}"
 type = "function"
 
@@ -17,7 +17,7 @@ export = "run"
 
 [extensions.build]
 command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/{{name | replace: " ", "_" | downcase}}.wasm"
+path = "target/wasm32-wasi/release/{{handle | replace: "-", "_" | downcase}}.wasm"
 watch = ["src/**/*.rs"]
 
 [extensions.ui.paths]
