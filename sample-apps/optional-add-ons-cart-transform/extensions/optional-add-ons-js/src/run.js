@@ -1,12 +1,8 @@
 // @ts-check
 
 /*
-A straightforward example of a function that expands a bundle into its component parts.
-The parts of a bundle are stored in a metafield on the product parent value with a specific format,
-specifying each part's quantity and variant.
-
-The function reads the cart. Any item containing the metafield that specifies the bundle parts
-will return an Expand operation containing the parts.
+A straightforward example of a function that expands a single line into a bundle with add-on products.
+The add-on options are are stored in a line item property and metafield on the product.
 */
 
 /**
