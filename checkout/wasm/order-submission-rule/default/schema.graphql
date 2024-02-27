@@ -4,7 +4,7 @@ schema {
 }
 
 """
-Exactly one field of input must be provided, and all others omitted.
+Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
@@ -63,7 +63,7 @@ type BuyerIdentity {
 """
 A cart represents the merchandise that a buyer intends to purchase, and the cost associated with the cart.
 """
-type Cart {
+type Cart implements HasMetafields {
   """
   The attributes associated with the cart. Attributes are represented as key-value pairs.
   """
@@ -98,6 +98,21 @@ type Cart {
   A list of lines containing information about the items the customer intends to purchase.
   """
   lines: [CartLine!]!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 }
 
 """
@@ -182,7 +197,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -1520,7 +1535,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -2518,6 +2533,11 @@ type Customer implements HasMetafields {
   email: String
 
   """
+  The customer's first name.
+  """
+  firstName: String
+
+  """
   Whether the customer has any of the given tags.
   """
   hasAnyTag(
@@ -2541,6 +2561,11 @@ type Customer implements HasMetafields {
   A unique identifier for the customer.
   """
   id: ID!
+
+  """
+  The customer's last name.
+  """
+  lastName: String
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -2659,17 +2684,6 @@ enum DeliveryMethod {
 }
 
 """
-The result of an order submission rule function. In API versions 2023-10 and
-beyond, this type is deprecated in favor of `FunctionRunResult`.
-"""
-input FunctionResult {
-  """
-  The ordered list of operations to apply to the order submission rule.
-  """
-  operations: [Operation!]!
-}
-
-"""
 The result of an order submission rule function.
 """
 input FunctionRunResult {
@@ -2691,7 +2705,7 @@ type GateConfiguration implements HasMetafields {
   """
   A non-unique string used to group gate configurations.
   """
-  handle: String
+  handle: Handle
 
   """
   The ID of the gate configuration.
@@ -2735,6 +2749,13 @@ type GateSubject {
 }
 
 """
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
+
+"""
 Gate subjects associated to the specified resource.
 """
 interface HasGates {
@@ -2745,7 +2766,7 @@ interface HasGates {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 }
 
@@ -3726,7 +3747,7 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
@@ -3841,16 +3862,6 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result.
-  """
-  handleResult(
-    """
-    The result of the Function.
-    """
-    result: FunctionResult!
-  ): Void! @deprecated(reason: "Use the target-specific field instead.")
-
-  """
   Handles the Function result for the purchase.order-submission-rule.run target.
   """
   run(
@@ -3872,18 +3883,18 @@ input Operation @oneOf {
 }
 
 """
-Whether the buyer checkout creates an order or a draft order.
+Whether the buyer checkout creates an order or submits for review.
 """
 enum OrderSubmission {
-  """
-  This setting means that the system will submit for review on checkout submission.
-  """
-  REVIEW
-
   """
   This setting means that the system will generate an order on checkout submission.
   """
   ORDER
+
+  """
+  This setting means that the system will submit for review on checkout submission.
+  """
+  REVIEW
 }
 
 """
@@ -3917,13 +3928,13 @@ type Product implements HasGates & HasMetafields {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.

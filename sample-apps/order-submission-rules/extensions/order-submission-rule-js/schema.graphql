@@ -4,7 +4,7 @@ schema {
 }
 
 """
-Exactly one field of input must be provided, and all others omitted.
+Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
 
@@ -51,12 +51,19 @@ type BuyerIdentity {
   The purchasing company associated with the cart.
   """
   purchasingCompany: PurchasingCompany
+
+  """
+  Represents the [Shop User](https://help.shopify.com/en/manual/online-sales-channels/shop/sign-in-features)
+   corresponding to the customer within the shop, if the buyer is a Shop User. Can be used to request [Shop User
+   metafields](https://shopify.dev/docs/api/shop-user-custom-data).
+  """
+  shopUser: ShopUser
 }
 
 """
 A cart represents the merchandise that a buyer intends to purchase, and the cost associated with the cart.
 """
-type Cart {
+type Cart implements HasMetafields {
   """
   The attributes associated with the cart. Attributes are represented as key-value pairs.
   """
@@ -91,6 +98,21 @@ type Cart {
   A list of lines containing information about the items the customer intends to purchase.
   """
   lines: [CartLine!]!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 }
 
 """
@@ -175,7 +197,7 @@ type CartDeliveryOption {
   """
   The unique identifier of the delivery option.
   """
-  handle: String!
+  handle: Handle!
 
   """
   The title of the delivery option.
@@ -1513,7 +1535,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -1551,6 +1573,11 @@ enum CountryCode {
   U.S. Outlying Islands.
   """
   UM
+
+  """
+  Unknown country code.
+  """
+  UNKNOWN__
 
   """
   United States.
@@ -2657,17 +2684,6 @@ enum DeliveryMethod {
 }
 
 """
-The result of an order submission rule function. In API versions 2023-10 and
-beyond, this type is deprecated in favor of `FunctionRunResult`.
-"""
-input FunctionResult {
-  """
-  The ordered list of operations to apply to the order submission rule.
-  """
-  operations: [Operation!]!
-}
-
-"""
 The result of an order submission rule function.
 """
 input FunctionRunResult {
@@ -2689,7 +2705,7 @@ type GateConfiguration implements HasMetafields {
   """
   A non-unique string used to group gate configurations.
   """
-  handle: String
+  handle: Handle
 
   """
   The ID of the gate configuration.
@@ -2733,6 +2749,13 @@ type GateSubject {
 }
 
 """
+A function-scoped handle to a refer a resource.
+The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
+Example value: `"10079785100"`
+"""
+scalar Handle
+
+"""
 Gate subjects associated to the specified resource.
 """
 interface HasGates {
@@ -2743,7 +2766,7 @@ interface HasGates {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 }
 
@@ -3724,12 +3747,17 @@ type Market implements HasMetafields {
   """
   A human-readable unique string for the market automatically generated from its title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   A globally-unique identifier.
   """
   id: ID!
+
+  """
+  The manager of the market, if the accessing app is the market’s manager. Otherwise, this will be null.
+  """
+  manager: MarketManager
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -3750,6 +3778,17 @@ type Market implements HasMetafields {
   A geographic region which comprises a market.
   """
   regions: [MarketRegion!]!
+}
+
+"""
+The entity that manages a particular market.
+"""
+type MarketManager {
+  """
+  The identity of the manager. This can either be `merchant` if the market is
+  manually managed by the merchant or an ID of the app responsible for managing the market.
+  """
+  identifier: String!
 }
 
 """
@@ -3823,16 +3862,6 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result.
-  """
-  handleResult(
-    """
-    The result of the Function.
-    """
-    result: FunctionResult!
-  ): Void! @deprecated(reason: "Use the target-specific field instead.")
-
-  """
   Handles the Function result for the purchase.order-submission-rule.run target.
   """
   run(
@@ -3854,18 +3883,18 @@ input Operation @oneOf {
 }
 
 """
-Whether the buyer checkout creates an order or a draft order.
+Whether the buyer checkout creates an order or submits for review.
 """
 enum OrderSubmission {
-  """
-  This setting means that the system will submit for review on checkout submission.
-  """
-  REVIEW
-
   """
   This setting means that the system will generate an order on checkout submission.
   """
   ORDER
+
+  """
+  This setting means that the system will submit for review on checkout submission.
+  """
+  REVIEW
 }
 
 """
@@ -3899,13 +3928,13 @@ type Product implements HasGates & HasMetafields {
     """
     The handle of the gate configurations to search for.
     """
-    handle: String
+    handle: Handle
   ): [GateSubject!]!
 
   """
   A unique human-friendly string of the product's title.
   """
-  handle: String!
+  handle: Handle!
 
   """
   Whether the product has any of the given tags.
@@ -4150,6 +4179,26 @@ type Shop implements HasMetafields {
   """
   localTime: LocalTime!
 
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+Represents information about the buyer that is interacting with the cart.
+"""
+type ShopUser implements HasMetafields {
   """
   Returns a metafield by namespace and key that belongs to the resource.
   """
