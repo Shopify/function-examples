@@ -84,16 +84,10 @@ fn build_address(external_api_delivery_point: &Value) -> Option<run::output::Pic
                 .unwrap()
                 .to_string(),
         ),
-        country_code: serde_json::from_str::<run::output::CountryCode>(
-            format!(
-                "\"{}\"",
-                external_api_delivery_point["location"]["addressComponents"]["countryCode"]
-                    .as_str()
-                    .unwrap()
-            )
-            .as_str(),
-        )
-        .unwrap(),
+        country_code: external_api_delivery_point["location"]["addressComponents"]["countryCode"]
+            .as_str()
+            .unwrap()
+            .to_string(),
         latitude: external_api_delivery_point["location"]["geometry"]["location"]["lat"]
             .as_f64()
             .unwrap_or_default(),
@@ -252,7 +246,7 @@ mod tests {
                             address2: None,
                             city: "Toronto".to_string(),
                             country: Some("Canada".to_string()),
-                            country_code: CountryCode::CA,
+                            country_code: "CA".to_string(),
                             latitude: 43.644664618786685,
                             longitude: -79.40066267417106,
                             phone: None,

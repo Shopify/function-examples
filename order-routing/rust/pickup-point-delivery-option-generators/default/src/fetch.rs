@@ -9,7 +9,7 @@ fn fetch(input: fetch::input::ResponseData) -> Result<fetch::output::FunctionFet
             &delivery_address.longitude,
             &delivery_address.latitude,
         ) {
-            if *country_code == fetch::input::CountryCode::CA {
+            if country_code.as_str() == "CA" {
                 return Ok(fetch::output::FunctionFetchResult {
                     request: Some(build_external_api_request(latitude, longitude)),
                 });

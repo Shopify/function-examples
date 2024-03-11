@@ -83,7 +83,7 @@ fn get_merge_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation>
                     .price_adjustment
                     .map(|price_adjustment| PriceAdjustment {
                         percentage_decrease: Some(PriceAdjustmentValue {
-                            value: price_adjustment.to_string(),
+                            value: Decimal(price_adjustment),
                         }),
                     });
 
@@ -220,7 +220,7 @@ fn get_price_adjustment(
         .as_ref()
         .map(|price_adjustment| PriceAdjustment {
             percentage_decrease: Some(PriceAdjustmentValue {
-                value: price_adjustment.value.parse().unwrap(),
+                value: Decimal(price_adjustment.value.parse().unwrap()),
             }),
         })
 }
