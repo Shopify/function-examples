@@ -51,6 +51,66 @@
             "value": "10.5"
           }
         }
+      },
+      {
+        "id": "gid://shopify/CartLine/5",
+        "quantity": 5,
+        "merchandise": {
+          "__typename": "ProductVariant",
+          "id": "gid://shopify/ProductVariant/456",
+          "title": "Something cool in bundle",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/123\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/456\",\"gid://shopify/ProductVariant/789\"]},\"component_quantities\":{\"value\":[2,3]},\"price_adjustment\":{\"value\":10.5}}]"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/6",
+        "quantity": 9,
+        "merchandise": {
+          "__typename": "ProductVariant",
+          "id": "gid://shopify/ProductVariant/789",
+          "title": "Something also cool in bundle",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/123\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/456\",\"gid://shopify/ProductVariant/789\"]},\"component_quantities\":{\"value\":[2,3]},\"price_adjustment\":{\"value\":10.5}}]"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/7",
+        "quantity": 2,
+        "merchandise": {
+          "__typename": "ProductVariant",
+          "id": "gid://shopify/ProductVariant/131415",
+          "title": "Shared Bundle Component",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/101112\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/131415\",\"gid://shopify/ProductVariant/161718\"]},\"component_quantities\":{\"value\":[1,1]}}, {\"id\":\"gid://shopify/ProductVariant/192021\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/131415\",\"gid://shopify/ProductVariant/222324\"]},\"component_quantities\":{\"value\":[1,1]}}]"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/8",
+        "quantity": 1,
+        "merchandise": {
+          "__typename": "ProductVariant",
+          "id": "gid://shopify/ProductVariant/161718",
+          "title": "Bundle Component",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/101112\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/131415\",\"gid://shopify/ProductVariant/161718\"]},\"component_quantities\":{\"value\":[1,1]}}]"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/CartLine/9",
+        "quantity": 1,
+        "merchandise": {
+          "__typename": "ProductVariant",
+          "id": "gid://shopify/ProductVariant/222324",
+          "title": "Bundle Component",
+          "component_parents": {
+            "value": "[{\"id\":\"gid://shopify/ProductVariant/192021\",\"component_reference\":{\"value\":[\"gid://shopify/ProductVariant/131415\",\"gid://shopify/ProductVariant/222324\"]},\"component_quantities\":{\"value\":[1,1]}}]"
+          }
+        }
       }
     ]
   }
