@@ -128,7 +128,7 @@ fn get_components_in_cart(
 
     update_cart_lines_from_function_result(cart_lines, line_results.clone());
 
-    return line_results;
+    line_results
 }
 
 fn update_cart_lines_from_function_result(
