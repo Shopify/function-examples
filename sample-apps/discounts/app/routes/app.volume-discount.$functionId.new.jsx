@@ -30,7 +30,8 @@ import {
   Page,
   PageActions,
   TextField,
-  VerticalStack,
+  BlockStack,
+  Box,
 } from "@shopify/polaris";
 
 import shopify from "../shopify.server";
@@ -226,7 +227,7 @@ export default function VolumeNew() {
   const errorBanner =
     submitErrors.length > 0 ? (
       <Layout.Section>
-        <Banner status="critical">
+        <Banner tone="critical">
           <p>There were some issues with your form submission:</p>
           <ul>
             {submitErrors.map(({ message, field }, index) => {
@@ -259,7 +260,7 @@ export default function VolumeNew() {
         {errorBanner}
         <Layout.Section>
           <Form method="post">
-            <VerticalStack align="space-around" gap="2">
+            <BlockStack align="space-around" gap="200">
               <MethodCard
                 title="Volume"
                 discountTitle={discountTitle}
@@ -267,24 +268,26 @@ export default function VolumeNew() {
                 discountCode={discountCode}
                 discountMethod={discountMethod}
               />
-              <Card>
-                <VerticalStack gap="3">
-                  <Text variant="headingMd" as="h2">
-                    Volume
-                  </Text>
-                  <TextField
-                    label="Minimum quantity"
-                    autoComplete="on"
-                    {...configuration.quantity}
-                  />
-                  <TextField
-                    label="Discount percentage"
-                    autoComplete="on"
-                    {...configuration.percentage}
-                    suffix="%"
-                  />
-                </VerticalStack>
-              </Card>
+              <Box paddingBlockEnd="300">
+                <Card>
+                  <BlockStack>
+                    <Text variant="headingMd" as="h2">
+                      Volume
+                    </Text>
+                    <TextField
+                      label="Minimum quantity"
+                      autoComplete="on"
+                      {...configuration.quantity}
+                    />
+                    <TextField
+                      label="Discount percentage"
+                      autoComplete="on"
+                      {...configuration.percentage}
+                      suffix="%"
+                    />
+                  </BlockStack>
+                </Card>
+              </Box>
               {discountMethod.value === DiscountMethod.Code && (
                 <UsageLimitsCard
                   totalUsageLimit={usageLimit}
@@ -301,10 +304,10 @@ export default function VolumeNew() {
                 endDate={endDate}
                 timezoneAbbreviation="EST"
               />
-            </VerticalStack>
+            </BlockStack>
           </Form>
         </Layout.Section>
-        <Layout.Section secondary>
+        <Layout.Section variant="oneThird">
           <SummaryCard
             header={{
               discountMethod: discountMethod.value,

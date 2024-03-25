@@ -10,10 +10,10 @@ import {
   Page,
   Layout,
   Text,
-  VerticalStack,
+  BlockStack,
   Card,
   Button,
-  HorizontalStack,
+  InlineStack,
   Box,
   Divider,
   List,
@@ -102,12 +102,12 @@ export default function Index() {
           Generate a product
         </button>
       </ui-title-bar>
-      <VerticalStack gap="5">
+      <BlockStack gap="500">
         <Layout>
           <Layout.Section>
             <Card>
-              <VerticalStack gap="5">
-                <VerticalStack gap="2">
+              <BlockStack gap="500">
+                <BlockStack gap="200">
                   <Text as="h2" variant="headingMd">
                     Congrats on creating a new Shopify app 🎉
                   </Text>
@@ -133,8 +133,8 @@ export default function Index() {
                     mutation demo, to provide a starting point for app
                     development.
                   </Text>
-                </VerticalStack>
-                <VerticalStack gap="2">
+                </BlockStack>
+                <BlockStack gap="200">
                   <Text as="h3" variant="headingMd">
                     Get started with products
                   </Text>
@@ -149,8 +149,8 @@ export default function Index() {
                     </Link>{" "}
                     mutation in our API references.
                   </Text>
-                </VerticalStack>
-                <HorizontalStack gap="3" align="end">
+                </BlockStack>
+                <InlineStack gap="300" align="end">
                   {actionData?.product && (
                     <Button
                       url={`https://admin.shopify.com/store/${shop}/admin/products/${productId}`}
@@ -159,17 +159,21 @@ export default function Index() {
                       View product
                     </Button>
                   )}
-                  <Button loading={isLoading} primary onClick={generateProduct}>
+                  <Button
+                    loading={isLoading}
+                    variant="primary"
+                    onClick={generateProduct}
+                  >
                     Generate a product
                   </Button>
-                </HorizontalStack>
+                </InlineStack>
                 {actionData?.product && (
                   <Box
-                    padding="4"
-                    background="bg-subdued"
+                    padding="400"
+                    background="bg-surface-active"
                     borderColor="border"
-                    borderWidth="1"
-                    borderRadius="2"
+                    borderWidth="100"
+                    borderRadius="200"
                     overflowX="scroll"
                   >
                     <pre style={{ margin: 0 }}>
@@ -177,37 +181,37 @@ export default function Index() {
                     </pre>
                   </Box>
                 )}
-              </VerticalStack>
+              </BlockStack>
             </Card>
           </Layout.Section>
-          <Layout.Section secondary>
-            <VerticalStack gap="5">
+          <Layout.Section>
+            <BlockStack gap="500">
               <Card>
-                <VerticalStack gap="2">
+                <BlockStack gap="200">
                   <Text as="h2" variant="headingMd">
                     App template specs
                   </Text>
-                  <VerticalStack gap="2">
+                  <BlockStack gap="200">
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <InlineStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         Framework
                       </Text>
                       <Link url="https://remix.run" target="_blank">
                         Remix
                       </Link>
-                    </HorizontalStack>
+                    </InlineStack>
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <InlineStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         Database
                       </Text>
                       <Link url="https://www.prisma.io/" target="_blank">
                         Prisma
                       </Link>
-                    </HorizontalStack>
+                    </InlineStack>
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <InlineStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         Interface
                       </Text>
@@ -223,9 +227,9 @@ export default function Index() {
                           App Bridge
                         </Link>
                       </span>
-                    </HorizontalStack>
+                    </InlineStack>
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <InlineStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         API
                       </Text>
@@ -235,16 +239,16 @@ export default function Index() {
                       >
                         GraphQL API
                       </Link>
-                    </HorizontalStack>
-                  </VerticalStack>
-                </VerticalStack>
+                    </InlineStack>
+                  </BlockStack>
+                </BlockStack>
               </Card>
               <Card>
-                <VerticalStack gap="2">
+                <BlockStack gap="200">
                   <Text as="h2" variant="headingMd">
                     Next steps
                   </Text>
-                  <List spacing="extraTight">
+                  <List>
                     <List.Item>
                       Build an{" "}
                       <Link
@@ -266,12 +270,12 @@ export default function Index() {
                       </Link>
                     </List.Item>
                   </List>
-                </VerticalStack>
+                </BlockStack>
               </Card>
-            </VerticalStack>
+            </BlockStack>
           </Layout.Section>
         </Layout>
-      </VerticalStack>
+      </BlockStack>
     </Page>
   );
 }
