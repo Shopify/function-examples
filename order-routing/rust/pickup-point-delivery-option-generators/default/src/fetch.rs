@@ -23,7 +23,7 @@ fn fetch(input: fetch::input::ResponseData) -> Result<fetch::output::FunctionFet
 fn build_external_api_request(latitude: &f64, longitude: &f64) -> fetch::output::HttpRequest {
     // The latitude and longitude parameters are included in the URL for demonstration purposes only. They do not influence the result.
     let url = format!(
-        "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api.json?v=1706549257&lat={}&lon={}",
+        "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v1.json?v=1712853748&lat={}&lon={}",
         latitude, longitude
     );
 
@@ -89,7 +89,7 @@ mod tests {
         let expected = FunctionFetchResult {
             request: Some(HttpRequest {
                 method: HttpRequestMethod::GET,
-                url: "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api.json?v=1706549257&lat=-79.42&lon=43.7".to_string(),
+                url: "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v1.json?v=1712853748&lat=-79.42&lon=43.7".to_string(),
 
                 headers: vec![
                     HttpRequestHeader {
@@ -192,7 +192,7 @@ mod tests {
         let expected = FunctionFetchResult {
             request: Some(HttpRequest {
                 method: HttpRequestMethod::GET,
-                url: "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api.json?v=1706549257&lat=-79.42&lon=43.7".to_string(),
+                url: "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v1.json?v=1712853748&lat=-79.42&lon=43.7".to_string(),
 
                 headers: vec![
                     HttpRequestHeader {
