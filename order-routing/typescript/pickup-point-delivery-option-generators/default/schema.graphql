@@ -2692,29 +2692,17 @@ enum DeliveryMethod {
 }
 
 """
-The result of a pickup point delivery option generator function fetch command.
+The fetch target result. Refer to network access for Shopify Functions.
 """
 input FunctionFetchResult {
   """
-  Request.
+  HTTP Request.
   """
   request: HttpRequest
 }
 
 """
-The result of a pickup point delivery option generator function run command. In
-API versions 2023-10 and beyond, this type is deprecated in favor of
-`FunctionRunResult`.
-"""
-input FunctionResult {
-  """
-  An ordered list of operations to apply for pickup point delivery option generation.
-  """
-  operations: [Operation!]!
-}
-
-"""
-The result of a pickup point delivery option generator function run command.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -2960,7 +2948,7 @@ type Input {
   cart: Cart!
 
   """
-  The HTTP response of the HTTP request from the fetch command.
+  The result of the fetch target. Refer to network access for Shopify Functions.
   """
   fetchResult: HttpResponse @restrictTarget(only: ["purchase.pickup-point-delivery-option-generator.run"])
 
@@ -3996,16 +3984,6 @@ type MutationRoot {
   ): Void!
 
   """
-  Handles the Function result.
-  """
-  handleResult(
-    """
-    The result of the Function.
-    """
-    result: FunctionResult!
-  ): Void! @deprecated(reason: "Use the target-specific field instead.")
-
-  """
   Handles the Function result for the purchase.pickup-point-delivery-option-generator.run target.
   """
   run(
@@ -4099,7 +4077,7 @@ input PickupPoint {
   The business hours of the pickup point location. Any day that is either not
   mentioned or does not have any defined periods will be considered as closed.
   """
-  businessHours: [BusinessHours!]!
+  businessHours: [BusinessHours!]
 
   """
   The external id assigned by the provider for the pickup point delivery option.
@@ -4292,7 +4270,7 @@ The provider for a pickup point.
 """
 input Provider {
   """
-  The provider logo url. The base URL must be `https::/cdn.shopify.com`.
+  The provider logo url. The base URL must be `https://cdn.shopify.com`.
   """
   logoUrl: URL!
 
