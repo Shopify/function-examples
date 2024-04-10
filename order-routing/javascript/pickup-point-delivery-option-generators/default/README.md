@@ -2,7 +2,7 @@
 
 This repository contains a function that demonstrates how to generate pickup point delivery options based on an external
 API accessible via an HTTP request. To simulate an external API, we have hosted a
-[JSON file](https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api.json?v=1706549257),
+[JSON file](https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v1.json?v=1712853748),
 which contains pickup point information in the following format:
 
 ```json
