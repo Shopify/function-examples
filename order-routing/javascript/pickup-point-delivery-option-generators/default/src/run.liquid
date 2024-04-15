@@ -64,7 +64,11 @@ function buildAddress(externalApiDeliveryPoint) {
 // "Monday: 9:00 AM – 5:00 PM" is transformed to {day: "MONDAY", periods: [{opening_time: "09:00:00", closing_time: "17:00:00"}]}
 // "Tuesday: Closed" is transformed to {day: "TUESDAY", periods: []}
 function buildBusinessHours(externalApiDeliveryPoint) {
-    return externalApiDeliveryPoint.openingHours.weekdayText
+    if(!externalApiDeliveryPoint.openingHours) {
+        return null;
+    }
+
+   return externalApiDeliveryPoint.openingHours.weekdayText
         .map(day => {
             let dayParts = day.split(": ");
             let dayName = dayParts[0].toUpperCase();

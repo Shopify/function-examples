@@ -73,7 +73,11 @@ function buildAddress(externalApiDeliveryPoint: any): PickupAddress {
 // Each day's opening hours are represented using a `BusinessHours` object as follows:
 // "Monday: 9:00 AM – 5:00 PM" is transformed to {day: "MONDAY", periods: [{opening_time: "09:00:00", closing_time: "17:00:00"}]}
 // "Tuesday: Closed" is transformed to {day: "TUESDAY", periods: []}
-function buildBusinessHours(externalApiDeliveryPoint: any): BusinessHours[] {
+function buildBusinessHours(externalApiDeliveryPoint: any): BusinessHours[] | null {
+    if(!externalApiDeliveryPoint.openingHours){
+        return null;
+    }
+
     return externalApiDeliveryPoint.openingHours.weekdayText
         .map((dayOpeningHours: string) => {
             let dayOpeningHoursParts = dayOpeningHours.split(": ");

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { run } from './run';
 
+
 describe('run function', () => {
   it('returns operations when fetch result is successful', () => {
     const result = run({
@@ -98,6 +99,74 @@ describe('run function', () => {
     const expected = {
       operations: []
     }
+
+    expect(result).toEqual(expected);
+  });
+
+  it("returns an add operation with null pickup point business hours when the external API's delivery point has null opening hours", () => {
+    const result = run({
+      fetchResult: {
+        status: 200,
+        body: JSON.stringify({
+          deliveryPoints: [
+            {
+              location: {
+                addressComponents: {
+                  country: 'Canada',
+                  countryCode: 'CA',
+                  streetNumber: '123',
+                  route: 'Main St',
+                  locality: 'Toronto',
+                  administrativeAreaLevel1: 'ON',
+                  postalCode: 'M5V 2T6',
+                },
+                geometry: {
+                  location: {
+                    lat: 43.70,
+                    lng: -79.42,
+                  },
+                },
+              },
+              openingHours: null,
+              pointId: '1',
+              pointName: 'Point 1',
+            },
+          ],
+        }),
+      },
+    });
+
+    const expected = {
+      operations: [
+        {
+          add: {
+            cost: null,
+            pickupPoint: {
+              address: {
+                address1: '123 Main St',
+                address2: null,
+                city: 'Toronto',
+                country: 'Canada',
+                countryCode: 'CA',
+                latitude: 43.70,
+                longitude: -79.42,
+                phone: null,
+                province: 'ON',
+                provinceCode: null,
+                zip: 'M5V 2T6',
+              },
+              businessHours: null,
+              provider: {
+                name: 'Shopify Javascript Demo',
+                logoUrl: 'https://cdn.shopify.com/s/files/1/0628/3830/9033/files/shopify_icon_146101.png?v=1706120545',
+              },
+              externalId: '1',
+              name: 'Point 1',
+            },
+          },
+        },
+      ],
+    };
 
     expect(result).toEqual(expected);
   });
