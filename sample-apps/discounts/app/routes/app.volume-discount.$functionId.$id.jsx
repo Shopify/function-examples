@@ -1,8 +1,6 @@
-import { useEffect } from "react";
+import { returnToDiscounts } from "~/utils/navigation";
 import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
 import { CurrencyCode } from "@shopify/react-i18n";
 import {
   Form,
@@ -21,7 +19,6 @@ import {
   RequirementType,
   SummaryCard,
   UsageLimitsCard,
-  onBreadcrumbAction,
 } from "@shopify/discount-app-components";
 import {
   Banner,
@@ -100,7 +97,7 @@ export const action = async ({ params, request }) => {
             ],
           },
         },
-      }
+      },
     );
 
     const responseJson = await response.json();
@@ -134,7 +131,7 @@ export const action = async ({ params, request }) => {
             ],
           },
         },
-      }
+      },
     );
 
     const responseJson = await response.json();
@@ -199,7 +196,7 @@ export const loader = async ({ params, request }) => {
       variables: {
         id: `gid://shopify/DiscountNode/${id}`,
       },
-    }
+    },
   );
 
   const responseJson = await response.json();
@@ -225,7 +222,7 @@ export const loader = async ({ params, request }) => {
     endsAt,
   } = responseJson.data.discountNode.discount;
   const configuration = JSON.parse(
-    responseJson.data.discountNode.configurationField.value
+    responseJson.data.discountNode.configurationField.value,
   );
 
   const discount = {
@@ -252,20 +249,9 @@ export default function VolumeEdit() {
   const actionData = useActionData();
   const { discount } = useLoaderData();
   const navigation = useNavigation();
-  const app = useAppBridge();
-
   const isLoading = navigation.state === "submitting";
   const currencyCode = CurrencyCode.Cad;
   const submitErrors = actionData?.errors || [];
-  const redirect = Redirect.create(app);
-
-  useEffect(() => {
-    if (actionData?.errors.length === 0) {
-      redirect.dispatch(Redirect.Action.ADMIN_SECTION, {
-        name: Redirect.ResourceType.Discount,
-      });
-    }
-  }, [actionData]);
 
   if (!discount) {
     return <NotFoundPage />;
@@ -349,18 +335,15 @@ export default function VolumeEdit() {
 
   return (
     // Render a discount form using Polaris components and the discount app components
-    <Page
-      title="Create volume discount"
-      backAction={{
-        content: "Discounts",
-        onAction: () => onBreadcrumbAction(redirect, true),
-      }}
-      primaryAction={{
-        content: "Save",
-        onAction: submit,
-        loading: isLoading,
-      }}
-    >
+    <Page>
+      <ui-title-bar title="Create volume discount">
+        <button variant="breadcrumb" onClick={returnToDiscounts}>
+          Discounts
+        </button>
+        <button variant="primary" onClick={submit}>
+          Save discount
+        </button>
+      </ui-title-bar>
       <Layout>
         {errorBanner}
         <Layout.Section>
@@ -454,7 +437,7 @@ export default function VolumeEdit() {
             secondaryActions={[
               {
                 content: "Discard",
-                onAction: () => onBreadcrumbAction(redirect, true),
+                onAction: returnToDiscounts,
               },
             ]}
           />

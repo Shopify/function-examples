@@ -1,8 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
 import { CurrencyCode } from "@shopify/react-i18n";
 import {
   Form,
@@ -20,7 +18,6 @@ import {
   RequirementType,
   SummaryCard,
   UsageLimitsCard,
-  onBreadcrumbAction,
 } from "@shopify/discount-app-components";
 import {
   Banner,
@@ -35,6 +32,7 @@ import {
 } from "@shopify/polaris";
 
 import shopify from "../shopify.server";
+import { returnToDiscounts } from "~/utils/navigation";
 
 // This is a server-side action that is invoked when the form is submitted.
 // It makes an admin GraphQL request to create a discount.
@@ -75,6 +73,9 @@ export const action = async ({ params, request }) => {
       `#graphql
           mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
             discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
+              codeAppDiscount{
+                discountId
+              }
               userErrors {
                 code
                 message
@@ -99,17 +100,22 @@ export const action = async ({ params, request }) => {
             ],
           },
         },
-      }
+      },
     );
 
     const responseJson = await response.json();
+
     const errors = responseJson.data.discountCreate?.userErrors;
-    return json({ errors });
+    const discount = responseJson.data.discountCreate?.codeAppDiscount;
+    return json({ errors, discount: { ...discount, functionId } });
   } else {
     const response = await admin.graphql(
       `#graphql
           mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
             discountCreate: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
+              automaticAppDiscount {
+                discountId
+              }
               userErrors {
                 code
                 message
@@ -134,7 +140,7 @@ export const action = async ({ params, request }) => {
             ],
           },
         },
-      }
+      },
     );
 
     const responseJson = await response.json();
@@ -148,19 +154,15 @@ export default function VolumeNew() {
   const submitForm = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
-  const app = useAppBridge();
   const todaysDate = useMemo(() => new Date(), []);
 
   const isLoading = navigation.state === "submitting";
   const currencyCode = CurrencyCode.Cad;
   const submitErrors = actionData?.errors || [];
-  const redirect = Redirect.create(app);
 
   useEffect(() => {
-    if (actionData?.errors.length === 0) {
-      redirect.dispatch(Redirect.Action.ADMIN_SECTION, {
-        name: Redirect.ResourceType.Discount,
-      });
+    if (actionData?.errors.length === 0 && actionData?.discount) {
+      returnToDiscounts();
     }
   }, [actionData]);
 
@@ -244,18 +246,15 @@ export default function VolumeNew() {
 
   return (
     // Render a discount form using Polaris components and the discount app components
-    <Page
-      title="Create volume discount"
-      backAction={{
-        content: "Discounts",
-        onAction: () => onBreadcrumbAction(redirect, true),
-      }}
-      primaryAction={{
-        content: "Save",
-        onAction: submit,
-        loading: isLoading,
-      }}
-    >
+    <Page>
+      <ui-title-bar title="Create volume discount">
+        <button variant="breadcrumb" onClick={returnToDiscounts}>
+          Discounts
+        </button>
+        <button variant="primary" onClick={submit}>
+          Save discount
+        </button>
+      </ui-title-bar>
       <Layout>
         {errorBanner}
         <Layout.Section>
@@ -349,7 +348,7 @@ export default function VolumeNew() {
             secondaryActions={[
               {
                 content: "Discard",
-                onAction: () => onBreadcrumbAction(redirect, true),
+                onAction: returnToDiscounts,
               },
             ]}
           />
