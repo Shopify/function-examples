@@ -176,24 +176,44 @@ Shopify apps are best when they are embedded into the Shopify Admin. This templa
 ### OAuth goes into a loop when I change my app's scopes
 
 If you change your app's scopes and notice that authentication goes into a loop and fails with a message from Shopify that it tried too many times, you might have forgotten to update your scopes with Shopify.
-To do that, you can run the `config push` CLI command.
+To do that, you can run the `deploy` CLI command.
 
 Using yarn:
 
 ```shell
-yarn shopify app config push
+yarn deploy
 ```
 
 Using npm:
 
 ```shell
-npm run shopify app config push
+npm run deploy
 ```
 
 Using pnpm:
 
 ```shell
-pnpm run shopify app config push
+pnpm run deploy
+```
+
+When running a development server you can pass the `--reset` flag to your dev command.
+
+Using yarn:
+
+```shell
+yarn dev --reset
+```
+
+Using npm:
+
+```shell
+npm run dev -- --reset
+```
+
+Using pnpm:
+
+```shell
+pnpm run dev -- --reset
 ```
 
 ## Benefits
