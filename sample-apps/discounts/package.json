@@ -27,7 +27,7 @@
     "@shopify/app-bridge": "^3.7.10",
     "@shopify/app-bridge-types": "^0.0.11",
     "@shopify/cli": "3.59.0",
-    "@shopify/discount-app-components": "file:.yalc/@shopify/discount-app-components",
+    "@shopify/discount-app-components": "2.1.2",
     "@shopify/polaris": "^13.0.0",
     "@shopify/react-form": "^2.5.6",
     "@shopify/shopify-app-remix": "^2.8.0",
