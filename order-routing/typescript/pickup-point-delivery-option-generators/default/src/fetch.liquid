@@ -10,14 +10,11 @@ import {
 } from '../generated/api';
 
 export function fetch(input: FetchInput): FunctionFetchResult {
-    let deliveryAddress = getUniformDeliveryAddress(input.allocations);
-    if (deliveryAddress) {
-        let { countryCode, longitude, latitude } = deliveryAddress;
-        if (longitude && latitude && countryCode === CountryCode.Ca) {
-            return {
-                request: buildExternalApiRequest(latitude, longitude),
-            };
-        }
+    let { countryCode, longitude, latitude } = input.deliveryAddress;
+    if (longitude && latitude && countryCode === CountryCode.Ca) {
+        return {
+            request: buildExternalApiRequest(latitude, longitude),
+        };
     }
     return { request: null };
 }
@@ -38,27 +35,4 @@ function buildExternalApiRequest(latitude: number, longitude: number): HttpReque
             readTimeoutMs: 500,
         },
     };
-}
-
-function getUniformDeliveryAddress(allocations: Allocation[]): Maybe<MailingAddress> {
-    if (allocations.length === 0) {
-        return null;
-    }
-
-    let deliveryAddress = allocations[0].deliveryAddress;
-
-    for (let i = 1; i < allocations.length; i++) {
-        if (!isDeliveryAddressEqual(allocations[i].deliveryAddress, deliveryAddress)) {
-            console.error("Allocations pointing to different delivery addresses are not supported.");
-            return null;
-        }
-    }
-
-    return deliveryAddress;
-}
-
-function isDeliveryAddressEqual(address1: MailingAddress, address2: MailingAddress): boolean {
-    return address1.countryCode === address2.countryCode &&
-        address1.longitude === address2.longitude &&
-        address1.latitude === address2.latitude;
 }
