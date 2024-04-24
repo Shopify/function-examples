@@ -6,15 +6,11 @@ import { CountryCode, FunctionFetchResult, HttpRequestMethod } from '../generate
 describe('fetch function', () => {
   it('returns a request when country is Canada', () => {
     const result = fetch({
-      allocations: [
-        {
-          deliveryAddress: {
-            countryCode: CountryCode.Ca,
-            longitude: 12.3,
-            latitude: 45.6,
-          }
-        }
-      ]
+      deliveryAddress: {
+        countryCode: CountryCode.Ca,
+        longitude: 12.3,
+        latitude: 45.6,
+      }
     });
     const expected: FunctionFetchResult = ({
       request: {
@@ -35,77 +31,13 @@ describe('fetch function', () => {
 
   it('returns no request when country is not Canada', () => {
     const result = fetch({
-      allocations: [
-        {
-          deliveryAddress: {
-            countryCode: CountryCode.Us,
-            longitude: 12.3,
-            latitude: 45.6,
-          }
-        }
-      ]
-    });
-    const expected: FunctionFetchResult = ({ request: null });
-
-    expect(result).toEqual(expected);
-  });
-
-  it('returns no request when allocations have different addresses', () => {
-    const result = fetch({
-      allocations: [
-        {
-          deliveryAddress: {
-            countryCode: CountryCode.Ca,
-            longitude: 12.3,
-            latitude: 45.6,
-          }
-        },
-        {
-          deliveryAddress: {
-            countryCode: CountryCode.Ca,
-            longitude: 78.9,
-            latitude: 10.1,
-          }
-        }
-      ]
-    });
-    const expected: FunctionFetchResult = ({ request: null });
-
-    expect(result).toEqual(expected);
-  });
-
-  it('returns a request when allocations have the same address', () => {
-    const result = fetch({
-      allocations: [
-        {
-          deliveryAddress: {
-            countryCode: CountryCode.Ca,
-            longitude: 12.3,
-            latitude: 45.6,
-          }
-        },
-        {
-          deliveryAddress: {
-            countryCode: CountryCode.Ca,
-            longitude: 12.3,
-            latitude: 45.6,
-          }
-        }
-      ]
-    });
-    const expected: FunctionFetchResult = ({
-      request: {
-        body: null,
-        headers: [
-          { name: "Accept", value: "application/json; charset=utf-8" },
-        ],
-        method: HttpRequestMethod.Get,
-        policy: {
-          readTimeoutMs: 500,
-        },
-        url: 'https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v1.json?v=1712853748&lat=45.6&lon=12.3',
+      deliveryAddress: {
+        countryCode: CountryCode.Us,
+        longitude: 12.3,
+        latitude: 45.6,
       }
     });
+    const expected: FunctionFetchResult = ({ request: null });
 
     expect(result).toEqual(expected);
   });

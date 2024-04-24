@@ -2940,12 +2940,17 @@ type Input {
   """
   A list of allocations.
   """
-  allocations: [Allocation!]!
+  allocations: [Allocation!]! @deprecated(reason: "Use `deliveryAddress` instead.")
 
   """
   The cart.
   """
   cart: Cart!
+
+  """
+  The delivery address for pickup point delivery option.
+  """
+  deliveryAddress: MailingAddress!
 
   """
   The result of the fetch target. Refer to network access for Shopify Functions.
@@ -4303,7 +4308,7 @@ type PurchasingCompany {
 """
 Represents how products and variants can be sold and purchased.
 """
-type SellingPlan {
+type SellingPlan implements HasMetafields {
   """
   The description of the selling plan.
   """
@@ -4313,6 +4318,21 @@ type SellingPlan {
   A globally-unique identifier.
   """
   id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 
   """
   The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.

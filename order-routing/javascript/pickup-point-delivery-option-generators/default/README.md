@@ -66,15 +66,11 @@ the [schema](./schema.graphql).
 
 ```json
 {
-  "allocations": [
-    {
-      "deliveryAddress": {
-        "countryCode": "CA",
-        "longitude": 43.70,
-        "latitude": -79.42
-      }
-    }
-  ]
+  "deliveryAddres": {
+    "countryCode": "CA",
+    "longitude": 43.70,
+    "latitude": -79.42
+  }
 }
 ```
 
