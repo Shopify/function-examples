@@ -15,7 +15,7 @@ import {
   useSubmit,
   useLoaderData,
 } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 
 import { authenticate } from "../shopify.server";
 
