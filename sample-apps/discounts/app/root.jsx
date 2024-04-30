@@ -5,18 +5,17 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData
+  useLoaderData,
 } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
 export async function loader() {
   const apiKey = process.env.SHOPIFY_API_KEY;
-  console.log('apiKey', apiKey)
   return json({ apiKey });
 }
 
 export default function App() {
-  const {apiKey} = useLoaderData();
+  const { apiKey } = useLoaderData();
   return (
     <html>
       <head>
