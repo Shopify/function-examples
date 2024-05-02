@@ -53,6 +53,7 @@ function buildAddress(externalApiDeliveryPoint: any): PickupAddress {
     let location = externalApiDeliveryPoint.location;
     let addressComponents = location.addressComponents;
     let geometry = location.geometry.location;
+    let administrativeArea = addressComponents.administrativeArea;
 
     return {
         address1: `${addressComponents.streetNumber} ${addressComponents.route}`,
@@ -63,8 +64,8 @@ function buildAddress(externalApiDeliveryPoint: any): PickupAddress {
         latitude: geometry.lat,
         longitude: geometry.lng,
         phone: null,
-        province: addressComponents.administrativeAreaLevel1,
-        provinceCode: null,
+        province: administrativeArea.name,
+        provinceCode: administrativeArea.code,
         zip: addressComponents.postalCode,
     };
 }

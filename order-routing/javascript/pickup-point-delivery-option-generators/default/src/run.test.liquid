@@ -17,7 +17,10 @@ describe('run function', () => {
                   streetNumber: '123',
                   route: 'Main St',
                   locality: 'Toronto',
-                  administrativeAreaLevel1: 'ON',
+                  administrativeArea: {
+                    name: 'Ontario',
+                    code: 'ON'
+                  },
                   postalCode: 'M5V 2T6',
                 },
                 geometry: {
@@ -61,8 +64,8 @@ describe('run function', () => {
                 latitude: 43.70,
                 longitude: -79.42,
                 phone: null,
-                province: 'ON',
-                provinceCode: null,
+                province: 'Ontario',
+                provinceCode: 'ON',
                 zip: 'M5V 2T6',
               },
               businessHours: [
@@ -117,7 +120,10 @@ describe('run function', () => {
                   streetNumber: '123',
                   route: 'Main St',
                   locality: 'Toronto',
-                  administrativeAreaLevel1: 'ON',
+                  administrativeArea: {
+                    name: "Ontario",
+                    code: "ON"
+                  },
                   postalCode: 'M5V 2T6',
                 },
                 geometry: {
@@ -151,8 +157,8 @@ describe('run function', () => {
                 latitude: 43.70,
                 longitude: -79.42,
                 phone: null,
-                province: 'ON',
-                provinceCode: null,
+                province: 'Ontario',
+                provinceCode: 'ON',
                 zip: 'M5V 2T6',
               },
               businessHours: null,
