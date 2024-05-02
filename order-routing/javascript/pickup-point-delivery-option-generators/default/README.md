@@ -2,7 +2,7 @@
 
 This repository contains a function that demonstrates how to generate pickup point delivery options based on an external
 API accessible via an HTTP request. To simulate an external API, we have hosted a
-[JSON file](https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v1.json?v=1712853748),
+[JSON file](https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v2.json?v=1714588690),
 which contains pickup point information in the following format:
 
 ```json
@@ -16,7 +16,10 @@ which contains pickup point information in the following format:
           "streetNumber": "620",
           "route": "King St W",
           "locality": "Toronto",
-          "administrativeAreaLevel1": "ON",
+          "administrativeArea": {
+            "name": "Ontario",
+            "code": "ON"
+          },
           "postalCode": "M5V 1M6",
           "country": "Canada",
           "countryCode": "CA"
@@ -80,7 +83,7 @@ the [schema](./schema.graphql).
 {
   "request": {
     "method": "GET",
-    "url": "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/demo-pickup-points_3dcda620-e196-40cb-ae6b-6dac17dc81c3.json?v=1706119857&lat=-79.42&lon=43.7",
+    "url": "https://cdn.shopify.com/s/files/1/0628/3830/9033/files/pickup-points-external-api-v2.json?v=1714588690&lat=-79.42&lon=43.7",
     "headers": [
       {
         "name": "Accept",
@@ -112,7 +115,7 @@ specified by the `FunctionRunResult` type in the [schema](./schema.graphql).
 {
   "fetchResult": {
     "status": 200,
-    "body": "{\"deliveryPoints\":[{\"pointId\":\"001\",\"pointName\":\"Toronto Store\",\"location\":{\"addressComponents\":{\"streetNumber\":\"620\",\"route\":\"King St W\",\"locality\":\"Toronto\",\"administrativeAreaLevel1\":\"ON\",\"postalCode\":\"M5V 1M6\",\"country\":\"Canada\",\"countryCode\":\"CA\"},\"geometry\":{\"location\":{\"lat\":43.644664618786685,\"lng\":-79.40066267417106}}},\"openingHours\":{\"weekdayText\":[\"Monday: 9:00 AM – 9:00 PM\",\"Tuesday: 9:00 AM – 9:00 PM\",\"Wednesday: 9:00 AM – 9:00 PM\",\"Thursday: 9:00 AM – 9:00 PM\",\"Friday: 9:00 AM – 9:00 PM\",\"Saturday: 10:00 AM – 6:00 PM\",\"Sunday: Closed\"]}}]}"
+    "body": "{\"deliveryPoints\":[{\"pointId\":\"001\",\"pointName\":\"Toronto Store\",\"location\":{\"addressComponents\":{\"streetNumber\":\"620\",\"route\":\"King St W\",\"locality\":\"Toronto\",\"administrativeArea\":{\"name\":\"Ontario\",\"code\":\"ON\"},\"postalCode\":\"M5V 1M6\",\"country\":\"Canada\",\"countryCode\":\"CA\"},\"geometry\":{\"location\":{\"lat\":43.644664618786685,\"lng\":-79.40066267417106}}},\"openingHours\":{\"weekdayText\":[\"Monday: 9:00 AM – 9:00 PM\",\"Tuesday: 9:00 AM – 9:00 PM\",\"Wednesday: 9:00 AM – 9:00 PM\",\"Thursday: 9:00 AM – 9:00 PM\",\"Friday: 9:00 AM – 9:00 PM\",\"Saturday: 10:00 AM – 6:00 PM\",\"Sunday: Closed\"]}}]}"
   }
 }
 ```
@@ -141,8 +144,8 @@ specified by the `FunctionRunResult` type in the [schema](./schema.graphql).
             "latitude": 43.644664618786685,
             "longitude": -79.40066267417106,
             "phone": null,
-            "province": "ON",
-            "province_code": null,
+            "province": "Ontario",
+            "province_code": "ON",
             "zip": "M5V 1M6"
           },
           "business_hours": [
