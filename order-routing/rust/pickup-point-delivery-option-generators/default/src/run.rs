@@ -96,13 +96,19 @@ fn build_address(external_api_delivery_point: &Value) -> Option<run::output::Pic
             .unwrap_or_default(),
         phone: None,
         province: Some(
-            external_api_delivery_point["location"]["addressComponents"]
-                ["administrativeAreaLevel1"]
+            external_api_delivery_point["location"]["addressComponents"]["administrativeArea"]
+                ["name"]
                 .as_str()
                 .unwrap()
                 .to_string(),
         ),
-        province_code: None,
+        province_code: Some(
+            external_api_delivery_point["location"]["addressComponents"]["administrativeArea"]
+                ["code"]
+                .as_str()
+                .unwrap()
+                .to_string(),
+        ),
         zip: Some(
             external_api_delivery_point["location"]["addressComponents"]["postalCode"]
                 .as_str()
@@ -206,7 +212,10 @@ mod tests {
                             "streetNumber": "620",
                             "route": "King St W",
                             "locality": "Toronto",
-                            "administrativeAreaLevel1": "ON",
+                            "administrativeArea": {
+                                "name": "Ontario",
+                                "code": "ON"
+                            },
                             "postalCode": "M5V 1M6",
                             "country": "Canada",
                             "countryCode": "CA"
@@ -258,8 +267,8 @@ mod tests {
                             latitude: 43.644664618786685,
                             longitude: -79.40066267417106,
                             phone: None,
-                            province: Some("ON".to_string()),
-                            province_code: None,
+                            province: Some("Ontario".to_string()),
+                            province_code: Some("ON".to_string()),
                             zip: Some("M5V 1M6".to_string()),
                         },
                         business_hours: Some(vec![
@@ -362,7 +371,10 @@ mod tests {
                             "streetNumber": "620",
                             "route": "King St W",
                             "locality": "Toronto",
-                            "administrativeAreaLevel1": "ON",
+                            "administrativeArea": {
+                                "name": "Ontario",
+                                "code": "ON"
+                            },
                             "postalCode": "M5V 1M6",
                             "country": "Canada",
                             "countryCode": "CA"
@@ -404,8 +416,8 @@ mod tests {
                             latitude: 43.644664618786685,
                             longitude: -79.40066267417106,
                             phone: None,
-                            province: Some("ON".to_string()),
-                            province_code: None,
+                            province: Some("Ontario".to_string()),
+                            province_code: Some("ON".to_string()),
                             zip: Some("M5V 1M6".to_string()),
                         },
                         business_hours: None,
