@@ -28,11 +28,14 @@ export function run(input) {
   const configuration = JSON.parse(
     input?.paymentCustomization?.metafield?.value ?? "{}"
   );
-  if (!configuration.paymentMethodName || !configuration.cartTotal) {
+  if (configuration.paymentMethodName == undefined || configuration.cartTotal == undefined) {
+    console.error(
+      "Configuration is missing."
+    );
     return NO_CHANGES;
   }
 
-  const cartTotal = parseFloat(input.cart.cost.totalAmount.amount ?? "0.0");
+  const cartTotal = parseFloat(input.cart.cost.totalAmount.amount);
   // Use the configured cart total instead of a hardcoded value
   if (cartTotal < configuration.cartTotal) {
     console.error(
