@@ -8,7 +8,6 @@ node_modules
 # These files are generated from Shopify CLI templating and should not be committed to this repo
 
 ## Extensions
-**/.output.graphql
 **/input.graphql
 */rust/**/Cargo.lock
 */rust/**/Cargo.toml

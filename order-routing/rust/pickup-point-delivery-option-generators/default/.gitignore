@@ -1,6 +1,5 @@
 /target
 Cargo.lock
-*.output.graphql
 .idea
 
 !/src/*.graphql
