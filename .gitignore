@@ -8,17 +8,12 @@ node_modules
 # These files are generated from Shopify CLI templating and should not be committed to this repo
 
 ## Extensions
-**/input.graphql
 */rust/**/Cargo.lock
 */rust/**/Cargo.toml
-**/shopify.extension.toml
-*/javascript/**/package.json
-*/javascript/**/src/*
 */rust/**/src/*.graphql
 */wasm/**/*.graphql
 !*/wasm/**/schema.graphql
 **/locales/*.json
-!*/javascript/**/src/*.liquid
 
 ## Sample Apps
 sample-apps/*/web/frontend/metafields.js
