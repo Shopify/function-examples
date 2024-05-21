@@ -1,9 +1,10 @@
 api_version = "unstable"
 
 [[extensions]]
-handle = "{{handle}}"
 name = "{{name}}"
+handle = "{{handle}}"
 type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
 
   [[extensions.targeting]]
   target = "purchase.pickup-point-delivery-option-generator.fetch"

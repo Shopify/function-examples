@@ -1,10 +1,11 @@
 api_version = "2024-01"
 
 [[extensions]]
-handle = "bundles_cart_transform"
 name = "t:name"
-description = "t:description"
+handle = "bundles_cart_transform"
 type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
+description = "t:description"
 
   [[extensions.targeting]]
   target = "purchase.cart-transform.run"
