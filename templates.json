@@ -404,5 +404,85 @@
         ]
       }
     ]
+  },
+  {
+    "identifier": "order_submission_rule",
+    "name": "Order submission rule — Function",
+    "defaultName": "order-submission-rule",
+    "group": "Discounts and checkout",
+    "sortPriority": null,
+    "supportLinks": [],
+    "types": [
+      {
+        "url": "https://github.com/Shopify/function-examples",
+        "type": "function",
+        "extensionPoints": [],
+        "supportedFlavors": [
+          {
+            "name": "JavaScript",
+            "value": "vanilla-js",
+            "path": "checkout/javascript/order-submission-rule/default"
+          },
+          {
+            "name": "TypeScript",
+            "value": "typescript",
+            "path": "checkout/javascript/order-submission-rule/default"
+          },
+          {
+            "name": "Rust",
+            "value": "rust",
+            "path": "checkout/rust/order-submission-rule/default"
+          },
+          {
+            "name": "Wasm",
+            "value": "wasm",
+            "path": "checkout/wasm/order-submission-rule/default"
+          }
+        ]
+      }
+    ],
+    "organizationBetaFlags": [
+      "enable_cli_checkout_completion_target_function"
+    ]
+  },
+  {
+    "identifier": "order_routing_location_rule",
+    "name": "Order routing location rule - Function",
+    "defaultName": "order-routing-location-rule",
+    "group": "Discounts and checkout",
+    "sortPriority": null,
+    "supportLinks": [],
+    "types": [
+      {
+        "url": "https://github.com/Shopify/function-examples",
+        "type": "function",
+        "extensionPoints": [],
+        "supportedFlavors": [
+          {
+            "name": "JavaScript",
+            "value": "vanilla-js",
+            "path": "order-routing/javascript/location-rules/default"
+          },
+          {
+            "name": "TypeScript",
+            "value": "typescript",
+            "path": "order-routing/javascript/location-rules/default"
+          },
+          {
+            "name": "Rust",
+            "value": "rust",
+            "path": "order-routing/rust/location-rules/default"
+          },
+          {
+            "name": "Wasm",
+            "value": "wasm",
+            "path": "order-routing/wasm/location-rules/default"
+          }
+        ]
+      }
+    ],
+    "organizationBetaFlags": [
+      "order_routing_extensibility_partner"
+    ]
   }
 ]
