@@ -28,7 +28,7 @@ export function run(input) {
   const configuration = JSON.parse(
     input?.paymentCustomization?.metafield?.value ?? "{}"
   );
-  if (configuration.paymentMethodName == undefined || configuration.cartTotal == undefined) {
+  if (configuration.paymentMethodName === undefined || configuration.cartTotal === undefined) {
     console.error(
       "Configuration is missing."
     );
