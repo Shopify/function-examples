@@ -1,7 +1,6 @@
-import { useState } from "react";
+
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
-import { Provider as AppBridgeReactProvider } from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css";
 import { DiscountProvider } from "../components/providers/DiscountProvider";
 import { boundary } from "@shopify/shopify-app-remix/server";
@@ -23,12 +22,10 @@ export async function loader({ request }) {
 }
 
 export default function App() {
-  const { apiKey, host } = useLoaderData();
-  const [config] = useState({ host, apiKey });
+  const { apiKey } = useLoaderData();
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
-      <AppBridgeReactProvider config={config}>
         <DiscountProvider>
           <ui-nav-menu>
             <Link to="/app" rel="home">
@@ -38,7 +35,6 @@ export default function App() {
           </ui-nav-menu>
           <Outlet />
         </DiscountProvider>
-      </AppBridgeReactProvider>
     </AppProvider>
   );
 }
