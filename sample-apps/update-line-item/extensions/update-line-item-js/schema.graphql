@@ -24,6 +24,21 @@ type Attribute {
 }
 
 """
+Key-value pairs that contains additional information.
+"""
+input AttributeOutput {
+  """
+  Key or name of the attribute.
+  """
+  key: String!
+
+  """
+  Value of the attribute.
+  """
+  value: String!
+}
+
+"""
 Represents information about the buyer that is interacting with the cart.
 """
 type BuyerIdentity {
@@ -162,7 +177,14 @@ input CartLineInput {
 An operation to apply to the Cart.
 """
 input CartOperation @oneOf {
+  """
+  A cart line expand operation.
+  """
   expand: ExpandOperation
+
+  """
+  A cart line merge operation.
+  """
   merge: MergeOperation
 
   """
@@ -1448,7 +1470,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -2524,6 +2546,9 @@ Example values: `"29.99"`, `"29.999"`.
 """
 scalar Decimal
 
+"""
+A cart line expand operation.
+"""
 input ExpandOperation {
   """
   The cart line id to expand.
@@ -2552,6 +2577,11 @@ input ExpandOperation {
 }
 
 input ExpandedItem {
+  """
+  The CartLine attributes to be added to component line.
+  """
+  attributes: [AttributeOutput!] = []
+
   """
   The merchandise id of the expanded item.
   """
@@ -2599,8 +2629,7 @@ input ExpandedItemPriceAdjustmentValue @oneOf {
 }
 
 """
-Transformations to apply to the Cart. In API versions 2023-10 and beyond, this
-type is deprecated in favor of `FunctionRunResult`.
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2610,7 +2639,7 @@ input FunctionResult {
 }
 
 """
-Transformations to apply to the Cart.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -3576,7 +3605,15 @@ The merchandise to be purchased at checkout.
 """
 union Merchandise = CustomProduct | ProductVariant
 
+"""
+A cart line merge operation.
+"""
 input MergeOperation {
+  """
+  The CartLine attributes to be added to the parent line.
+  """
+  attributes: [AttributeOutput!] = []
+
   """
   The list of cart lines to merge.
   """
