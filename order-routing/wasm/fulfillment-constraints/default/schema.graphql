@@ -2672,7 +2672,7 @@ type FulfillmentConstraintRule implements HasMetafields {
 }
 
 """
-The result of the function. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2682,7 +2682,7 @@ input FunctionResult {
 }
 
 """
-The result of the function.
+The run target result.
 """
 input FunctionRunResult {
   """
