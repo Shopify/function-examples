@@ -87,6 +87,7 @@ fn get_merge_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation>
                     cart_lines,
                     image: None,
                     price,
+                    attributes: None,
                 };
 
                 CartOperation::Merge(merge_operation)
@@ -204,6 +205,7 @@ fn get_expand_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation
                         merchandise_id: reference,
                         quantity,
                         price: None,
+                        attributes: None,
                     })
                     .collect();
 

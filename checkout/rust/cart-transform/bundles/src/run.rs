@@ -88,6 +88,7 @@ fn get_merge_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation>
                     cart_lines,
                     image: None,
                     price,
+                    attributes: None,
                 })
             })
         })
@@ -169,6 +170,7 @@ fn get_expand_cart_operations(cart: &Cart) -> impl Iterator<Item = CartOperation
                         merchandise_id: reference,
                         quantity,
                         price: None,
+                        attributes: None,
                     })
                     .collect();
 
