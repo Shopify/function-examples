@@ -1,10 +1,11 @@
 api_version = "2024-01"
 
 [[extensions]]
-handle = "{{handle}}"
 name = "t:name"
-description = "t:description"
+handle = "{{handle}}"
 type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
+description = "t:description"
 
   [[extensions.targeting]]
   target = "purchase.shipping-discount.run"
