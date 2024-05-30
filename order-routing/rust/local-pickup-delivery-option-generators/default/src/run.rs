@@ -16,6 +16,7 @@ fn run(_input: input::ResponseData) -> Result<output::FunctionRunResult> {
                 location_handle: "2578303".to_string(),
                 pickup_instruction: Some("Usually ready in 24 hours.".to_string()),
             },
+            metafields: None,
         },
     }];
 
@@ -81,6 +82,7 @@ mod tests {
                     location_handle: "2578303".to_string(),
                     pickup_instruction: Some("Usually ready in 24 hours.".to_string()),
                 },
+                metafields: None,
             },
         }];
 
