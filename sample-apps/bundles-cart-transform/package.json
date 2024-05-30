@@ -12,8 +12,8 @@
     "info": "shopify app info"
   },
   "dependencies": {
-    "@shopify/app": "3.41.1",
-    "@shopify/cli": "3.41.1"
+    "@shopify/app": "3.58.2",
+    "@shopify/cli": "3.60.1"
   },
   "author": "ryanworkman"
 }
