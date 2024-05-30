@@ -1508,7 +1508,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -2652,8 +2652,7 @@ enum DeliveryMethod {
 }
 
 """
-The result of a payment method function. In API versions 2023-10 and beyond,
-this type is deprecated in favor of `FunctionRunResult`.
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2663,7 +2662,7 @@ input FunctionResult {
 }
 
 """
-The result of a payment method function.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -3629,7 +3628,7 @@ type MailingAddress {
   phone: String
 
   """
-  The two-letter code for the region. For example, ON.
+  The alphanumeric code for the region. For example, ON.
   """
   provinceCode: String
 

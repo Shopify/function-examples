@@ -2689,7 +2689,8 @@ input Discount {
   The targets of the discount.
 
   The value is validated against: targets should contain only one type of `Target`.
-  For example, targets that contain a list of `ProductVariantTarget` targets are valid.
+  Only a list that contains either a single `OrderSubtotalTarget` or one or more
+  `ProductVariantTarget`s is valid.
   """
   targets: [Target!]!
 
@@ -2747,7 +2748,7 @@ input FixedAmount {
 }
 
 """
-The result of the function. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2762,7 +2763,7 @@ input FunctionResult {
 }
 
 """
-The result of the function.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -3721,7 +3722,7 @@ type MailingAddress {
   phone: String
 
   """
-  The two-letter code for the region. For example, ON.
+  The alphanumeric code for the region. For example, ON.
   """
   provinceCode: String
 
@@ -3885,11 +3886,12 @@ input OrderMinimumSubtotal {
 }
 
 """
-The subtotal of the target order.
+If used, the discount targets the entire order subtotal after product discounts are applied.
 """
 input OrderSubtotalTarget {
   """
-  Variant IDs with a merchandise line price that's excluded for the minimum subtotal condition of the order.
+  The list of excluded product variant IDs. Cart lines for these product variants are excluded from the order
+  subtotal calculation when calculating the maximum value of the discount.
   """
   excludedVariantIds: [ID!]!
 }
@@ -3901,7 +3903,7 @@ input Percentage {
   """
   The percentage value.
 
-  The value is validated against: >= 0.
+  The value is validated against: >= 0 and <= 100.
   """
   value: Decimal!
 }
@@ -4096,11 +4098,11 @@ type ProductVariant implements HasMetafields {
 }
 
 """
-The target product variant.
+A product variant targeted by a discount.
 """
 input ProductVariantTarget {
   """
-  The ID of the target product variant.
+  The ID of the targeted product variant.
   """
   id: ID!
 
@@ -4227,16 +4229,18 @@ type Shop implements HasMetafields {
 }
 
 """
-The target of the discount.
+A target of a discount.
+
+A discount can either have a single `OrderSubtotalTarget`, or one or more `ProductVariantTarget`s.
 """
 input Target @oneOf {
   """
-  The subtotal of the target order.
+  If used, the discount targets the entire order subtotal after product discounts are applied.
   """
   orderSubtotal: OrderSubtotalTarget
 
   """
-  The target product variant.
+  A product variant targeted by a discount.
   """
   productVariant: ProductVariantTarget
 }

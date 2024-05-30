@@ -2672,8 +2672,7 @@ enum DeliveryMethod {
 }
 
 """
-The result of a delivery customization function. In API versions 2023-10 and
-beyond, this type is deprecated in favor of `FunctionRunResult`.
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2683,7 +2682,7 @@ input FunctionResult {
 }
 
 """
-The result of a delivery customization function.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -3644,7 +3643,7 @@ type MailingAddress {
   phone: String
 
   """
-  The two-letter code for the region. For example, ON.
+  The alphanumeric code for the region. For example, ON.
   """
   provinceCode: String
 
@@ -3770,7 +3769,7 @@ input MoveOperation {
   deliveryOptionHandle: Handle!
 
   """
-  The index to move the delivery option to.
+  The target index within the delivery group to move the delivery option to.
   """
   index: Int!
 }

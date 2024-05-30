@@ -4,6 +4,11 @@ schema {
 }
 
 """
+Only allow the field to be queried when targeting one of the specified targets.
+"""
+directive @restrictTarget(only: [String!]!) on FIELD_DEFINITION
+
+"""
 Represents a generic custom attribute.
 """
 type Attribute {
@@ -1503,7 +1508,7 @@ enum CountryCode {
   TO
 
   """
-  Turkey.
+  Türkiye.
   """
   TR
 
@@ -2697,8 +2702,7 @@ type FulfillmentGroup {
 }
 
 """
-The result of a local pickup delivery option generator function. In API versions
-2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2708,7 +2712,7 @@ input FunctionResult {
 }
 
 """
-The result of a local pickup delivery option generator function.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -3595,6 +3599,16 @@ enum LanguageCode {
 }
 
 """
+Local pickup settings associated with a location.
+"""
+type LocalPickup {
+  """
+  Whether local pickup is enabled for the location.
+  """
+  enabled: Boolean!
+}
+
+"""
 A local pickup delivery option.
 """
 input LocalPickupDeliveryOption {
@@ -3604,12 +3618,17 @@ input LocalPickupDeliveryOption {
   cost: Decimal
 
   """
+  Metafields associated with the delivery option.
+  """
+  metafields: [MetafieldOutput!] = []
+
+  """
   The pickup location.
   """
   pickupLocation: PickupLocation!
 
   """
-  The title of the delivery option.
+  The title of the delivery option. Defaults to pickup location's name.
   """
   title: String
 }
@@ -3732,6 +3751,11 @@ type Location implements HasMetafields {
   The location id.
   """
   id: ID!
+
+  """
+  Local pickup settings associated with a location.
+  """
+  localPickup: LocalPickup!
 
   """
   Returns a metafield by namespace and key that belongs to the resource.
@@ -3884,7 +3908,7 @@ type MailingAddress {
   phone: String
 
   """
-  The two-letter code for the region. For example, ON.
+  The alphanumeric code for the region. For example, ON.
   """
   provinceCode: String
 
@@ -3981,6 +4005,31 @@ type Metafield {
 
   """
   The data to store in the metafield. The data is always stored as a string, regardless of the metafield's type.
+  """
+  value: String!
+}
+
+"""
+[Metafields](https://shopify.dev/apps/metafields) enable you to attach additional information.
+"""
+input MetafieldOutput {
+  """
+  The key for the metafield.
+  """
+  key: String!
+
+  """
+  The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+  """
+  namespace: String
+
+  """
+  The type of data that is stored in the metafield. Refer to the list of supported types.
+  """
+  type: String!
+
+  """
+  The data to store in the metafield.
   """
   value: String!
 }
@@ -4226,7 +4275,7 @@ type PurchasingCompany {
 """
 Represents how products and variants can be sold and purchased.
 """
-type SellingPlan {
+type SellingPlan implements HasMetafields {
   """
   The description of the selling plan.
   """
@@ -4236,6 +4285,21 @@ type SellingPlan {
   A globally-unique identifier.
   """
   id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 
   """
   The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.

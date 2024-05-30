@@ -4,6 +4,11 @@ schema {
 }
 
 """
+Only allow the field to be queried when targeting one of the specified targets.
+"""
+directive @restrictTarget(only: [String!]!) on FIELD_DEFINITION
+
+"""
 Represents a generic custom attribute.
 """
 type Attribute {
@@ -2686,8 +2691,17 @@ input FunctionError {
 }
 
 """
-The result of a cart validation function. In API versions 2023-10 and beyond,
-this type is deprecated in favor of `FunctionRunResult`.
+The fetch target result. Refer to network access for Shopify Functions.
+"""
+input FunctionFetchResult {
+  """
+  HTTP Request.
+  """
+  request: HttpRequest
+}
+
+"""
+The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
 """
 input FunctionResult {
   """
@@ -2697,7 +2711,7 @@ input FunctionResult {
 }
 
 """
-The result of a cart validation function.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -2749,6 +2763,111 @@ type HasTagResponse {
 }
 
 """
+The attributes associated with an HTTP request.
+"""
+input HttpRequest {
+  """
+  The HTTP body.
+  """
+  body: String
+
+  """
+  The HTTP headers.
+  """
+  headers: [HttpRequestHeader!]!
+
+  """
+  The HTTP method.
+  """
+  method: HttpRequestMethod!
+
+  """
+  Policy attached to the HTTP request.
+  """
+  policy: HttpRequestPolicy!
+
+  """
+  The HTTP url (eg.: https://example.com). The scheme needs to be HTTPS.
+  """
+  url: URL!
+}
+
+"""
+The attributes associated with an HTTP request header.
+"""
+input HttpRequestHeader {
+  """
+  Header name.
+  """
+  name: String!
+
+  """
+  Header value.
+  """
+  value: String!
+}
+
+"""
+The HTTP request available methods.
+"""
+enum HttpRequestMethod {
+  """
+  Http GET.
+  """
+  GET
+
+  """
+  Http POST.
+  """
+  POST
+}
+
+"""
+The attributes associated with an HTTP request policy.
+"""
+input HttpRequestPolicy {
+  """
+  Read timeout in milliseconds.
+  """
+  readTimeoutMs: Int!
+}
+
+"""
+The attributes associated with an HTTP response.
+"""
+type HttpResponse {
+  """
+  The HTTP body.
+  """
+  body: String
+
+  """
+  The HTTP headers.
+  """
+  headers: [HttpResponseHeader!]!
+
+  """
+  The HTTP status code.
+  """
+  status: Int!
+}
+
+"""
+The attributes associated with an HTTP response header.
+"""
+type HttpResponseHeader {
+  """
+  Header name.
+  """
+  name: String!
+
+  """
+  Header value.
+  """
+  value: String!
+}
+
+"""
 Represents a unique identifier, often used to refetch an object.
 The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
 
@@ -2766,6 +2885,11 @@ type Input {
   The cart.
   """
   cart: Cart!
+
+  """
+  The result of the fetch target. Refer to network access for Shopify Functions.
+  """
+  fetchResult: HttpResponse @restrictTarget(only: ["purchase.validation.run"])
 
   """
   The localization of the Function execution context.
@@ -3653,7 +3777,7 @@ type MailingAddress {
   phone: String
 
   """
-  The two-letter code for the region. For example, ON.
+  The alphanumeric code for the region. For example, ON.
   """
   provinceCode: String
 
@@ -3773,6 +3897,16 @@ type MoneyV2 {
 The root mutation for the API.
 """
 type MutationRoot {
+  """
+  Handles the Function result for the purchase.validation.fetch target.
+  """
+  fetch(
+    """
+    The result of the Function.
+    """
+    result: FunctionFetchResult!
+  ): Void!
+
   """
   Handles the Function result.
   """
@@ -4058,6 +4192,15 @@ includes the time but not the date or timezone which is determined from context.
 For example, "05:43:21".
 """
 scalar TimeWithoutTimezone
+
+"""
+Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) and
+[RFC 3987](https://datatracker.ietf.org/doc/html/rfc3987)-compliant URI string.
+
+For example, `"https://johns-apparel.myshopify.com"` is a valid URL. It includes a scheme (`https`) and a host
+(`johns-apparel.myshopify.com`).
+"""
+scalar URL
 
 """
 A customization that validates a cart and/or checkout.
