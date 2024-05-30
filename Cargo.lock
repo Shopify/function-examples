@@ -175,15 +175,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "discounts-order-discounts-fixed-amount"
-version = "1.0.0"
-dependencies = [
- "serde",
- "serde_json",
- "serde_with",
-]
-
-[[package]]
 name = "discounts-product-discounts-default"
 version = "1.0.0"
 dependencies = [
@@ -191,15 +182,6 @@ dependencies = [
  "serde",
  "serde_json",
  "shopify_function",
-]
-
-[[package]]
-name = "discounts-product-discounts-fixed-amount"
-version = "1.0.0"
-dependencies = [
- "serde",
- "serde_json",
- "serde_with",
 ]
 
 [[package]]
@@ -217,15 +199,6 @@ name = "either"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fcaabb2fef8c910e7f4c7ce9f67a1283a1715879a7c230ca9d6d1ae31f16d91"
-
-[[package]]
-name = "fixed-amount"
-version = "1.0.0"
-dependencies = [
- "serde",
- "serde_json",
- "serde_with",
-]
 
 [[package]]
 name = "fnv"
