@@ -2710,7 +2710,7 @@ The strategy that's applied to the list of discounts.
 """
 enum DiscountApplicationStrategy {
   """
-  Apply all discounts with conditions that are satisfied.
+  Apply all discounts with conditions that are satisfied. This does not override discount combination or stacking rules.
   """
   ALL
 
@@ -2794,22 +2794,7 @@ type FixedAmount {
 }
 
 """
-The result of the Function. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
-"""
-input FunctionResult {
-  """
-  The list of displayable errors.
-  """
-  displayableErrors: [DisplayableError!]
-
-  """
-  The list of applied line discounts.
-  """
-  lineDiscounts: [LineDiscount!]
-}
-
-"""
-The result of the Function.
+The run target result.
 """
 input FunctionRunResult {
   """
@@ -3875,7 +3860,7 @@ type MailingAddress {
   phone: String
 
   """
-  The two-letter code for the region. For example, ON.
+  The alphanumeric code for the region. For example, ON.
   """
   provinceCode: String
 
@@ -3905,11 +3890,6 @@ type Market implements HasMetafields {
   id: ID!
 
   """
-  The manager of the market, if the accessing app is the market’s manager. Otherwise, this will be null.
-  """
-  manager: MarketManager
-
-  """
   Returns a metafield by namespace and key that belongs to the resource.
   """
   metafield(
@@ -3928,17 +3908,6 @@ type Market implements HasMetafields {
   A geographic region which comprises a market.
   """
   regions: [MarketRegion!]!
-}
-
-"""
-The entity that manages a particular market.
-"""
-type MarketManager {
-  """
-  The identity of the manager. This can either be `merchant` if the market is
-  manually managed by the merchant or an ID of the app responsible for managing the market.
-  """
-  identifier: String!
 }
 
 """
@@ -4011,16 +3980,6 @@ type MoneyV2 {
 The root mutation for the API.
 """
 type MutationRoot {
-  """
-  Handles the Function result.
-  """
-  handleResult(
-    """
-    The result of the Function.
-    """
-    result: FunctionResult!
-  ): Void! @deprecated(reason: "Use the target-specific field instead.")
-
   """
   Handles the Function result for the purchase.discounts-allocator.run target.
   """
@@ -4232,7 +4191,7 @@ type PurchasingCompany {
 """
 Represents how products and variants can be sold and purchased.
 """
-type SellingPlan {
+type SellingPlan implements HasMetafields {
   """
   The description of the selling plan.
   """
@@ -4242,6 +4201,21 @@ type SellingPlan {
   A globally-unique identifier.
   """
   id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 
   """
   The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.
