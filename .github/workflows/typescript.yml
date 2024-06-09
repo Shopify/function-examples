@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Expand liquid
-        run: yarn expand-liquid typescript
+        run: CI=1 yarn expand-liquid typescript
       - name: Install workspace dependencies
         run: yarn
       - name: Generate types
