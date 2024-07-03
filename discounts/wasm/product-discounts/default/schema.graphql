@@ -252,6 +252,24 @@ type CartLineCost {
 }
 
 """
+A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that applies to a specific cart line, up to an optional quantity limit.
+"""
+input CartLineTarget {
+  """
+  The ID of the targeted cart line.
+  """
+  id: ID!
+
+  """
+  The number of line items that are being discounted.
+  The default value is `null`, which represents the quantity of the matching line items.
+
+  The value is validated against: > 0.
+  """
+  quantity: Int
+}
+
+"""
 Represents whether the product is a member of the given collection.
 """
 type CollectionMembership {
@@ -2662,6 +2680,8 @@ input Discount {
 
   """
   The targets of the discount.
+
+  This argument accepts a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
   """
   targets: [Target!]!
 
@@ -2840,6 +2860,23 @@ type Input {
   """
   shop: Shop!
 }
+
+"""
+A [JSON](https://www.json.org/json-en.html) object.
+
+Example value:
+`{
+  "product": {
+    "id": "gid://shopify/Product/1346443542550",
+    "title": "White T-shirt",
+    "options": [{
+      "name": "Size",
+      "values": ["M", "L"]
+    }]
+  }
+}`
+"""
+scalar JSON
 
 """
 A language.
@@ -3796,13 +3833,18 @@ For more information about the Shopify resources that you can attach metafields 
 """
 type Metafield {
   """
+  The data stored in the metafield in JSON format.
+  """
+  jsonValue: JSON!
+
+  """
   The type of data that the metafield stores in the `value` field.
   Refer to the list of [supported types](https://shopify.dev/apps/metafields/types).
   """
   type: String!
 
   """
-  The data to store in the metafield. The data is always stored as a string, regardless of the metafield's type.
+  The data stored in the metafield. Always stored as a string, regardless of the metafield's type.
   """
   value: String!
 }
@@ -4005,7 +4047,8 @@ type ProductVariant implements HasMetafields {
 }
 
 """
-A product variant targeted by a discount.
+A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
+optional quantity limit.
 """
 input ProductVariantTarget {
   """
@@ -4014,8 +4057,8 @@ input ProductVariantTarget {
   id: ID!
 
   """
-  The number of line items that are being discounted.
-  The default value is `null`, which represents the quantity of the matching line items.
+  The maximum number of line item units to be discounted.
+  The default value is `null`, which represents the total quantity of the matching line items.
 
   The value is validated against: > 0.
   """
@@ -4045,7 +4088,7 @@ type PurchasingCompany {
 """
 Represents how products and variants can be sold and purchased.
 """
-type SellingPlan {
+type SellingPlan implements HasMetafields {
   """
   The description of the selling plan.
   """
@@ -4055,6 +4098,21 @@ type SellingPlan {
   A globally-unique identifier.
   """
   id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 
   """
   The name of the selling plan. For example, '6 weeks of prepaid granola, delivered weekly'.
@@ -4136,13 +4194,24 @@ type Shop implements HasMetafields {
 }
 
 """
-A target of a discount.
+A target of a discount, which determines which cart line(s) the discount will affect.
 
-A discount can have one or more `ProductVariantTarget`s.
+A discount can have a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
+
+Multiple targets with the same type and ID are the same as a single target of that type and ID with their
+quantities added together, or `null` if any of those targets have a quantity of `null`.
+
+See the [Product Discount API reference](https://shopify.dev/docs/api/functions/reference/product-discounts/graphql#functionrunresult) for examples.
 """
 input Target @oneOf {
   """
-  A product variant targeted by a discount.
+  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that applies to a specific cart line, up to an optional quantity limit.
+  """
+  cartLine: CartLineTarget
+
+  """
+  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
+  optional quantity limit.
   """
   productVariant: ProductVariantTarget
 }

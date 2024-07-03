@@ -2974,6 +2974,23 @@ type Input {
 }
 
 """
+A [JSON](https://www.json.org/json-en.html) object.
+
+Example value:
+`{
+  "product": {
+    "id": "gid://shopify/Product/1346443542550",
+    "title": "White T-shirt",
+    "options": [{
+      "name": "Size",
+      "values": ["M", "L"]
+    }]
+  }
+}`
+"""
+scalar JSON
+
+"""
 A language.
 """
 type Language {
@@ -3948,13 +3965,18 @@ For more information about the Shopify resources that you can attach metafields 
 """
 type Metafield {
   """
+  The data stored in the metafield in JSON format.
+  """
+  jsonValue: JSON!
+
+  """
   The type of data that the metafield stores in the `value` field.
   Refer to the list of [supported types](https://shopify.dev/apps/metafields/types).
   """
   type: String!
 
   """
-  The data to store in the metafield. The data is always stored as a string, regardless of the metafield's type.
+  The data stored in the metafield. Always stored as a string, regardless of the metafield's type.
   """
   value: String!
 }
