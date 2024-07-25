@@ -42,7 +42,7 @@
     "@remix-run/dev": "^2.8.1",
     "@remix-run/eslint-config": "^2.8.1",
     "@types/eslint": "^8.56.9",
-    "eslint": "^9.0.0",
+    "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.5"
   },
