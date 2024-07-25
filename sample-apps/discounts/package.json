@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@prisma/client": "^5.12.1",
-    "@remix-run/node": "^2.8.1",
-    "@remix-run/react": "^2.8.1",
-    "@remix-run/serve": "^2.8.1",
+    "@remix-run/node": "^2.10.3",
+    "@remix-run/react": "^2.10.3",
+    "@remix-run/serve": "^2.10.3",
     "@shopify/app": "3.58.2",
     "@shopify/app-bridge-react": "^4.1.3",
     "@shopify/app-bridge": "^3.7.10",
@@ -39,8 +39,8 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.8.1",
-    "@remix-run/eslint-config": "^2.8.1",
+    "@remix-run/dev": "^2.10.3",
+    "@remix-run/eslint-config": "^2.10.3",
     "@types/eslint": "^8.56.9",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
