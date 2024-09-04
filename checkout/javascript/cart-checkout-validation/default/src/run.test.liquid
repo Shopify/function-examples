@@ -20,7 +20,7 @@ describe('cart checkout validation function', () => {
     const expected = /** @type {FunctionRunResult} */ ({ errors: [
       {
         localizedMessage: "Not possible to order more than one of each",
-        target: "cart"
+        target: "$.cart"
       }
     ] });
 
@@ -61,7 +61,7 @@ describe('cart checkout validation function', () => {
     const expected: FunctionRunResult = { errors: [
       {
         localizedMessage: "Not possible to order more than one of each",
-        target: "cart"
+        target: "$.cart"
       }
     ] };
 
