@@ -19,7 +19,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
     {
         errors.push(output::FunctionError {
             localized_message: "Not possible to order more than one of each".to_owned(),
-            target: "cart".to_owned(),
+            target: "$.cart".to_owned(),
         })
     }
     Ok(output::FunctionRunResult { errors })
@@ -51,7 +51,7 @@ mod tests {
         let expected = FunctionRunResult {
             errors: vec![FunctionError {
                 localized_message: "Not possible to order more than one of each".to_owned(),
-                target: "cart".to_owned(),
+                target: "$.cart".to_owned(),
             }],
         };
 

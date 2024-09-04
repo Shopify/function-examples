@@ -15,7 +15,7 @@ export function run(input) {
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({
       localizedMessage: "Not possible to order more than one of each",
-      target: "cart",
+      target: "$.cart",
     }));
 
   return {
@@ -34,7 +34,7 @@ export function run(input: RunInput): FunctionRunResult {
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({
       localizedMessage: "Not possible to order more than one of each",
-      target: "cart",
+      target: "$.cart",
     }));
 
   return {
