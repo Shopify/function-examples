@@ -9,6 +9,11 @@ Only allow the field to be queried when targeting one of the specified targets.
 directive @restrictTarget(only: [String!]!) on FIELD_DEFINITION
 
 """
+Scale the Functions resource limits based on the field's length.
+"""
+directive @scaleLimits(rate: Float!) on FIELD_DEFINITION
+
+"""
 Information about the allocation for one or more line items that are to be delivered to a specific address.
 """
 type Allocation {
@@ -19,16 +24,16 @@ type Allocation {
 }
 
 """
-Represents a generic custom attribute.
+Represents a generic custom attribute, such as whether an order is a customer's first.
 """
 type Attribute {
   """
-  Key or name of the attribute.
+  The key or name of the attribute. For example, `"customersFirstOrder"`.
   """
   key: String!
 
   """
-  Value of the attribute.
+  The value of the attribute. For example, `"true"`.
   """
   value: String
 }
@@ -130,7 +135,7 @@ type Cart {
   """
   A list of lines containing information about the items the customer intends to purchase.
   """
-  lines: [CartLine!]!
+  lines: [CartLine!]! @scaleLimits(rate: 0.005)
 }
 
 """
@@ -165,7 +170,7 @@ type CartDeliveryGroup {
   """
   A list of cart lines for the delivery group.
   """
-  cartLines: [CartLine!]!
+  cartLines: [CartLine!]! @scaleLimits(rate: 0.005)
 
   """
   The destination address for the delivery group.
@@ -2903,9 +2908,28 @@ type HttpResponse {
   body: String
 
   """
+  An HTTP header.
+  """
+  header(
+    """
+    A case-insensitive header name.
+    """
+    name: String!
+  ): HttpResponseHeader
+
+  """
   The HTTP headers.
   """
-  headers: [HttpResponseHeader!]!
+  headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
+
+  """
+  The body of the response in JSON format. If the body isn't valid JSON, it will
+  be returned as a JSON string. This field shouldn't be used in conjunction with
+  the body field, which returns the body solely as a plain string. Use this
+  field when you need to handle mixed use cases, such as receiving both JSON and
+  non-JSON responses.
+  """
+  jsonBody: JSON
 
   """
   The HTTP status code.
@@ -3001,7 +3025,7 @@ type Language {
 }
 
 """
-ISO 639-1 language codes supported by Shopify.
+Language codes supported by Shopify.
 """
 enum LanguageCode {
   """
@@ -3982,6 +4006,31 @@ type Metafield {
 }
 
 """
+[Metafields](https://shopify.dev/apps/metafields) enable you to attach additional information.
+"""
+input MetafieldOutput {
+  """
+  The key for the metafield.
+  """
+  key: String!
+
+  """
+  The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+  """
+  namespace: String
+
+  """
+  The type of data that is stored in the metafield. Refer to the list of supported types.
+  """
+  type: String!
+
+  """
+  The data to store in the metafield.
+  """
+  value: String!
+}
+
+"""
 A monetary value with currency.
 """
 type MoneyV2 {
@@ -4130,6 +4179,11 @@ input PickupPointDeliveryOption {
   The cost of the delivery option in the currency of the cart. Defaults to the location pickup points settings price.
   """
   cost: Decimal
+
+  """
+  The metafields associated with the delivery option.
+  """
+  metafields: [MetafieldOutput!] = []
 
   """
   The pickup point.
@@ -4446,8 +4500,8 @@ scalar TimeWithoutTimezone
 Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) and
 [RFC 3987](https://datatracker.ietf.org/doc/html/rfc3987)-compliant URI string.
 
-For example, `"https://johns-apparel.myshopify.com"` is a valid URL. It includes a scheme (`https`) and a host
-(`johns-apparel.myshopify.com`).
+For example, `"https://example.myshopify.com"` is a valid URL. It includes a scheme (`https`) and a host
+(`example.myshopify.com`).
 """
 scalar URL
 

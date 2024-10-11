@@ -9,16 +9,21 @@ Only allow the field to be queried when targeting one of the specified targets.
 directive @restrictTarget(only: [String!]!) on FIELD_DEFINITION
 
 """
-Represents a generic custom attribute.
+Scale the Functions resource limits based on the field's length.
+"""
+directive @scaleLimits(rate: Float!) on FIELD_DEFINITION
+
+"""
+Represents a generic custom attribute, such as whether an order is a customer's first.
 """
 type Attribute {
   """
-  Key or name of the attribute.
+  The key or name of the attribute. For example, `"customersFirstOrder"`.
   """
   key: String!
 
   """
-  Value of the attribute.
+  The value of the attribute. For example, `"true"`.
   """
   value: String
 }
@@ -90,7 +95,7 @@ type Cart {
   """
   A list of lines containing information about the items the customer intends to purchase.
   """
-  lines: [CartLine!]!
+  lines: [CartLine!]! @scaleLimits(rate: 0.005)
 }
 
 """
@@ -125,7 +130,7 @@ type CartDeliveryGroup {
   """
   A list of cart lines for the delivery group.
   """
-  cartLines: [CartLine!]!
+  cartLines: [CartLine!]! @scaleLimits(rate: 0.005)
 
   """
   The destination address for the delivery group.
@@ -2672,11 +2677,14 @@ type DeliveryOptionGenerator implements HasMetafields {
 }
 
 """
-A group of one or more items to be fulfilled together.
+A group of one or more items to be fulfilled together. Every cart line belongs to
+exactly one fulfillment group.
 """
 type FulfillmentGroup {
   """
-  The delivery group for the fulfillment group.
+  The delivery group for the fulfillment group. Contains information about
+  the destination address and which delivery options were available for this
+  set of cart lines.
   """
   deliveryGroup: CartDeliveryGroup!
 
@@ -2691,14 +2699,16 @@ type FulfillmentGroup {
   id: ID!
 
   """
-  A list of inventory location handles for the fulfillment group.
+  The list of inventory location handles for the fulfillment group.
+  These are the locations that stock the items, and can be used to fulfill
+  this particular group of items.
   """
   inventoryLocationHandles: [Handle!]!
 
   """
-  The merchandise in the fulfillment group.
+  The merchandise in the fulfillment group. A subset of cart lines.
   """
-  lines: [CartLine!]!
+  lines: [CartLine!]! @scaleLimits(rate: 0.005)
 }
 
 """
@@ -2906,7 +2916,7 @@ type Language {
 }
 
 """
-ISO 639-1 language codes supported by Shopify.
+Language codes supported by Shopify.
 """
 enum LanguageCode {
   """
@@ -3626,7 +3636,7 @@ type LocalPickup {
 }
 
 """
-A local pickup delivery option.
+A local pickup delivery option, which will be presented to the customer.
 """
 input LocalPickupDeliveryOption {
   """

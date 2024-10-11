@@ -4,16 +4,21 @@ schema {
 }
 
 """
-Represents a generic custom attribute.
+Scale the Functions resource limits based on the field's length.
+"""
+directive @scaleLimits(rate: Float!) on FIELD_DEFINITION
+
+"""
+Represents a generic custom attribute, such as whether an order is a customer's first.
 """
 type Attribute {
   """
-  Key or name of the attribute.
+  The key or name of the attribute. For example, `"customersFirstOrder"`.
   """
   key: String!
 
   """
-  Value of the attribute.
+  The value of the attribute. For example, `"true"`.
   """
   value: String
 }
@@ -85,7 +90,7 @@ type Cart {
   """
   A list of lines containing information about the items the customer intends to purchase.
   """
-  lines: [CartLine!]!
+  lines: [CartLine!]! @scaleLimits(rate: 0.005)
 }
 
 """
@@ -120,7 +125,7 @@ type CartDeliveryGroup {
   """
   A list of cart lines for the delivery group.
   """
-  cartLines: [CartLine!]!
+  cartLines: [CartLine!]! @scaleLimits(rate: 0.005)
 
   """
   The destination address for the delivery group.
@@ -2986,7 +2991,7 @@ type Language {
 }
 
 """
-ISO 639-1 language codes supported by Shopify.
+Language codes supported by Shopify.
 """
 enum LanguageCode {
   """

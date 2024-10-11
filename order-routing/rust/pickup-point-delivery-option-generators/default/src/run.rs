@@ -52,6 +52,7 @@ fn build_pickup_point_delivery_option(
             address: build_address(external_api_delivery_point)?,
             business_hours: build_business_hours(external_api_delivery_point),
         },
+        metafields: Some(vec![]),
     })
 }
 
@@ -326,6 +327,7 @@ mod tests {
                         external_id: "001".to_string(),
                         name: "Toronto Store".to_string(),
                     },
+                    metafields: Some(vec![]),
                 },
             }],
         };
@@ -428,6 +430,7 @@ mod tests {
                         external_id: "001".to_string(),
                         name: "Toronto Store".to_string(),
                     },
+                    metafields: Some(vec![]),
                 },
             }],
         };
