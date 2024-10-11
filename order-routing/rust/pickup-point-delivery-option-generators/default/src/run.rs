@@ -327,6 +327,7 @@ mod tests {
                         external_id: "001".to_string(),
                         name: "Toronto Store".to_string(),
                     },
+                    metafields: Some(vec![]),
                 },
             }],
         };
@@ -429,6 +430,7 @@ mod tests {
                         external_id: "001".to_string(),
                         name: "Toronto Store".to_string(),
                     },
+                    metafields: Some(vec![]),
                 },
             }],
         };
