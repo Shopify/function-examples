@@ -9,16 +9,16 @@ Requires that exactly one field must be supplied and that field must not be `nul
 directive @oneOf on INPUT_OBJECT
 
 """
-Represents a generic custom attribute.
+Represents a generic custom attribute, such as whether an order is a customer's first.
 """
 type Attribute {
   """
-  Key or name of the attribute.
+  The key or name of the attribute. For example, `"customersFirstOrder"`.
   """
   key: String!
 
   """
-  Value of the attribute.
+  The value of the attribute. For example, `"true"`.
   """
   value: String
 }
@@ -2851,7 +2851,7 @@ type Language {
 }
 
 """
-ISO 639-1 language codes supported by Shopify.
+Language codes supported by Shopify.
 """
 enum LanguageCode {
   """
@@ -2928,6 +2928,11 @@ enum LanguageCode {
   Chechen.
   """
   CE
+
+  """
+  Central Kurdish.
+  """
+  CKB
 
   """
   Czech.
@@ -3008,6 +3013,11 @@ enum LanguageCode {
   Finnish.
   """
   FI
+
+  """
+  Filipino.
+  """
+  FIL
 
   """
   Faroese.
@@ -3358,6 +3368,16 @@ enum LanguageCode {
   Kinyarwanda.
   """
   RW
+
+  """
+  Sanskrit.
+  """
+  SA
+
+  """
+  Sardinian.
+  """
+  SC
 
   """
   Sindhi.
