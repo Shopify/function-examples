@@ -68,16 +68,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "checkout-order-submission-rule-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
 name = "checkout-payment-customization-default"
 version = "1.0.0"
 dependencies = [
@@ -336,16 +326,6 @@ dependencies = [
 
 [[package]]
 name = "order-routing-pickup-point-delivery-option-generators-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "order-submission-rule-rust"
 version = "1.0.0"
 dependencies = [
  "graphql_client",
