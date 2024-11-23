@@ -9,7 +9,7 @@
     "@graphql-codegen/cli": "^3.2.2",
     "@graphql-codegen/typescript": "^3.0.2",
     "@graphql-codegen/typescript-operations": "^3.0.2",
-    "graphql": "^16.6.0"
+    "graphql": "^16.8.1"
   },
   "scripts": {
     "expand-liquid": "node ./util/expand-liquid.js",
