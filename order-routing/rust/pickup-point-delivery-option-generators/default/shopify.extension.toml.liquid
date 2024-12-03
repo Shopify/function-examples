@@ -17,7 +17,7 @@ input_query = "src/run.graphql"
 export = "run"
 
 [extensions.build]
-command = "cargo wasi build --release"
+command = "cargo build --target=wasm32-wasip1 --release"
 path = "target/wasm32-wasi/release/{{handle | replace: "-", "_" | downcase}}.wasm"
 watch = ["src/**/*.rs"]
 

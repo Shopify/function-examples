@@ -4,5 +4,5 @@ title = "cart merge expand"
 api_version = "2024-04"
 
 [build]
-command = "cargo wasi build --release"
+command = "cargo build --target=wasm32-wasip1 --release"
 path = "target/wasm32-wasi/release/bundle_cart_transform.wasm"

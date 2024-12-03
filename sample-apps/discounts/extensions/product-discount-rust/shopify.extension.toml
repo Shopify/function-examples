@@ -12,7 +12,7 @@ type = "function"
   export = "run"
 
   [extensions.build]
-  command = "cargo wasi build --release"
+  command = "cargo build --target=wasm32-wasip1 --release"
   path = "target/wasm32-wasi/release/product-discount-rust.wasm"
   watch = ["src/**/*.rs"]
 
