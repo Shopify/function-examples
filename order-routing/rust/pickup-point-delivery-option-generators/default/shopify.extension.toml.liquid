@@ -18,7 +18,7 @@ export = "run"
 
 [extensions.build]
 command = "cargo build --target=wasm32-wasip1 --release"
-path = "target/wasm32-wasi/release/{{handle | replace: "-", "_" | downcase}}.wasm"
+path = "target/wasm32-wasip1/release/{{handle | replace: "-", "_" | downcase}}.wasm"
 watch = ["src/**/*.rs"]
 
 [extensions.ui.paths]

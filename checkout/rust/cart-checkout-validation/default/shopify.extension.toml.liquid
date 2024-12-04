@@ -14,6 +14,6 @@ description = "t:description"
 
   [extensions.build]
   command = "cargo build --target=wasm32-wasip1 --release"
-  path = "target/wasm32-wasi/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  path = "target/wasm32-wasip1/release/{{handle | replace: " ", "-" | downcase}}.wasm"
   watch = [ "src/**/*.rs" ]
 

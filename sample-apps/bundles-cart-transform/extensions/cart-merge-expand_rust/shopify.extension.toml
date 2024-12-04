@@ -5,4 +5,4 @@ api_version = "2024-04"
 
 [build]
 command = "cargo build --target=wasm32-wasip1 --release"
-path = "target/wasm32-wasi/release/bundle_cart_transform.wasm"
+path = "target/wasm32-wasip1/release/bundle_cart_transform.wasm"
