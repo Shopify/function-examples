@@ -3,10 +3,78 @@
 version = 3
 
 [[package]]
+name = "ariadne"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "31beedec3ce83ae6da3a79592b3d8d7afd146a5b15bb9bb940279aced60faa89"
+dependencies = [
+ "unicode-width",
+ "yansi",
+]
+
+[[package]]
 name = "ascii"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eab1c04a571841102f5345a8fc0f6bb3d31c315dec879b5c6e42e40ce7ffa34e"
+
+[[package]]
+name = "beef"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a8241f3ebb85c056b509d4327ad0358fbbba6ffb340bf388f26350aeda225b1"
+
+[[package]]
+name = "bluejay-core"
+version = "0.2.0"
+source = "git+https://github.com/Shopify/bluejay?rev=01118fda7debbadeb47de69254d0d7408892d1d7#01118fda7debbadeb47de69254d0d7408892d1d7"
+dependencies = [
+ "enum-as-inner",
+ "itertools",
+ "serde_json",
+ "strum",
+]
+
+[[package]]
+name = "bluejay-parser"
+version = "0.2.0"
+source = "git+https://github.com/Shopify/bluejay?rev=01118fda7debbadeb47de69254d0d7408892d1d7#01118fda7debbadeb47de69254d0d7408892d1d7"
+dependencies = [
+ "ariadne",
+ "bluejay-core",
+ "enum-as-inner",
+ "itertools",
+ "logos",
+ "strum",
+]
+
+[[package]]
+name = "bluejay-typegen-codegen"
+version = "0.2.0"
+source = "git+https://github.com/Shopify/bluejay?rev=01118fda7debbadeb47de69254d0d7408892d1d7#01118fda7debbadeb47de69254d0d7408892d1d7"
+dependencies = [
+ "bluejay-core",
+ "bluejay-parser",
+ "bluejay-validator",
+ "convert_case",
+ "itertools",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.90",
+]
+
+[[package]]
+name = "bluejay-validator"
+version = "0.2.0"
+source = "git+https://github.com/Shopify/bluejay?rev=01118fda7debbadeb47de69254d0d7408892d1d7#01118fda7debbadeb47de69254d0d7408892d1d7"
+dependencies = [
+ "bluejay-core",
+ "bluejay-parser",
+ "itertools",
+ "paste",
+ "seq-macro",
+ "serde_json",
+]
 
 [[package]]
 name = "bundle_cart_transform"
@@ -16,7 +84,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -27,7 +95,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -43,7 +111,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -54,7 +122,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -64,7 +132,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -74,7 +142,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -141,7 +209,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -151,7 +219,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -161,17 +229,15 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
 name = "discounts-product-discounts-default"
 version = "1.0.0"
 dependencies = [
- "graphql_client",
  "serde",
- "serde_json",
- "shopify_function",
+ "shopify_function 0.8.1",
 ]
 
 [[package]]
@@ -181,7 +247,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -189,6 +255,18 @@ name = "either"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fcaabb2fef8c910e7f4c7ce9f67a1283a1715879a7c230ca9d6d1ae31f16d91"
+
+[[package]]
+name = "enum-as-inner"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1e6a265c649f3f5979b601d26f1d05ada116434c87741c9493cb56218f76cbc"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.90",
+]
 
 [[package]]
 name = "fnv"
@@ -234,7 +312,7 @@ checksum = "5e27ed0c2cf0c0cc52c6bcf3b45c907f433015e580879d14005386251842fb0a"
 dependencies = [
  "graphql-introspection-query",
  "graphql-parser",
- "heck",
+ "heck 0.4.1",
  "lazy_static",
  "proc-macro2",
  "quote",
@@ -261,10 +339,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
+name = "heck"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+
+[[package]]
 name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
+]
 
 [[package]]
 name = "itoa"
@@ -279,6 +372,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
+name = "logos"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab6f536c1af4c7cc81edf73da1f8029896e7e1e16a219ef09b184e76a296f3db"
+dependencies = [
+ "logos-derive",
+]
+
+[[package]]
+name = "logos-codegen"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "189bbfd0b61330abea797e5e9276408f2edbe4f822d7ad08685d67419aafb34e"
+dependencies = [
+ "beef",
+ "fnv",
+ "lazy_static",
+ "proc-macro2",
+ "quote",
+ "regex-syntax",
+ "rustc_version",
+ "syn 2.0.90",
+]
+
+[[package]]
+name = "logos-derive"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebfe8e1a19049ddbfccbd14ac834b215e11b85b90bab0c2dba7c7b92fb5d5cba"
+dependencies = [
+ "logos-codegen",
+]
+
+[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -291,7 +418,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -301,7 +428,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -311,7 +438,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -321,7 +448,7 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
@@ -331,8 +458,14 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
+
+[[package]]
+name = "paste"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "payment-customization"
@@ -341,14 +474,14 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.59"
+version = "1.0.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aeca18b86b413c660b781aa319e4e2648a3e6f9eadc9b47e9038e6fe9f3451b"
+checksum = "37d3544b3f2748c54e147655edb5025752e2303145b5aefb3c3ea2c78b973bb0"
 dependencies = [
  "unicode-ident",
 ]
@@ -360,17 +493,38 @@ dependencies = [
  "graphql_client",
  "serde",
  "serde_json",
- "shopify_function",
+ "shopify_function 0.8.0",
 ]
 
 [[package]]
 name = "quote"
-version = "1.0.28"
+version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b9ab9c7eadfd8df19006f1cf1a4aed13540ed5cbc047010ece5826e10825488"
+checksum = "b5b9d34b8991d19d98081b46eacdd8eb58c6f2b201139f7c5f643cc155a633af"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "regex-syntax"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
+
+[[package]]
+name = "rustc_version"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
+dependencies = [
+ "semver",
+]
+
+[[package]]
+name = "rustversion"
+version = "1.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e819f2bc632f285be6d7cd36e25940d45b2391dd6d9b939e79de557f7014248"
 
 [[package]]
 name = "ryu"
@@ -379,23 +533,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f91339c0467de62360649f8d3e185ca8de4224ff281f66000de5eb2a77a79041"
 
 [[package]]
-name = "serde"
-version = "1.0.163"
+name = "semver"
+version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2113ab51b87a539ae008b5c6c02dc020ffa39afd2d83cffcb3f4eb2722cebec2"
+checksum = "3cb6eb87a131f756572d7fb904f6e7b68633f09cca868c5df1c4b8d1a694bbba"
+
+[[package]]
+name = "seq-macro"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3f0bf26fd526d2a95683cd0f87bf103b8539e2ca1ef48ce002d67aad59aa0b4"
+
+[[package]]
+name = "serde"
+version = "1.0.216"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b9781016e935a97e8beecf0c933758c97a5520d32930e460142b4cd80c6338e"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.163"
+version = "1.0.216"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c805777e3930c8883389c602315a24224bcc738b63905ef87cd1420353ea93e"
+checksum = "46f859dbbf73865c6627ed570e78961cd3ac92407a2d117204c49232485da55e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.18",
+ "syn 2.0.90",
 ]
 
 [[package]]
@@ -440,7 +606,18 @@ dependencies = [
  "ryu",
  "serde",
  "serde_json",
- "shopify_function_macro",
+ "shopify_function_macro 0.8.0",
+]
+
+[[package]]
+name = "shopify_function"
+version = "0.8.1"
+source = "git+https://github.com/Shopify/shopify-function-rust?rev=33455e44f3232a03fb9af64b05828b40d9db6943#33455e44f3232a03fb9af64b05828b40d9db6943"
+dependencies = [
+ "ryu",
+ "serde",
+ "serde_json",
+ "shopify_function_macro 0.8.1",
 ]
 
 [[package]]
@@ -457,10 +634,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "shopify_function_macro"
+version = "0.8.1"
+source = "git+https://github.com/Shopify/shopify-function-rust?rev=33455e44f3232a03fb9af64b05828b40d9db6943#33455e44f3232a03fb9af64b05828b40d9db6943"
+dependencies = [
+ "bluejay-typegen-codegen",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.90",
+]
+
+[[package]]
 name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
+name = "strum"
+version = "0.26.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8fec0f0aef304996cf250b31b5a10dee7980c85da9d759361292b8bca5a18f06"
+dependencies = [
+ "strum_macros",
+]
+
+[[package]]
+name = "strum_macros"
+version = "0.26.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c6bee85a5a24955dc440386795aa378cd9cf82acd5f764469152d2270e581be"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn 2.0.90",
+]
 
 [[package]]
 name = "syn"
@@ -475,9 +685,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.18"
+version = "2.0.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32d41677bcbe24c20c52e7c70b0d8db04134c5d1066bf98662e2871ad200ea3e"
+checksum = "919d3b74a5dd0ccd15aeb8f93e7006bd9e14c295087c9896a110f490752bcf31"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -501,7 +711,7 @@ checksum = "f9456a42c5b0d803c8cd86e73dd7cc9edd429499f37a3550d286d5e86720569f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.18",
+ "syn 2.0.90",
 ]
 
 [[package]]
@@ -517,6 +727,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1dd624098567895118886609431a7c3b8f516e41d30e0643f03d94592a147e36"
 
 [[package]]
+name = "unicode-width"
+version = "0.1.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
 name = "unreachable"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -530,3 +746,9 @@ name = "void"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a02e4885ed3bc0f2de90ea6dd45ebcbb66dacffe03547fadbb0eeae2770887d"
+
+[[package]]
+name = "yansi"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfe53a6657fd280eaa890a3bc59152892ffa3e30101319d168b781ed6529b049"
