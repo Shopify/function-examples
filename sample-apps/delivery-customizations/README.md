@@ -1,216 +1,267 @@
-# Shopify App Template - Remix
+# `@shopify/shopify-app-remix`
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
+<!-- ![Build Status]() -->
 
-<!-- TODO: Uncomment this after we've started using the template in the CLI -->
-<!-- Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template). -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+[![npm version](https://badge.fury.io/js/%40shopify%2Fshopify-app-remix.svg)](https://badge.fury.io/js/%40shopify%2Fshopify-app-remix)
 
-## Quick start
+This package makes it easy to use [Remix](https://remix.run/) to build Shopify apps.
+It builds on the `@shopify/shopify-api` package and exposes a `shopifyApp` function. You can use `shopifyApp` to configure your app and then authenticate requests from Shopify.
 
-### Prerequisites
+Visit the [`shopify.dev` documentation](https://shopify.dev/docs/api/shopify-app-remix) for more details on the Remix app package.
 
-1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
-1. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
-1. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
+## Requirements
 
-<!-- TODO Make this section about using @shopify/app once it's added to the CLI. -->
+To use this package, you will need to have:
 
-### Setup
+- a Shopify Partner account and development store
+- an app already set up on your partner account
+- a JavaScript package manager such as [yarn](https://yarnpkg.com) installed
 
-If you used the CLI to create the template, you can skip this section.
+## Getting started
 
-Using yarn:
+### Shopify CLI
 
-```shell
-yarn install
+The easiest way to get started with developing Shopify apps is using the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli).
+It helps you set up your environment for developing and publishing your apps and extensions.
+
+We strongly recommend using the CLI to create and manage your Remix apps and extensions!
+Refer to the [getting started documentation](https://shopify.dev/docs/apps/getting-started/create) to create your app using the Shopify CLI.
+
+### Using a plain Remix app
+
+This package works with any Remix app. If you're starting an app from scratch, then you can create a brand new Remix app that uses the indie-stack:
+
+```bash
+npx create-remix@latest --template remix-run/indie-stack
+cd ./name-of-your-app
 ```
 
-Using npm:
+Now let's install this package:
 
-```shell
-npm install
+```bash
+npm install @shopify/shopify-app-remix
 ```
 
-Using pnpm:
+Next, you'll need to set up some routes and headers so you can embed your app in the Shopify admin.
+You can find more details on all the steps described here in the [package documentation](https://shopify.dev/docs/api/shopify-app-remix).
 
-```shell
-pnpm install
+Create `app/shopify.server.js`. We will use this file to configure our Shopify app by calling the [`shopifyApp` function](https://shopify.dev/docs/api/shopify-app-remix/latest/entrypoints/shopifyapp):
+
+```ts
+// app/shopify.server.js
+// Note that you don't need to import the node adapter if you're running on a different runtime.
+import '@shopify/shopify-app-remix/server/adapters/node';
+// Memory storage makes it easy to set an app up, but should never be used in production.
+import {MemorySessionStorage} from '@shopify/shopify-app-session-storage-memory';
+
+import {LATEST_API_VERSION, shopifyApp} from '@shopify/shopify-app-remix';
+
+const shopify = shopifyApp({
+  apiKey: process.env.SHOPIFY_API_KEY!,
+  apiSecretKey: process.env.SHOPIFY_API_SECRET!,
+  appUrl: process.env.SHOPIFY_APP_URL!,
+  scopes: ['read_products'],
+  apiVersion: LATEST_API_VERSION,
+  sessionStorage: new MemorySessionStorage(),
+});
+export default shopify;
 ```
 
-### Local Development
+This will require some environment variables. So let's create an `.env` file:
 
-Using yarn:
-
-```shell
-yarn dev
+```env
+SHOPIFY_API_KEY="[Copy from partners dashboard]"
+SHOPIFY_API_SECRET="[Copy from partners dashboard]"
+SHOPIFY_APP_URL="[The tunnel URL you are using to run your app]"
 ```
 
-Using npm:
+`shopifyApp` needs to reserve a [splat route](https://remix.run/docs/en/main/guides/routing#splats) for auth.
+It should export a loader that uses `shopifyApp` to authenticate:
 
-```shell
-npm run dev
-```
+```ts
+// app/routes/auth/$.tsx
+import {LoaderFunctionArgs} from '@remix-run/node';
 
-Using pnpm:
+import shopify from '~/shopify.server';
 
-```shell
-pnpm run setup
-pnpm run dev
-```
+export async function loader({request}: LoaderFunctionArgs) {
+  await shopify.authenticate.admin(request);
 
-Press P to open the URL to your app. Once you click install, you can start development.
-
-Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
-
-### Authenticating and querying data
-
-To authenticate and query data you can use the `shopify` const that is exported from `/app/shopify.server.js`:
-
-```js
-export async function loader({ request }) {
-  const { admin } = await shopify.authenticate.admin(request);
-
-  const response = await admin.graphql(`
-    {
-      products(first: 25) {
-        nodes {
-          title
-          description
-        }
-      }
-    }`);
-
-  const {
-    data: {
-      products: { nodes },
-    },
-  } = await response.json();
-
-  return json(nodes);
+  return null;
 }
 ```
 
-This template come preconfigured with examples of:
+Next, set up the [`AppProvider` component](https://shopify.dev/docs/api/shopify-app-remix/latest/entrypoints/appprovider) in your app's routes. To do this pass the `process.env.SHOPIFY_API_KEY` to the frontend via the loader.
 
-1. Setting up your Shopify app in [/app/shopify.server.js](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/shopify.server.js)
-2. Querying data using Graphql. Please see: [/app/routes/app.\_index.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/app._index.jsx).
-3. Responding to mandatory webhooks in [/app/routes/webhooks.jsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/webhooks.jsx)
+Here is an example:
 
-Please read the [documentation for @shopify/shopify-app-remix](https://www.npmjs.com/package/@shopify/shopify-app-remix#authenticating-admin-requests) to understand what other API's are available.
+```ts
+// root.tsx
+import {LoaderFunctionArgs} from '@remix-run/node';
+import {AppProvider} from '@shopify/shopify-app-remix/react';
 
-## Deployment
+import shopify from '~/shopify.server';
 
-### Application Storage
+export async function loader({request}: LoaderFunctionArgs) {
+  await shopify.authenticate.admin(request);
 
-This template uses [Prisma](https://www.prisma.io/) to store session data, by default using an [SQLite](https://www.sqlite.org/index.html) database.
-The database is defined as a Prisma schema in `prisma/schema.prisma`.
+  return json({
+    apiKey: process.env.SHOPIFY_API_KEY,
+  });
+}
 
-This use of SQLite works in production if your app runs as a single instance.
-The database that works best for you depends on the data your app needs and how it is queried.
-You can run your database of choice on a server yourself or host it with a SaaS company.
-Here’s a short list of databases providers that provide a free tier to get started:
+export default function App() {
+  const {apiKey} = useLoaderData<typeof loader>();
 
-| Database   | Type             | Hosters                                                                                                                                                                                                                               |
-| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MySQL      | SQL              | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-mysql), [Planet Scale](https://planetscale.com/), [Amazon Aurora](https://aws.amazon.com/rds/aurora/), [Google Cloud SQL](https://cloud.google.com/sql/docs/mysql) |
-| PostgreSQL | SQL              | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-postgresql), [Amazon Aurora](https://aws.amazon.com/rds/aurora/), [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)                                   |
-| Redis      | Key-value        | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-redis), [Amazon MemoryDB](https://aws.amazon.com/memorydb/)                                                                                                        |
-| MongoDB    | NoSQL / Document | [Digital Ocean](https://www.digitalocean.com/try/managed-databases-mongodb), [MongoDB Atlas](https://www.mongodb.com/atlas/database)                                                                                                  |
-
-To use one of these, you can use a different [datasource provider](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#datasource) in your `schema.prisma` file, or a different [SessionStorage adapter package](https://github.com/Shopify/shopify-api-js/tree/main/docs/guides/session-storage.md).
-
-### Build
-
-Remix handles building the app for you, by running the command below with the package manager of your choice:
-
-Using yarn:
-
-```shell
-yarn build
+  return (
+    <html>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <AppProvider apiKey={apiKey} isEmbeddedApp>
+          <Outlet />
+        </AppProvider>
+      </body>
+    </html>
+  );
+}
 ```
 
-Using npm:
+This component will set up [Polaris](https://polaris.shopify.com/components/utilities/app-provider) and [App Bridge](https://shopify.dev/tools/app-bridge). If your app isn't embedded, set the `isEmbeddedApp` prop to `false`.
 
-```shell
-npm run build
+Now that your app is ready to respond to requests, it will also need to add the required `Content-Security-Policy` header directives, as per [our documentation](https://shopify.dev/docs/apps/store/security/iframe-protection).
+To do that, this package provides the `shopify.addDocumentResponseHeaders` method.
+
+You should return these headers from any endpoint that renders HTML in your app.
+Most likely you'll want to add this to every HTML response by updating the entry.server.tsx file:
+
+```ts
+// entry.server.tsx
+import shopify from './shopify.server';
+
+export default function handleRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  remixContext: EntryContext,
+) {
+  shopify.addDocumentResponseHeaders(request, responseHeaders);
+
+  /// ..etc
+}
 ```
 
-Using pnpm:
+### Running your app
 
-```shell
-pnpm run build
+To run your app and load it within the Shopify Admin, you need to:
+
+1. Update your app's URL in your Partners Dashboard app setup page to `http://localhost:8080`
+1. Update your app's callback URL to `http://localhost:8080/api/auth/callback` in that same page
+1. Go to **Test your app** in Partners Dashboard and select your development store
+
+## Next steps
+
+Once your app is up and running, you can start using this package to interact with Shopify APIs, webhooks and more.
+
+Here are some guides to help you set up your app:
+
+- [Interacting with Shopify Admin](https://shopify.dev/docs/api/shopify-app-remix/latest/guide-admin)
+- [Subscribing to webhooks](https://shopify.dev/docs/api/shopify-app-remix/latest/guide-webhooks)
+
+You can also authenticate requests from surfaces other than the admin.
+To see all supported methods, see [the `shopify.authenticate` object documentation](https://shopify.dev/docs/api/shopify-app-remix/latest/authenticate).
+
+### New embedded app authorization strategy
+
+> [!TIP]
+> If you are building an embedded app, we **strongly** recommend using [Shopify managed installation](https://shopify.dev/docs/apps/auth/installation#shopify-managed-installation)
+> with [token exchange](https://shopify.dev/docs/apps/auth/get-access-tokens/token-exchange) instead of the legacy authorization code grant flow.
+
+We've introduced a new installation and authorization strategy for **embedded apps** that
+eliminates the redirects that were previously necessary.
+It replaces the existing [installation and authorization code grant flow](https://shopify.dev/docs/apps/auth/get-access-tokens/authorization-code-grant).
+
+This is achieved by using [Shopify managed installation](https://shopify.dev/docs/apps/auth/installation#shopify-managed-installation)
+to handle automatic app installations and scope updates, while utilizing
+[token exchange](https://shopify.dev/docs/apps/auth/get-access-tokens/token-exchange) to retrieve an access token for
+authenticated API access.
+
+#### Enabling this new strategy in your app
+
+> [!NOTE]
+> Newly created Remix apps from the template after February 1st 2024 has this feature enabled by default.
+
+1. Enable [Shopify managed installation](https://shopify.dev/docs/apps/auth/installation#shopify-managed-installation)
+   by configuring your scopes [through the Shopify CLI](https://shopify.dev/docs/apps/tools/cli/configuration).
+2. Enable the future flag `unstable_newEmbeddedAuthStrategy` in your app's server configuration file.
+
+   ```ts
+   // my-app/app/shopify.server.ts
+   const shopify = shopifyApp({
+     ...
+     isEmbeddedApp: true,
+     future: {
+       unstable_newEmbeddedAuthStrategy: true,
+     }
+   })
+   ```
+
+3. Enjoy a smoother and faster app installation process.
+
+##### Learn more about
+
+- [How token exchange works](https://shopify.dev/docs/apps/auth/get-access-tokens/token-exchange)
+- [Using Shopify managed installation](https://shopify.dev/docs/apps/auth/installation#shopify-managed-installation)
+- [Configuring access scopes through the Shopify CLI](https://shopify.dev/docs/apps/tools/cli/configuration)
+
+### Testing your app
+
+This package exports a helper method through `@shopify/shopify-app-remix/test-helpers` to simplify testing: `testConfig()`. This method can be used to pass dummy configuration properties to `shopifyApp()`.
+
+If your testing framework supports setting environment variables, we recommend using an environment variable, for example "SHOPIFY_TESTING" to replace your default config with the config returned from `testConfig()`.
+
+```ts
+// my-app/app/shopify.server.ts
+import { testConfig } from "@shopify/shopify-app-remix/test-helpers";
+...
+const config = {
+  ...
+};
+
+if (process.env.SHOPIFY_TESTING) {
+  Object.assign(config, testConfig());
+}
+
+const shopify = shopifyApp(config);
+...
 ```
 
-## Hosting
+`testConfig()` accepts a config object as an optional parameter. The config values provided override the default config values returned by `testConfig()`. This is especially useful for integration testing and end-to-end testing to ensure `shopifyApp()` reads the sessions from the development database.
 
-When you're ready to set up your app in production, you can follow [our deployment documentation](https://shopify.dev/docs/apps/deployment/web) to host your app on a cloud provider like [Heroku](https://www.heroku.com/) or [Fly.io](https://fly.io/).
+```ts
+// my-app/app/shopify.server.ts
+import { testConfig } from "@shopify/shopify-app-remix/test-helpers";
+...
+const sessionStorage = new PrismaSessionStorage(prisma);
+const config = {
+  ...
+  sessionStorage,
+  ...
+};
 
-When you reach the step for [setting up environment variables](https://shopify.dev/docs/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
+if (process.env.SHOPIFY_TESTING) {
+  Object.assign(config, testConfig());
+}
+
+if (process.env.SHOPIFY_TESTING === "e2e") {
+  Object.assign(config, testConfig({ sessionStorage }));
+}
+...
+```
 
 ## Gotchas / Troubleshooting
 
-### Database tables don't exist
-
-If you run the app right after creating it, you'll get this error:
-
-```
-The table `main.Session` does not exist in the current database.
-```
-
-This will happen when the Prisma database hasn't been created.
-You can solve this by running the `setup` script in your app.
-
-### Navigating to other pages breaks
-
-In Remix apps, you can navigate to a different page either by adding an `<a>` tag, or using the `<Link>` component from `@remix-run/react`.
-
-In Shopify Remix apps you should avoid using `<a>`. Use `<Link> `from `@remix-run/react` instead. This ensures that your user remains authenticated.
-
-### Non Embedded
-
-Shopify apps are best when they are embedded into the Shopify Admin. This template is configured that way. If you have a reason to not embed your please make 2 changes:
-
-1. Remove the `<script/>` tag to App Bridge in `/app/routes/app.jsx`
-2. Remove any use of App Bridge APIs (`window.shopify`) from your code. By default, the only place that happens is in `/app/routes/app._index.jsx`
-3. Update the config for shopifyApp in `app/shopify.server.js`. Pass `isEmbedded: false`
-
-## Benefits
-
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience.
-
-<!-- TODO: Uncomment this after we've updated the docs -->
-<!-- The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template. -->
-
-The Remix app template comes with the following out-of-the-box functionality:
-
-- [OAuth](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#authenticating-admin-requests): Installing the app and granting permissions
-- [GraphQL Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-graphql-api): Querying or mutating Shopify admin data
-- [REST Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-rest-api): Resource classes to interact with the API
-- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [AppBridge](https://shopify.dev/docs/apps/tools/app-bridge): This template uses the next generation of the Shopify App Bridge library.
-  - This library is currently in development and works in unison with the current Shopify App Bridge library.
-- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
-
-## Tech Stack
-
-This template uses [Remix](https://remix.run). The following Shopify tools are also included to ease app development:
-
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/main/packages/shopify-app-remix/README.md) provides authentication and methods for interacting with Shopify APIs.
-- [Shopify App Bridge](https://shopify.dev/docs/apps/tools/app-bridge) allows your app to seamlessly integrate your app within Shopify's Admin.
-- [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
-- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
-
-> **Note**: This template runs on JavaScript, but it's fully set up for [TypeScript](https://www.typescriptlang.org/).
-> If you want to create your routes using TypeScript, we recommend removing the `noImplicitAny` config from [`tsconfig.json`](/tsconfig.json)
-
-## Resources
-
-- [Remix Docs](https://remix.run/docs/en/v1)
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/release-candidate/packages/shopify-app-remix/README.md)
-- [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
-- [App authentication](https://shopify.dev/docs/apps/auth)
-- [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
-- [App extensions](https://shopify.dev/docs/apps/app-extensions/list)
-- [Shopify Functions](https://shopify.dev/docs/api/functions)
-- [Getting started with internationalizing your app](https://shopify.dev/docs/apps/best-practices/internationalization/getting-started)
+If you're experiencing unexpected behaviors when using this package, check our [app template's documentation](https://github.com/Shopify/shopify-app-template-remix#gotchas--troubleshooting) for the solution to common issues.

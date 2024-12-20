@@ -1,3 +1,24 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "write_products,write_delivery_customizations"
+client_id = "d4b30ceeb0d1fdd3d2a8513f2d0aee36"
+application_url = "https://shopify.dev/apps/default-app-home"
+embedded = true
+name = "my-delivery-customizations-app"
+handle = "my-delivery-customizations-app-1"
+
+[build]
+include_config_on_deploy = true
+dev_store_url = "stefanhorne.myshopify.com"
+
+[webhooks]
+api_version = "2024-10"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+
+[pos]
+embedded = false

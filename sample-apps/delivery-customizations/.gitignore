@@ -1,14 +1,7 @@
-node_modules
-
-/.cache
-/build
-/app/build
-/public/build/
-/app/public/build
-/prisma/dev.sqlite
-/prisma/dev.sqlite-journal
-database.sqlite
+dist
+tsconfig.tsbuildinfo
+shopify-shopify-app-remix*.tgz
+coverage
+.cache/
 
 .env
-package-lock.json
-yarn.lock

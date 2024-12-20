@@ -1,25 +1,15 @@
 {
-  "include": ["**/*.js", "**/*.jsx"],
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "moduleResolution": "node16",
-    "resolveJsonModule": true,
-    "target": "ES2019",
-    "strict": true,
-    "allowJs": true,
-    "checkJs": true,
-    "noImplicitAny": false,
-    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "paths": {
-      "~/*": ["./app/*"]
-    },
-    "types": [
-      "@shopify/app-bridge-types"
-    ],
-    "noEmit": true
-  }
+    "outDir": "./dist/ts",
+    "rootDir": "src",
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": [
+    "**/*.example.ts",
+    "**/*.example.*.ts",
+    "**/*.example.tsx",
+    "**/*.example.*.tsx"
+  ]
 }

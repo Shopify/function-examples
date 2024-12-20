@@ -1,13 +1,15 @@
-/** @type {import('@types/eslint').Linter.BaseConfig} */
+const config = require('../../../.eslintrc');
+
 module.exports = {
-  root: true,
-  extends: [
-    "@remix-run/eslint-config",
-    "@remix-run/eslint-config/node",
-    "@remix-run/eslint-config/jest-testing-library",
-    "prettier",
+  ...config,
+  ignorePatterns: [
+    'docs/',
+    '*.example.ts',
+    '*.example.tsx',
+    '*.example.*.ts',
+    '*.example.*.tsx',
   ],
-  globals: {
-    shopify: "readonly"
+  env: {
+    node: true,
   },
 };
