@@ -136,6 +136,16 @@ type Cart {
   A list of lines containing information about the items the customer intends to purchase.
   """
   lines: [CartLine!]! @scaleLimits(rate: 0.005)
+
+  """
+  The localized fields available for the cart.
+  """
+  localizedFields(
+    """
+    The keys of the localized fields to retrieve.
+    """
+    keys: [LocalizedFieldKey!]! = []
+  ): [LocalizedField!]!
 }
 
 """
@@ -281,7 +291,8 @@ type CartLineCost {
   amountPerQuantity: MoneyV2!
 
   """
-  The compare at amount of the merchandise line.
+  The compare at amount of the merchandise line. This value varies depending on
+  the buyer's identity, and is null when the value is hidden to buyers.
   """
   compareAtAmountPerQuantity: MoneyV2
 
@@ -2833,7 +2844,8 @@ The attributes associated with an HTTP request.
 """
 input HttpRequest {
   """
-  The HTTP body.
+  The HTTP request body as a plain string.
+  Use this field when the body isn't in JSON format.
   """
   body: String
 
@@ -2841,6 +2853,17 @@ input HttpRequest {
   The HTTP headers.
   """
   headers: [HttpRequestHeader!]!
+
+  """
+  The HTTP request body as a JSON object.
+  Use this field when the body's in JSON format, to reduce function instruction consumption
+  and to ensure the body's formatted in logs.
+  Don't use this field together with the `body` field. If both are provided, then the `body` field
+  will take precedence.
+  If this field is specified and no `Content-Type` header is included, then the header will
+  automatically be set to `application/json`.
+  """
+  jsonBody: JSON
 
   """
   The HTTP method.
@@ -2903,7 +2926,8 @@ The attributes associated with an HTTP response.
 """
 type HttpResponse {
   """
-  The HTTP body.
+  The HTTP response body as a plain string.
+  Use this field when the body is not in JSON format.
   """
   body: String
 
@@ -2923,11 +2947,14 @@ type HttpResponse {
   headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
 
   """
-  The body of the response in JSON format. If the body isn't valid JSON, it will
-  be returned as a JSON string. This field shouldn't be used in conjunction with
-  the body field, which returns the body solely as a plain string. Use this
-  field when you need to handle mixed use cases, such as receiving both JSON and
-  non-JSON responses.
+  The HTTP response body parsed as JSON. 
+  If the body is valid JSON, it will be parsed and returned as a JSON object. 
+  If parsing fails, then raw body is returned as a string. 
+  Use this field when you expect the response to be JSON, or when you're dealing
+  with mixed response types, meaning both JSON and non-JSON.
+  Using this field reduces function instruction consumption and ensures that the data is formatted in logs.
+  To prevent increasing the function target input size unnecessarily, avoid querying
+  both `body` and `jsonBody` simultaneously.
   """
   jsonBody: JSON
 
@@ -3832,6 +3859,219 @@ type Localization {
   The market of the active localized experience.
   """
   market: Market!
+}
+
+"""
+Represents the value captured by a localized field. Localized fields are
+additional fields required by certain countries on international orders. For
+example, some countries require additional fields for customs information or tax
+identification numbers.
+"""
+type LocalizedField {
+  """
+  The key of the localized field.
+  """
+  key: LocalizedFieldKey!
+
+  """
+  The title of the localized field.
+  """
+  title: String!
+
+  """
+  The value of the localized field.
+  """
+  value: String
+}
+
+"""
+Unique key identifying localized fields.
+"""
+enum LocalizedFieldKey {
+  """
+  Localized field key 'shipping_credential_br' for country BR.
+  """
+  SHIPPING_CREDENTIAL_BR
+
+  """
+  Localized field key 'shipping_credential_cl' for country CL.
+  """
+  SHIPPING_CREDENTIAL_CL
+
+  """
+  Localized field key 'shipping_credential_cn' for country CN.
+  """
+  SHIPPING_CREDENTIAL_CN
+
+  """
+  Localized field key 'shipping_credential_co' for country CO.
+  """
+  SHIPPING_CREDENTIAL_CO
+
+  """
+  Localized field key 'shipping_credential_cr' for country CR.
+  """
+  SHIPPING_CREDENTIAL_CR
+
+  """
+  Localized field key 'shipping_credential_ec' for country EC.
+  """
+  SHIPPING_CREDENTIAL_EC
+
+  """
+  Localized field key 'shipping_credential_es' for country ES.
+  """
+  SHIPPING_CREDENTIAL_ES
+
+  """
+  Localized field key 'shipping_credential_gt' for country GT.
+  """
+  SHIPPING_CREDENTIAL_GT
+
+  """
+  Localized field key 'shipping_credential_id' for country ID.
+  """
+  SHIPPING_CREDENTIAL_ID
+
+  """
+  Localized field key 'shipping_credential_kr' for country KR.
+  """
+  SHIPPING_CREDENTIAL_KR
+
+  """
+  Localized field key 'shipping_credential_mx' for country MX.
+  """
+  SHIPPING_CREDENTIAL_MX
+
+  """
+  Localized field key 'shipping_credential_my' for country MY.
+  """
+  SHIPPING_CREDENTIAL_MY
+
+  """
+  Localized field key 'shipping_credential_pe' for country PE.
+  """
+  SHIPPING_CREDENTIAL_PE
+
+  """
+  Localized field key 'shipping_credential_pt' for country PT.
+  """
+  SHIPPING_CREDENTIAL_PT
+
+  """
+  Localized field key 'shipping_credential_py' for country PY.
+  """
+  SHIPPING_CREDENTIAL_PY
+
+  """
+  Localized field key 'shipping_credential_tr' for country TR.
+  """
+  SHIPPING_CREDENTIAL_TR
+
+  """
+  Localized field key 'shipping_credential_tw' for country TW.
+  """
+  SHIPPING_CREDENTIAL_TW
+
+  """
+  Localized field key 'shipping_credential_type_co' for country CO.
+  """
+  SHIPPING_CREDENTIAL_TYPE_CO
+
+  """
+  Localized field key 'tax_credential_br' for country BR.
+  """
+  TAX_CREDENTIAL_BR
+
+  """
+  Localized field key 'tax_credential_cl' for country CL.
+  """
+  TAX_CREDENTIAL_CL
+
+  """
+  Localized field key 'tax_credential_co' for country CO.
+  """
+  TAX_CREDENTIAL_CO
+
+  """
+  Localized field key 'tax_credential_cr' for country CR.
+  """
+  TAX_CREDENTIAL_CR
+
+  """
+  Localized field key 'tax_credential_ec' for country EC.
+  """
+  TAX_CREDENTIAL_EC
+
+  """
+  Localized field key 'tax_credential_es' for country ES.
+  """
+  TAX_CREDENTIAL_ES
+
+  """
+  Localized field key 'tax_credential_gt' for country GT.
+  """
+  TAX_CREDENTIAL_GT
+
+  """
+  Localized field key 'tax_credential_id' for country ID.
+  """
+  TAX_CREDENTIAL_ID
+
+  """
+  Localized field key 'tax_credential_it' for country IT.
+  """
+  TAX_CREDENTIAL_IT
+
+  """
+  Localized field key 'tax_credential_mx' for country MX.
+  """
+  TAX_CREDENTIAL_MX
+
+  """
+  Localized field key 'tax_credential_my' for country MY.
+  """
+  TAX_CREDENTIAL_MY
+
+  """
+  Localized field key 'tax_credential_pe' for country PE.
+  """
+  TAX_CREDENTIAL_PE
+
+  """
+  Localized field key 'tax_credential_pt' for country PT.
+  """
+  TAX_CREDENTIAL_PT
+
+  """
+  Localized field key 'tax_credential_py' for country PY.
+  """
+  TAX_CREDENTIAL_PY
+
+  """
+  Localized field key 'tax_credential_tr' for country TR.
+  """
+  TAX_CREDENTIAL_TR
+
+  """
+  Localized field key 'tax_credential_type_co' for country CO.
+  """
+  TAX_CREDENTIAL_TYPE_CO
+
+  """
+  Localized field key 'tax_credential_type_mx' for country MX.
+  """
+  TAX_CREDENTIAL_TYPE_MX
+
+  """
+  Localized field key 'tax_credential_use_mx' for country MX.
+  """
+  TAX_CREDENTIAL_USE_MX
+
+  """
+  Localized field key 'tax_email_it' for country IT.
+  """
+  TAX_EMAIL_IT
 }
 
 """

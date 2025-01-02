@@ -4,6 +4,11 @@ schema {
 }
 
 """
+Scale the Functions resource limits based on the field's length.
+"""
+directive @scaleLimits(rate: Float!) on FIELD_DEFINITION
+
+"""
 Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
@@ -90,7 +95,7 @@ type Cart {
   """
   A list of lines containing information about the items the customer intends to purchase.
   """
-  lines: [CartLine!]!
+  lines: [CartLine!]! @scaleLimits(rate: 0.005)
 }
 
 """
@@ -146,7 +151,8 @@ type CartLineCost {
   amountPerQuantity: MoneyV2!
 
   """
-  The compare at amount of the merchandise line.
+  The compare at amount of the merchandise line. This value varies depending on
+  the buyer's identity, and is null when the value is hidden to buyers.
   """
   compareAtAmountPerQuantity: MoneyV2
 
