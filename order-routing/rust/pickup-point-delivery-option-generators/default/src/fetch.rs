@@ -34,6 +34,7 @@ fn build_external_api_request(latitude: &f64, longitude: &f64) -> fetch::output:
             value: "application/json; charset=utf-8".to_string(),
         }],
         body: None,
+        json_body: None,
         policy: fetch::output::HttpRequestPolicy {
             read_timeout_ms: 500,
         },
@@ -74,6 +75,7 @@ mod tests {
                     },
                 ],
                 body: None,
+                json_body: None,
                 policy: HttpRequestPolicy {
                     read_timeout_ms: 500,
                 },
