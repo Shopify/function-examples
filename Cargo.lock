@@ -37,47 +37,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
-name = "checkout-cart-checkout-validation-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "checkout-cart-transform-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "serde_with",
- "shopify_function",
-]
-
-[[package]]
-name = "checkout-delivery-customization-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "checkout-payment-customization-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
 name = "combine"
 version = "3.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -136,46 +95,6 @@ dependencies = [
 
 [[package]]
 name = "delivery-customization-rust"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "discounts-discounts-allocator-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "discounts-order-discounts-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "discounts-product-discounts-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "discounts-shipping-discounts-default"
 version = "1.0.0"
 dependencies = [
  "graphql_client",
@@ -295,46 +214,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "order-routing-fulfillment-constraints-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "order-routing-local-pickup-delivery-option-generators-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "order-routing-location-rules-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
-name = "order-routing-pickup-point-delivery-option-generators-default"
-version = "1.0.0"
-dependencies = [
- "graphql_client",
- "serde",
- "serde_json",
- "shopify_function",
-]
-
-[[package]]
 name = "payment-customization"
 version = "1.0.0"
 dependencies = [
@@ -346,9 +225,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.59"
+version = "1.0.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aeca18b86b413c660b781aa319e4e2648a3e6f9eadc9b47e9038e6fe9f3451b"
+checksum = "37d3544b3f2748c54e147655edb5025752e2303145b5aefb3c3ea2c78b973bb0"
 dependencies = [
  "unicode-ident",
 ]
@@ -365,11 +244,132 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.28"
+version = "1.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b9ab9c7eadfd8df19006f1cf1a4aed13540ed5cbc047010ece5826e10825488"
+checksum = "0e4dccaaaf89514f546c693ddc140f729f958c247918a13380cccc6078391acc"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "rust-checkout-cart-checkout-va"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-checkout-cart-transform-d"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-checkout-delivery-customi"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-checkout-payment-customiz"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-discounts-discounts-alloc"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-discounts-order-discounts"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-discounts-product-discoun"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-discounts-shipping-discou"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-order-routing-fulfillment"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-order-routing-local-pickup-delivery-option-generators-default"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-order-routing-location-ru"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
+]
+
+[[package]]
+name = "rust-order-routing-pickup-poin"
+version = "1.0.0"
+dependencies = [
+ "graphql_client",
+ "serde",
+ "serde_json",
+ "shopify_function",
 ]
 
 [[package]]
@@ -380,22 +380,22 @@ checksum = "f91339c0467de62360649f8d3e185ca8de4224ff281f66000de5eb2a77a79041"
 
 [[package]]
 name = "serde"
-version = "1.0.163"
+version = "1.0.217"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2113ab51b87a539ae008b5c6c02dc020ffa39afd2d83cffcb3f4eb2722cebec2"
+checksum = "02fc4265df13d6fa1d00ecff087228cc0a2b5f3c0e87e258d8b94a156e984c70"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.163"
+version = "1.0.217"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c805777e3930c8883389c602315a24224bcc738b63905ef87cd1420353ea93e"
+checksum = "5a9bf7cf98d04a2b28aead066b7496853d4779c9cc183c440dbac457641e19a0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.18",
+ "syn 2.0.94",
 ]
 
 [[package]]
@@ -433,9 +433,9 @@ dependencies = [
 
 [[package]]
 name = "shopify_function"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6101136018b2168312bbb772a0c4bb8a1a5ed6b1614a11488f0af78f4345188a"
+checksum = "fe39e7aeb386154b7de913070f40a6311e8ba1d9ec5f8f1133ea0756767fd4b6"
 dependencies = [
  "ryu",
  "serde",
@@ -445,9 +445,9 @@ dependencies = [
 
 [[package]]
 name = "shopify_function_macro"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50f8ebb443cc44277038bce36b272c9b8ab6bea58a43707f619cec056d812496"
+checksum = "8d57fb50a00892ca17b9990b3770de8293a581e6174104530b6498b7a4885c1c"
 dependencies = [
  "convert_case",
  "graphql_client_codegen",
@@ -475,9 +475,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.18"
+version = "2.0.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32d41677bcbe24c20c52e7c70b0d8db04134c5d1066bf98662e2871ad200ea3e"
+checksum = "987bc0be1cdea8b10216bd06e2ca407d40b9543468fafd3ddfb02f36e77f71f3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -501,7 +501,7 @@ checksum = "f9456a42c5b0d803c8cd86e73dd7cc9edd429499f37a3550d286d5e86720569f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.18",
+ "syn 2.0.94",
 ]
 
 [[package]]
