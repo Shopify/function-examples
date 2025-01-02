@@ -4,8 +4,8 @@ type = "local_pickup_delivery_option_generator"
 api_version = "unstable"
 
 [build]
-command = "cargo wasi build --release"
-path = "target/wasm32-wasi/release/{{name | replace: " ", "-" | downcase}}.wasm"
+command = "cargo build --target=wasm32-wasip1 --release"
+path = "target/wasm32-wasip1/release/{{name | replace: " ", "-" | downcase}}.wasm"
 watch = [ "src/**/*.rs" ]
 
 [ui.paths]
