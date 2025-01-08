@@ -13,8 +13,8 @@ description = "t:description"
   export = "run"
 
   [extensions.build]
-  command = "cargo wasi build --release"
-  path = "target/wasm32-wasi/release/bundles_cart_transform.wasm"
+  command = "cargo build --target=wasm32-wasip1 --release"
+  path = "target/wasm32-wasip1/release/bundles_cart_transform.wasm"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]

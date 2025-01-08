@@ -12,8 +12,8 @@ type = "function"
   export = "run"
 
   [extensions.build]
-  command = "cargo wasi build --release"
-  path = "target/wasm32-wasi/release/optional-add-ons-rust.wasm"
+  command = "cargo build --target=wasm32-wasip1 --release"
+  path = "target/wasm32-wasip1/release/optional-add-ons-rust.wasm"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]
