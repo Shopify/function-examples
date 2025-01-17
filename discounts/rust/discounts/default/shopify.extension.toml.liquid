@@ -1,0 +1,37 @@
+api_version = "2025-01"
+
+[[extensions]]
+name = "t:name"
+handle = "{{handle}}"
+type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "purchase.discount.cart_run"
+  input_query = "src/run.graphql"
+  export = "cart_run"
+
+  [[extensions.targeting]]
+  target = "purchase.discount.cart_fetch"
+  input_query = "src/run.graphql"
+  export = "cart_fetch"
+
+  [[extensions.targeting]]
+  target = "purchase.discount.delivery_run"
+  input_query = "src/run.graphql"
+  export = "delivery_run"
+
+  [[extensions.targeting]]
+  target = "purchase.discount.delivery_fetch"
+  input_query = "src/run.graphql"
+  export = "delivery_fetch"
+
+  [extensions.build]
+  command = "cargo build --target=wasm32-wasip1 --release"
+  path = "target/wasm32-wasip1/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  watch = [ "src/**/*.rs" ]
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
