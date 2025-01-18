@@ -5,7 +5,7 @@
   "devDependencies": {
     "@iarna/toml": "^2.2.5",
     "fast-glob": "^3.2.11",
-    "liquidjs": "^9.37.0",
+    "liquidjs": "^10.0.0",
     "@graphql-codegen/cli": "^3.2.2",
     "@graphql-codegen/typescript": "^3.0.2",
     "@graphql-codegen/typescript-operations": "^3.0.2",
