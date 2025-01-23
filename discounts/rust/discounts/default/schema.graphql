@@ -1,7 +1,19 @@
+# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
+# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
+#
+# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
+# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
+# Check out the "Docs" tab in the top right.
+
 schema {
   query: Input
   mutation: MutationRoot
 }
+
+"""
+Only allow the field to be queried when targeting one of the specified targets.
+"""
+directive @restrictTarget(only: [String!]!) on FIELD_DEFINITION
 
 """
 Scale the Functions resource limits based on the field's length.
@@ -12,6 +24,16 @@ directive @scaleLimits(rate: Float!) on FIELD_DEFINITION
 Requires that exactly one field must be supplied and that field must not be `null`.
 """
 directive @oneOf on INPUT_OBJECT
+
+"""
+A discount code that is associated with a discount candidate.
+"""
+input AssociatedDiscountCode {
+  """
+  The discount code.
+  """
+  code: String!
+}
 
 """
 Represents a generic custom attribute, such as whether an order is a customer's first.
@@ -56,12 +78,19 @@ type BuyerIdentity {
   The purchasing company associated with the cart.
   """
   purchasingCompany: PurchasingCompany
+
+  """
+  Represents the [Shop User](https://help.shopify.com/en/manual/online-sales-channels/shop/sign-in-features)
+   corresponding to the customer within the shop, if the buyer is a Shop User. Can be used to request [Shop User
+   metafields](https://shopify.dev/docs/api/shop-user-custom-data).
+  """
+  shopUser: ShopUser
 }
 
 """
 A cart represents the merchandise that a buyer intends to purchase, and the cost associated with the cart.
 """
-type Cart {
+type Cart implements HasMetafields {
   """
   The attributes associated with the cart. Attributes are represented as key-value pairs.
   """
@@ -106,6 +135,21 @@ type Cart {
     """
     keys: [LocalizedFieldKey!]! = []
   ): [LocalizedField!]!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 }
 
 """
@@ -286,6 +330,27 @@ input CartLineTarget {
 }
 
 """
+The operations that can be performed to apply discounts to the cart.
+"""
+input CartOperation @oneOf {
+  """
+  A group of order discounts that share a selection strategy.
+  """
+  addOrderDiscounts: OrderDiscounts
+
+  """
+  A group of product discounts that share a selection strategy.
+  """
+  addProductDiscounts: ProductDiscounts
+
+  """
+  A list of valid discount codes that correspond to external discounts. This can
+  only be used by Functions with network access.
+  """
+  addValidDiscountCodes: ValidDiscountCodes
+}
+
+"""
 Represents whether the product is a member of the given collection.
 """
 type CollectionMembership {
@@ -423,10 +488,35 @@ type CompanyLocation implements HasMetafields {
   name: String!
 
   """
+  The number of orders placed at this company location.
+  """
+  orderCount: Int!
+
+  """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
   at which the company location was last modified.
   """
   updatedAt: DateTime!
+}
+
+"""
+The condition to apply the discount candidate.
+"""
+input Condition @oneOf {
+  """
+  The condition for checking the minimum subtotal amount of the order.
+  """
+  orderMinimumSubtotal: OrderMinimumSubtotal
+
+  """
+  The condition for checking the minimum quantity of a product.
+  """
+  productMinimumQuantity: ProductMinimumQuantity
+
+  """
+  The condition for checking the minimum subtotal amount of the product.
+  """
+  productMinimumSubtotal: ProductMinimumSubtotal
 }
 
 """
@@ -1582,6 +1672,11 @@ enum CountryCode {
   UM
 
   """
+  Unknown country code.
+  """
+  UNKNOWN__
+
+  """
   United States.
   """
   US
@@ -1801,7 +1896,10 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+  BYR
+    @deprecated(
+      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
+    )
 
   """
   Belize Dollar (BZD).
@@ -2326,7 +2424,10 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+  STD
+    @deprecated(
+      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
+    )
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2421,7 +2522,10 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+  VEF
+    @deprecated(
+      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
+    )
 
   """
   Venezuelan Bolivares Soberanos (VES).
@@ -2651,6 +2755,97 @@ type DeliverableCartLine {
 }
 
 """
+The delivery discount candidate to be applied.
+"""
+input DeliveryDiscountCandidate {
+  """
+  The discount code associated with this discount candidate, for code-based discounts.
+  """
+  associatedDiscountCode: AssociatedDiscountCode
+
+  """
+  The discount message.
+  """
+  message: String
+
+  """
+  The targets of the delivery discount candidate.
+  """
+  targets: [DeliveryDiscountCandidateTarget!]!
+
+  """
+  The value of the delivery discount candidate.
+  """
+  value: DeliveryDiscountCandidateValue!
+}
+
+"""
+The target of the delivery discount candidate.
+"""
+input DeliveryDiscountCandidateTarget @oneOf {
+  """
+  The target delivery group.
+  """
+  deliveryGroup: DeliveryGroupTarget
+
+  """
+  The target delivery option.
+  """
+  deliveryOption: DeliveryOptionTarget
+}
+
+"""
+The delivery discount candidate value.
+"""
+input DeliveryDiscountCandidateValue @oneOf {
+  """
+  A fixed amount value.
+  """
+  fixedAmount: FixedAmount
+
+  """
+  A percentage value.
+  """
+  percentage: Percentage
+}
+
+"""
+The strategy that's applied to the list of delivery discount candidates.
+"""
+enum DeliveryDiscountSelectionStrategy {
+  """
+  Apply all delivery discount candidates with conditions that are satisfied. This does not override
+  discount combination or stacking rules.
+  """
+  ALL
+}
+
+"""
+A group of delivery discounts that share a selection strategy.
+"""
+input DeliveryDiscounts {
+  """
+  The list of delivery discount candidates to be applied.
+  """
+  candidates: [DeliveryDiscountCandidate!]!
+
+  """
+  The strategy that's applied to the list of discounts.
+  """
+  selectionStrategy: DeliveryDiscountSelectionStrategy!
+}
+
+"""
+The target delivery group.
+"""
+input DeliveryGroupTarget {
+  """
+  The ID of the target delivery group.
+  """
+  id: ID!
+}
+
+"""
 List of different delivery method types.
 """
 enum DeliveryMethod {
@@ -2686,51 +2881,67 @@ enum DeliveryMethod {
 }
 
 """
-The discount to be applied.
+The operations that can be performed to apply discounts to the delivery lines.
 """
-input Discount {
+input DeliveryOperation @oneOf {
   """
-  The discount message.
+  A group of delivery discounts that share a selection strategy.
   """
-  message: String
+  addDeliveryDiscounts: DeliveryDiscounts
 
   """
-  The targets of the discount.
-
-  This argument accepts a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
+  A list of valid discount codes that correspond to external discounts. This can
+  only be used by Functions with network access.
   """
-  targets: [Target!]!
-
-  """
-  The value of the discount.
-  """
-  value: Value!
+  addValidDiscountCodes: ValidDiscountCodes
 }
 
 """
-The strategy that's applied to the list of discounts.
+The target delivery option.
 """
-enum DiscountApplicationStrategy {
+input DeliveryOptionTarget {
   """
-  Apply all discounts with conditions that are satisfied. This does not override discount combination or stacking rules.
+  The handle of the target delivery option.
   """
-  ALL
+  handle: Handle!
+}
+
+"""
+The [discount class](https://help.shopify.com/manual/discounts/combining-discounts/discount-combinations)
+that's used to control how discounts can be combined.
+"""
+enum DiscountClass {
+  """
+  The discount is combined with an
+  [order discount](https://help.shopify.com/manual/discounts/combining-discounts/discount-combinations)
+  class.
+  """
+  ORDER
 
   """
-  Only apply the first discount with conditions that are satisfied.
+  The discount is combined with a
+  [product discount](https://help.shopify.com/manual/discounts/combining-discounts/discount-combinations)
+  class.
   """
-  FIRST
+  PRODUCT
 
   """
-  Only apply the discount that offers the maximum reduction.
+  The discount is combined with a
+  [shipping discount](https://help.shopify.com/manual/discounts/combining-discounts/discount-combinations)
+  class.
   """
-  MAXIMUM
+  SHIPPING
 }
 
 """
 A discount wrapper node.
 """
 type DiscountNode implements HasMetafields {
+  """
+  The discount classes supported by the discount node.
+  """
+  discountClasses: [DiscountClass!]!
+
   """
   Returns a metafield by namespace and key that belongs to the resource.
   """
@@ -2757,44 +2968,104 @@ input FixedAmount {
   The amount must be greater than or equal to 0.
   """
   amount: Decimal!
-
-  """
-  Whether to apply the value to each entitled item.
-
-  The default value is `false`, which causes the value to be applied once across the entitled items.
-  When the value is `true`, the value will be applied to each of the entitled items.
-  """
-  appliesToEachItem: Boolean
 }
 
 """
-The run target result. In API versions 2023-10 and beyond, this type is deprecated in favor of `FunctionRunResult`.
+The cart.fetch target result. Refer to [network access]
+(https://shopify.dev/apps/build/functions/input-output/network-access/graphql) for Shopify Functions.
 """
-input FunctionResult {
+input FunctionCartFetchResult {
   """
-  The strategy to apply the list of discounts.
+  The http request.
   """
-  discountApplicationStrategy: DiscountApplicationStrategy!
-
-  """
-  The list of discounts to be applied.
-  """
-  discounts: [Discount!]!
+  request: HttpRequest
 }
 
 """
-The run target result.
+The cart.run target result.
 """
-input FunctionRunResult {
+input FunctionCartRunResult {
   """
-  The strategy to apply the list of discounts.
+  The list of operations to apply discounts to the cart.
   """
-  discountApplicationStrategy: DiscountApplicationStrategy!
+  operations: [CartOperation!]!
+}
+
+"""
+The delivery.fetch target result. Refer to
+[network access](https://shopify.dev/apps/build/functions/input-output/network-access/graphql) for Shopify Functions.
+"""
+input FunctionDeliveryFetchResult {
+  """
+  The http request.
+  """
+  request: HttpRequest
+}
+
+"""
+The delivery.run target result.
+"""
+input FunctionDeliveryRunResult {
+  """
+  The list of operations to apply discounts to the delivery lines.
+  """
+  operations: [DeliveryOperation!]!
+}
+
+"""
+Represents a gate configuration.
+"""
+type GateConfiguration implements HasMetafields {
+  """
+  An optional string identifier.
+  """
+  appId: String
 
   """
-  The list of discounts to be applied.
+  A non-unique string used to group gate configurations.
   """
-  discounts: [Discount!]!
+  handle: Handle
+
+  """
+  The ID of the gate configuration.
+  """
+  id: ID!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
+}
+
+"""
+Represents a connection from a subject to a gate configuration.
+"""
+type GateSubject {
+  """
+  The bound gate configuration.
+  """
+  configuration(
+    """
+    The appId of the gate configurations to search for.
+    """
+    appId: String
+      @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
+  ): GateConfiguration!
+
+  """
+  The ID of the gate subject.
+  """
+  id: ID!
 }
 
 """
@@ -2803,6 +3074,21 @@ The Handle type appears in a JSON response as a String, but it is not intended t
 Example value: `"10079785100"`
 """
 scalar Handle
+
+"""
+Gate subjects associated to the specified resource.
+"""
+interface HasGates {
+  """
+  Returns active gate subjects bound to the resource.
+  """
+  gates(
+    """
+    The handle of the gate configurations to search for.
+    """
+    handle: Handle
+  ): [GateSubject!]!
+}
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -2840,6 +3126,146 @@ type HasTagResponse {
 }
 
 """
+The attributes associated with an HTTP request.
+"""
+input HttpRequest {
+  """
+  The HTTP request body as a plain string.
+  Use this field when the body isn't in JSON format.
+  """
+  body: String
+
+  """
+  The HTTP headers.
+  """
+  headers: [HttpRequestHeader!]!
+
+  """
+  The HTTP request body as a JSON object.
+  Use this field when the body's in JSON format, to reduce function instruction consumption
+  and to ensure the body's formatted in logs.
+  Don't use this field together with the `body` field. If both are provided, then the `body` field
+  will take precedence.
+  If this field is specified and no `Content-Type` header is included, then the header will
+  automatically be set to `application/json`.
+  """
+  jsonBody: JSON
+
+  """
+  The HTTP method.
+  """
+  method: HttpRequestMethod!
+
+  """
+  Policy attached to the HTTP request.
+  """
+  policy: HttpRequestPolicy!
+
+  """
+  The HTTP url (eg.: https://example.com). The scheme needs to be HTTPS.
+  """
+  url: URL!
+}
+
+"""
+The attributes associated with an HTTP request header.
+"""
+input HttpRequestHeader {
+  """
+  Header name.
+  """
+  name: String!
+
+  """
+  Header value.
+  """
+  value: String!
+}
+
+"""
+The HTTP request available methods.
+"""
+enum HttpRequestMethod {
+  """
+  Http GET.
+  """
+  GET
+
+  """
+  Http POST.
+  """
+  POST
+}
+
+"""
+The attributes associated with an HTTP request policy.
+"""
+input HttpRequestPolicy {
+  """
+  Read timeout in milliseconds.
+  """
+  readTimeoutMs: Int!
+}
+
+"""
+The attributes associated with an HTTP response.
+"""
+type HttpResponse {
+  """
+  The HTTP response body as a plain string.
+  Use this field when the body is not in JSON format.
+  """
+  body: String
+
+  """
+  An HTTP header.
+  """
+  header(
+    """
+    A case-insensitive header name.
+    """
+    name: String!
+  ): HttpResponseHeader
+
+  """
+  The HTTP headers.
+  """
+  headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
+
+  """
+  The HTTP response body parsed as JSON.
+  If the body is valid JSON, it will be parsed and returned as a JSON object.
+  If parsing fails, then raw body is returned as a string.
+  Use this field when you expect the response to be JSON, or when you're dealing
+  with mixed response types, meaning both JSON and non-JSON.
+  Using this field reduces function instruction consumption and ensures that the data is formatted in logs.
+  To prevent increasing the function target input size unnecessarily, avoid querying
+  both `body` and `jsonBody` simultaneously.
+  """
+  jsonBody: JSON
+
+  """
+  The HTTP status code.
+  """
+  status: Int!
+}
+
+"""
+The attributes associated with an HTTP response header.
+"""
+type HttpResponseHeader {
+  """
+  Header name.
+  """
+  name: String!
+
+  """
+  Header value.
+  """
+  value: String!
+}
+
+"""
 Represents a unique identifier, often used to refetch an object.
 The ID type appears in a JSON response as a String, but it is not intended to be human-readable.
 
@@ -2848,7 +3274,7 @@ Example value: `"gid://shopify/Product/10079785100"`
 scalar ID
 
 """
-The input object for the function.
+The input object for the Function.
 """
 type Input {
   """
@@ -2857,9 +3283,27 @@ type Input {
   cart: Cart!
 
   """
-  The discount node executing the function.
+  The discount node executing the Function.
   """
   discountNode: DiscountNode!
+
+  """
+  Discount codes entered by the buyer as an array of strings, excluding gift cards.
+  Codes are not validated in any way other than gift card filtering.
+  """
+  enteredDiscountCodes: [String!]!
+    @restrictTarget(
+      only: ["purchase.discount.cart_fetch", "purchase.discount.delivery_fetch"]
+    )
+
+  """
+  The result of the fetch target. Refer to [network access](https://shopify.dev/apps/build/functions/input-output/network-access/graphql)
+  for Shopify Functions.
+  """
+  fetchResult: HttpResponse
+    @restrictTarget(
+      only: ["purchase.discount.cart_run", "purchase.discount.delivery_run"]
+    )
 
   """
   The localization of the Function execution context.
@@ -3742,187 +4186,187 @@ Unique key identifying localized fields.
 """
 enum LocalizedFieldKey {
   """
-  Localized field key 'shipping_credential_br' for country BR.
+  Localized field key 'shipping_credential_br' for country Brazil.
   """
   SHIPPING_CREDENTIAL_BR
 
   """
-  Localized field key 'shipping_credential_cl' for country CL.
+  Localized field key 'shipping_credential_cl' for country Chile.
   """
   SHIPPING_CREDENTIAL_CL
 
   """
-  Localized field key 'shipping_credential_cn' for country CN.
+  Localized field key 'shipping_credential_cn' for country China.
   """
   SHIPPING_CREDENTIAL_CN
 
   """
-  Localized field key 'shipping_credential_co' for country CO.
+  Localized field key 'shipping_credential_co' for country Colombia.
   """
   SHIPPING_CREDENTIAL_CO
 
   """
-  Localized field key 'shipping_credential_cr' for country CR.
+  Localized field key 'shipping_credential_cr' for country Costa Rica.
   """
   SHIPPING_CREDENTIAL_CR
 
   """
-  Localized field key 'shipping_credential_ec' for country EC.
+  Localized field key 'shipping_credential_ec' for country Ecuador.
   """
   SHIPPING_CREDENTIAL_EC
 
   """
-  Localized field key 'shipping_credential_es' for country ES.
+  Localized field key 'shipping_credential_es' for country Spain.
   """
   SHIPPING_CREDENTIAL_ES
 
   """
-  Localized field key 'shipping_credential_gt' for country GT.
+  Localized field key 'shipping_credential_gt' for country Guatemala.
   """
   SHIPPING_CREDENTIAL_GT
 
   """
-  Localized field key 'shipping_credential_id' for country ID.
+  Localized field key 'shipping_credential_id' for country Indonesia.
   """
   SHIPPING_CREDENTIAL_ID
 
   """
-  Localized field key 'shipping_credential_kr' for country KR.
+  Localized field key 'shipping_credential_kr' for country South Korea.
   """
   SHIPPING_CREDENTIAL_KR
 
   """
-  Localized field key 'shipping_credential_mx' for country MX.
+  Localized field key 'shipping_credential_mx' for country Mexico.
   """
   SHIPPING_CREDENTIAL_MX
 
   """
-  Localized field key 'shipping_credential_my' for country MY.
+  Localized field key 'shipping_credential_my' for country Malaysia.
   """
   SHIPPING_CREDENTIAL_MY
 
   """
-  Localized field key 'shipping_credential_pe' for country PE.
+  Localized field key 'shipping_credential_pe' for country Peru.
   """
   SHIPPING_CREDENTIAL_PE
 
   """
-  Localized field key 'shipping_credential_pt' for country PT.
+  Localized field key 'shipping_credential_pt' for country Portugal.
   """
   SHIPPING_CREDENTIAL_PT
 
   """
-  Localized field key 'shipping_credential_py' for country PY.
+  Localized field key 'shipping_credential_py' for country Paraguay.
   """
   SHIPPING_CREDENTIAL_PY
 
   """
-  Localized field key 'shipping_credential_tr' for country TR.
+  Localized field key 'shipping_credential_tr' for country Turkey.
   """
   SHIPPING_CREDENTIAL_TR
 
   """
-  Localized field key 'shipping_credential_tw' for country TW.
+  Localized field key 'shipping_credential_tw' for country Taiwan.
   """
   SHIPPING_CREDENTIAL_TW
 
   """
-  Localized field key 'shipping_credential_type_co' for country CO.
+  Localized field key 'shipping_credential_type_co' for country Colombia.
   """
   SHIPPING_CREDENTIAL_TYPE_CO
 
   """
-  Localized field key 'tax_credential_br' for country BR.
+  Localized field key 'tax_credential_br' for country Brazil.
   """
   TAX_CREDENTIAL_BR
 
   """
-  Localized field key 'tax_credential_cl' for country CL.
+  Localized field key 'tax_credential_cl' for country Chile.
   """
   TAX_CREDENTIAL_CL
 
   """
-  Localized field key 'tax_credential_co' for country CO.
+  Localized field key 'tax_credential_co' for country Colombia.
   """
   TAX_CREDENTIAL_CO
 
   """
-  Localized field key 'tax_credential_cr' for country CR.
+  Localized field key 'tax_credential_cr' for country Costa Rica.
   """
   TAX_CREDENTIAL_CR
 
   """
-  Localized field key 'tax_credential_ec' for country EC.
+  Localized field key 'tax_credential_ec' for country Ecuador.
   """
   TAX_CREDENTIAL_EC
 
   """
-  Localized field key 'tax_credential_es' for country ES.
+  Localized field key 'tax_credential_es' for country Spain.
   """
   TAX_CREDENTIAL_ES
 
   """
-  Localized field key 'tax_credential_gt' for country GT.
+  Localized field key 'tax_credential_gt' for country Guatemala.
   """
   TAX_CREDENTIAL_GT
 
   """
-  Localized field key 'tax_credential_id' for country ID.
+  Localized field key 'tax_credential_id' for country Indonesia.
   """
   TAX_CREDENTIAL_ID
 
   """
-  Localized field key 'tax_credential_it' for country IT.
+  Localized field key 'tax_credential_it' for country Italy.
   """
   TAX_CREDENTIAL_IT
 
   """
-  Localized field key 'tax_credential_mx' for country MX.
+  Localized field key 'tax_credential_mx' for country Mexico.
   """
   TAX_CREDENTIAL_MX
 
   """
-  Localized field key 'tax_credential_my' for country MY.
+  Localized field key 'tax_credential_my' for country Malaysia.
   """
   TAX_CREDENTIAL_MY
 
   """
-  Localized field key 'tax_credential_pe' for country PE.
+  Localized field key 'tax_credential_pe' for country Peru.
   """
   TAX_CREDENTIAL_PE
 
   """
-  Localized field key 'tax_credential_pt' for country PT.
+  Localized field key 'tax_credential_pt' for country Portugal.
   """
   TAX_CREDENTIAL_PT
 
   """
-  Localized field key 'tax_credential_py' for country PY.
+  Localized field key 'tax_credential_py' for country Paraguay.
   """
   TAX_CREDENTIAL_PY
 
   """
-  Localized field key 'tax_credential_tr' for country TR.
+  Localized field key 'tax_credential_tr' for country Turkey.
   """
   TAX_CREDENTIAL_TR
 
   """
-  Localized field key 'tax_credential_type_co' for country CO.
+  Localized field key 'tax_credential_type_co' for country Colombia.
   """
   TAX_CREDENTIAL_TYPE_CO
 
   """
-  Localized field key 'tax_credential_type_mx' for country MX.
+  Localized field key 'tax_credential_type_mx' for country Mexico.
   """
   TAX_CREDENTIAL_TYPE_MX
 
   """
-  Localized field key 'tax_credential_use_mx' for country MX.
+  Localized field key 'tax_credential_use_mx' for country Mexico.
   """
   TAX_CREDENTIAL_USE_MX
 
   """
-  Localized field key 'tax_email_it' for country IT.
+  Localized field key 'tax_email_it' for country Italy.
   """
   TAX_EMAIL_IT
 }
@@ -4022,6 +4466,11 @@ type Market implements HasMetafields {
   id: ID!
 
   """
+  The manager of the market, if the accessing app is the market’s manager. Otherwise, this will be null.
+  """
+  manager: MarketManager
+
+  """
   Returns a metafield by namespace and key that belongs to the resource.
   """
   metafield(
@@ -4040,6 +4489,17 @@ type Market implements HasMetafields {
   A geographic region which comprises a market.
   """
   regions: [MarketRegion!]!
+}
+
+"""
+The entity that manages a particular market.
+"""
+type MarketManager {
+  """
+  The identity of the manager. This can either be `merchant` if the market is
+  manually managed by the merchant or an ID of the app responsible for managing the market.
+  """
+  identifier: String!
 }
 
 """
@@ -4118,24 +4578,167 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result.
+  Handles the Function result for the purchase.discount.cart_fetch target.
   """
-  handleResult(
+  cartFetch(
     """
     The result of the Function.
     """
-    result: FunctionResult!
-  ): Void! @deprecated(reason: "Use the target-specific field instead.")
+    result: FunctionCartFetchResult!
+  ): Void!
 
   """
-  Handles the Function result for the purchase.product-discount.run target.
+  Handles the Function result for the purchase.discount.cart_run target.
   """
-  run(
+  cartRun(
     """
     The result of the Function.
     """
-    result: FunctionRunResult!
+    result: FunctionCartRunResult!
   ): Void!
+
+  """
+  Handles the Function result for the purchase.discount.delivery_fetch target.
+  """
+  deliveryFetch(
+    """
+    The result of the Function.
+    """
+    result: FunctionDeliveryFetchResult!
+  ): Void!
+
+  """
+  Handles the Function result for the purchase.discount.delivery_run target.
+  """
+  deliveryRun(
+    """
+    The result of the Function.
+    """
+    result: FunctionDeliveryRunResult!
+  ): Void!
+}
+
+"""
+The order discount candidate to be applied.
+"""
+input OrderDiscountCandidate {
+  """
+  The discount code associated with this discount candidate, for code-based discounts.
+  """
+  associatedDiscountCode: AssociatedDiscountCode
+
+  """
+  The conditions that must be satisfied to apply the order discount candidate.
+  """
+  conditions: [Condition!]
+
+  """
+  The discount message.
+  """
+  message: String
+
+  """
+  The targets of the order discount candidate.
+
+  The value is validated against: targets should contain only one type of `OrderDiscountCandidateTarget`.
+  Only a list that contains either a single `OrderSubtotalTarget` or one or more
+  `ProductVariantTarget`s is valid.
+  """
+  targets: [OrderDiscountCandidateTarget!]!
+
+  """
+  The value of the order discount candidate.
+  """
+  value: OrderDiscountCandidateValue!
+}
+
+"""
+A target of a order discount candidate.
+
+An `OrderDiscountCandidate` can either have a single `OrderSubtotalTarget`, or one or more `ProductVariantTarget`s.
+"""
+input OrderDiscountCandidateTarget @oneOf {
+  """
+  If used, the discount targets the entire order subtotal after product discounts are applied.
+  """
+  orderSubtotal: OrderSubtotalTarget
+
+  """
+  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
+  optional quantity limit.
+  """
+  productVariant: ProductVariantTarget
+}
+
+"""
+The order discount candidate value.
+"""
+input OrderDiscountCandidateValue @oneOf {
+  """
+  A fixed amount value.
+  """
+  fixedAmount: FixedAmount
+
+  """
+  A percentage value.
+  """
+  percentage: Percentage
+}
+
+"""
+The strategy that's applied to the list of order discount candidates.
+"""
+enum OrderDiscountSelectionStrategy {
+  """
+  Only apply the first order discount candidate with conditions that are satisfied.
+  """
+  FIRST
+
+  """
+  Only apply the order discount candidate that offers the maximum reduction.
+  """
+  MAXIMUM
+}
+
+"""
+A group of order discounts that share a selection strategy.
+"""
+input OrderDiscounts {
+  """
+  The list of order discount candidates to be applied.
+  """
+  candidates: [OrderDiscountCandidate!]!
+
+  """
+  The strategy that's applied to the list of discounts.
+  """
+  selectionStrategy: OrderDiscountSelectionStrategy!
+}
+
+"""
+The condition for checking the minimum subtotal amount of the order.
+"""
+input OrderMinimumSubtotal {
+  """
+  Variant IDs with a merchandise line price that's excluded to calculate the minimum subtotal amount of the order.
+  """
+  excludedVariantIds: [ID!]!
+
+  """
+  The minimum subtotal amount of the order.
+  """
+  minimumAmount: Decimal!
+}
+
+"""
+If used, the discount targets the entire order subtotal after product discounts are applied.
+"""
+input OrderSubtotalTarget {
+  """
+  The list of excluded product variant IDs. Cart lines for these product variants are excluded from the order
+  subtotal calculation when calculating the maximum value of the discount.
+  """
+  excludedVariantIds: [ID!]!
 }
 
 """
@@ -4153,7 +4756,17 @@ input Percentage {
 """
 Represents a product.
 """
-type Product implements HasMetafields {
+type Product implements HasGates & HasMetafields {
+  """
+  Returns active gate subjects bound to the resource.
+  """
+  gates(
+    """
+    The handle of the gate configurations to search for.
+    """
+    handle: Handle
+  ): [GateSubject!]!
+
   """
   A unique human-friendly string of the product's title.
   """
@@ -4238,6 +4851,156 @@ type Product implements HasMetafields {
   The name of the product's vendor.
   """
   vendor: String
+}
+
+"""
+The product discount candidate to be applied.
+"""
+input ProductDiscountCandidate {
+  """
+  The discount code associated with this discount candidate, for code-based discounts.
+  """
+  associatedDiscountCode: AssociatedDiscountCode
+
+  """
+  The discount message.
+  """
+  message: String
+
+  """
+  The targets of the product discount candidate.
+  This argument accepts a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
+  """
+  targets: [ProductDiscountCandidateTarget!]!
+
+  """
+  The value of the product discount candidate.
+  """
+  value: ProductDiscountCandidateValue!
+}
+
+"""
+A product discount candidate fixed amount value.
+"""
+input ProductDiscountCandidateFixedAmount {
+  """
+  The fixed amount value of the product discount candidate, in the currency of the cart.
+
+  The amount must be greater than or equal to 0.
+  """
+  amount: Decimal!
+
+  """
+  Whether to apply the value to each entitled item.
+
+  The default value is `false`, which causes the value to be applied once across the entitled items.
+  When the value is `true`, the value will be applied to each of the entitled items.
+  """
+  appliesToEachItem: Boolean = false
+}
+
+"""
+A target of a product discount candidate, which determines which cart line(s) the discount will affect.
+
+A `ProductDiscountCandidate` can have a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
+
+Multiple targets with the same type and ID are the same as a single target of that type and ID with their
+quantities added together, or `null` if any of those targets have a quantity of `null`.
+
+See the [Discounts API reference](https://shopify.dev/docs/api/functions/reference/product-discounts/graphql#functionrunresult) for examples.
+"""
+input ProductDiscountCandidateTarget @oneOf {
+  """
+  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that applies to a specific cart line, up to an optional quantity limit.
+  """
+  cartLine: CartLineTarget
+
+  """
+  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
+  optional quantity limit.
+  """
+  productVariant: ProductVariantTarget
+}
+
+"""
+The value of the product discount candidate.
+"""
+input ProductDiscountCandidateValue @oneOf {
+  """
+  A product discount candidate fixed amount value.
+  """
+  fixedAmount: ProductDiscountCandidateFixedAmount
+
+  """
+  A percentage value.
+  """
+  percentage: Percentage
+}
+
+"""
+The strategy that's applied to the list of product discount candidates.
+"""
+enum ProductDiscountSelectionStrategy {
+  """
+  Apply all product discount candidates with conditions that are satisfied. This
+  does not override discount combination or stacking rules.
+  """
+  ALL
+
+  """
+  Only apply the first product discount candidate with conditions that are satisfied.
+  """
+  FIRST
+
+  """
+  Only apply the product discount candidate that offers the maximum reduction.
+  """
+  MAXIMUM
+}
+
+"""
+A group of product discounts that share a selection strategy.
+"""
+input ProductDiscounts {
+  """
+  The list of product discount candidates to be applied.
+  """
+  candidates: [ProductDiscountCandidate!]!
+
+  """
+  The strategy that's applied to the list of product discount candidates.
+  """
+  selectionStrategy: ProductDiscountSelectionStrategy!
+}
+
+"""
+The condition for checking the minimum quantity of a product.
+"""
+input ProductMinimumQuantity {
+  """
+  Variant IDs with a merchandise line price that's included to calculate the minimum quantity of the product.
+  """
+  ids: [ID!]!
+
+  """
+  The minimum quantity of a product.
+  """
+  minimumQuantity: Int!
+}
+
+"""
+The condition for checking the minimum subtotal amount of the product.
+"""
+input ProductMinimumSubtotal {
+  """
+  Variant IDs with a merchandise line price that's included to calculate the minimum subtotal amount of a product.
+  """
+  ids: [ID!]!
+
+  """
+  The minimum subtotal amount of the product.
+  """
+  minimumAmount: Decimal!
 }
 
 """
@@ -4443,26 +5206,23 @@ type Shop implements HasMetafields {
 }
 
 """
-A target of a discount, which determines which cart line(s) the discount will affect.
-
-A discount can have a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
-
-Multiple targets with the same type and ID are the same as a single target of that type and ID with their
-quantities added together, or `null` if any of those targets have a quantity of `null`.
-
-See the [Product Discount API reference](https://shopify.dev/docs/api/functions/reference/product-discounts/graphql#functionrunresult) for examples.
+Represents information about the buyer that is interacting with the cart.
 """
-input Target @oneOf {
+type ShopUser implements HasMetafields {
   """
-  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that applies to a specific cart line, up to an optional quantity limit.
+  Returns a metafield by namespace and key that belongs to the resource.
   """
-  cartLine: CartLineTarget
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
 
-  """
-  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
-  optional quantity limit.
-  """
-  productVariant: ProductVariantTarget
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 }
 
 """
@@ -4473,18 +5233,34 @@ For example, "05:43:21".
 scalar TimeWithoutTimezone
 
 """
-The value of the discount.
-"""
-input Value @oneOf {
-  """
-  A fixed amount value.
-  """
-  fixedAmount: FixedAmount
+Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) and
+[RFC 3987](https://datatracker.ietf.org/doc/html/rfc3987)-compliant URI string.
 
+For example, `"https://example.myshopify.com"` is a valid URL. It includes a scheme (`https`) and a host
+(`example.myshopify.com`).
+"""
+scalar URL
+
+"""
+A discount code that corresponds to a valid external discount.
+This can only be used by Functions with network access.
+"""
+input ValidDiscountCode {
   """
-  A percentage value.
+  The discount code.
   """
-  percentage: Percentage
+  code: String!
+}
+
+"""
+A list of valid discount codes that correspond to external discounts. This can
+only be used by Functions with network access.
+"""
+input ValidDiscountCodes {
+  """
+  The list of valid discount codes.
+  """
+  codes: [ValidDiscountCode!]!
 }
 
 """

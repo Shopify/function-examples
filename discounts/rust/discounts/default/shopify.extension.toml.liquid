@@ -1,4 +1,4 @@
-api_version = "2025-01"
+api_version = "unstable"
 
 [[extensions]]
 name = "t:name"
@@ -19,12 +19,12 @@ description = "t:description"
 
   [[extensions.targeting]]
   target = "purchase.discount.delivery_run"
-  input_query = "src/run.graphql"
+  input_query = "src/fetch.graphql"
   export = "delivery_run"
 
   [[extensions.targeting]]
   target = "purchase.discount.delivery_fetch"
-  input_query = "src/run.graphql"
+  input_query = "src/fetch.graphql"
   export = "delivery_fetch"
 
   [extensions.build]
@@ -33,5 +33,5 @@ description = "t:description"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]
-  create = "/"
-  details = "/"
+  create = "/app/discounts/:functionId/new"
+  details = "/app/discounts/:functionId/:id"
