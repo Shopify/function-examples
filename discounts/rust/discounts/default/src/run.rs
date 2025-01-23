@@ -1,22 +1,22 @@
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Deserialize};
 
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use cart_fetch::output::{
-    FunctionCartFetchResult, HttpRequest as CartHttpRequest,
-    HttpRequestMethod as CartHttpRequestMethod, HttpRequestPolicy as CartHttpRequestPolicy,
-};
+use cart_fetch::output::FunctionCartFetchResult;
 use cart_run::output::FunctionCartRunResult;
-use delivery_fetch::output::{
-    FunctionDeliveryFetchResult, HttpRequest as DeliveryHttpRequest,
-    HttpRequestMethod as DeliveryHttpRequestMethod, HttpRequestPolicy as DeliveryHttpRequestPolicy,
-};
+use delivery_fetch::output::FunctionDeliveryFetchResult;
 use delivery_run::output::FunctionDeliveryRunResult;
 
 type CartResponseData = cart_run::input::ResponseData;
 type DeliveryResponseData = delivery_run::input::ResponseData;
 type CartFetchResponseData = cart_fetch::input::ResponseData;
+
+#[derive(Deserialize)]
+struct Wrapper {
+    cart: Option<FunctionCartRunResult>,
+    delivery: Option<FunctionDeliveryRunResult>,
+}
 
 #[shopify_function_target(
     target = "cart_run",
@@ -26,7 +26,9 @@ type CartFetchResponseData = cart_fetch::input::ResponseData;
 fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
     let fetch_result = input.fetch_result.as_ref().expect("Missing fetch result");
     let body = fetch_result.body.as_ref().expect("Missing body");
-    let result = metafield_to_config::<FunctionCartRunResult>(&body);
+    let result = string_to_config::<Wrapper>(&body)
+        .cart
+        .unwrap_or_else(|| FunctionCartRunResult { operations: vec![] });
 
     Ok(result)
 }
@@ -39,7 +41,9 @@ fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
 fn delivery_run(input: DeliveryResponseData) -> Result<FunctionDeliveryRunResult> {
     let fetch_result = input.fetch_result.as_ref().expect("Missing fetch result");
     let body = fetch_result.body.as_ref().expect("Missing body");
-    let result = metafield_to_config::<FunctionDeliveryRunResult>(&body);
+    let result = string_to_config::<Wrapper>(&body)
+        .delivery
+        .unwrap_or_else(|| FunctionDeliveryRunResult { operations: vec![] });
 
     Ok(result)
 }
@@ -55,18 +59,9 @@ fn cart_fetch(input: CartFetchResponseData) -> Result<FunctionCartFetchResult> {
         .metafield
         .expect("Missing required metafield configuration");
 
-    Ok(FunctionCartFetchResult {
-        request: Some(CartHttpRequest {
-            body: Some(metafield.value.clone()),
-            headers: vec![],
-            json_body: serde_json::from_str(&metafield.value)?,
-            method: CartHttpRequestMethod::POST,
-            policy: CartHttpRequestPolicy {
-                read_timeout_ms: 2000,
-            },
-            url: "https://example.com".to_string(),
-        }),
-    })
+    Ok(string_to_config::<FunctionCartFetchResult>(
+        &metafield.value,
+    ))
 }
 
 #[shopify_function_target(
@@ -80,30 +75,29 @@ fn delivery_fetch(input: CartFetchResponseData) -> Result<FunctionDeliveryFetchR
         .metafield
         .expect("Missing required metafield configuration");
 
-    Ok(FunctionDeliveryFetchResult {
-        request: Some(DeliveryHttpRequest {
-            body: Some(metafield.value.clone()),
-            headers: vec![],
-            json_body: serde_json::from_str(&metafield.value)?,
-            method: DeliveryHttpRequestMethod::POST,
-            policy: DeliveryHttpRequestPolicy {
-                read_timeout_ms: 2000,
-            },
-            url: "https://example.com".to_string(),
-        }),
-    })
+    Ok(string_to_config::<FunctionDeliveryFetchResult>(
+        &metafield.value,
+    ))
 }
 
-fn metafield_to_config<T: DeserializeOwned>(value: &str) -> T {
+fn string_to_config<T: DeserializeOwned>(value: &str) -> T {
     serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use cart_fetch::output::{
+        HttpRequest as CartHttpRequest, HttpRequestMethod as CartHttpRequestMethod,
+        HttpRequestPolicy as CartHttpRequestPolicy,
+    };
     use cart_run::output::{
         CartOperation, OrderDiscountSelectionStrategy, OrderDiscounts,
         ProductDiscountSelectionStrategy, ProductDiscounts,
+    };
+    use delivery_fetch::output::{
+        HttpRequest as DeliveryHttpRequest, HttpRequestMethod as DeliveryHttpRequestMethod,
+        HttpRequestPolicy as DeliveryHttpRequestPolicy,
     };
     use delivery_run::output::{
         DeliveryDiscountSelectionStrategy, DeliveryDiscounts, DeliveryOperation,
@@ -114,13 +108,23 @@ mod tests {
 
     #[test]
     fn test_cart_run() -> Result<()> {
-        let query_input_json = r#"
-        {
+        let query_input_json = json!({
             "fetchResult": {
-                "body": "{\"operations\":[{\"addOrderDiscounts\":{\"selectionStrategy\":\"FIRST\",\"candidates\":[]}},{\"addProductDiscounts\":{\"selectionStrategy\":\"FIRST\",\"candidates\":[]}}]}"
+                "body": json!(
+                    {
+                        "cart": {
+                            "operations": [
+                                {
+                                    "addOrderDiscounts": {"selectionStrategy":"FIRST","candidates":[]},
+                                }, {
+                                    "addProductDiscounts": {"selectionStrategy":"FIRST","candidates":[]}
+                                }
+                            ]
+                        }
+                    }
+                ).to_string()
             }
-        }
-        "#;
+        });
 
         let expected = FunctionCartRunResult {
             operations: vec![
@@ -136,7 +140,7 @@ mod tests {
         };
 
         assert_eq!(
-            run_function_with_input(cart_run, query_input_json)?,
+            run_function_with_input(cart_run, &query_input_json.to_string())?,
             expected
         );
         Ok(())
@@ -144,13 +148,21 @@ mod tests {
 
     #[test]
     fn test_delivery_run() -> Result<()> {
-        let query_input_json = r#"
-        {
+        let query_input_json = json!({
             "fetchResult": {
-                "body": "{\"operations\":[{\"addDeliveryDiscounts\":{\"selectionStrategy\":\"ALL\",\"candidates\":[]}}]}"
+                "body": json!(
+                    {
+                        "delivery": {
+                            "operations": [
+                                {
+                                    "addDeliveryDiscounts": {"selectionStrategy":"ALL","candidates":[]},
+                                }
+                            ]
+                        }
+                    }
+                ).to_string()
             }
-        }
-        "#;
+        });
 
         let expected = FunctionDeliveryRunResult {
             operations: vec![DeliveryOperation::AddDeliveryDiscounts(DeliveryDiscounts {
@@ -160,7 +172,7 @@ mod tests {
         };
 
         assert_eq!(
-            run_function_with_input(delivery_run, query_input_json)?,
+            run_function_with_input(delivery_run, &query_input_json.to_string())?,
             expected
         );
         Ok(())
@@ -169,15 +181,17 @@ mod tests {
     #[test]
     fn test_cart_fetch() -> Result<()> {
         let body = json!({
-            "operations": [
-                {
-                    "addOrderDiscounts": {"selectionStrategy": "FIRST", "candidates": []},
-                    "addProductDiscounts": {"selectionStrategy": "FIRST", "candidates": []}
-                }
-            ]
+            "cart": {
+                "operations": [
+                    {
+                        "addOrderDiscounts": {"selectionStrategy": "FIRST", "candidates": []},
+                        "addProductDiscounts": {"selectionStrategy": "FIRST", "candidates": []}
+                    }
+                ]
+            }
         });
 
-        let fetch_result = FunctionCartFetchResult {
+        let expected_fetch_result = FunctionCartFetchResult {
             request: Some(CartHttpRequest {
                 body: Some(body.to_string()),
                 headers: vec![],
@@ -193,14 +207,25 @@ mod tests {
         let metafield = json!({
             "discountNode": {
                 "metafield": {
-                    "value": body.to_string(),
+                    "value": json!({
+                        "request": {
+                            "body": Some(body.to_string()),
+                            "headers": [],
+                            "jsonBody": Some(body.clone()),
+                            "method": "POST",
+                            "policy": {
+                                "readTimeoutMs": 2000,
+                            },
+                            "url": "https://example.com",
+                        }
+                    }).to_string(),
                 }
             }
         });
 
         assert_eq!(
             run_function_with_input(cart_fetch, &metafield.to_string())?,
-            fetch_result
+            expected_fetch_result
         );
         Ok(())
     }
@@ -208,14 +233,16 @@ mod tests {
     #[test]
     fn test_delivery_fetch() -> Result<()> {
         let body = json!({
-            "operations": [
-                {
-                    "addDeliveryDiscounts": {"selectionStrategy": "ALL", "candidates": []},
-                }
-            ]
+            "delivery": {
+                "operations": [
+                    {
+                        "addDeliveryDiscounts": {"selectionStrategy": "ALL", "candidates": []},
+                    }
+                ]
+            }
         });
 
-        let fetch_result = FunctionDeliveryFetchResult {
+        let expected_fetch_result = FunctionDeliveryFetchResult {
             request: Some(DeliveryHttpRequest {
                 body: Some(body.to_string()),
                 headers: vec![],
@@ -231,14 +258,25 @@ mod tests {
         let metafield = json!({
             "discountNode": {
                 "metafield": {
-                    "value": body.to_string(),
+                    "value": json!({
+                        "request": {
+                            "body": Some(body.to_string()),
+                            "headers": [],
+                            "jsonBody": Some(body.clone()),
+                            "method": "POST",
+                            "policy": {
+                                "readTimeoutMs": 2000,
+                            },
+                            "url": "https://example.com",
+                        }
+                    }).to_string(),
                 }
             }
         });
 
         assert_eq!(
             run_function_with_input(delivery_fetch, &metafield.to_string())?,
-            fetch_result
+            expected_fetch_result
         );
         Ok(())
     }
