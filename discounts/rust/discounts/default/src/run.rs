@@ -1,42 +1,47 @@
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::Deserialize;
 
-use serde_json::json;
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-use cart_fetch::output::{
-    FunctionCartFetchResult, HttpRequest as CartHttpRequest,
-    HttpRequestMethod as CartHttpRequestMethod, HttpRequestPolicy as CartHttpRequestPolicy,
-};
 use cart_run::output::{
-    CartLineTarget, CartOperation, FunctionCartRunResult, OrderDiscountCandidate,
-    OrderDiscountCandidateTarget, OrderDiscountCandidateValue, OrderDiscountSelectionStrategy,
-    OrderDiscounts, OrderSubtotalTarget, Percentage as CartPercentage, ProductDiscountCandidate,
+    AssociatedDiscountCode as CartAssociatedDiscountCode, CartLineTarget, CartOperation,
+    FunctionCartRunResult, OrderDiscountCandidate, OrderDiscountCandidateTarget,
+    OrderDiscountCandidateValue, OrderDiscountSelectionStrategy, OrderDiscounts,
+    OrderSubtotalTarget, Percentage as CartPercentage, ProductDiscountCandidate,
     ProductDiscountCandidateTarget, ProductDiscountCandidateValue,
-    ProductDiscountSelectionStrategy, ProductDiscounts,
+    ProductDiscountSelectionStrategy, ProductDiscounts, ValidDiscountCode as CartValidDiscountCode,
+    ValidDiscountCodes as CartValidDiscountCodes,
 };
-use delivery_fetch::output::FunctionDeliveryFetchResult;
-use delivery_fetch::output::{
-    HttpRequest as DeliveryHttpRequest, HttpRequestMethod as DeliveryHttpRequestMethod,
-    HttpRequestPolicy as DeliveryHttpRequestPolicy,
-};
+
 use delivery_run::output::{
-    DeliveryDiscountCandidate, DeliveryDiscountCandidateTarget, DeliveryDiscountCandidateValue,
+    AssociatedDiscountCode as DeliveryAssociatedDiscountCode, DeliveryDiscountCandidate,
+    DeliveryDiscountCandidateTarget, DeliveryDiscountCandidateValue,
     DeliveryDiscountSelectionStrategy, DeliveryDiscounts, DeliveryGroupTarget, DeliveryOperation,
     FunctionDeliveryRunResult, Percentage as DeliveryPercentage,
+    ValidDiscountCode as DeliveryValidDiscountCode,
+    ValidDiscountCodes as DeliveryValidDiscountCodes,
 };
 
 type CartResponseData = cart_run::input::ResponseData;
 type DeliveryResponseData = delivery_run::input::ResponseData;
-type CartFetchResponseData = cart_fetch::input::ResponseData;
-type DeliveryFetchResponseData = delivery_fetch::input::ResponseData;
 
 impl CartResponseData {
     fn metafield(&self) -> Metafield {
         self.discount_node
             .metafield
             .as_ref()
-            .map(|metafield| string_to_config::<Metafield>(&metafield.value))
+            .map(|metafield| serde_json::from_str(&metafield.value))
+            .unwrap()
+            .expect("Missing required metafield configuration")
+    }
+    fn valid_discount_codes(&self) -> Vec<String> {
+        self.fetch_result
+            .as_ref()
+            .unwrap()
+            .body
+            .as_ref()
+            .map(|available_codes| serde_json::from_str(available_codes))
+            .unwrap()
             .expect("Missing required metafield configuration")
     }
 }
@@ -46,7 +51,19 @@ impl DeliveryResponseData {
         self.discount_node
             .metafield
             .as_ref()
-            .map(|metafield| string_to_config::<Metafield>(&metafield.value))
+            .map(|metafield| serde_json::from_str(&metafield.value))
+            .unwrap()
+            .expect("Missing required metafield configuration")
+    }
+
+    fn valid_discount_codes(&self) -> Vec<String> {
+        self.fetch_result
+            .as_ref()
+            .unwrap()
+            .body
+            .as_ref()
+            .map(|available_codes| serde_json::from_str(available_codes))
+            .unwrap()
             .expect("Missing required metafield configuration")
     }
 }
@@ -65,17 +82,27 @@ struct Metafield {
 )]
 fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
     let default = FunctionCartRunResult { operations: vec![] };
+    let codes = input.valid_discount_codes();
+    let available_discount_code = codes.first();
 
-    let fetch_result = input.fetch_result.as_ref().expect("Missing fetch result");
-    if fetch_result.status != 200 {
+    if available_discount_code.is_none() {
         return Ok(default);
     }
 
     let metafield = input.metafield();
     let mut operations: Vec<CartOperation> = vec![];
+    let available_discount_code = available_discount_code.unwrap();
+
+    operations.push(CartOperation::AddValidDiscountCodes(
+        CartValidDiscountCodes {
+            codes: vec![CartValidDiscountCode {
+                code: available_discount_code.to_string(),
+            }],
+        },
+    ));
 
     if metafield.cart_percent.is_some() {
-        operations.push(create_order_discount(&metafield));
+        operations.push(create_order_discount(&metafield, available_discount_code));
     }
 
     if metafield.product_percent.is_some() {
@@ -89,7 +116,11 @@ fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
                 a_amount.partial_cmp(&b_amount).unwrap()
             })
             .unwrap();
-        operations.push(create_product_discount(&highest_priced_line.id, &metafield));
+        operations.push(create_product_discount(
+            &highest_priced_line.id,
+            &metafield,
+            available_discount_code,
+        ));
     }
 
     Ok(FunctionCartRunResult { operations })
@@ -102,85 +133,43 @@ fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
 )]
 fn delivery_run(input: DeliveryResponseData) -> Result<FunctionDeliveryRunResult> {
     let default = FunctionDeliveryRunResult { operations: vec![] };
-
-    let fetch_result = input.fetch_result.as_ref().expect("Missing fetch result");
-    if fetch_result.status != 200 {
-        return Ok(default);
-    }
-
+    let codes = input.valid_discount_codes();
+    let available_discount_code = codes.first();
     let metafield = input.metafield();
-    if metafield.delivery_percent.is_none() {
+
+    if available_discount_code.is_none() || metafield.delivery_percent.is_none() {
         return Ok(default);
     }
+
+    let mut operations: Vec<DeliveryOperation> = vec![];
+    let available_discount_code = available_discount_code.unwrap();
+
+    operations.push(DeliveryOperation::AddValidDiscountCodes(
+        DeliveryValidDiscountCodes {
+            codes: vec![DeliveryValidDiscountCode {
+                code: available_discount_code.to_string(),
+            }],
+        },
+    ));
 
     let candidates = input
         .cart
         .delivery_groups
         .iter()
-        .map(|group| create_delivery_discount_candidate(&group.id, &metafield))
+        .map(|group| {
+            create_delivery_discount_candidate(&group.id, &metafield, available_discount_code)
+        })
         .collect::<Vec<_>>();
 
-    Ok(FunctionDeliveryRunResult {
-        operations: vec![DeliveryOperation::AddDeliveryDiscounts(DeliveryDiscounts {
-            selection_strategy: DeliveryDiscountSelectionStrategy::ALL,
-            candidates,
-        })],
-    })
+    operations.push(DeliveryOperation::AddDeliveryDiscounts(DeliveryDiscounts {
+        selection_strategy: DeliveryDiscountSelectionStrategy::ALL,
+        candidates,
+    }));
+
+    Ok(FunctionDeliveryRunResult { operations })
 }
 
-#[shopify_function_target(
-    target = "cart_fetch",
-    query_path = "src/fetch.graphql",
-    schema_path = "schema.graphql"
-)]
-fn cart_fetch(input: CartFetchResponseData) -> Result<FunctionCartFetchResult> {
-    let body = json!({
-        "buyerIdentity": {
-            "email": input.cart.buyer_identity.as_ref().unwrap().email
-        }
-    });
-
-    Ok(FunctionCartFetchResult {
-        request: Some(CartHttpRequest {
-            body: Some(body.to_string()),
-            headers: vec![],
-            json_body: Some(body.clone()),
-            method: CartHttpRequestMethod::POST,
-            policy: CartHttpRequestPolicy {
-                read_timeout_ms: 2000,
-            },
-            url: "https://example.com".to_string(),
-        }),
-    })
-}
-
-#[shopify_function_target(
-    target = "delivery_fetch",
-    query_path = "src/fetch.graphql",
-    schema_path = "schema.graphql"
-)]
-fn delivery_fetch(input: DeliveryFetchResponseData) -> Result<FunctionDeliveryFetchResult> {
-    let body = json!({
-        "buyerIdentity": {
-            "email": input.cart.buyer_identity.as_ref().unwrap().email
-        }
-    });
-
-    Ok(FunctionDeliveryFetchResult {
-        request: Some(DeliveryHttpRequest {
-            body: Some(body.to_string()),
-            headers: vec![],
-            json_body: Some(body.clone()),
-            method: DeliveryHttpRequestMethod::POST,
-            policy: DeliveryHttpRequestPolicy {
-                read_timeout_ms: 2000,
-            },
-            url: "https://example.com".to_string(),
-        }),
-    })
-}
-
-fn create_order_discount(metafield: &Metafield) -> CartOperation {
+fn create_order_discount(metafield: &Metafield, available_discount_code: &str) -> CartOperation {
     CartOperation::AddOrderDiscounts(OrderDiscounts {
         selection_strategy: OrderDiscountSelectionStrategy::FIRST,
         candidates: vec![OrderDiscountCandidate {
@@ -189,7 +178,9 @@ fn create_order_discount(metafield: &Metafield) -> CartOperation {
                     excluded_variant_ids: vec![],
                 },
             )],
-            associated_discount_code: None,
+            associated_discount_code: Some(CartAssociatedDiscountCode {
+                code: available_discount_code.to_string(),
+            }),
             message: None,
             value: OrderDiscountCandidateValue::Percentage(CartPercentage {
                 value: metafield.cart_percent.unwrap(),
@@ -199,7 +190,11 @@ fn create_order_discount(metafield: &Metafield) -> CartOperation {
     })
 }
 
-fn create_product_discount(cart_line_id: &str, metafield: &Metafield) -> CartOperation {
+fn create_product_discount(
+    cart_line_id: &str,
+    metafield: &Metafield,
+    available_discount_code: &str,
+) -> CartOperation {
     CartOperation::AddProductDiscounts(ProductDiscounts {
         selection_strategy: ProductDiscountSelectionStrategy::FIRST,
         candidates: vec![ProductDiscountCandidate {
@@ -207,7 +202,9 @@ fn create_product_discount(cart_line_id: &str, metafield: &Metafield) -> CartOpe
                 id: cart_line_id.to_string(),
                 quantity: Some(1),
             })],
-            associated_discount_code: None,
+            associated_discount_code: Some(CartAssociatedDiscountCode {
+                code: available_discount_code.to_string(),
+            }),
             message: None,
             value: ProductDiscountCandidateValue::Percentage(CartPercentage {
                 value: metafield.product_percent.unwrap(),
@@ -219,6 +216,7 @@ fn create_product_discount(cart_line_id: &str, metafield: &Metafield) -> CartOpe
 fn create_delivery_discount_candidate(
     delivery_group_id: &str,
     metafield: &Metafield,
+    available_discount_code: &str,
 ) -> DeliveryDiscountCandidate {
     DeliveryDiscountCandidate {
         targets: vec![DeliveryDiscountCandidateTarget::DeliveryGroup(
@@ -230,12 +228,10 @@ fn create_delivery_discount_candidate(
             value: metafield.delivery_percent.unwrap(),
         }),
         message: None,
-        associated_discount_code: None,
+        associated_discount_code: Some(DeliveryAssociatedDiscountCode {
+            code: available_discount_code.to_string(),
+        }),
     }
-}
-
-fn string_to_config<T: DeserializeOwned>(value: &str) -> T {
-    serde_json::from_str(value).expect("Unable to parse configuration value from metafield")
 }
 
 #[cfg(test)]
@@ -282,26 +278,22 @@ mod tests {
                 }
             },
             "fetchResult": {
-                "status": 200,
+                "body": "[\"WELCOME10\"]",
+                "status": 200
             }
         })
         .to_string()
-    }
-
-    fn get_fetch_input_json() -> serde_json::Value {
-        json!({
-            "cart": {
-                "buyerIdentity": {
-                    "email": "test@example.com"
-                }
-            }
-        })
     }
 
     #[test]
     fn test_cart_run() -> Result<()> {
         let expected = FunctionCartRunResult {
             operations: vec![
+                CartOperation::AddValidDiscountCodes(CartValidDiscountCodes {
+                    codes: vec![CartValidDiscountCode {
+                        code: "WELCOME10".to_string(),
+                    }],
+                }),
                 CartOperation::AddOrderDiscounts(OrderDiscounts {
                     selection_strategy: OrderDiscountSelectionStrategy::FIRST,
                     candidates: vec![OrderDiscountCandidate {
@@ -310,7 +302,9 @@ mod tests {
                                 excluded_variant_ids: vec![],
                             },
                         )],
-                        associated_discount_code: None,
+                        associated_discount_code: Some(CartAssociatedDiscountCode {
+                            code: "WELCOME10".to_string(),
+                        }),
                         message: None,
                         value: OrderDiscountCandidateValue::Percentage(CartPercentage {
                             value: Decimal(10.0),
@@ -325,7 +319,9 @@ mod tests {
                             id: "gid://shopify/CartLine/123".to_string(),
                             quantity: Some(1),
                         })],
-                        associated_discount_code: None,
+                        associated_discount_code: Some(CartAssociatedDiscountCode {
+                            code: "WELCOME10".to_string(),
+                        }),
                         message: None,
                         value: ProductDiscountCandidateValue::Percentage(CartPercentage {
                             value: Decimal(20.0),
@@ -345,76 +341,35 @@ mod tests {
     #[test]
     fn test_delivery_run() -> Result<()> {
         let expected = FunctionDeliveryRunResult {
-            operations: vec![DeliveryOperation::AddDeliveryDiscounts(DeliveryDiscounts {
-                selection_strategy: DeliveryDiscountSelectionStrategy::ALL,
-                candidates: vec![DeliveryDiscountCandidate {
-                    targets: vec![DeliveryDiscountCandidateTarget::DeliveryGroup(
-                        DeliveryGroupTarget {
-                            id: "gid://shopify/DeliveryGroup/123".to_string(),
-                        },
-                    )],
-                    value: DeliveryDiscountCandidateValue::Percentage(DeliveryPercentage {
-                        value: Decimal(30.0),
-                    }),
-                    message: None,
-                    associated_discount_code: None,
-                }],
-            })],
+            operations: vec![
+                DeliveryOperation::AddValidDiscountCodes(DeliveryValidDiscountCodes {
+                    codes: vec![DeliveryValidDiscountCode {
+                        code: "WELCOME10".to_string(),
+                    }],
+                }),
+                DeliveryOperation::AddDeliveryDiscounts(DeliveryDiscounts {
+                    selection_strategy: DeliveryDiscountSelectionStrategy::ALL,
+                    candidates: vec![DeliveryDiscountCandidate {
+                        targets: vec![DeliveryDiscountCandidateTarget::DeliveryGroup(
+                            DeliveryGroupTarget {
+                                id: "gid://shopify/DeliveryGroup/123".to_string(),
+                            },
+                        )],
+                        value: DeliveryDiscountCandidateValue::Percentage(DeliveryPercentage {
+                            value: Decimal(30.0),
+                        }),
+                        message: None,
+                        associated_discount_code: Some(DeliveryAssociatedDiscountCode {
+                            code: "WELCOME10".to_string(),
+                        }),
+                    }],
+                }),
+            ],
         };
 
         assert_eq!(
             run_function_with_input(delivery_run, &get_run_input())?,
             expected
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_cart_fetch() -> Result<()> {
-        let fetch_input = get_fetch_input_json();
-        let buyer_identity = &fetch_input["cart"];
-
-        let expected_fetch_result = FunctionCartFetchResult {
-            request: Some(CartHttpRequest {
-                body: Some(buyer_identity.to_string()),
-                headers: vec![],
-                json_body: Some(buyer_identity.clone()),
-                method: CartHttpRequestMethod::POST,
-                policy: CartHttpRequestPolicy {
-                    read_timeout_ms: 2000,
-                },
-                url: "https://example.com".to_string(),
-            }),
-        };
-
-        assert_eq!(
-            run_function_with_input(cart_fetch, &fetch_input.to_string())?,
-            expected_fetch_result
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_delivery_fetch() -> Result<()> {
-        let fetch_input = get_fetch_input_json();
-        let buyer_identity = &fetch_input["cart"];
-
-        let expected_fetch_result = FunctionDeliveryFetchResult {
-            request: Some(DeliveryHttpRequest {
-                body: Some(buyer_identity.to_string()),
-                headers: vec![],
-                json_body: Some(buyer_identity.clone()),
-                method: DeliveryHttpRequestMethod::POST,
-                policy: DeliveryHttpRequestPolicy {
-                    read_timeout_ms: 2000,
-                },
-                url: "https://example.com".to_string(),
-            }),
-        };
-
-        assert_eq!(
-            run_function_with_input(delivery_fetch, &fetch_input.to_string())?,
-            expected_fetch_result
         );
         Ok(())
     }

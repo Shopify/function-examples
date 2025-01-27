@@ -1,4 +1,5 @@
 use std::process;
+pub mod fetch;
 pub mod run;
 
 fn main() {
