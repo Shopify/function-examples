@@ -1,0 +1,24 @@
+query Input {
+  fetchResult {
+    body
+    status
+  }
+  cart {
+    deliveryGroups {
+      id
+    }
+    lines {
+      id
+      cost {
+        subtotalAmount {
+          amount
+        }
+      }
+    }
+  }
+  discountNode {
+    metafield(namespace: "$app:{{handle | replace: " ", "-" | downcase}}", key: "function-configuration") {
+      value
+    }
+  }
+}
