@@ -2,7 +2,6 @@
 name = "bundles_cart_transform"
 version = "1.0.0"
 edition = "2021"
-rust-version = "1.62"
 
 [dependencies]
 serde = { version = "1.0.13", features = ["derive"] }
@@ -13,5 +12,5 @@ graphql_client = "0.14.0"
 
 [profile.release]
 lto = true
-opt-level = 's'
+opt-level = 'z'
 strip = true
