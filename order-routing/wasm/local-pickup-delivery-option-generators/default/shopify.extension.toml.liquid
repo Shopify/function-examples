@@ -1,11 +1,21 @@
-name = "{{name}}"
-type = "local_pickup_delivery_option_generator"
-{% if uid %}uid = "{{ uid }}"{% endif %}
 api_version = "unstable"
 
-[build]
-command = "echo 'build the wasm'"
+[[extensions]]
+name = "t:name"
+handle = "{{handle}}"
+type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
 
-[ui.paths]
-create = "/"
-details = "/"
+  [[extensions.targeting]]
+  target = "purchase.local-pickup-delivery-option-generator.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "echo 'build the wasm'"
+  path = ""
+  watch = []
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
