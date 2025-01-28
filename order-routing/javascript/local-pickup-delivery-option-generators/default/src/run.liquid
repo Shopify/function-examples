@@ -2,66 +2,60 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").InputQuery} InputQuery
- * @typedef {import("../generated/api").FunctionResult} FunctionResult
+ * @typedef {import("../generated/api").RunInput} RunInput
+ * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
  */
 
 /**
- * @type {FunctionResult}
+ * @param {RunInput} input
+ * @returns {FunctionRunResult}
  */
-const DELIVERY_OPTION = {
-  operations: [
-    {
-      add: {
-        title: "Main St.",
-        cost: 1.99,
-        pickupLocation: {
-          locationHandle: "2578303",
-          pickupInstruction: "Usually ready in 24 hours."
-        }
-      }
-    }
-  ],
-};
-
-export default /**
- * @param {InputQuery} input
- * @returns {FunctionResult}
- */
-(input) => {
+export function run(input) {
   const configuration = JSON.parse(
     input?.deliveryOptionGenerator?.metafield?.value ?? "{}"
   );
 
-  return DELIVERY_OPTION;
-};
-{%- elsif flavor contains "typescript" -%}
-import {
-  InputQuery,
-  FunctionResult,
-} from "../generated/api";
-
-const DELIVERY_OPTION: FunctionResult = {
-  operations: [
-    {
-      add: {
-        title: "Main St.",
-        cost: 1.99,
-        pickupLocation: {
-          locationHandle: "2578303",
-          pickupInstruction: "Usually ready in 24 hours."
+  return {
+    operations: [
+      {
+        add: {
+          title: "Main St.",
+          cost: 1.99,
+          pickupLocation: {
+            locationHandle: "2578303",
+            pickupInstruction: "Usually ready in 24 hours."
+          }
         }
       }
-    }
-  ],
-};
+    ],
+  };
+}
+{%- elsif flavor contains "typescript" -%}
+import {
+  RunInput,
+  FunctionRunResult,
+} from "../generated/api";
 
 type Configuration = {};
 
-export default (input: InputQuery): FunctionResult => {
+export function run(input: RunInput): FunctionRunResult {
   const configuration: Configuration = JSON.parse(
     input?.deliveryOptionGenerator?.metafield?.value ?? "{}"
   );
-  return DELIVERY_OPTION;
-};
+
+  return {
+    operations: [
+      {
+        add: {
+          title: "Main St.",
+          cost: 1.99,
+          pickupLocation: {
+            locationHandle: "2578303",
+            pickupInstruction: "Usually ready in 24 hours."
+          }
+        }
+      }
+    ],
+  };
+}
 {%- endif -%}
