@@ -1,6 +1,9 @@
 import path from 'path';
 import { getLanguageFromPath } from '../utils/file-utils.js';
 
+// All functions must have all three implementations
+const REQUIRED_LANGUAGES = ['rust', 'javascript', 'wasm'];
+
 export async function validateLanguageImplementations(analysis) {
   // Group functions by their base path (removing the language part)
   const functionGroups = new Map();
@@ -9,30 +12,28 @@ export async function validateLanguageImplementations(analysis) {
     const language = getLanguageFromPath(entry);
     if (!language) return;
 
-    // Get the base path by removing the language part
-    const basePath = entry.replace(`/${language}/`, '/*/');
+    // Get the function path by removing both language and file name
+    const functionPath = path.dirname(entry.replace(`/${language}/`, '/*/'));
     
-    if (!functionGroups.has(basePath)) {
-      functionGroups.set(basePath, new Set());
+    if (!functionGroups.has(functionPath)) {
+      functionGroups.set(functionPath, new Set());
     }
-    functionGroups.get(basePath).add(language);
+    functionGroups.get(functionPath).add(language);
   });
 
   // Check each function group for missing implementations
-  functionGroups.forEach((implementations, basePath) => {
-    const requiredLanguages = ['rust', 'javascript', 'wasm'];
-    const missingLanguages = requiredLanguages.filter(lang => !implementations.has(lang));
+  functionGroups.forEach((implementations, functionPath) => {
+    const missingLanguages = REQUIRED_LANGUAGES.filter(lang => !implementations.has(lang));
 
     if (missingLanguages.length > 0) {
-      const functionType = basePath.split('/').slice(-2)[0];
-      const suggestedPath = basePath.replace('/*/', '/');
+      const basePath = functionPath.replace('/*/', '/');
       
       analysis.inconsistencies.push({
-        file: suggestedPath,
-        issue: `Missing language implementations for ${functionType} function`,
+        file: basePath,
+        issue: `Function is missing required language implementations`,
         found: Array.from(implementations).join(', '),
-        expected: requiredLanguages.join(', '),
-        fix: `Create corresponding implementations in: ${missingLanguages.map(lang => suggestedPath.replace('*', lang)).join(', ')}`
+        expected: REQUIRED_LANGUAGES.join(', '),
+        fix: `Create implementations in: ${missingLanguages.map(lang => basePath.replace('*', lang)).join(', ')}`
       });
     }
   });

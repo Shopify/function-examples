@@ -59,6 +59,16 @@ export async function analyzeShopifyExtension(entry, analysis) {
     }
   }
 
+  // Check api_version
+  if (!content.includes('api_version = "2025-01"')) {
+    analysis.inconsistencies.push({
+      file: entry,
+      issue: 'Incorrect or missing api_version',
+      expected: 'api_version = "2025-01"',
+      fix: 'Set api_version to "2025-01" at the top of the file'
+    });
+  }
+
   // Check for type = "function"
   if (!content.includes('type = "function"')) {
     analysis.inconsistencies.push({
@@ -80,22 +90,30 @@ export async function analyzeShopifyExtension(entry, analysis) {
     });
   }
 
-  // Check for [[extensions]] section
-  if (!content.includes('[[extensions]]')) {
-    analysis.inconsistencies.push({
-      file: entry,
-      issue: 'Missing [[extensions]] section',
-      fix: 'Add the [[extensions]] section before any targeting sections'
-    });
-  }
-
-  // Check for [[extensions.targeting]] section
-  if (!content.includes('[[extensions.targeting]]')) {
-    analysis.inconsistencies.push({
-      file: entry,
-      issue: 'Missing [[extensions.targeting]] section',
+  // Check for required sections
+  const requiredSections = [
+    {
+      name: '[[extensions]]',
+      fix: 'Add the [[extensions]] section'
+    },
+    {
+      name: '[[extensions.targeting]]',
       fix: 'Add at least one [[extensions.targeting]] section'
-    });
+    },
+    {
+      name: '[extensions.build]',
+      fix: 'Add the [extensions.build] section'
+    }
+  ];
+
+  for (const section of requiredSections) {
+    if (!content.includes(section.name)) {
+      analysis.inconsistencies.push({
+        file: entry,
+        issue: `Missing required section: ${section.name}`,
+        fix: section.fix
+      });
+    }
   }
 
   // Check section order
@@ -108,22 +126,5 @@ export async function analyzeShopifyExtension(entry, analysis) {
       issue: 'Incorrect section order',
       fix: 'Move [[extensions]] section before [[extensions.targeting]] section'
     });
-  }
-
-  // Check for any GraphQL query references
-  const queryMatches = content.match(/input_query\s*=\s*"([^"]+)"/g) || [];
-  for (const match of queryMatches) {
-    const queryPath = match.split('"')[1];
-    const queryPathWithLiquid = `${queryPath}.liquid`;
-    const fullPath = path.join(functionDir, queryPathWithLiquid);
-    
-    const hasQueryFile = await checkFileExists(fullPath);
-    if (!hasQueryFile) {
-      analysis.inconsistencies.push({
-        file: fullPath,
-        issue: 'Missing GraphQL query file',
-        fix: `Create the GraphQL query file at ${queryPathWithLiquid}`
-      });
-    }
   }
 } 

@@ -5,6 +5,7 @@ import { analyzeLocales } from './analyzers/locales.js';
 import { analyzeGraphQL } from './analyzers/graphql.js';
 import { analyzeShopifyExtension } from './analyzers/shopify-extension.js';
 import { validateLanguageImplementations } from './analyzers/language-implementations.js';
+import { analyzeGitignore } from './analyzers/gitignore.js';
 import { formatResults } from './formatters/output.js';
 
 async function findTemplateFiles() {
@@ -54,6 +55,9 @@ export async function analyzeAllTemplates(entries = null) {
 
     // Analyze GraphQL files
     await analyzeGraphQL(functionDir, analysis);
+
+    // Analyze .gitignore
+    await analyzeGitignore(functionDir, analysis);
   }
 
   // Validate language implementations

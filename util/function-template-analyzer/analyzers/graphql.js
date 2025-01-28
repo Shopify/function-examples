@@ -1,10 +1,9 @@
 import path from 'path';
-import { readFileIfExists, checkFileExists } from '../utils/file-utils.js';
+import { readFileIfExists, checkFileExists, getLanguageFromPath } from '../utils/file-utils.js';
 
 export async function analyzeGraphQL(functionDir, analysis) {
   const schemaPath = path.join(functionDir, 'schema.graphql');
-  const runGraphqlPath = path.join(functionDir, 'src', 'run.graphql.liquid');
-
+  
   // Check for schema.graphql
   const schemaContent = await readFileIfExists(schemaPath);
   if (!schemaContent) {
@@ -27,16 +26,54 @@ export async function analyzeGraphQL(functionDir, analysis) {
     }
   }
 
-  // Check for run.graphql.liquid
-  const hasRunGraphql = await checkFileExists(runGraphqlPath);
-  if (!hasRunGraphql) {
-    analysis.inconsistencies.push({
-      file: runGraphqlPath,
-      issue: 'Missing required run.graphql.liquid file'
-    });
-  }
+  const language = getLanguageFromPath(functionDir);
 
-  // Check for any additional .graphql.liquid files referenced in shopify.extension.toml
+  // Check GraphQL query files and their content
+  const checkQueryFile = async (basePath, exportName) => {
+    // Try both .graphql and .graphql.liquid versions
+    const liquidPath = `${basePath}.liquid`;
+    const nonLiquidPath = basePath;
+    
+    const liquidContent = await readFileIfExists(liquidPath);
+    const nonLiquidContent = await readFileIfExists(nonLiquidPath);
+    
+    // If neither file exists, return early
+    if (!liquidContent && !nonLiquidContent) {
+      return;
+    }
+
+    // Use whichever content exists (prefer non-liquid if both exist)
+    const content = nonLiquidContent || liquidContent;
+    const filePath = nonLiquidContent ? nonLiquidPath : liquidPath;
+
+    // Determine expected query name based on language and export name
+    let expectedQueryName;
+    if (language === 'javascript') {
+      expectedQueryName = `${exportName}Input`;
+    } else {
+      // Both rust and wasm use 'Input'
+      expectedQueryName = 'Input';
+    }
+
+    // Check if the query has the expected name, allowing for whitespace
+    const queryMatch = content.match(/query\s+([^\s{(]+)/);
+    if (!queryMatch || queryMatch[1] !== expectedQueryName) {
+      analysis.inconsistencies.push({
+        file: filePath,
+        issue: `Incorrect query name for ${language} function`,
+        expected: `query ${expectedQueryName}`,
+        fix: `Rename the query to "query ${expectedQueryName}"`
+      });
+    }
+  };
+
+  // Check run.graphql
+  await checkQueryFile(path.join(functionDir, 'src', 'run.graphql'), 'Run');
+
+  // Check fetch.graphql if it exists
+  await checkQueryFile(path.join(functionDir, 'src', 'fetch.graphql'), 'Fetch');
+
+  // Check for any additional .graphql files referenced in shopify.extension.toml
   const extensionTomlPath = path.join(functionDir, 'shopify.extension.toml.liquid');
   const extensionContent = await readFileIfExists(extensionTomlPath);
   if (extensionContent) {
@@ -44,13 +81,21 @@ export async function analyzeGraphQL(functionDir, analysis) {
     
     for (const match of inputQueryMatches) {
       const queryPath = match.split('"')[1];
-      const fullPath = path.join(functionDir, queryPath);
+      // Get the base path without any .liquid extension
+      const basePath = path.join(functionDir, queryPath.replace(/\.liquid$/, ''));
       
-      const hasQueryFile = await checkFileExists(fullPath);
-      if (!hasQueryFile) {
+      // Check for either version of the file
+      const hasLiquidFile = await checkFileExists(`${basePath}.liquid`);
+      const hasNonLiquidFile = await checkFileExists(basePath);
+      
+      // If either version exists, it's valid
+      if (!hasLiquidFile && !hasNonLiquidFile) {
+        // If neither exists, suggest creating either version
+        const suggestedPath = queryPath.endsWith('.liquid') ? queryPath : `${queryPath}.liquid`;
         analysis.inconsistencies.push({
-          file: fullPath,
-          issue: `Missing GraphQL query file referenced in shopify.extension.toml.liquid`
+          file: path.join(functionDir, queryPath),
+          issue: `Missing GraphQL query file referenced in shopify.extension.toml.liquid`,
+          fix: `Create either ${queryPath.replace(/\.liquid$/, '')} or ${suggestedPath}`
         });
       }
     }
