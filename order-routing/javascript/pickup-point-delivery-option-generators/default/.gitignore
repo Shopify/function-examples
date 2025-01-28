@@ -1,6 +1,2 @@
 dist
 generated
-node_modules
-
-!/src/*.js
-!/src/*.graphql
