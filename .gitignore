@@ -14,6 +14,8 @@ node_modules
 **/shopify.extension.toml
 */javascript/**/package.json
 */javascript/**/src/*
+*/typescript/**/package.json
+*/typescript/**/src/*
 */rust/**/src/*.graphql
 */wasm/**/*.graphql
 !*/wasm/**/schema.graphql

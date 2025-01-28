@@ -13,8 +13,9 @@ description = "t:description"
   export = "run"
 
   [extensions.build]
-  command = ""
-  path = "dist/function.wasm"
+  command = "echo 'build the wasm'"
+  path = ""
+  watch = []
 
   [extensions.ui.paths]
   create = "/"

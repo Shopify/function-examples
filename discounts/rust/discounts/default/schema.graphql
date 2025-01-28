@@ -1,10 +1,3 @@
-# This file is auto-generated from the current state of the GraphQL API. Instead of editing this file,
-# please edit the ruby definition files and run `bin/rails graphql:schema:dump` to regenerate the schema.
-#
-# If you're just looking to browse, you may find it friendlier to use the graphiql browser which is
-# available in services-internal at https://app.shopify.com/services/internal/shops/14168/graphql.
-# Check out the "Docs" tab in the top right.
-
 schema {
   query: Input
   mutation: MutationRoot
