@@ -1,0 +1,13 @@
+{
+  "name": "function-template-analyzer",
+  "version": "1.0.0",
+  "description": "Analyzes Shopify function templates for consistency and completeness",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "analyze": "node index.js"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.2"
+  }
+} 
