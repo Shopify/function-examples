@@ -1,7 +1,7 @@
 api_version = "unstable"
 
 [[extensions]]
-name = "{{name}}"
+name = "t:name"
 handle = "{{handle}}"
 type = "function"
 {% if uid %}uid = "{{ uid }}"{% endif %}
@@ -18,7 +18,7 @@ export = "run"
 
 [extensions.build]
 command = "cargo build --target=wasm32-wasip1 --release"
-path = "target/wasm32-wasip1/release/{{handle | replace: "-", "_" | downcase}}.wasm"
+path = "target/wasm32-wasip1/release/{{handle | replace: " ", "_" | downcase}}.wasm"
 watch = ["src/**/*.rs"]
 
 [extensions.ui.paths]
