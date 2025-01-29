@@ -1,4 +1,4 @@
-use serde_json::json;
+use serde::Serialize;
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
@@ -18,24 +18,30 @@ type DeliveryFetchResponseData = delivery_fetch::input::ResponseData;
 type CartHttpRequestHeader = cart_fetch::output::HttpRequestHeader;
 type DeliveryHttpRequestHeader = delivery_fetch::output::HttpRequestHeader;
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RequestBody {
+    entered_discount_codes: Vec<String>,
+}
+
 #[shopify_function_target(
     target = "cart_fetch",
     query_path = "src/fetch.graphql",
     schema_path = "schema.graphql"
 )]
 fn cart_fetch(input: CartFetchResponseData) -> Result<FunctionCartFetchResult> {
-    let body = json!({
-        "enteredDiscountCodes": input.entered_discount_codes
-    });
+    let request_body = RequestBody {
+        entered_discount_codes: input.entered_discount_codes,
+    };
 
     Ok(FunctionCartFetchResult {
         request: Some(CartHttpRequest {
-            body: Some(body.to_string()),
+            body: Some(serde_json::to_string(&request_body)?),
             headers: vec![CartHttpRequestHeader {
                 name: "Accept".to_string(),
                 value: "application/json; charset=utf-8".to_string(),
             }],
-            json_body: Some(body.clone()),
+            json_body: Some(serde_json::to_value(&request_body)?),
             method: CartHttpRequestMethod::POST,
             policy: CartHttpRequestPolicy {
                 read_timeout_ms: 2000,
@@ -51,18 +57,18 @@ fn cart_fetch(input: CartFetchResponseData) -> Result<FunctionCartFetchResult> {
     schema_path = "schema.graphql"
 )]
 fn delivery_fetch(input: DeliveryFetchResponseData) -> Result<FunctionDeliveryFetchResult> {
-    let body = json!({
-        "enteredDiscountCodes": input.entered_discount_codes
-    });
+    let request_body = RequestBody {
+        entered_discount_codes: input.entered_discount_codes,
+    };
 
     Ok(FunctionDeliveryFetchResult {
         request: Some(DeliveryHttpRequest {
-            body: Some(body.to_string()),
+            body: Some(serde_json::to_string(&request_body)?),
             headers: vec![DeliveryHttpRequestHeader {
                 name: "Accept".to_string(),
                 value: "application/json; charset=utf-8".to_string(),
             }],
-            json_body: Some(body.clone()),
+            json_body: Some(serde_json::to_value(&request_body)?),
             method: DeliveryHttpRequestMethod::POST,
             policy: DeliveryHttpRequestPolicy {
                 read_timeout_ms: 2000,
@@ -75,6 +81,7 @@ fn delivery_fetch(input: DeliveryFetchResponseData) -> Result<FunctionDeliveryFe
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
     use shopify_function::{run_function_with_input, Result};
 
     fn get_fetch_input_json() -> serde_json::Value {
