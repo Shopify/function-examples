@@ -9,6 +9,7 @@ import path from 'path';
 import fs from 'node:fs/promises';
 import { existsSync } from 'fs';
 import toml from '@iarna/toml';
+import { exec } from 'child_process';
 
 async function expandLiquidTemplates(template, liquidData) {
   const entries = await glob([path.join(template, "**/*.liquid")], {
@@ -106,6 +107,26 @@ async function expandExtensionLiquidTemplates(domainName, flavor) {
   console.log();
 }
 
+function ensureNoGitChanges() {
+  exec('git status --porcelain', (error, stdout, _stderr) => {
+    if (error) {
+      console.error(`error calling \`git status\`: ${error}`);
+      process.exit(1);;
+    }
+    if (stdout) {
+      console.error('Untracked files detected:\n', stdout);
+      exec('git diff', (error, stdout, _stderr) => {
+        if (error) {
+          console.error(`error calling \`git diff\`: ${error}`);
+        } else {
+          console.log(`Git diff:\n${stdout}`);
+        }
+        process.exit(1);
+      });
+    }
+  });
+}
+
 const flavor = process.argv[2] || "vanilla-js";
 
 const SAMPLE_APP_DIR = 'sample-apps';
@@ -116,4 +137,8 @@ for (const domain of DOMAINS) {
   await expandExtensionLiquidTemplates(domain, flavor);
 }
 
-console.log('The above files should be added to .gitignore if they have not already been added.');
+console.log('The above files should be added to .gitignore if they have not already been added.\n');
+
+if (process.env.CI) {
+  ensureNoGitChanges();
+}

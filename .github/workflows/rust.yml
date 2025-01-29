@@ -19,7 +19,7 @@ jobs:
       - name: Install node dependencies
         run: yarn
       - name: Expand liquid
-        run: yarn expand-liquid rust
+        run: CI=1 yarn expand-liquid rust
       - name: Run cargo fmt
         run: cargo fmt --check
       - name: Run clippy
