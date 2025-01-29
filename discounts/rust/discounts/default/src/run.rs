@@ -1,4 +1,3 @@
-use anyhow::Context;
 use serde::Deserialize;
 
 use shopify_function::prelude::*;
@@ -27,35 +26,37 @@ type CartResponseData = cart_run::input::ResponseData;
 type DeliveryResponseData = delivery_run::input::ResponseData;
 
 impl CartResponseData {
-    fn metafield(&self) -> anyhow::Result<Metafield> {
+    fn metafield(&self) -> Result<Metafield> {
         let metafield = self
             .discount_node
             .metafield
             .as_ref()
-            .context("Missing metafield")?;
-        serde_json::from_str(&metafield.value).context("Metafield value cannot be parsed")
+            .ok_or("Missing metafield")?;
+        serde_json::from_str(&metafield.value)
+            .map_err(|_| "Metafield value cannot be parsed".into())
     }
-    fn valid_discount_codes(&self) -> anyhow::Result<Vec<String>> {
-        let fetch_result = self.fetch_result.as_ref().context("Missing fetch result")?;
-        let body = fetch_result.body.as_ref().context("Missing body")?;
-        serde_json::from_str(body).context("Fetch result body cannot be parsed")
+    fn valid_discount_codes(&self) -> Result<Vec<String>> {
+        let fetch_result = self.fetch_result.as_ref().ok_or("Missing fetch result")?;
+        let body = fetch_result.body.as_ref().ok_or("Missing body")?;
+        serde_json::from_str(body).map_err(|_| "Fetch result body cannot be parsed".into())
     }
 }
 
 impl DeliveryResponseData {
-    fn metafield(&self) -> anyhow::Result<Metafield> {
-        let metafield = &self
+    fn metafield(&self) -> Result<Metafield> {
+        let metafield = self
             .discount_node
             .metafield
             .as_ref()
-            .context("Missing metafield")?;
-        serde_json::from_str(&metafield.value).context("Metafield value cannot be parsed")
+            .ok_or("Missing metafield")?;
+        serde_json::from_str(&metafield.value)
+            .map_err(|_| "Metafield value cannot be parsed".into())
     }
 
-    fn valid_discount_codes(&self) -> anyhow::Result<Vec<String>> {
-        let fetch_result = self.fetch_result.as_ref().expect("Missing fetch result");
-        let body = fetch_result.body.as_ref().expect("Missing body");
-        serde_json::from_str(body).context("Fetch result body cannot be parsed")
+    fn valid_discount_codes(&self) -> Result<Vec<String>> {
+        let fetch_result = self.fetch_result.as_ref().ok_or("Missing fetch result")?;
+        let body = fetch_result.body.as_ref().ok_or("Missing body")?;
+        serde_json::from_str(body).map_err(|_| "Fetch result body cannot be parsed".into())
     }
 }
 
