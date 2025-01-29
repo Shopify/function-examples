@@ -1,3 +1,4 @@
+use anyhow::Context;
 use serde::Deserialize;
 
 use shopify_function::prelude::*;
@@ -26,53 +27,44 @@ type CartResponseData = cart_run::input::ResponseData;
 type DeliveryResponseData = delivery_run::input::ResponseData;
 
 impl CartResponseData {
-    fn metafield(&self) -> Metafield {
-        self.discount_node
+    fn metafield(&self) -> anyhow::Result<Metafield> {
+        let metafield = self
+            .discount_node
             .metafield
             .as_ref()
-            .map(|metafield| serde_json::from_str(&metafield.value))
-            .unwrap()
-            .expect("Missing required metafield configuration")
+            .context("Missing metafield")?;
+        serde_json::from_str(&metafield.value).context("Metafield value cannot be parsed")
     }
-    fn valid_discount_codes(&self) -> Vec<String> {
-        self.fetch_result
-            .as_ref()
-            .unwrap()
-            .body
-            .as_ref()
-            .map(|available_codes| serde_json::from_str(available_codes))
-            .unwrap()
-            .expect("Missing required metafield configuration")
+    fn valid_discount_codes(&self) -> anyhow::Result<Vec<String>> {
+        let fetch_result = self.fetch_result.as_ref().context("Missing fetch result")?;
+        let body = fetch_result.body.as_ref().context("Missing body")?;
+        serde_json::from_str(body).context("Fetch result body cannot be parsed")
     }
 }
 
 impl DeliveryResponseData {
-    fn metafield(&self) -> Metafield {
-        self.discount_node
+    fn metafield(&self) -> anyhow::Result<Metafield> {
+        let metafield = &self
+            .discount_node
             .metafield
             .as_ref()
-            .map(|metafield| serde_json::from_str(&metafield.value))
-            .unwrap()
-            .expect("Missing required metafield configuration")
+            .context("Missing metafield")?;
+        serde_json::from_str(&metafield.value).context("Metafield value cannot be parsed")
     }
 
-    fn valid_discount_codes(&self) -> Vec<String> {
-        self.fetch_result
-            .as_ref()
-            .unwrap()
-            .body
-            .as_ref()
-            .map(|available_codes| serde_json::from_str(available_codes))
-            .unwrap()
-            .expect("Missing required metafield configuration")
+    fn valid_discount_codes(&self) -> anyhow::Result<Vec<String>> {
+        let fetch_result = self.fetch_result.as_ref().expect("Missing fetch result");
+        let body = fetch_result.body.as_ref().expect("Missing body");
+        serde_json::from_str(body).context("Fetch result body cannot be parsed")
     }
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Metafield {
-    cart_percent: Option<Decimal>,
-    product_percent: Option<Decimal>,
-    delivery_percent: Option<Decimal>,
+    order_percentage: Option<Decimal>,
+    product_percentage: Option<Decimal>,
+    delivery_percentage: Option<Decimal>,
 }
 
 #[shopify_function_target(
@@ -81,15 +73,14 @@ struct Metafield {
     schema_path = "schema.graphql"
 )]
 fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
-    let default = FunctionCartRunResult { operations: vec![] };
-    let codes = input.valid_discount_codes();
+    let codes = input.valid_discount_codes()?;
     let available_discount_code = codes.first();
 
     if available_discount_code.is_none() {
-        return Ok(default);
+        return Ok(FunctionCartRunResult { operations: vec![] });
     }
 
-    let metafield = input.metafield();
+    let metafield = input.metafield()?;
     let mut operations: Vec<CartOperation> = vec![];
     let available_discount_code = available_discount_code.unwrap();
 
@@ -101,11 +92,11 @@ fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
         },
     ));
 
-    if metafield.cart_percent.is_some() {
+    if metafield.order_percentage.is_some() {
         operations.push(create_order_discount(&metafield, available_discount_code));
     }
 
-    if metafield.product_percent.is_some() {
+    if metafield.product_percentage.is_some() {
         let highest_priced_line = input
             .cart
             .lines
@@ -132,13 +123,12 @@ fn cart_run(input: CartResponseData) -> Result<FunctionCartRunResult> {
     schema_path = "schema.graphql"
 )]
 fn delivery_run(input: DeliveryResponseData) -> Result<FunctionDeliveryRunResult> {
-    let default = FunctionDeliveryRunResult { operations: vec![] };
-    let codes = input.valid_discount_codes();
+    let codes = input.valid_discount_codes()?;
     let available_discount_code = codes.first();
-    let metafield = input.metafield();
+    let metafield = input.metafield()?;
 
-    if available_discount_code.is_none() || metafield.delivery_percent.is_none() {
-        return Ok(default);
+    if available_discount_code.is_none() || metafield.delivery_percentage.is_none() {
+        return Ok(FunctionDeliveryRunResult { operations: vec![] });
     }
 
     let mut operations: Vec<DeliveryOperation> = vec![];
@@ -183,7 +173,7 @@ fn create_order_discount(metafield: &Metafield, available_discount_code: &str) -
             }),
             message: None,
             value: OrderDiscountCandidateValue::Percentage(CartPercentage {
-                value: metafield.cart_percent.unwrap(),
+                value: metafield.order_percentage.unwrap(),
             }),
             conditions: None,
         }],
@@ -207,7 +197,7 @@ fn create_product_discount(
             }),
             message: None,
             value: ProductDiscountCandidateValue::Percentage(CartPercentage {
-                value: metafield.product_percent.unwrap(),
+                value: metafield.product_percentage.unwrap(),
             }),
         }],
     })
@@ -225,7 +215,7 @@ fn create_delivery_discount_candidate(
             },
         )],
         value: DeliveryDiscountCandidateValue::Percentage(DeliveryPercentage {
-            value: metafield.delivery_percent.unwrap(),
+            value: metafield.delivery_percentage.unwrap(),
         }),
         message: None,
         associated_discount_code: Some(DeliveryAssociatedDiscountCode {
@@ -271,9 +261,9 @@ mod tests {
             "discountNode": {
                 "metafield": {
                     "value": json!({
-                        "cart_percent": "10",
-                        "product_percent": "20",
-                        "delivery_percent": "30",
+                        "orderPercentage": "10",
+                        "productPercentage": "20",
+                        "deliveryPercentage": "30",
                     }).to_string(),
                 }
             },
