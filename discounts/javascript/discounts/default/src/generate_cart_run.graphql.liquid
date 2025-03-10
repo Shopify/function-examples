@@ -1,0 +1,14 @@
+# [START discount-function.graphql.cart]
+query CartInput {
+  cart {
+    lines {
+      id
+      cost {
+        subtotalAmount {
+          amount
+        }
+      }
+    }
+  }
+}
+# [END discount-function.graphql.cart]

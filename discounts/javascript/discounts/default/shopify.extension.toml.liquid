@@ -1,0 +1,24 @@
+api_version = "unstable"
+
+[[extensions]]
+name = "t:name"
+handle = "{{handle}}"
+type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "purchase.discount.cart_run"
+  input_query = "src/generate_cart_run.graphql"
+  export = "generate-cart-run"
+
+  [[extensions.targeting]]
+  target = "purchase.discount.delivery_run"
+  input_query = "src/generate_delivery_run.graphql"
+  export = "generate-delivery-run"
+
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+  path = "dist/{{handle | replace: " ", "-" | downcase}}.wasm"
