@@ -1,0 +1,80 @@
+{%- if flavor contains "vanilla-js" -%}
+import {DeliveryDiscountSelectionStrategy} from '../generated/api';
+
+
+export function generateDeliveryRun(input) {
+  const firstDeliveryGroup = input.cart.deliveryGroups[0];
+  if (!firstDeliveryGroup) {
+    throw new Error('No delivery groups found');
+  }
+
+  return {
+    operations: [
+      {
+        addDeliveryDiscounts: {
+          candidates: [
+            {
+              message: 'FREE DELIVERY',
+              targets: [
+                {
+                  deliveryGroup: {
+                    id: firstDeliveryGroup.id,
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 100,
+                },
+              },
+            },
+          ],
+          selectionStrategy: DeliveryDiscountSelectionStrategy.All,
+        },
+      },
+    ],
+  };
+}
+{%- elsif flavor contains "typescript" -%}
+import {
+  DeliveryDiscountSelectionStrategy,
+  DeliveryInput,
+  FunctionDeliveryRunResult,
+} from '../generated/api';
+
+export function generateDeliveryRun(
+  input: DeliveryInput,
+): FunctionDeliveryRunResult {
+  const firstDeliveryGroup = input.cart.deliveryGroups[0];
+  if (!firstDeliveryGroup) {
+    throw new Error('No delivery groups found');
+  }
+
+  return {
+    operations: [
+      {
+        addDeliveryDiscounts: {
+          candidates: [
+            {
+              message: 'FREE DELIVERY',
+              targets: [
+                {
+                  deliveryGroup: {
+                    id: firstDeliveryGroup.id,
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 100,
+                },
+              },
+            },
+          ],
+          selectionStrategy: DeliveryDiscountSelectionStrategy.All,
+        },
+      },
+    ],
+  };
+}
+{% endif %}
