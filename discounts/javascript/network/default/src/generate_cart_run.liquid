@@ -1,0 +1,37 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+/**
+ * @typedef {import("../generated/api").InputCartRun} InputCartRun
+ * @typedef {import("../generated/api").FunctionCartRunResult} FunctionCartRunResult
+ */
+/**
+ * Processes the fetched cart discount data and generates operations
+ * @param {InputCartRun} input - The cart run input data including fetch results
+ * @returns {FunctionCartRunResult} - The function result with discount operations
+ */
+export function generateCartRun(input) {
+    const { fetchResult } = input;
+    const body = fetchResult?.body;
+    if (!body) {
+        throw new Error('Missing response body');
+    }
+    // Parse the response body and extract the operations
+    const { operations } = JSON.parse(body);
+    return { operations };
+}
+{%- elsif flavor contains "typescript" -%}
+import {InputCartRun, FunctionCartRunResult} from '../generated/api';
+
+export function generateCartRun(input: InputCartRun): FunctionCartRunResult {
+  const {fetchResult} = input;
+  const body = fetchResult?.body;
+
+  if (!body) {
+    throw new Error('Missing response body');
+  }
+
+  // Parse the response body and extract the operations
+  const {operations} = JSON.parse(body);
+  return {operations};
+}
+{%- endif -%}

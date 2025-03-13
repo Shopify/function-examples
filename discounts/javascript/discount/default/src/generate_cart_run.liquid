@@ -1,0 +1,147 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+import {
+  OrderDiscountSelectionStrategy,
+  ProductDiscountSelectionStrategy,
+} from '../generated/api';
+
+/**
+ * @typedef {import("../generated/api").CartInput} CartInput
+ * @typedef {import("../generated/api").FunctionCartRunResult} FunctionCartRunResult
+ */
+
+/**
+ * generateCartRun
+ * @param {CartInput} input - The CartInput
+ * @returns {FunctionCartRunResult} - The function result with discounts.
+ */
+export function generateCartRun(input) {
+    if (!input.cart.lines.length) {
+        throw new Error('No cart lines found');
+    }
+    const maxCartLine = input.cart.lines.reduce((maxLine, line) => {
+        if (line.cost.subtotalAmount > maxLine.cost.subtotalAmount) {
+            return line;
+        }
+        return maxLine;
+    }, input.cart.lines[0]);
+    return {
+        operations: [
+            {
+                addOrderDiscounts: {
+                    candidates: [
+                        {
+                            message: '10% OFF ORDER',
+                            targets: [
+                                {
+                                    orderSubtotal: {
+                                        excludedCartLineIds: [],
+                                    },
+                                },
+                            ],
+                            value: {
+                                percentage: {
+                                    value: 10,
+                                },
+                            },
+                        },
+                    ],
+                    selectionStrategy: OrderDiscountSelectionStrategy.First,
+                },
+            },
+            {
+                addProductDiscounts: {
+                    candidates: [
+                        {
+                            message: '20% OFF PRODUCT',
+                            targets: [
+                                {
+                                    cartLine: {
+                                        id: maxCartLine.id,
+                                    },
+                                },
+                            ],
+                            value: {
+                                percentage: {
+                                    value: 20,
+                                },
+                            },
+                        },
+                    ],
+                    selectionStrategy: ProductDiscountSelectionStrategy.First,
+                },
+            },
+        ],
+    };
+}
+{%- elsif flavor contains "typescript" -%}
+import {
+  OrderDiscountSelectionStrategy,
+  ProductDiscountSelectionStrategy,
+  CartInput,
+  FunctionCartRunResult,
+} from '../generated/api';
+
+export function generateCartRun(input: CartInput): FunctionCartRunResult {
+  if (!input.cart.lines.length) {
+    throw new Error('No cart lines found');
+  }
+
+  const maxCartLine = input.cart.lines.reduce((maxLine, line) => {
+    if (line.cost.subtotalAmount > maxLine.cost.subtotalAmount) {
+      return line;
+    }
+    return maxLine;
+  }, input.cart.lines[0]);
+
+  return {
+    operations: [
+      {
+        addOrderDiscounts: {
+          candidates: [
+            {
+              message: '10% OFF ORDER',
+              targets: [
+                {
+                  orderSubtotal: {
+                    excludedCartLineIds: [],
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 10,
+                },
+              },
+            },
+          ],
+          selectionStrategy: OrderDiscountSelectionStrategy.First,
+        },
+      },
+      {
+        addProductDiscounts: {
+          candidates: [
+            {
+              message: '20% OFF PRODUCT',
+              targets: [
+                {
+                  cartLine: {
+                    id: maxCartLine.id,
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 20,
+                },
+              },
+            },
+          ],
+          selectionStrategy: ProductDiscountSelectionStrategy.First,
+        },
+      },
+    ],
+  };
+}
+{%- endif -%}

@@ -71,19 +71,12 @@ type BuyerIdentity {
   The purchasing company associated with the cart.
   """
   purchasingCompany: PurchasingCompany
-
-  """
-  Represents the [Shop User](https://help.shopify.com/en/manual/online-sales-channels/shop/sign-in-features)
-   corresponding to the customer within the shop, if the buyer is a Shop User. Can be used to request [Shop User
-   metafields](https://shopify.dev/docs/api/shop-user-custom-data).
-  """
-  shopUser: ShopUser
 }
 
 """
 A cart represents the merchandise that a buyer intends to purchase, and the cost associated with the cart.
 """
-type Cart implements HasMetafields {
+type Cart {
   """
   The attributes associated with the cart. Attributes are represented as key-value pairs.
   """
@@ -128,21 +121,6 @@ type Cart implements HasMetafields {
     """
     keys: [LocalizedFieldKey!]! = []
   ): [LocalizedField!]!
-
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
 }
 
 """
@@ -305,6 +283,38 @@ type CartLineCost {
 }
 
 """
+The condition for checking the minimum quantity of products across a group of cart lines.
+"""
+input CartLineMinimumQuantity {
+  """
+  Cart line IDs with a merchandise line price that's included to calculate the
+  minimum quantity purchased to receive the discount.
+  """
+  ids: [ID!]!
+
+  """
+  The minimum quantity of a product.
+  """
+  minimumQuantity: Int!
+}
+
+"""
+The condition for checking the minimum subtotal of products across a group of cart lines.
+"""
+input CartLineMinimumSubtotal {
+  """
+  Cart line IDs with a merchandise line price that's included to calculate the
+  minimum subtotal purchased to receive the discount.
+  """
+  ids: [ID!]!
+
+  """
+  The minimum subtotal amount of the product.
+  """
+  minimumAmount: Decimal!
+}
+
+"""
 A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that applies to a specific cart line, up to an optional quantity limit.
 """
 input CartLineTarget {
@@ -327,6 +337,12 @@ The operations that can be performed to apply discounts to the cart.
 """
 input CartOperation @oneOf {
   """
+  A list of valid discount codes that correspond to external discounts. This can
+  only be used by Functions with network access.
+  """
+  addDiscountCodeValidations: ValidDiscountCodes
+
+  """
   A group of order discounts that share a selection strategy.
   """
   addOrderDiscounts: OrderDiscounts
@@ -335,12 +351,6 @@ input CartOperation @oneOf {
   A group of product discounts that share a selection strategy.
   """
   addProductDiscounts: ProductDiscounts
-
-  """
-  A list of valid discount codes that correspond to external discounts. This can
-  only be used by Functions with network access.
-  """
-  addValidDiscountCodes: ValidDiscountCodes
 }
 
 """
@@ -481,11 +491,6 @@ type CompanyLocation implements HasMetafields {
   name: String!
 
   """
-  The number of orders placed at this company location.
-  """
-  orderCount: Int!
-
-  """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
   at which the company location was last modified.
   """
@@ -497,19 +502,19 @@ The condition to apply the discount candidate.
 """
 input Condition @oneOf {
   """
+  The condition for checking the minimum quantity of products across a group of cart lines.
+  """
+  cartLineMinimumQuantity: CartLineMinimumQuantity
+
+  """
+  The condition for checking the minimum subtotal of products across a group of cart lines.
+  """
+  cartLineMinimumSubtotal: CartLineMinimumSubtotal
+
+  """
   The condition for checking the minimum subtotal amount of the order.
   """
   orderMinimumSubtotal: OrderMinimumSubtotal
-
-  """
-  The condition for checking the minimum quantity of a product.
-  """
-  productMinimumQuantity: ProductMinimumQuantity
-
-  """
-  The condition for checking the minimum subtotal amount of the product.
-  """
-  productMinimumSubtotal: ProductMinimumSubtotal
 }
 
 """
@@ -1665,11 +1670,6 @@ enum CountryCode {
   UM
 
   """
-  Unknown country code.
-  """
-  UNKNOWN__
-
-  """
   United States.
   """
   US
@@ -1889,10 +1889,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR
-    @deprecated(
-      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
-    )
+  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
 
   """
   Belize Dollar (BZD).
@@ -2417,10 +2414,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD
-    @deprecated(
-      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
-    )
+  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2515,10 +2509,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF
-    @deprecated(
-      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
-    )
+  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
   Venezuelan Bolivares Soberanos (VES).
@@ -2886,7 +2877,7 @@ input DeliveryOperation @oneOf {
   A list of valid discount codes that correspond to external discounts. This can
   only be used by Functions with network access.
   """
-  addValidDiscountCodes: ValidDiscountCodes
+  addDiscountCodeValidations: ValidDiscountCodes
 }
 
 """
@@ -2897,6 +2888,31 @@ input DeliveryOptionTarget {
   The handle of the target delivery option.
   """
   handle: Handle!
+}
+
+"""
+The discount that invoked the Function.
+"""
+type Discount implements HasMetafields {
+  """
+  The discount classes supported by the discount node.
+  """
+  discountClasses: [DiscountClass!]!
+
+  """
+  Returns a metafield by namespace and key that belongs to the resource.
+  """
+  metafield(
+    """
+    The key for the metafield.
+    """
+    key: String!
+
+    """
+    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
+    """
+    namespace: String
+  ): Metafield
 }
 
 """
@@ -2924,31 +2940,6 @@ enum DiscountClass {
   class.
   """
   SHIPPING
-}
-
-"""
-A discount wrapper node.
-"""
-type DiscountNode implements HasMetafields {
-  """
-  The discount classes supported by the discount node.
-  """
-  discountClasses: [DiscountClass!]!
-
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
 }
 
 """
@@ -3051,8 +3042,7 @@ type GateSubject {
     """
     The appId of the gate configurations to search for.
     """
-    appId: String
-      @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
+    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
   ): GateConfiguration!
 
   """
@@ -3226,9 +3216,9 @@ type HttpResponse {
   headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
 
   """
-  The HTTP response body parsed as JSON.
-  If the body is valid JSON, it will be parsed and returned as a JSON object.
-  If parsing fails, then raw body is returned as a string.
+  The HTTP response body parsed as JSON. 
+  If the body is valid JSON, it will be parsed and returned as a JSON object. 
+  If parsing fails, then raw body is returned as a string. 
   Use this field when you expect the response to be JSON, or when you're dealing
   with mixed response types, meaning both JSON and non-JSON.
   Using this field reduces function instruction consumption and ensures that the data is formatted in logs.
@@ -3278,25 +3268,19 @@ type Input {
   """
   The discount node executing the Function.
   """
-  discountNode: DiscountNode!
+  discount: Discount!
 
   """
   Discount codes entered by the buyer as an array of strings, excluding gift cards.
   Codes are not validated in any way other than gift card filtering.
   """
-  enteredDiscountCodes: [String!]!
-    @restrictTarget(
-      only: ["purchase.discount.cart_fetch", "purchase.discount.delivery_fetch"]
-    )
+  enteredDiscountCodes: [String!]! @restrictTarget(only: ["cart.lines.discounts.generate.fetch", "cart.delivery-options.discounts.generate.fetch"])
 
   """
   The result of the fetch target. Refer to [network access](https://shopify.dev/apps/build/functions/input-output/network-access/graphql)
   for Shopify Functions.
   """
-  fetchResult: HttpResponse
-    @restrictTarget(
-      only: ["purchase.discount.cart_run", "purchase.discount.delivery_run"]
-    )
+  fetchResult: HttpResponse @restrictTarget(only: ["cart.lines.discounts.generate.run", "cart.delivery-options.discounts.generate.run"])
 
   """
   The localization of the Function execution context.
@@ -3312,6 +3296,13 @@ type Input {
   Information about the shop.
   """
   shop: Shop!
+
+  """
+  The discount code entered by the buyer that caused the Function to run.
+  This input is only available in the cart.lines.discounts.generate.run
+  and cart.delivery-options.discounts.generate.run extension targets.
+  """
+  triggeringDiscountCode: String @restrictTarget(only: ["cart.lines.discounts.generate.run", "cart.delivery-options.discounts.generate.run"])
 }
 
 """
@@ -4148,7 +4139,7 @@ type Localization {
   """
   The market of the active localized experience.
   """
-  market: Market!
+  market: Market! @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 }
 
 """
@@ -4416,7 +4407,7 @@ type MailingAddress {
   """
   The market of the address.
   """
-  market: Market
+  market: Market @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 
   """
   The full name of the customer, based on firstName and lastName.
@@ -4459,11 +4450,6 @@ type Market implements HasMetafields {
   id: ID!
 
   """
-  The manager of the market, if the accessing app is the market’s manager. Otherwise, this will be null.
-  """
-  manager: MarketManager
-
-  """
   Returns a metafield by namespace and key that belongs to the resource.
   """
   metafield(
@@ -4482,17 +4468,6 @@ type Market implements HasMetafields {
   A geographic region which comprises a market.
   """
   regions: [MarketRegion!]!
-}
-
-"""
-The entity that manages a particular market.
-"""
-type MarketManager {
-  """
-  The identity of the manager. This can either be `merchant` if the market is
-  manually managed by the merchant or an ID of the app responsible for managing the market.
-  """
-  identifier: String!
 }
 
 """
@@ -4571,29 +4546,9 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
-  Handles the Function result for the purchase.discount.cart_fetch target.
+  Handles the Function result for the cart.delivery-options.discounts.generate.fetch target.
   """
-  cartFetch(
-    """
-    The result of the Function.
-    """
-    result: FunctionCartFetchResult!
-  ): Void!
-
-  """
-  Handles the Function result for the purchase.discount.cart_run target.
-  """
-  cartRun(
-    """
-    The result of the Function.
-    """
-    result: FunctionCartRunResult!
-  ): Void!
-
-  """
-  Handles the Function result for the purchase.discount.delivery_fetch target.
-  """
-  deliveryFetch(
+  cartDeliveryOptionsDiscountsGenerateFetch(
     """
     The result of the Function.
     """
@@ -4601,13 +4556,33 @@ type MutationRoot {
   ): Void!
 
   """
-  Handles the Function result for the purchase.discount.delivery_run target.
+  Handles the Function result for the cart.delivery-options.discounts.generate.run target.
   """
-  deliveryRun(
+  cartDeliveryOptionsDiscountsGenerateRun(
     """
     The result of the Function.
     """
     result: FunctionDeliveryRunResult!
+  ): Void!
+
+  """
+  Handles the Function result for the cart.lines.discounts.generate.fetch target.
+  """
+  cartLinesDiscountsGenerateFetch(
+    """
+    The result of the Function.
+    """
+    result: FunctionCartFetchResult!
+  ): Void!
+
+  """
+  Handles the Function result for the cart.lines.discounts.generate.run target.
+  """
+  cartLinesDiscountsGenerateRun(
+    """
+    The result of the Function.
+    """
+    result: FunctionCartRunResult!
   ): Void!
 }
 
@@ -4632,10 +4607,6 @@ input OrderDiscountCandidate {
 
   """
   The targets of the order discount candidate.
-
-  The value is validated against: targets should contain only one type of `OrderDiscountCandidateTarget`.
-  Only a list that contains either a single `OrderSubtotalTarget` or one or more
-  `ProductVariantTarget`s is valid.
   """
   targets: [OrderDiscountCandidateTarget!]!
 
@@ -4647,20 +4618,12 @@ input OrderDiscountCandidate {
 
 """
 A target of a order discount candidate.
-
-An `OrderDiscountCandidate` can either have a single `OrderSubtotalTarget`, or one or more `ProductVariantTarget`s.
 """
 input OrderDiscountCandidateTarget @oneOf {
   """
   If used, the discount targets the entire order subtotal after product discounts are applied.
   """
   orderSubtotal: OrderSubtotalTarget
-
-  """
-  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
-  optional quantity limit.
-  """
-  productVariant: ProductVariantTarget
 }
 
 """
@@ -4713,9 +4676,9 @@ The condition for checking the minimum subtotal amount of the order.
 """
 input OrderMinimumSubtotal {
   """
-  Variant IDs with a merchandise line price that's excluded to calculate the minimum subtotal amount of the order.
+  Cart line IDs with a merchandise line price that's excluded to calculate the minimum subtotal amount of the order.
   """
-  excludedVariantIds: [ID!]!
+  excludedCartLineIds: [ID!]!
 
   """
   The minimum subtotal amount of the order.
@@ -4728,10 +4691,10 @@ If used, the discount targets the entire order subtotal after product discounts 
 """
 input OrderSubtotalTarget {
   """
-  The list of excluded product variant IDs. Cart lines for these product variants are excluded from the order
+  The list of excluded cart line IDs. These cart lines are excluded from the order
   subtotal calculation when calculating the maximum value of the discount.
   """
-  excludedVariantIds: [ID!]!
+  excludedCartLineIds: [ID!]!
 }
 
 """
@@ -4862,7 +4825,6 @@ input ProductDiscountCandidate {
 
   """
   The targets of the product discount candidate.
-  This argument accepts a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
   """
   targets: [ProductDiscountCandidateTarget!]!
 
@@ -4895,8 +4857,6 @@ input ProductDiscountCandidateFixedAmount {
 """
 A target of a product discount candidate, which determines which cart line(s) the discount will affect.
 
-A `ProductDiscountCandidate` can have a collection of either `ProductVariantTarget`s or `CartLineTarget`s, but not both.
-
 Multiple targets with the same type and ID are the same as a single target of that type and ID with their
 quantities added together, or `null` if any of those targets have a quantity of `null`.
 
@@ -4907,12 +4867,6 @@ input ProductDiscountCandidateTarget @oneOf {
   A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that applies to a specific cart line, up to an optional quantity limit.
   """
   cartLine: CartLineTarget
-
-  """
-  A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
-  optional quantity limit.
-  """
-  productVariant: ProductVariantTarget
 }
 
 """
@@ -4964,36 +4918,6 @@ input ProductDiscounts {
   The strategy that's applied to the list of product discount candidates.
   """
   selectionStrategy: ProductDiscountSelectionStrategy!
-}
-
-"""
-The condition for checking the minimum quantity of a product.
-"""
-input ProductMinimumQuantity {
-  """
-  Variant IDs with a merchandise line price that's included to calculate the minimum quantity of the product.
-  """
-  ids: [ID!]!
-
-  """
-  The minimum quantity of a product.
-  """
-  minimumQuantity: Int!
-}
-
-"""
-The condition for checking the minimum subtotal amount of the product.
-"""
-input ProductMinimumSubtotal {
-  """
-  Variant IDs with a merchandise line price that's included to calculate the minimum subtotal amount of a product.
-  """
-  ids: [ID!]!
-
-  """
-  The minimum subtotal amount of the product.
-  """
-  minimumAmount: Decimal!
 }
 
 """
@@ -5049,25 +4973,6 @@ type ProductVariant implements HasMetafields {
   Unit of measurement for weight.
   """
   weightUnit: WeightUnit!
-}
-
-"""
-A discount [Target](https://shopify.dev/api/functions/reference/product-discounts/graphql/common-objects/target) that can apply to any cart lines for a specific product variant, up to an
-optional quantity limit.
-"""
-input ProductVariantTarget {
-  """
-  The ID of the targeted product variant.
-  """
-  id: ID!
-
-  """
-  The maximum number of line item units to be discounted.
-  The default value is `null`, which represents the total quantity of the matching line items.
-
-  The value is validated against: > 0.
-  """
-  quantity: Int
 }
 
 """
@@ -5182,26 +5087,6 @@ type Shop implements HasMetafields {
   """
   localTime: LocalTime!
 
-  """
-  Returns a metafield by namespace and key that belongs to the resource.
-  """
-  metafield(
-    """
-    The key for the metafield.
-    """
-    key: String!
-
-    """
-    The container the metafield belongs to. If omitted, the app-reserved namespace will be used.
-    """
-    namespace: String
-  ): Metafield
-}
-
-"""
-Represents information about the buyer that is interacting with the cart.
-"""
-type ShopUser implements HasMetafields {
   """
   Returns a metafield by namespace and key that belongs to the resource.
   """
