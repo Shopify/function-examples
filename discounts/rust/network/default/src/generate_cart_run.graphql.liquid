@@ -1,0 +1,17 @@
+query Input {
+  fetchResult {
+    body
+    status
+  }
+  cart {
+    lines {
+      id
+      cost {
+        subtotalAmount {
+          amount
+        }
+      }
+    }
+  }
+}
+

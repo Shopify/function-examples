@@ -1,0 +1,65 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+import {HttpRequestMethod} from '../generated/api';
+
+/**
+ * @typedef {import("../generated/api").InputCartFetch} InputCartFetch
+ * @typedef {import("../generated/api").FunctionCartFetchResult} FunctionCartFetchResult
+ */
+/**
+ * Generates a network request to fetch cart discount information
+ * @param {InputCartFetch} input - The cart fetch input data
+ * @returns {FunctionCartFetchResult} - The function result with network request configuration
+ */
+export function generateCartFetch(input) {
+  const { enteredDiscountCodes } = input;
+  const jsonBody = { enteredDiscountCodes };
+  const request = {
+      headers: [
+          {
+              name: 'accept',
+              value: 'application/json',
+          },
+      ],
+      method: HttpRequestMethod.Post,
+      policy: {
+          readTimeoutMs: 2000,
+      },
+      url: '<external server url>',
+      body: JSON.stringify(jsonBody),
+      jsonBody,
+  };
+  return { request };
+}
+{%- elsif flavor contains "typescript" -%}
+import {
+  HttpRequestMethod,
+  InputCartFetch,
+  FunctionCartFetchResult,
+} from '../generated/api';
+
+export function generateCartFetch(
+  input: InputCartFetch,
+): FunctionCartFetchResult {
+  const {enteredDiscountCodes} = input;
+  const jsonBody = {enteredDiscountCodes};
+  const request = {
+    headers: [
+      {
+        name: 'accept',
+        value: 'application/json',
+      },
+    ],
+    method: HttpRequestMethod.Post,
+    policy: {
+      readTimeoutMs: 2000,
+    },
+    url: '<external server url>',
+    body: JSON.stringify(jsonBody),
+    jsonBody,
+  };
+
+  return {request};
+}
+{%- endif -%}

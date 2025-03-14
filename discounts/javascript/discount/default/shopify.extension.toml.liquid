@@ -1,0 +1,22 @@
+api_version = "2025-04"
+
+[[extensions]]
+name = "t:name"
+handle = "{{handle}}"
+type = "function"
+{% if uid %}uid = "{{ uid }}"{% endif %}
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.lines.discounts.generate.run"
+  input_query = "src/generate_cart_run.graphql"
+  export = "generate-cart-run"
+
+  [[extensions.targeting]]
+  target = "cart.delivery-options.discounts.generate.run"
+  input_query = "src/generate_delivery_run.graphql"
+  export = "generate-delivery-run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"

@@ -1,0 +1,167 @@
+import { describe, it, expect } from "vitest";
+
+import { generateCartFetch } from "./generate_cart_fetch";
+import { generateDeliveryFetch } from "./generate_delivery_fetch";
+import { generateCartRun } from "./generate_cart_run";
+import {
+  HttpRequestMethod,
+  OrderDiscountSelectionStrategy,
+  ProductDiscountSelectionStrategy,
+  DeliveryDiscountSelectionStrategy,
+} from "../generated/api";
+
+describe("discount", () => {
+  it("cart.lines.discounts.generate.fetch returns a fetch request", () => {
+    const input = {
+      enteredDiscountCodes: ["10% OFF ORDER", "20% OFF PRODUCT"],
+    };
+
+    const result = generateCartFetch(input);
+
+    expect(result.request).toMatchObject({
+      headers: [
+        {
+          name: "accept",
+          value: "application/json",
+        },
+      ],
+      method: HttpRequestMethod.Post,
+      policy: {
+        readTimeoutMs: 2000,
+      },
+      url: "<external server url>",
+      body: JSON.stringify(input),
+      jsonBody: input,
+    });
+  });
+
+  it("cart.delivery-options.discounts.generate.fetch returns a fetch request", () => {
+    const input = {
+      enteredDiscountCodes: ["FREE_DELIVERY"],
+    };
+
+    const result = generateDeliveryFetch(input);
+
+    expect(result.request).toMatchObject({
+      headers: [
+        {
+          name: "accept",
+          value: "application/json",
+        },
+      ],
+      method: HttpRequestMethod.Post,
+      policy: {
+        readTimeoutMs: 2000,
+      },
+      url: "<external server url>",
+      body: JSON.stringify(input),
+      jsonBody: input,
+    });
+  });
+
+  it("cart.lines.discounts.generate.run returns a list of operations", () => {
+    const operations = [
+      {
+        addDiscountCodeValidations: {
+          codes: ["10% OFF ORDER", "20% OFF PRODUCT"],
+        },
+      },
+      {
+        addOrderDiscounts: {
+          candidates: [
+            {
+              message: "10% OFF ORDER",
+              targets: [
+                {
+                  orderSubtotal: {
+                    excludedCartLineIds: [],
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 10,
+                },
+              },
+            },
+          ],
+          selectionStrategy: OrderDiscountSelectionStrategy.First,
+        },
+      },
+      {
+        addProductDiscounts: {
+          candidates: [
+            {
+              message: "20% OFF PRODUCT",
+              targets: [
+                {
+                  cartLine: {
+                    id: "gid://shopify/CartLine/0",
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 20,
+                },
+              },
+            },
+          ],
+          selectionStrategy: ProductDiscountSelectionStrategy.First,
+        },
+      },
+    ];
+
+    const input = {
+      fetchResult: {
+        body: JSON.stringify({ operations }),
+      },
+    };
+
+    const result = generateCartRun(input);
+
+    expect(result.operations).toMatchObject(operations);
+  });
+
+  it("cart.delivery-options.discounts.generate.run returns a list of operations", () => {
+    const operations = [
+      {
+        addDiscountCodeValidations: {
+          codes: ["FREE_DELIVERY"],
+        },
+      },
+      {
+        addDeliveryDiscounts: {
+          candidates: [
+            {
+              message: "FREE DELIVERY",
+              targets: [
+                {
+                  deliveryGroup: {
+                    id: "gid://shopify/DeliveryGroup/0",
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: 100,
+                },
+              },
+            },
+          ],
+          selectionStrategy: DeliveryDiscountSelectionStrategy.All,
+        },
+      },
+    ];
+
+    const input = {
+      fetchResult: {
+        body: JSON.stringify({ operations }),
+      },
+    };
+
+    const result = generateCartRun(input);
+
+    expect(result.operations).toMatchObject(operations);
+  });
+});
