@@ -22,15 +22,21 @@ fn generate_delivery_fetch(
     let json_body = json!({ "enteredDiscountCodes": entered_discount_codes });
 
     let request = DeliveryFetchHttpRequest {
-        headers: vec![DeliveryFetchHttpRequestHeader {
-            name: "accept".to_string(),
-            value: "application/json".to_string(),
-        }],
-        method: DeliveryFetchHttpRequestMethod::GET,
+        headers: vec![
+            DeliveryFetchHttpRequestHeader {
+                name: "accept".to_string(),
+                value: "application/json".to_string(),
+            },
+            DeliveryFetchHttpRequestHeader {
+                name: "Content-Type".to_string(),
+                value: "application/json".to_string(),
+            },
+        ],
+        method: DeliveryFetchHttpRequestMethod::POST,
         policy: DeliveryFetchHttpRequestPolicy {
             read_timeout_ms: 2000,
         },
-        url: "<external server url>".to_string(),
+        url: "<external-server-url>".to_string(),
         body: Some(json_body.to_string()),
         json_body: Some(json_body.clone()),
     };
@@ -59,15 +65,21 @@ mod tests {
         let json_body = json!({ "enteredDiscountCodes": ["ABC"] });
         let expected = FunctionDeliveryFetchResult {
             request: Some(DeliveryFetchHttpRequest {
-                headers: vec![DeliveryFetchHttpRequestHeader {
-                    name: "accept".to_string(),
-                    value: "application/json".to_string(),
-                }],
-                method: DeliveryFetchHttpRequestMethod::GET,
+                headers: vec![
+                    DeliveryFetchHttpRequestHeader {
+                        name: "accept".to_string(),
+                        value: "application/json".to_string(),
+                    },
+                    DeliveryFetchHttpRequestHeader {
+                        name: "Content-Type".to_string(),
+                        value: "application/json".to_string(),
+                    },
+                ],
+                method: DeliveryFetchHttpRequestMethod::POST,
                 policy: DeliveryFetchHttpRequestPolicy {
                     read_timeout_ms: 2000,
                 },
-                url: "<external server url>".to_string(),
+                url: "<external-server-url>".to_string(),
                 json_body: Some(json_body.clone()),
                 body: Some(json_body.to_string()),
             }),
