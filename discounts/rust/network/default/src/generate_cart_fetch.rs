@@ -30,7 +30,7 @@ fn generate_cart_fetch(
             CartFetchHttpRequestHeader {
                 name: "Content-Type".to_string(),
                 value: "application/json".to_string(),
-            }
+            },
         ],
         method: CartFetchHttpRequestMethod::POST,
         policy: CartFetchHttpRequestPolicy {
@@ -73,7 +73,7 @@ mod tests {
                     CartFetchHttpRequestHeader {
                         name: "Content-Type".to_string(),
                         value: "application/json".to_string(),
-                    }
+                    },
                 ],
                 method: CartFetchHttpRequestMethod::POST,
                 policy: CartFetchHttpRequestPolicy {

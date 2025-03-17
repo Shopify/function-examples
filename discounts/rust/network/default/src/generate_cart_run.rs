@@ -31,7 +31,9 @@ fn generate_cart_run(input: ResponseData) -> Result<FunctionCartRunResult> {
     let fetch_result = input.fetch_result.ok_or("Missing fetch result")?;
 
     // Use jsonBody which is the only available property
-    let json_body = fetch_result.json_body.ok_or("Missing json_body in response")?;
+    let json_body = fetch_result
+        .json_body
+        .ok_or("Missing json_body in response")?;
 
     // Parse using the JSON value
     let operation_items = serde_json::from_value::<Vec<OperationItem>>(json_body)

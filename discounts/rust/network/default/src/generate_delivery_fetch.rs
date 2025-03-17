@@ -30,7 +30,7 @@ fn generate_delivery_fetch(
             DeliveryFetchHttpRequestHeader {
                 name: "Content-Type".to_string(),
                 value: "application/json".to_string(),
-            }
+            },
         ],
         method: DeliveryFetchHttpRequestMethod::POST,
         policy: DeliveryFetchHttpRequestPolicy {
@@ -73,7 +73,7 @@ mod tests {
                     DeliveryFetchHttpRequestHeader {
                         name: "Content-Type".to_string(),
                         value: "application/json".to_string(),
-                    }
+                    },
                 ],
                 method: DeliveryFetchHttpRequestMethod::POST,
                 policy: DeliveryFetchHttpRequestPolicy {
