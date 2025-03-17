@@ -22,15 +22,21 @@ fn generate_cart_fetch(
     let json_body = json!({ "enteredDiscountCodes": entered_discount_codes });
 
     let request = CartFetchHttpRequest {
-        headers: vec![CartFetchHttpRequestHeader {
-            name: "accept".to_string(),
-            value: "application/json".to_string(),
-        }],
-        method: CartFetchHttpRequestMethod::GET,
+        headers: vec![
+            CartFetchHttpRequestHeader {
+                name: "accept".to_string(),
+                value: "application/json".to_string(),
+            },
+            CartFetchHttpRequestHeader {
+                name: "Content-Type".to_string(),
+                value: "application/json".to_string(),
+            }
+        ],
+        method: CartFetchHttpRequestMethod::POST,
         policy: CartFetchHttpRequestPolicy {
             read_timeout_ms: 2000,
         },
-        url: "<external server url>".to_string(),
+        url: "<external-server-url>".to_string(),
         body: Some(json_body.to_string()),
         json_body: Some(json_body.clone()),
     };
@@ -59,15 +65,21 @@ mod tests {
         let json_body = json!({ "enteredDiscountCodes": [] });
         let expected = FunctionCartFetchResult {
             request: Some(CartFetchHttpRequest {
-                headers: vec![CartFetchHttpRequestHeader {
-                    name: "accept".to_string(),
-                    value: "application/json".to_string(),
-                }],
-                method: CartFetchHttpRequestMethod::GET,
+                headers: vec![
+                    CartFetchHttpRequestHeader {
+                        name: "accept".to_string(),
+                        value: "application/json".to_string(),
+                    },
+                    CartFetchHttpRequestHeader {
+                        name: "Content-Type".to_string(),
+                        value: "application/json".to_string(),
+                    }
+                ],
+                method: CartFetchHttpRequestMethod::POST,
                 policy: CartFetchHttpRequestPolicy {
                     read_timeout_ms: 2000,
                 },
-                url: "<external server url>".to_string(),
+                url: "<external-server-url>".to_string(),
                 json_body: Some(json_body.clone()),
                 body: Some(json_body.to_string()),
             }),

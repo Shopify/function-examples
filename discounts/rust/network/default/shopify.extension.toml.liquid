@@ -1,4 +1,4 @@
-api_version = "2025-04"
+api_version = "unstable"
 
 [[extensions]]
 name = "t:name"
@@ -29,6 +29,8 @@ description = "t:description"
 
   [extensions.build]
   command = "cargo build --target=wasm32-wasip1 --release"
-  path = "target/wasm32-wasip1/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  path = "target/wasm32-wasip1/release/function-network-rust.wasm/{{handle | replace: " ", "-" | downcase}}.wasm"
   watch = [ "src/**/*.rs" ]
 
+  [extensions.ui]
+  handle = "{{handle}}"
