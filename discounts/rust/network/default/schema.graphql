@@ -1889,10 +1889,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR
-    @deprecated(
-      reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead."
-    )
+  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
 
   """
   Belize Dollar (BZD).
@@ -2417,10 +2414,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD
-    @deprecated(
-      reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead."
-    )
+  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2515,10 +2509,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF
-    @deprecated(
-      reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead."
-    )
+  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
 
   """
   Venezuelan Bolivares Soberanos (VES).
@@ -3051,8 +3042,7 @@ type GateSubject {
     """
     The appId of the gate configurations to search for.
     """
-    appId: String
-      @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
+    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
   ): GateConfiguration!
 
   """
@@ -3080,7 +3070,7 @@ interface HasGates {
     The handle of the gate configurations to search for.
     """
     handle: Handle
-  ): [GateSubject!]!
+  ): [GateSubject!]! @deprecated(reason: "Gates API is being sunset and will be removed in a future version. Use `metafields` instead for gate configuration.")
 }
 
 """
@@ -3226,9 +3216,9 @@ type HttpResponse {
   headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
 
   """
-  The HTTP response body parsed as JSON.
-  If the body is valid JSON, it will be parsed and returned as a JSON object.
-  If parsing fails, then raw body is returned as a string.
+  The HTTP response body parsed as JSON. 
+  If the body is valid JSON, it will be parsed and returned as a JSON object. 
+  If parsing fails, then raw body is returned as a string. 
   Use this field when you expect the response to be JSON, or when you're dealing
   with mixed response types, meaning both JSON and non-JSON.
   Using this field reduces function instruction consumption and ensures that the data is formatted in logs.
@@ -3284,25 +3274,13 @@ type Input {
   Discount codes entered by the buyer as an array of strings, excluding gift cards.
   Codes are not validated in any way other than gift card filtering.
   """
-  enteredDiscountCodes: [String!]!
-    @restrictTarget(
-      only: [
-        "cart.lines.discounts.generate.fetch"
-        "cart.delivery-options.discounts.generate.fetch"
-      ]
-    )
+  enteredDiscountCodes: [String!]! @restrictTarget(only: ["cart.lines.discounts.generate.fetch", "cart.delivery-options.discounts.generate.fetch"])
 
   """
   The result of the fetch target. Refer to [network access](https://shopify.dev/apps/build/functions/input-output/network-access/graphql)
   for Shopify Functions.
   """
-  fetchResult: HttpResponse
-    @restrictTarget(
-      only: [
-        "cart.lines.discounts.generate.run"
-        "cart.delivery-options.discounts.generate.run"
-      ]
-    )
+  fetchResult: HttpResponse @restrictTarget(only: ["cart.lines.discounts.generate.run", "cart.delivery-options.discounts.generate.run"])
 
   """
   The localization of the Function execution context.
@@ -3324,13 +3302,7 @@ type Input {
   This input is only available in the cart.lines.discounts.generate.run
   and cart.delivery-options.discounts.generate.run extension targets.
   """
-  triggeringDiscountCode: String
-    @restrictTarget(
-      only: [
-        "cart.lines.discounts.generate.run"
-        "cart.delivery-options.discounts.generate.run"
-      ]
-    )
+  triggeringDiscountCode: String @restrictTarget(only: ["cart.lines.discounts.generate.run", "cart.delivery-options.discounts.generate.run"])
 }
 
 """
@@ -4167,10 +4139,7 @@ type Localization {
   """
   The market of the active localized experience.
   """
-  market: Market!
-    @deprecated(
-      reason: "This `market` field will be removed in a future version of the API."
-    )
+  market: Market! @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 }
 
 """
@@ -4438,10 +4407,7 @@ type MailingAddress {
   """
   The market of the address.
   """
-  market: Market
-    @deprecated(
-      reason: "This `market` field will be removed in a future version of the API."
-    )
+  market: Market @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 
   """
   The full name of the customer, based on firstName and lastName.
@@ -4755,7 +4721,7 @@ type Product implements HasGates & HasMetafields {
     The handle of the gate configurations to search for.
     """
     handle: Handle
-  ): [GateSubject!]!
+  ): [GateSubject!]! @deprecated(reason: "Gates API is being sunset and will be removed in a future version. Use `metafields` instead for gate configuration.")
 
   """
   A unique human-friendly string of the product's title.
