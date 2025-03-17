@@ -2,7 +2,7 @@ api_version = "unstable"
 
 [[extensions]]
 name = "t:name"
-handle = "{{handle}}"
+handle = "{{handle | replace: " ", "-" | downcase}}"
 type = "function"
 {% if uid %}uid = "{{ uid }}"{% endif %}
 description = "t:description"
@@ -29,8 +29,5 @@ description = "t:description"
 
   [extensions.build]
   command = "cargo build --target=wasm32-wasip1 --release"
-  path = "target/wasm32-wasip1/release/function-network-rust.wasm/{{handle | replace: " ", "-" | downcase}}.wasm"
+  path = "{{handle | replace: " ", "-" | downcase}}.wasm"
   watch = [ "src/**/*.rs" ]
-
-  [extensions.ui]
-  handle = "{{handle}}"
