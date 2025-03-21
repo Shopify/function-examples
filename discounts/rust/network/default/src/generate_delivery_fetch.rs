@@ -4,7 +4,7 @@ use shopify_function::prelude::*;
 
 use cart_delivery_options_discounts_generate_fetch::input::ResponseData as DeliveryFetchResponseData;
 use cart_delivery_options_discounts_generate_fetch::output::{
-    FunctionDeliveryFetchResult, HttpRequest as DeliveryFetchHttpRequest,
+    CartDeliveryOptionsDiscountsGenerateFetchResult, HttpRequest as DeliveryFetchHttpRequest,
     HttpRequestHeader as DeliveryFetchHttpRequestHeader,
     HttpRequestMethod as DeliveryFetchHttpRequestMethod,
     HttpRequestPolicy as DeliveryFetchHttpRequestPolicy,
@@ -17,7 +17,7 @@ use cart_delivery_options_discounts_generate_fetch::output::{
 )]
 fn generate_delivery_fetch(
     input: DeliveryFetchResponseData,
-) -> shopify_function::Result<FunctionDeliveryFetchResult> {
+) -> shopify_function::Result<CartDeliveryOptionsDiscountsGenerateFetchResult> {
     let entered_discount_codes = &input.entered_discount_codes;
     let json_body = json!({ "enteredDiscountCodes": entered_discount_codes });
 
@@ -41,7 +41,7 @@ fn generate_delivery_fetch(
         json_body: Some(json_body.clone()),
     };
 
-    Ok(FunctionDeliveryFetchResult {
+    Ok(CartDeliveryOptionsDiscountsGenerateFetchResult {
         request: Some(request),
     })
 }
@@ -50,7 +50,7 @@ fn generate_delivery_fetch(
 mod tests {
     use super::*;
     use cart_delivery_options_discounts_generate_fetch::output::{
-        FunctionDeliveryFetchResult, HttpRequest as DeliveryFetchHttpRequest,
+        CartDeliveryOptionsDiscountsGenerateFetchResult, HttpRequest as DeliveryFetchHttpRequest,
         HttpRequestHeader as DeliveryFetchHttpRequestHeader,
         HttpRequestMethod as DeliveryFetchHttpRequestMethod,
         HttpRequestPolicy as DeliveryFetchHttpRequestPolicy,
@@ -63,7 +63,7 @@ mod tests {
 
         let result = run_function_with_input(generate_delivery_fetch, &input)?;
         let json_body = json!({ "enteredDiscountCodes": ["ABC"] });
-        let expected = FunctionDeliveryFetchResult {
+        let expected = CartDeliveryOptionsDiscountsGenerateFetchResult {
             request: Some(DeliveryFetchHttpRequest {
                 headers: vec![
                     DeliveryFetchHttpRequestHeader {

@@ -4,7 +4,7 @@ use shopify_function::prelude::*;
 
 use cart_lines_discounts_generate_fetch::input::ResponseData as CartFetchResponseData;
 use cart_lines_discounts_generate_fetch::output::{
-    FunctionCartFetchResult, HttpRequest as CartFetchHttpRequest,
+    CartLinesDiscountsGenerateFetchResult, HttpRequest as CartFetchHttpRequest,
     HttpRequestHeader as CartFetchHttpRequestHeader,
     HttpRequestMethod as CartFetchHttpRequestMethod,
     HttpRequestPolicy as CartFetchHttpRequestPolicy,
@@ -17,7 +17,7 @@ use cart_lines_discounts_generate_fetch::output::{
 )]
 fn generate_cart_fetch(
     input: CartFetchResponseData,
-) -> shopify_function::Result<FunctionCartFetchResult> {
+) -> shopify_function::Result<CartLinesDiscountsGenerateFetchResult> {
     let entered_discount_codes = &input.entered_discount_codes;
     let json_body = json!({ "enteredDiscountCodes": entered_discount_codes });
 
@@ -41,7 +41,7 @@ fn generate_cart_fetch(
         json_body: Some(json_body.clone()),
     };
 
-    Ok(FunctionCartFetchResult {
+    Ok(CartLinesDiscountsGenerateFetchResult {
         request: Some(request),
     })
 }
@@ -50,7 +50,7 @@ fn generate_cart_fetch(
 mod tests {
     use super::*;
     use cart_lines_discounts_generate_fetch::output::{
-        FunctionCartFetchResult, HttpRequest as CartFetchHttpRequest,
+        CartLinesDiscountsGenerateFetchResult, HttpRequest as CartFetchHttpRequest,
         HttpRequestHeader as CartFetchHttpRequestHeader,
         HttpRequestMethod as CartFetchHttpRequestMethod,
         HttpRequestPolicy as CartFetchHttpRequestPolicy,
@@ -63,7 +63,7 @@ mod tests {
 
         let result = run_function_with_input(generate_cart_fetch, &input)?;
         let json_body = json!({ "enteredDiscountCodes": [] });
-        let expected = FunctionCartFetchResult {
+        let expected = CartLinesDiscountsGenerateFetchResult {
             request: Some(CartFetchHttpRequest {
                 headers: vec![
                     CartFetchHttpRequestHeader {

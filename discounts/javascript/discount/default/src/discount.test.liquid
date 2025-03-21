@@ -27,7 +27,7 @@ describe("discount", () => {
 
     expect(result.operations.length).toBe(2);
     expect(result.operations[0]).toMatchObject({
-      addOrderDiscounts: {
+      orderDiscountsAdd: {
         candidates: [
           {
             message: "10% OFF ORDER",
@@ -50,7 +50,7 @@ describe("discount", () => {
     });
 
     expect(result.operations[1]).toMatchObject({
-      addProductDiscounts: {
+      productDiscountsAdd: {
         candidates: [
           {
             message: "20% OFF PRODUCT",
@@ -88,7 +88,7 @@ describe("discount", () => {
 
     expect(result.operations.length).toBe(1);
     expect(result.operations[0]).toMatchObject({
-      addDeliveryDiscounts: {
+      deliveryDiscountsAdd: {
         candidates: [
           {
             message: "FREE DELIVERY",

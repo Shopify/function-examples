@@ -2,12 +2,12 @@
 // @ts-check
 /**
  * @typedef {import("../generated/api").InputDeliveryRun} InputDeliveryRun
- * @typedef {import("../generated/api").FunctionDeliveryRunResult} FunctionDeliveryRunResult
+ * @typedef {import("../generated/api").CartDeliveryOptionsDiscountsGenerateRunResult} CartDeliveryOptionsDiscountsGenerateRunResult
  */
 /**
  * Processes the fetched delivery discount data and generates operations
  * @param {InputDeliveryRun} input - The delivery run input data including fetch results
- * @returns {FunctionDeliveryRunResult} - The function result with discount operations
+ * @returns {CartDeliveryOptionsDiscountsGenerateRunResult} - The function result with discount operations
  */
 export function generateDeliveryRun(input) {
     const { fetchResult } = input;
@@ -20,11 +20,11 @@ export function generateDeliveryRun(input) {
     return { operations };
 }
 {%- elsif flavor contains "typescript" -%}
-import {InputDeliveryRun, FunctionDeliveryRunResult} from '../generated/api';
+import {InputDeliveryRun, CartDeliveryOptionsDiscountsGenerateRunResult} from '../generated/api';
 
 export function generateDeliveryRun(
   input: InputDeliveryRun,
-): FunctionDeliveryRunResult {
+): CartDeliveryOptionsDiscountsGenerateRunResult {
   const {fetchResult} = input;
   const body = fetchResult?.body;
 

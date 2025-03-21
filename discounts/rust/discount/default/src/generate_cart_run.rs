@@ -2,11 +2,11 @@ use shopify_function::prelude::*;
 use shopify_function::Result;
 
 use cart_lines_discounts_generate_run::output::{
-    CartLineTarget, CartOperation, FunctionCartRunResult, OrderDiscountCandidate,
+    CartLineTarget, CartLinesDiscountsGenerateRunResult, CartOperation, OrderDiscountCandidate,
     OrderDiscountCandidateTarget, OrderDiscountCandidateValue, OrderDiscountSelectionStrategy,
-    OrderDiscounts, OrderSubtotalTarget, Percentage, ProductDiscountCandidate,
+    OrderDiscountsAddOperation, OrderSubtotalTarget, Percentage, ProductDiscountCandidate,
     ProductDiscountCandidateTarget, ProductDiscountCandidateValue,
-    ProductDiscountSelectionStrategy, ProductDiscounts,
+    ProductDiscountSelectionStrategy, ProductDiscountsAddOperation,
 };
 
 use cart_lines_discounts_generate_run::input::ResponseData;
@@ -16,7 +16,7 @@ use cart_lines_discounts_generate_run::input::ResponseData;
     query_path = "src/generate_cart_run.graphql",
     schema_path = "schema.graphql"
 )]
-fn generate_cart_run(input: ResponseData) -> Result<FunctionCartRunResult> {
+fn generate_cart_run(input: ResponseData) -> Result<CartLinesDiscountsGenerateRunResult> {
     let max_cart_line = input
         .cart
         .lines
@@ -30,9 +30,9 @@ fn generate_cart_run(input: ResponseData) -> Result<FunctionCartRunResult> {
         })
         .ok_or("No cart lines found")?;
 
-    Ok(FunctionCartRunResult {
+    Ok(CartLinesDiscountsGenerateRunResult {
         operations: vec![
-            CartOperation::AddOrderDiscounts(OrderDiscounts {
+            CartOperation::OrderDiscountsAdd(OrderDiscountsAddOperation {
                 selection_strategy: OrderDiscountSelectionStrategy::FIRST,
                 candidates: vec![OrderDiscountCandidate {
                     targets: vec![OrderDiscountCandidateTarget::OrderSubtotal(
@@ -48,7 +48,7 @@ fn generate_cart_run(input: ResponseData) -> Result<FunctionCartRunResult> {
                     associated_discount_code: None,
                 }],
             }),
-            CartOperation::AddProductDiscounts(ProductDiscounts {
+            CartOperation::ProductDiscountsAdd(ProductDiscountsAddOperation {
                 selection_strategy: ProductDiscountSelectionStrategy::FIRST,
                 candidates: vec![ProductDiscountCandidate {
                     targets: vec![ProductDiscountCandidateTarget::CartLine(CartLineTarget {
