@@ -3,7 +3,8 @@ use shopify_function::prelude::*;
 use shopify_function::Result;
 
 use cart_lines_discounts_generate_run::output::{
-    CartOperation, FunctionCartRunResult, OrderDiscounts, ProductDiscounts, ValidDiscountCodes,
+    CartLinesDiscountsGenerateRunResult, CartOperation, EnteredDiscountCodesAcceptOperation,
+    OrderDiscountsAddOperation, ProductDiscountsAddOperation,
 };
 
 use cart_lines_discounts_generate_run::input::ResponseData;
@@ -12,11 +13,11 @@ use cart_lines_discounts_generate_run::input::ResponseData;
 #[serde(rename_all = "camelCase")]
 struct OperationItem {
     #[serde(default)]
-    add_product_discounts: Option<ProductDiscounts>,
+    product_discounts_add: Option<ProductDiscountsAddOperation>,
     #[serde(default)]
-    add_order_discounts: Option<OrderDiscounts>,
+    order_discounts_add: Option<OrderDiscountsAddOperation>,
     #[serde(default)]
-    add_discount_code_validations: Option<ValidDiscountCodes>,
+    entered_discount_codes_accept: Option<EnteredDiscountCodesAcceptOperation>,
     // Ignore other operation types that might be in the response but we don't use in cart context
     #[serde(flatten)]
     _other: std::collections::HashMap<String, serde_json::Value>,
@@ -27,7 +28,7 @@ struct OperationItem {
     query_path = "src/generate_cart_run.graphql",
     schema_path = "schema.graphql"
 )]
-fn generate_cart_run(input: ResponseData) -> Result<FunctionCartRunResult> {
+fn generate_cart_run(input: ResponseData) -> Result<CartLinesDiscountsGenerateRunResult> {
     let fetch_result = input.fetch_result.ok_or("Missing fetch result")?;
 
     // Use jsonBody which is the only available property
@@ -44,19 +45,23 @@ fn generate_cart_run(input: ResponseData) -> Result<FunctionCartRunResult> {
 
     // Process each operation item
     for item in operation_items {
-        if let Some(validations) = item.add_discount_code_validations {
-            operations.push(CartOperation::AddDiscountCodeValidations(validations));
+        if let Some(validations) = item.entered_discount_codes_accept {
+            operations.push(CartOperation::EnteredDiscountCodesAccept(validations));
         }
 
-        if let Some(product_discounts) = item.add_product_discounts {
-            operations.push(CartOperation::AddProductDiscounts(product_discounts));
+        if let Some(product_discounts_add_operation) = item.product_discounts_add {
+            operations.push(CartOperation::ProductDiscountsAdd(
+                product_discounts_add_operation,
+            ));
         }
 
-        if let Some(order_discounts) = item.add_order_discounts {
-            operations.push(CartOperation::AddOrderDiscounts(order_discounts));
+        if let Some(order_discounts_add_operation) = item.order_discounts_add {
+            operations.push(CartOperation::OrderDiscountsAdd(
+                order_discounts_add_operation,
+            ));
         }
         // Ignore delivery discounts for cart operations
     }
 
-    Ok(FunctionCartRunResult { operations })
+    Ok(CartLinesDiscountsGenerateRunResult { operations })
 }

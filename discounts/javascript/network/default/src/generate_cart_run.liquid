@@ -2,12 +2,12 @@
 // @ts-check
 /**
  * @typedef {import("../generated/api").InputCartRun} InputCartRun
- * @typedef {import("../generated/api").FunctionCartRunResult} FunctionCartRunResult
+ * @typedef {import("../generated/api").CartLinesDiscountsGenerateRunResult} CartLinesDiscountsGenerateRunResult
  */
 /**
  * Processes the fetched cart discount data and generates operations
  * @param {InputCartRun} input - The cart run input data including fetch results
- * @returns {FunctionCartRunResult} - The function result with discount operations
+ * @returns {CartLinesDiscountsGenerateRunResult} - The function result with discount operations
  */
 export function generateCartRun(input) {
     const { fetchResult } = input;
@@ -20,9 +20,9 @@ export function generateCartRun(input) {
     return { operations };
 }
 {%- elsif flavor contains "typescript" -%}
-import {InputCartRun, FunctionCartRunResult} from '../generated/api';
+import {InputCartRun, CartLinesDiscountsGenerateRunResult} from '../generated/api';
 
-export function generateCartRun(input: InputCartRun): FunctionCartRunResult {
+export function generateCartRun(input: InputCartRun): CartLinesDiscountsGenerateRunResult {
   const {fetchResult} = input;
   const body = fetchResult?.body;
 

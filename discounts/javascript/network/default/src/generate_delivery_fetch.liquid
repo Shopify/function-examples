@@ -4,12 +4,12 @@ import {HttpRequestMethod} from '../generated/api';
 
 /**
  * @typedef {import("../generated/api").InputDeliveryFetch} InputDeliveryFetch
- * @typedef {import("../generated/api").FunctionDeliveryFetchResult} FunctionDeliveryFetchResult
+ * @typedef {import("../generated/api").CartDeliveryOptionsDiscountsGenerateFetchResult} CartDeliveryOptionsDiscountsGenerateFetchResult
  */
 /**
  * Generates a network request to fetch delivery discount information
  * @param {InputDeliveryFetch} input - The delivery fetch input data
- * @returns {FunctionDeliveryFetchResult} - The function result with network request configuration
+ * @returns {CartDeliveryOptionsDiscountsGenerateFetchResult} - The function result with network request configuration
  */
 export function generateDeliveryFetch(input) {
     const { enteredDiscountCodes } = input;
@@ -35,11 +35,11 @@ export function generateDeliveryFetch(input) {
 import {
   HttpRequestMethod,
   InputDeliveryFetch,
-  FunctionDeliveryFetchResult,
+  CartDeliveryOptionsDiscountsGenerateFetchResult,
 } from '../generated/api';
 export function generateDeliveryFetch(
   input: InputDeliveryFetch,
-): FunctionDeliveryFetchResult {
+): CartDeliveryOptionsDiscountsGenerateFetchResult {
   const {enteredDiscountCodes} = input;
   const jsonBody = {enteredDiscountCodes};
 
