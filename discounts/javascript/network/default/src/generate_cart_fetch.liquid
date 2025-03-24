@@ -5,12 +5,12 @@ import {HttpRequestMethod} from '../generated/api';
 
 /**
  * @typedef {import("../generated/api").InputCartFetch} InputCartFetch
- * @typedef {import("../generated/api").FunctionCartFetchResult} FunctionCartFetchResult
+ * @typedef {import("../generated/api").CartLinesDiscountsGenerateFetchResult} CartLinesDiscountsGenerateFetchResult
  */
 /**
  * Generates a network request to fetch cart discount information
  * @param {InputCartFetch} input - The cart fetch input data
- * @returns {FunctionCartFetchResult} - The function result with network request configuration
+ * @returns {CartLinesDiscountsGenerateFetchResult} - The function result with network request configuration
  */
 export function generateCartFetch(input) {
   const { enteredDiscountCodes } = input;
@@ -36,12 +36,12 @@ export function generateCartFetch(input) {
 import {
   HttpRequestMethod,
   InputCartFetch,
-  FunctionCartFetchResult,
+  CartLinesDiscountsGenerateFetchResult,
 } from '../generated/api';
 
 export function generateCartFetch(
   input: InputCartFetch,
-): FunctionCartFetchResult {
+): CartLinesDiscountsGenerateFetchResult {
   const {enteredDiscountCodes} = input;
   const jsonBody = {enteredDiscountCodes};
   const request = {

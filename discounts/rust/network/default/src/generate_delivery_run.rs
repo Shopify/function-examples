@@ -3,7 +3,8 @@ use shopify_function::prelude::*;
 use shopify_function::Result;
 
 use cart_delivery_options_discounts_generate_run::output::{
-    DeliveryDiscounts, DeliveryOperation, FunctionDeliveryRunResult, ValidDiscountCodes,
+    CartDeliveryOptionsDiscountsGenerateRunResult, DeliveryDiscountsAddOperation,
+    DeliveryOperation, EnteredDiscountCodesAcceptOperation,
 };
 
 use cart_delivery_options_discounts_generate_run::input::ResponseData;
@@ -12,9 +13,9 @@ use cart_delivery_options_discounts_generate_run::input::ResponseData;
 #[serde(rename_all = "camelCase")]
 struct OperationItem {
     #[serde(default)]
-    add_delivery_discounts: Option<DeliveryDiscounts>,
+    delivery_discounts_add: Option<DeliveryDiscountsAddOperation>,
     #[serde(default)]
-    add_discount_code_validations: Option<ValidDiscountCodes>,
+    entered_discount_codes_accept: Option<EnteredDiscountCodesAcceptOperation>,
     // Ignore any other fields we don't need
     #[serde(flatten)]
     _other: std::collections::HashMap<String, serde_json::Value>,
@@ -25,7 +26,9 @@ struct OperationItem {
     query_path = "src/generate_delivery_run.graphql",
     schema_path = "schema.graphql"
 )]
-fn generate_delivery_run(input: ResponseData) -> Result<FunctionDeliveryRunResult> {
+fn generate_delivery_run(
+    input: ResponseData,
+) -> Result<CartDeliveryOptionsDiscountsGenerateRunResult> {
     let fetch_result = input.fetch_result.ok_or("Missing fetch result")?;
 
     // Use jsonBody which is the only available property
@@ -42,15 +45,17 @@ fn generate_delivery_run(input: ResponseData) -> Result<FunctionDeliveryRunResul
 
     // Process each operation item
     for item in operation_items {
-        if let Some(validations) = item.add_discount_code_validations {
-            operations.push(DeliveryOperation::AddDiscountCodeValidations(validations));
+        if let Some(validations) = item.entered_discount_codes_accept {
+            operations.push(DeliveryOperation::EnteredDiscountCodesAccept(validations));
         }
 
-        if let Some(delivery_discounts) = item.add_delivery_discounts {
-            operations.push(DeliveryOperation::AddDeliveryDiscounts(delivery_discounts));
+        if let Some(delivery_discounts_add_operation) = item.delivery_discounts_add {
+            operations.push(DeliveryOperation::DeliveryDiscountsAdd(
+                delivery_discounts_add_operation,
+            ));
         }
         // Ignore cart/order discounts for delivery operations
     }
 
-    Ok(FunctionDeliveryRunResult { operations })
+    Ok(CartDeliveryOptionsDiscountsGenerateRunResult { operations })
 }

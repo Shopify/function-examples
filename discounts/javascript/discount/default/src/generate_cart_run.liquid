@@ -8,13 +8,13 @@ import {
 
 /**
  * @typedef {import("../generated/api").CartInput} CartInput
- * @typedef {import("../generated/api").FunctionCartRunResult} FunctionCartRunResult
+ * @typedef {import("../generated/api").CartLinesDiscountsGenerateRunResult} CartLinesDiscountsGenerateRunResult
  */
 
 /**
  * generateCartRun
  * @param {CartInput} input - The CartInput
- * @returns {FunctionCartRunResult} - The function result with discounts.
+ * @returns {CartLinesDiscountsGenerateRunResult} - The function result with discounts.
  */
 export function generateCartRun(input) {
     if (!input.cart.lines.length) {
@@ -29,7 +29,7 @@ export function generateCartRun(input) {
     return {
         operations: [
             {
-                addOrderDiscounts: {
+                orderDiscountsAdd: {
                     candidates: [
                         {
                             message: '10% OFF ORDER',
@@ -51,7 +51,7 @@ export function generateCartRun(input) {
                 },
             },
             {
-                addProductDiscounts: {
+                productDiscountsAdd: {
                     candidates: [
                         {
                             message: '20% OFF PRODUCT',
@@ -80,10 +80,10 @@ import {
   OrderDiscountSelectionStrategy,
   ProductDiscountSelectionStrategy,
   CartInput,
-  FunctionCartRunResult,
+  CartLinesDiscountsGenerateRunResult,
 } from '../generated/api';
 
-export function generateCartRun(input: CartInput): FunctionCartRunResult {
+export function generateCartRun(input: CartInput): CartLinesDiscountsGenerateRunResult {
   if (!input.cart.lines.length) {
     throw new Error('No cart lines found');
   }
@@ -98,7 +98,7 @@ export function generateCartRun(input: CartInput): FunctionCartRunResult {
   return {
     operations: [
       {
-        addOrderDiscounts: {
+        orderDiscountsAdd: {
           candidates: [
             {
               message: '10% OFF ORDER',
@@ -120,7 +120,7 @@ export function generateCartRun(input: CartInput): FunctionCartRunResult {
         },
       },
       {
-        addProductDiscounts: {
+        productDiscountsAdd: {
           candidates: [
             {
               message: '20% OFF PRODUCT',

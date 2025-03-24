@@ -62,12 +62,12 @@ describe("discount", () => {
   it("cart.lines.discounts.generate.run returns a list of operations", () => {
     const operations = [
       {
-        addDiscountCodeValidations: {
+        enteredDiscountCodesAccept: {
           codes: ["10% OFF ORDER", "20% OFF PRODUCT"],
         },
       },
       {
-        addOrderDiscounts: {
+        orderDiscountsAdd: {
           candidates: [
             {
               message: "10% OFF ORDER",
@@ -89,7 +89,7 @@ describe("discount", () => {
         },
       },
       {
-        addProductDiscounts: {
+        productDiscountsAdd: {
           candidates: [
             {
               message: "20% OFF PRODUCT",
@@ -126,12 +126,12 @@ describe("discount", () => {
   it("cart.delivery-options.discounts.generate.run returns a list of operations", () => {
     const operations = [
       {
-        addDiscountCodeValidations: {
+        enteredDiscountCodesAccept: {
           codes: ["FREE_DELIVERY"],
         },
       },
       {
-        addDeliveryDiscounts: {
+        deliveryDiscountsAdd: {
           candidates: [
             {
               message: "FREE DELIVERY",
