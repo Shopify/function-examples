@@ -7,6 +7,10 @@ import {
   ProductDiscountSelectionStrategy,
 } from "../generated/api";
 
+/**
+ * @typedef {import("../generated/api").CartLinesDiscountsGenerateRunResult} CartLinesDiscountsGenerateRunResult
+ */
+
 describe("generateCartRun", () => {
   it("returns a product and order discount", () => {
     const input = {
@@ -79,11 +83,13 @@ import { generateCartRun } from "./generate_cart_run";
 import {
   OrderDiscountSelectionStrategy,
   ProductDiscountSelectionStrategy,
+  CartInput,
+  CartLinesDiscountsGenerateRunResult
 } from "../generated/api";
 
 describe("generateCartRun", () => {
   it("returns a product and order discount", () => {
-    const input = {
+    const input: CartInput = {
       cart: {
         lines: [
           {
@@ -96,7 +102,7 @@ describe("generateCartRun", () => {
       },
     };
 
-    const result = generateCartRun(input);
+    const result: CartLinesDiscountsGenerateRunResult = generateCartRun(input);
 
     expect(result.operations.length).toBe(2);
     expect(result.operations[0]).toMatchObject({
