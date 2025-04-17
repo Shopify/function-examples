@@ -1,0 +1,95 @@
+{%- if flavor contains "vanilla-js" -%}
+import { describe, it, expect } from "vitest";
+
+import { generateDeliveryRun } from "./generate_delivery_run";
+import {
+  DeliveryDiscountSelectionStrategy,
+} from "../generated/api";
+
+describe("generateDeliveryRun", () => {
+  it("returns a delivery discount", () => {
+    const input = {
+      cart: {
+        deliveryGroups: [
+          {
+            id: "gid://shopify/DeliveryGroup/0",
+          },
+        ],
+      },
+    };
+
+    const result = generateDeliveryRun(input);
+
+    expect(result.operations.length).toBe(1);
+    expect(result.operations[0]).toMatchObject({
+      deliveryDiscountsAdd: {
+        candidates: [
+          {
+            message: "FREE DELIVERY",
+            targets: [
+              {
+                deliveryGroup: {
+                  id: "gid://shopify/DeliveryGroup/0",
+                },
+              },
+            ],
+            value: {
+              percentage: {
+                value: 100,
+              },
+            },
+          },
+        ],
+        selectionStrategy: DeliveryDiscountSelectionStrategy.All,
+      },
+    });
+  });
+});
+{%- elsif flavor contains "typescript" -%}
+import { describe, it, expect } from "vitest";
+
+import { generateDeliveryRun } from "./generate_delivery_run";
+import {
+  DeliveryDiscountSelectionStrategy,
+} from "../generated/api";
+
+describe("generateDeliveryRun", () => {
+  it("returns a delivery discount", () => {
+    const input = {
+      cart: {
+        deliveryGroups: [
+          {
+            id: "gid://shopify/DeliveryGroup/0",
+          },
+        ],
+      },
+    };
+
+    const result = generateDeliveryRun(input);
+
+    expect(result.operations.length).toBe(1);
+    expect(result.operations[0]).toMatchObject({
+      deliveryDiscountsAdd: {
+        candidates: [
+          {
+            message: "FREE DELIVERY",
+            targets: [
+              {
+                deliveryGroup: {
+                  id: "gid://shopify/DeliveryGroup/0",
+                },
+              },
+            ],
+            value: {
+              percentage: {
+                value: 100,
+              },
+            },
+          },
+        ],
+        selectionStrategy: DeliveryDiscountSelectionStrategy.All,
+      },
+    });
+  });
+});
+{%- endif -%} 
