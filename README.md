@@ -57,3 +57,19 @@ cargo test
 cargo fmt
 cargo clippy -- -D warnings
 ```
+
+### Update Dependencies
+
+To check and update JavaScript dependencies in all package.json.liquid files:
+
+```shell
+yarn check-js-dependencies
+```
+
+To check and update Rust dependencies in all Cargo.toml and Cargo.toml.liquid files:
+
+```shell
+yarn check-rust-dependencies
+```
+
+These utilities will fetch the latest versions from npm and crates.io respectively and update your templates.
