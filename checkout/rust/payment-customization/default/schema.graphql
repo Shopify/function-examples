@@ -336,6 +336,17 @@ type CartLineCost {
 }
 
 """
+The `CartPaymentMethodsTransformRunResult` object is the output of the Function
+run target. The object contains the operations to apply to payment methods in checkout.
+"""
+input CartPaymentMethodsTransformRunResult {
+  """
+  The ordered list of operations to apply to the list of payment methods.
+  """
+  operations: [Operation!]!
+}
+
+"""
 Whether the product is in the specified collection.
 
 A collection is a group of products that can be displayed in online stores and other sales channels in
@@ -2792,6 +2803,45 @@ enum DeliveryMethod {
 }
 
 """
+An operation to apply to the list of payment methods.
+"""
+input DeprecatedOperation @oneOf {
+  """
+  A request to hide a payment method during checkout.
+
+  When your Function returns this operation, it removes the specified payment method
+  from the available options shown to customers during checkout.
+
+  Use this operation when you want to conditionally hide payment methods based on
+  checkout attributes, customer data, or other business logic implemented in your Function.
+  """
+  hide: HideOperation @deprecated(reason: "Use `paymentMethodHide` instead.")
+
+  """
+  A request to move a payment method to a new position in the checkout display order.
+
+  When your Function returns this operation, it changes the display order of payment methods
+  by placing the specified payment method at the requested index position.
+
+  Use this operation when you want to prioritize certain payment methods based on
+  checkout context, customer preferences, or other business logic implemented in your Function.
+  """
+  move: MoveOperation @deprecated(reason: "Use `paymentMethodMove` instead.")
+
+  """
+  A request to change the displayed name of a payment method during checkout.
+
+  When your Function returns this operation, it replaces the default name of the
+  specified payment method with the custom name that's provided in the request.
+
+  Use this operation when you want to provide more context or clarity about
+  payment methods based on checkout details, locale, or other business logic
+  implemented in your Function.
+  """
+  rename: RenameOperation @deprecated(reason: "Use `paymentMethodRename` instead.")
+}
+
+"""
 The output of the Function run target. The object contains the operations to
 apply to payment methods in checkout. In API versions 2023-10 and beyond, this
 type is deprecated in favor of `FunctionRunResult`.
@@ -2800,7 +2850,7 @@ input FunctionResult {
   """
   The ordered list of operations to apply to the list of payment methods.
   """
-  operations: [Operation!]!
+  operations: [DeprecatedOperation!]!
 }
 
 """
@@ -2810,7 +2860,7 @@ input FunctionRunResult {
   """
   The ordered list of operations to apply to the list of payment methods.
   """
-  operations: [Operation!]!
+  operations: [DeprecatedOperation!]!
 }
 
 """
@@ -3785,7 +3835,7 @@ type Localization {
   """
   The market of the active localized experience.
   """
-  market: Market!
+  market: Market! @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 }
 
 """
@@ -4053,7 +4103,7 @@ type MailingAddress {
   """
   The market of the address.
   """
-  market: Market
+  market: Market @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 
   """
   The full name of the customer, based on firstName and lastName.
@@ -4234,6 +4284,16 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
+  Handles the Function result for the cart.payment-methods.transform.run target.
+  """
+  cartPaymentMethodsTransformRun(
+    """
+    The result of the Function.
+    """
+    result: CartPaymentMethodsTransformRunResult!
+  ): Void!
+
+  """
   Handles the Function result.
   """
   handleResult(
@@ -4267,7 +4327,7 @@ input Operation @oneOf {
   Use this operation when you want to conditionally hide payment methods based on
   checkout attributes, customer data, or other business logic implemented in your Function.
   """
-  hide: HideOperation
+  paymentMethodHide: PaymentMethodHideOperation
 
   """
   A request to move a payment method to a new position in the checkout display order.
@@ -4278,7 +4338,7 @@ input Operation @oneOf {
   Use this operation when you want to prioritize certain payment methods based on
   checkout context, customer preferences, or other business logic implemented in your Function.
   """
-  move: MoveOperation
+  paymentMethodMove: PaymentMethodMoveOperation
 
   """
   A request to change the displayed name of a payment method during checkout.
@@ -4290,7 +4350,7 @@ input Operation @oneOf {
   payment methods based on checkout details, locale, or other business logic
   implemented in your Function.
   """
-  rename: RenameOperation
+  paymentMethodRename: PaymentMethodRenameOperation
 }
 
 """
@@ -4354,6 +4414,70 @@ enum PaymentCustomizationPaymentMethodPlacement {
   Payment method can be selected from a list of available payment methods in the payment section of checkout.
   """
   PAYMENT_METHOD
+}
+
+"""
+A request to hide a payment method during checkout.
+
+When your Function returns this operation, it removes the specified payment method
+from the available options shown to customers during checkout.
+
+Use this operation when you want to conditionally hide payment methods based on
+checkout attributes, customer data, or other business logic implemented in your Function.
+"""
+input PaymentMethodHideOperation {
+  """
+  The identifier of the payment method to hide out.
+  """
+  paymentMethodId: ID!
+
+  """
+  Placement types to hide. If not provided, all placements will be hidden.
+  """
+  placements: [PaymentCustomizationPaymentMethodPlacement!]
+}
+
+"""
+A request to move a payment method to a new position in the checkout display order.
+
+When your Function returns this operation, it changes the display order of payment methods
+by placing the specified payment method at the requested index position.
+
+Use this operation when you want to prioritize certain payment methods based on
+checkout context, customer preferences, or other business logic implemented in your Function.
+"""
+input PaymentMethodMoveOperation {
+  """
+  The index to move the payment method to.
+  """
+  index: Int!
+
+  """
+  The identifier of the payment method to move.
+  """
+  paymentMethodId: ID!
+}
+
+"""
+A request to change the displayed name of a payment method during checkout.
+
+When your Function returns this operation, it replaces the default name of the
+specified payment method with the custom name that's provided in the request.
+
+Use this operation when you want to provide more context or clarity about
+payment methods based on checkout details, locale, or other business logic
+implemented in your Function.
+"""
+input PaymentMethodRenameOperation {
+  """
+  The new name for the payment method.
+  """
+  name: String!
+
+  """
+  The identifier of the payment method to rename.
+  """
+  paymentMethodId: ID!
 }
 
 """

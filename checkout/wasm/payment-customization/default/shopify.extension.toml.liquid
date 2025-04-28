@@ -1,4 +1,4 @@
-api_version = "2025-01"
+api_version = "2025-07"
 
 [[extensions]]
 name = "t:name"
@@ -8,9 +8,9 @@ type = "function"
 description = "t:description"
 
   [[extensions.targeting]]
-  target = "purchase.payment-customization.run"
-  input_query = "run.graphql"
-  export = "run"
+  target = "cart.payment-methods.transform.run"
+  input_query = "cart_payment_methods_transform_run.graphql"
+  export = "cart_payment_methods_transform_run"
 
   [extensions.build]
   command = "echo 'build the wasm'"
