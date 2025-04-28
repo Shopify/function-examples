@@ -1,0 +1,45 @@
+{%- if flavor contains "vanilla-js" -%}
+// @ts-check
+
+/**
+ * @typedef {import("../generated/api").CartPaymentMethodsTransformRunInput} CartPaymentMethodsTransformRunInput
+ * @typedef {import("../generated/api").CartPaymentMethodsTransformRunResult} CartPaymentMethodsTransformRunResult
+ */
+
+/**
+ * @type {CartPaymentMethodsTransformRunResult}
+ */
+const NO_CHANGES = {
+  operations: [],
+};
+
+/**
+ * @param {CartPaymentMethodsTransformRunInput} input
+ * @returns {CartPaymentMethodsTransformRunResult}
+ */
+export function cartPaymentMethodsTransformRun(input) {
+  const configuration = JSON.parse(
+    input?.paymentCustomization?.metafield?.value ?? "{}"
+  );
+
+  return NO_CHANGES;
+};
+{%- elsif flavor contains "typescript" -%}
+import type {
+  CartPaymentMethodsTransformRunInput,
+  CartPaymentMethodsTransformRunResult,
+} from "../generated/api";
+
+const NO_CHANGES: CartPaymentMethodsTransformRunResult = {
+  operations: [],
+};
+
+type Configuration = {};
+
+export function cartPaymentMethodsTransformRun(input: CartPaymentMethodsTransformRunInput): CartPaymentMethodsTransformRunResult {
+  const configuration: Configuration = JSON.parse(
+    input?.paymentCustomization?.metafield?.value ?? "{}"
+  );
+  return NO_CHANGES;
+};
+{%- endif -%}
