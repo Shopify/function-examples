@@ -16,6 +16,29 @@ yarn expand-liquid vanilla-js
 yarn expand-liquid typescript
 ```
 
+### Update API Versions and Function Schemas
+
+To update API versions and function schemas automatically:
+
+```shell
+# Step 1: Link to a Shopify app to create shopify.app.toml with client_id
+shopify app config link
+
+# Step 2: Generate/update the extension directories list in shopify.app.toml
+yarn generate-app
+
+# Step 3: Run the comprehensive update command
+yarn update-api-version
+```
+
+This process:
+1. First, links to a Shopify app to create shopify.app.toml with the client ID
+2. Then adds all extension directories to the same file (preserving the client_id)
+3. Finally, runs a sequence of commands that:
+   - Updates API versions across all extensions
+   - Expands liquid templates
+   - Updates function schemas
+
 ### Run Tests
 
 ```shell

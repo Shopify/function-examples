@@ -62,6 +62,7 @@ async function directoryNames(parentPath) {
 async function expandExtensionLiquidTemplates(domainName, flavor) {
   console.log(`Expanding liquid templates for ${domainName}`);
   const domainPath = path.join(process.cwd(), domainName);
+  let handleCounter = 1; // Counter for potentially truncated handles within this domain
 
   const langNames = await directoryNames(domainPath);
   for (const langName of langNames) {
@@ -79,18 +80,36 @@ async function expandExtensionLiquidTemplates(domainName, flavor) {
           await (await glob(path.join(templatePath, 'src', '!(*.liquid|*.graphql)'))).forEach(async (path) => await fs.rm(path));
         }
 
+        let baseHandle = `${langName}-${domainName}-${extensionTypeName}-${templateName}`;
+        let handle;
+
+        if (baseHandle.length > 30) {
+          // Truncate to leave space for a counter suffix (e.g., '-99')
+          const maxBaseLength = 27;
+          // Remove trailing hyphen if present after slicing, then add counter
+          handle = `${baseHandle.slice(0, maxBaseLength).replace(/-$/, '')}-${handleCounter}`;
+          // Ensure final handle does not exceed 30 characters (safeguard)
+          if (handle.length > 30) {
+             handle = handle.slice(0, 30);
+          }
+          handleCounter++; // Increment counter only when a handle is truncated
+        } else {
+          // Use the base handle if it's within the length limit
+          handle = baseHandle;
+        }
+
         const liquidData = {
-          name: `${domainName}-${extensionTypeName}-${templateName}`,
-          handle: `${domainName}-${extensionTypeName}-${templateName}`,
+          name: `${langName}-${domainName}-${extensionTypeName}-${templateName}`, // Keep original descriptive name
+          handle, // Use the potentially modified handle
           flavor,
         };
 
         await expandLiquidTemplates(templatePath, liquidData);
 
         if (langName === "javascript") {
-          const srcFilePaths = await glob(path.join(templatePath, 'src', '!(*.liquid|*.graphql)'))
-          const srcFileExtensionsToChange = []
-
+          const srcFilePaths = await glob(path.join(templatePath, 'src', '!(*.liquid|*.graphql)'));
+          const srcFileExtensionsToChange = [];
+          
           const fileExtension = flavor === "typescript" ? "ts" : "js";
 
           for (const srcFilePath of srcFilePaths) {
@@ -99,7 +118,7 @@ async function expandExtensionLiquidTemplates(domainName, flavor) {
             }));
           }
 
-          await Promise.all(srcFileExtensionsToChange)
+          await Promise.all(srcFileExtensionsToChange);
         }
       }
     }
