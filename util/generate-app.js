@@ -47,19 +47,13 @@ async function updateAppToml() {
     // Read existing content
     const existingContent = await readExistingToml();
     
-    let baseToml;
-    
-    if (existingContent) {
-      // Use existing file as the base
-      baseToml = existingContent;
-    } else {
-      // Create a new base TOML file
-      baseToml = `# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
-extension_directories = []
-web_directories = []
-`;
+    // Require an existing shopify.app.toml file
+    if (!existingContent) {
+      throw new Error(`${OUTPUT_FILE} not found. Please run 'shopify app config link' first to create the file.`);
     }
+    
+    // Use existing file as the base
+    const baseToml = existingContent;
     
     // Update the TOML content with extension directories
     const updatedContent = updateTomlValues(baseToml, [
