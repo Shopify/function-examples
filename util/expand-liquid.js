@@ -8,7 +8,7 @@ import { Liquid } from 'liquidjs';
 import path from 'path';
 import fs from 'node:fs/promises';
 import { existsSync } from 'fs';
-import toml from '@iarna/toml';
+import toml from '@iarna/toml'; // For parsing only, no manipulation
 import { exec } from 'child_process';
 
 async function expandLiquidTemplates(template, liquidData) {
