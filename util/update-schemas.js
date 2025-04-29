@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import util from 'util';
 import { existsSync } from 'fs';
+import toml from '@iarna/toml';
 
 const execPromise = util.promisify(exec);
 const APP_TOML_FILE = 'shopify.app.toml';
@@ -16,56 +17,30 @@ async function getConfig() {
     }
     
     const content = await fs.readFile(APP_TOML_FILE, 'utf8');
-    const lines = content.split('\n');
+    
+    // Parse the TOML content
+    const parsedToml = toml.parse(content);
     
     const config = {
       clientId: '',
       directories: []
     };
-
-    let inExtensionDirectories = false;
-    const dirRegex = /'([^']+)'/g;
-    const quoteRegex = /"([^"]+)"/g;
-
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      
-      // Extract client_id
-      if (trimmedLine.startsWith('client_id')) {
-        const match = line.match(quoteRegex);
-        if (match) {
-          config.clientId = match[0].replace(/"/g, '');
+    
+    // Extract client_id if it exists
+    if (parsedToml.client_id) {
+      config.clientId = parsedToml.client_id;
+    }
+    
+    // Extract extension directories if they exist
+    if (parsedToml.extension_directories && Array.isArray(parsedToml.extension_directories)) {
+      // Filter the directories to ensure they exist
+      config.directories = parsedToml.extension_directories.filter(dir => {
+        const exists = existsSync(dir);
+        if (!exists) {
+          console.warn(`Directory specified in config does not exist: ${dir}`);
         }
-        continue;
-      }
-
-      // Check if we're entering the extension_directories section
-      if (trimmedLine.startsWith('extension_directories')) {
-        inExtensionDirectories = true;
-        continue;
-      }
-
-      // Check if we're leaving the extension_directories section
-      if (inExtensionDirectories && trimmedLine.startsWith(']')) {
-        inExtensionDirectories = false;
-        continue;
-      }
-
-      // Extract directories only when in extension_directories section
-      if (inExtensionDirectories) {
-        // Try to match with both single and double quotes
-        let match = trimmedLine.match(dirRegex);
-        if (!match) {
-          match = trimmedLine.match(quoteRegex);
-        }
-        
-        if (match) {
-          const cleanDir = match[0].replace(/['"]/g, '').trim();
-          if (cleanDir && existsSync(cleanDir)) {
-            config.directories.push(cleanDir);
-          }
-        }
-      }
+        return exists;
+      });
     }
 
     return config;
