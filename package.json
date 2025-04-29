@@ -7,6 +7,7 @@
     "@graphql-codegen/typescript": "^3.0.2",
     "@graphql-codegen/typescript-operations": "^3.0.2",
     "@iarna/toml": "^2.2.5",
+    "@shopify/toml-patch": "^1.0.0",
     "dayjs": "^1.11.11",
     "fast-glob": "^3.2.11",
     "graphql": "^16.6.0",

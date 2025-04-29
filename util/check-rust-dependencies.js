@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import fastGlob from 'fast-glob';
-import toml from '@iarna/toml';
+import { updateTomlValues } from '@shopify/toml-patch';
 
 const ROOT_DIR = '.';
 const FILE_PATTERNS = ['**/Cargo.toml', '**/Cargo.toml.liquid'];
@@ -68,29 +68,65 @@ async function checkAndUpdateDependencies(filePath) {
     liquidExpressions = processed.liquidExpressions;
   }
   
-  let tomlData;
   try {
-    tomlData = toml.parse(content);
-  } catch (error) {
-    console.error(`Failed to parse TOML in file: ${filePath}`, error.message);
-    return;
-  }
-
-  if (tomlData.dependencies) {
-    const dependencyNames = Object.keys(tomlData.dependencies);
-    for (const name of dependencyNames) {
-      const currentVersion = tomlData.dependencies[name];
-      tomlData.dependencies[name] = await updateDependencyVersion(name, currentVersion);
+    // Get all dependencies and their latest versions
+    const updates = [];
+    
+    // Simple regex to extract dependencies section
+    const depsMatch = content.match(/\[dependencies\]([\s\S]*?)(\[|\Z)/);
+    if (depsMatch) {
+      const depsSection = depsMatch[1];
+      // Extract dependency names with a simple regex
+      const depMatches = depsSection.matchAll(/^([a-zA-Z0-9_-]+)\s*=\s*("[^"]*"|{[^}]*})/gm);
+      
+      for (const match of depMatches) {
+        const name = match[1].trim();
+        const currentDef = match[2];
+        
+        // Only process string dependencies for now
+        if (currentDef.startsWith('"')) {
+          const currentVersion = currentDef.replace(/"/g, '');
+          const latestVersion = await getLatestVersion(name);
+          
+          if (latestVersion && !currentVersion.includes(latestVersion)) {
+            console.log(`Updating ${name} from ${currentVersion} to ${latestVersion}`);
+            updates.push([['dependencies', name], latestVersion]);
+          }
+        } else if (currentDef.startsWith('{')) {
+          // Extract version from table syntax like { version = "1.0.0", features = ["derive"] }
+          const versionMatch = currentDef.match(/version\s*=\s*"([^"]*)"/);
+          if (versionMatch) {
+            const currentVersion = versionMatch[1];
+            const latestVersion = await getLatestVersion(name);
+            
+            if (latestVersion && !currentVersion.includes(latestVersion)) {
+              console.log(`Updating ${name} from ${currentVersion} to ${latestVersion}`);
+              // For table dependencies, we need to update just the version field
+              // This approach preserves other fields like features
+              const newDef = currentDef.replace(/version\s*=\s*"[^"]*"/, `version = "${latestVersion}"`);
+              updates.push([['dependencies', name], newDef.replace(/[{}]/g, '').trim()]);
+            }
+          }
+        }
+      }
     }
+    
+    // Only update the file if we have changes
+    if (updates.length > 0) {
+      let updatedContent = updateTomlValues(content, updates);
+      
+      if (isLiquidFile) {
+        updatedContent = restoreLiquidSyntax(updatedContent, liquidExpressions);
+      }
+      
+      await fs.writeFile(filePath, updatedContent, 'utf8');
+      console.log(`Updated dependencies in ${filePath}`);
+    } else {
+      console.log(`No updates needed for ${filePath}`);
+    }
+  } catch (error) {
+    console.error(`Failed to update TOML in file: ${filePath}`, error.message);
   }
-
-  let updatedContent = toml.stringify(tomlData);
-  if (isLiquidFile) {
-    updatedContent = restoreLiquidSyntax(updatedContent, liquidExpressions);
-  }
-
-  await fs.writeFile(filePath, updatedContent, 'utf8');
-  console.log(`Updated dependencies in ${filePath}`);
 }
 
 async function main() {
