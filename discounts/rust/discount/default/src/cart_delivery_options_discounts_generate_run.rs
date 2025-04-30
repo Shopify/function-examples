@@ -11,11 +11,10 @@ use cart_delivery_options_discounts_generate_run::output::{
 use cart_delivery_options_discounts_generate_run::input::ResponseData;
 
 #[shopify_function_target(
-    target = "cartDeliveryOptionsDiscountsGenerateRun",
-    query_path = "src/generate_delivery_run.graphql",
+    query_path = "src/cart_delivery_options_discounts_generate_run.graphql",
     schema_path = "schema.graphql"
 )]
-fn generate_delivery_run(
+fn cart_delivery_options_discounts_generate_run(
     input: ResponseData,
 ) -> Result<CartDeliveryOptionsDiscountsGenerateRunResult> {
     let first_delivery_group = input

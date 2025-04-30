@@ -12,11 +12,12 @@ use cart_lines_discounts_generate_run::output::{
 use cart_lines_discounts_generate_run::input::ResponseData;
 
 #[shopify_function_target(
-    target = "cartLinesDiscountsGenerateRun",
-    query_path = "src/generate_cart_run.graphql",
+    query_path = "src/cart_lines_discounts_generate_run.graphql",
     schema_path = "schema.graphql"
 )]
-fn generate_cart_run(input: ResponseData) -> Result<CartLinesDiscountsGenerateRunResult> {
+fn cart_lines_discounts_generate_run(
+    input: ResponseData,
+) -> Result<CartLinesDiscountsGenerateRunResult> {
     let max_cart_line = input
         .cart
         .lines
