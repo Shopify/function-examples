@@ -9,7 +9,7 @@ use cart_lines_discounts_generate_run::output::{
     ProductDiscountSelectionStrategy, ProductDiscountsAddOperation,
 };
 
-use cart_lines_discounts_generate_run::input::ResponseData;
+use cart_lines_discounts_generate_run::input::{DiscountClass, ResponseData};
 
 #[shopify_function_target(
     target = "cartLinesDiscountsGenerateRun",
@@ -30,9 +30,25 @@ fn generate_cart_run(input: ResponseData) -> Result<CartLinesDiscountsGenerateRu
         })
         .ok_or("No cart lines found")?;
 
-    Ok(CartLinesDiscountsGenerateRunResult {
-        operations: vec![
-            CartOperation::OrderDiscountsAdd(OrderDiscountsAddOperation {
+    let has_order_discount_class = input
+        .discount
+        .discount_classes
+        .contains(&DiscountClass::ORDER);
+    let has_product_discount_class = input
+        .discount
+        .discount_classes
+        .contains(&DiscountClass::PRODUCT);
+
+    if !has_order_discount_class && !has_product_discount_class {
+        return Ok(CartLinesDiscountsGenerateRunResult { operations: vec![] });
+    }
+
+    let mut operations = vec![];
+
+    // Check if the discount has the ORDER class
+    if has_order_discount_class {
+        operations.push(CartOperation::OrderDiscountsAdd(
+            OrderDiscountsAddOperation {
                 selection_strategy: OrderDiscountSelectionStrategy::FIRST,
                 candidates: vec![OrderDiscountCandidate {
                     targets: vec![OrderDiscountCandidateTarget::OrderSubtotal(
@@ -47,8 +63,14 @@ fn generate_cart_run(input: ResponseData) -> Result<CartLinesDiscountsGenerateRu
                     conditions: None,
                     associated_discount_code: None,
                 }],
-            }),
-            CartOperation::ProductDiscountsAdd(ProductDiscountsAddOperation {
+            },
+        ));
+    }
+
+    // Check if the discount has the PRODUCT class
+    if has_product_discount_class {
+        operations.push(CartOperation::ProductDiscountsAdd(
+            ProductDiscountsAddOperation {
                 selection_strategy: ProductDiscountSelectionStrategy::FIRST,
                 candidates: vec![ProductDiscountCandidate {
                     targets: vec![ProductDiscountCandidateTarget::CartLine(CartLineTarget {
@@ -61,7 +83,9 @@ fn generate_cart_run(input: ResponseData) -> Result<CartLinesDiscountsGenerateRu
                     }),
                     associated_discount_code: None,
                 }],
-            }),
-        ],
-    })
+            },
+        ));
+    }
+
+    Ok(CartLinesDiscountsGenerateRunResult { operations })
 }

@@ -8,7 +8,7 @@ use cart_delivery_options_discounts_generate_run::output::{
     DeliveryOperation, Percentage,
 };
 
-use cart_delivery_options_discounts_generate_run::input::ResponseData;
+use cart_delivery_options_discounts_generate_run::input::{DiscountClass, ResponseData};
 
 #[shopify_function_target(
     target = "cartDeliveryOptionsDiscountsGenerateRun",
@@ -18,6 +18,15 @@ use cart_delivery_options_discounts_generate_run::input::ResponseData;
 fn generate_delivery_run(
     input: ResponseData,
 ) -> Result<CartDeliveryOptionsDiscountsGenerateRunResult> {
+    let has_shipping_discount_class = input
+        .discount
+        .discount_classes
+        .contains(&DiscountClass::SHIPPING);
+
+    if !has_shipping_discount_class {
+        return Ok(CartDeliveryOptionsDiscountsGenerateRunResult { operations: vec![] });
+    }
+
     let first_delivery_group = input
         .cart
         .delivery_groups

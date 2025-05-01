@@ -5,6 +5,7 @@ import { generateCartRun } from "./generate_cart_run";
 import {
   OrderDiscountSelectionStrategy,
   ProductDiscountSelectionStrategy,
+  DiscountClass,
 } from "../generated/api";
 
 /**
@@ -12,23 +13,114 @@ import {
  */
 
 describe("generateCartRun", () => {
-  it("returns a product and order discount", () => {
-    const input = {
-      cart: {
-        lines: [
-          {
-            id: "gid://shopify/CartLine/0",
-            cost: {
-              subtotalAmount: 100,
+  const baseInput = {
+    cart: {
+      lines: [
+        {
+          id: "gid://shopify/CartLine/0",
+          cost: {
+            subtotalAmount: {
+              amount: 100
             },
           },
-        ],
+        },
+      ],
+    },
+    discount: {
+      discountClasses: [],
+    }
+  };
+
+  it("returns empty operations when no discount classes are present", () => {
+    const input = {
+      ...baseInput,
+      discount: {
+        discountClasses: [],
       },
     };
 
     const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(0);
+  });
 
-    expect(result.operations.length).toBe(2);
+  it("returns only order discount when only order discount class is present", () => {
+    const input = {
+      ...baseInput,
+      discount: {
+        discountClasses: [DiscountClass.Order],
+      },
+    };
+
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(1);
+    expect(result.operations[0]).toMatchObject({
+      orderDiscountsAdd: {
+        candidates: [
+          {
+            message: "10% OFF ORDER",
+            targets: [
+              {
+                orderSubtotal: {
+                  excludedCartLineIds: [],
+                },
+              },
+            ],
+            value: {
+              percentage: {
+                value: 10,
+              },
+            },
+          },
+        ],
+        selectionStrategy: OrderDiscountSelectionStrategy.First,
+      },
+    });
+  });
+
+  it("returns only product discount when only product discount class is present", () => {
+    const input = {
+      ...baseInput,
+      discount: {
+        discountClasses: [DiscountClass.Product],
+      },
+    };
+
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(1);
+    expect(result.operations[0]).toMatchObject({
+      productDiscountsAdd: {
+        candidates: [
+          {
+            message: "20% OFF PRODUCT",
+            targets: [
+              {
+                cartLine: {
+                  id: "gid://shopify/CartLine/0",
+                },
+              },
+            ],
+            value: {
+              percentage: {
+                value: 20,
+              },
+            },
+          },
+        ],
+        selectionStrategy: ProductDiscountSelectionStrategy.First,
+      },
+    });
+  });
+
+  it("returns both discounts when both discount classes are present", () => {
+    const input = {
+      ...baseInput,
+      discount: {
+        discountClasses: [DiscountClass.Order, DiscountClass.Product],
+      },
+    };
+
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(2);
     expect(result.operations[0]).toMatchObject({
       orderDiscountsAdd: {
         candidates: [
@@ -83,28 +175,120 @@ import { generateCartRun } from "./generate_cart_run";
 import {
   OrderDiscountSelectionStrategy,
   ProductDiscountSelectionStrategy,
+  DiscountClass,
   CartInput,
   CartLinesDiscountsGenerateRunResult
 } from "../generated/api";
 
 describe("generateCartRun", () => {
-  it("returns a product and order discount", () => {
-    const input: CartInput = {
-      cart: {
-        lines: [
-          {
-            id: "gid://shopify/CartLine/0",
-            cost: {
-              subtotalAmount: 100,
+  const baseInput: CartInput = {
+    cart: {
+      lines: [
+        {
+          id: "gid://shopify/CartLine/0",
+          cost: {
+            subtotalAmount: {
+              amount: 100
             },
           },
-        ],
+        },
+      ],
+    },
+    discount: {
+      discountClasses: [],
+    }
+  };
+
+  it("returns empty operations when no discount classes are present", () => {
+    const input: CartInput = {
+      ...baseInput,
+      discount: {
+        discountClasses: [],
       },
     };
 
-    const result: CartLinesDiscountsGenerateRunResult = generateCartRun(input);
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(0);
+  });
 
-    expect(result.operations.length).toBe(2);
+  it("returns only order discount when only order discount class is present", () => {
+    const input: CartInput = {
+      ...baseInput,
+      discount: {
+        discountClasses: [DiscountClass.Order],
+      },
+    };
+
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(1);
+    expect(result.operations[0]).toMatchObject({
+      orderDiscountsAdd: {
+        candidates: [
+          {
+            message: "10% OFF ORDER",
+            targets: [
+              {
+                orderSubtotal: {
+                  excludedCartLineIds: [],
+                },
+              },
+            ],
+            value: {
+              percentage: {
+                value: 10,
+              },
+            },
+          },
+        ],
+        selectionStrategy: OrderDiscountSelectionStrategy.First,
+      },
+    });
+  });
+
+  it("returns only product discount when only product discount class is present", () => {
+    const input: CartInput = {
+      ...baseInput,
+      discount: {
+        discountClasses: [DiscountClass.Product],
+      },
+    };
+
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(1);
+    expect(result.operations[0]).toMatchObject({
+      productDiscountsAdd: {
+        candidates: [
+          {
+            message: "20% OFF PRODUCT",
+            targets: [
+              {
+                cartLine: {
+                  id: "gid://shopify/CartLine/0",
+                },
+              },
+            ],
+            value: {
+              percentage: {
+                value: 20,
+              },
+            },
+          },
+        ],
+        selectionStrategy: ProductDiscountSelectionStrategy.First,
+      },
+    });
+  });
+
+  it("returns both discounts when both discount classes are present", () => {
+    const input: CartInput = {
+      ...baseInput,
+      discount: {
+        discountClasses: [DiscountClass.Order, DiscountClass.Product],
+      },
+    };
+
+    const result = generateCartRun(input);
+    expect(result.operations).toHaveLength(2);
     expect(result.operations[0]).toMatchObject({
       orderDiscountsAdd: {
         candidates: [
@@ -152,4 +336,4 @@ describe("generateCartRun", () => {
     });
   });
 });
-{%- endif -%} 
+{%- endif -%}
