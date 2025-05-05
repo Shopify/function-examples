@@ -1,18 +1,18 @@
 {%- if flavor contains "vanilla-js" -%}
-import { describe, it, expect } from "vitest";
+import {describe, it, expect} from "vitest";
 
-import { generateDeliveryRun } from "./generate_delivery_run";
+import {cartDeliveryOptionsDiscountsGenerateRun} from "./cart_delivery_options_discounts_generate_run";
 import {
   DeliveryDiscountSelectionStrategy,
   DiscountClass,
 } from "../generated/api";
 
 /**
- * @typedef {import("../generated/api").CartDeliveryOptionsDiscountsGenerateRunResult} CartDeliveryOptionsDiscountsGenerateRunResult
- * @typedef {import("../generated/api").DeliveryInput} DeliveryInput
- */
+  * @typedef {import("../generated/api").CartDeliveryOptionsDiscountsGenerateRunResult} CartDeliveryOptionsDiscountsGenerateRunResult
+  * @typedef {import("../generated/api").DeliveryInput} DeliveryInput
+  */
 
-describe("generateDeliveryRun", () => {
+describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
   const baseInput = {
     cart: {
       deliveryGroups: [
@@ -23,7 +23,7 @@ describe("generateDeliveryRun", () => {
     },
     discount: {
       discountClasses: [],
-    }
+    },
   };
 
   it("returns empty operations when no discount classes are present", () => {
@@ -34,7 +34,7 @@ describe("generateDeliveryRun", () => {
       },
     };
 
-    const result = generateDeliveryRun(input);
+    const result = cartDeliveryOptionsDiscountsGenerateRun(input);
     expect(result.operations).toHaveLength(0);
   });
 
@@ -46,7 +46,7 @@ describe("generateDeliveryRun", () => {
       },
     };
 
-    const result = generateDeliveryRun(input);
+    const result = cartDeliveryOptionsDiscountsGenerateRun(input);
     expect(result.operations).toHaveLength(1);
     expect(result.operations[0]).toMatchObject({
       deliveryDiscountsAdd: {
@@ -82,21 +82,24 @@ describe("generateDeliveryRun", () => {
       },
     };
 
-    expect(() => generateDeliveryRun(input)).toThrow('No delivery groups found');
+    expect(() => cartDeliveryOptionsDiscountsGenerateRun(input)).toThrow(
+      "No delivery groups found",
+    );
   });
 });
 {%- elsif flavor contains "typescript" -%}
-import { describe, it, expect } from "vitest";
+import {describe, it, expect} from "vitest";
 
-import { generateDeliveryRun } from "./generate_delivery_run";
+import {cartDeliveryOptionsDiscountsGenerateRun} from "./cart_delivery_options_discounts_generate_run";
 import {
   DeliveryDiscountSelectionStrategy,
   DiscountClass,
-  CartDeliveryOptionsDiscountsGenerateRunResult
+  DeliveryInput,
+  CartDeliveryOptionsDiscountsGenerateRunResult,
 } from "../generated/api";
 
-describe("generateDeliveryRun", () => {
-  const baseInput = {
+describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
+  const baseInput: DeliveryInput = {
     cart: {
       deliveryGroups: [
         {
@@ -106,30 +109,32 @@ describe("generateDeliveryRun", () => {
     },
     discount: {
       discountClasses: [],
-    }
+    },
   };
 
   it("returns empty operations when no discount classes are present", () => {
-    const input = {
+    const input: DeliveryInput = {
       ...baseInput,
       discount: {
         discountClasses: [],
       },
     };
 
-    const result: CartDeliveryOptionsDiscountsGenerateRunResult = generateDeliveryRun(input);
+    const result: CartDeliveryOptionsDiscountsGenerateRunResult =
+      cartDeliveryOptionsDiscountsGenerateRun(input);
     expect(result.operations).toHaveLength(0);
   });
 
   it("returns delivery discount when shipping discount class is present", () => {
-    const input = {
+    const input: DeliveryInput = {
       ...baseInput,
       discount: {
         discountClasses: [DiscountClass.Shipping],
       },
     };
 
-    const result: CartDeliveryOptionsDiscountsGenerateRunResult = generateDeliveryRun(input);
+    const result: CartDeliveryOptionsDiscountsGenerateRunResult =
+      cartDeliveryOptionsDiscountsGenerateRun(input);
     expect(result.operations).toHaveLength(1);
     expect(result.operations[0]).toMatchObject({
       deliveryDiscountsAdd: {
@@ -156,7 +161,7 @@ describe("generateDeliveryRun", () => {
   });
 
   it("throws error when no delivery groups are present", () => {
-    const input = {
+    const input: DeliveryInput = {
       cart: {
         deliveryGroups: [],
       },
@@ -165,7 +170,10 @@ describe("generateDeliveryRun", () => {
       },
     };
 
-    expect(() => generateDeliveryRun(input)).toThrow('No delivery groups found');
+    expect(() => cartDeliveryOptionsDiscountsGenerateRun(input)).toThrow(
+      "No delivery groups found",
+    );
   });
 });
+
 {%- endif -%}
