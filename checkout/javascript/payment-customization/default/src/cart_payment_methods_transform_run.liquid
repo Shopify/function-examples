@@ -2,7 +2,7 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").RunInput} RunInput
+ * @typedef {import("../generated/api").CartPaymentMethodsTransformRunInput} CartPaymentMethodsTransformRunInput
  * @typedef {import("../generated/api").CartPaymentMethodsTransformRunResult} CartPaymentMethodsTransformRunResult
  */
 
@@ -14,7 +14,7 @@ const NO_CHANGES = {
 };
 
 /**
- * @param {RunInput} input
+ * @param {CartPaymentMethodsTransformRunInput} input
  * @returns {CartPaymentMethodsTransformRunResult}
  */
 export function cartPaymentMethodsTransformRun(input) {
@@ -26,7 +26,7 @@ export function cartPaymentMethodsTransformRun(input) {
 };
 {%- elsif flavor contains "typescript" -%}
 import type {
-  RunInput,
+  CartPaymentMethodsTransformRunInput,
   CartPaymentMethodsTransformRunResult,
 } from "../generated/api";
 
@@ -36,7 +36,7 @@ const NO_CHANGES: CartPaymentMethodsTransformRunResult = {
 
 type Configuration = {};
 
-export function cartPaymentMethodsTransformRun(input: RunInput): CartPaymentMethodsTransformRunResult {
+export function cartPaymentMethodsTransformRun(input: CartPaymentMethodsTransformRunInput): CartPaymentMethodsTransformRunResult {
   const configuration: Configuration = JSON.parse(
     input?.paymentCustomization?.metafield?.value ?? "{}"
   );
