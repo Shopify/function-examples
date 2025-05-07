@@ -3,11 +3,11 @@
 
 /**
  * @typedef {import("../generated/api").RunInput} RunInput
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartFulfillmentConstraintsGenerateRunResult} CartFulfillmentConstraintsGenerateRunResult
  */
 
 /**
- * @type {FunctionRunResult}
+ * @type {CartFulfillmentConstraintsGenerateRunResult}
  */
 const NO_CHANGES = {
   operations: [],
@@ -15,7 +15,7 @@ const NO_CHANGES = {
 
 /**
  * @param {RunInput} input
- * @returns {FunctionRunResult}
+ * @returns {CartFulfillmentConstraintsGenerateRunResult}
  */
 export function run(input) {
   const configuration = JSON.parse(
@@ -27,16 +27,16 @@ export function run(input) {
 {%- elsif flavor contains "typescript" -%}
 import type {
   RunInput,
-  FunctionRunResult,
+  CartFulfillmentConstraintsGenerateRunResult,
 } from "../generated/api";
 
-const NO_CHANGES: FunctionRunResult = {
+const NO_CHANGES: CartFulfillmentConstraintsGenerateRunResult = {
   operations: [],
 };
 
 type Configuration = {};
 
-export function run(input: RunInput): FunctionRunResult {
+export function run(input: RunInput): CartFulfillmentConstraintsGenerateRunResult {
   const configuration: Configuration = JSON.parse(
     input?.fulfillmentConstraintRule?.metafield?.value ?? "{}"
   );
