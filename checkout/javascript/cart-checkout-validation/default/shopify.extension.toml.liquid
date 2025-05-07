@@ -1,4 +1,4 @@
-api_version = "2025-01"
+api_version = "2025-07"
 
 [[extensions]]
 name = "t:name"
@@ -8,11 +8,10 @@ type = "function"
 description = "t:description"
 
   [[extensions.targeting]]
-  target = "purchase.validation.run"
+  target = "cart.validations.generate.run"
   input_query = "src/run.graphql"
   export = "run"
 
   [extensions.build]
   command = ""
   path = "dist/function.wasm"
-

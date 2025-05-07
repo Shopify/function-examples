@@ -7,7 +7,8 @@ use serde::{Deserialize, Serialize};
 struct Config {}
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
+fn run(input: input::ResponseData) -> Result<output::CartValidationsGenerateRunResult> {
+    let mut operations = Vec::new();
     let mut errors = Vec::new();
 
     if input
@@ -17,12 +18,16 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         .map(|line| line.quantity)
         .any(|quantity| quantity > 1)
     {
-        errors.push(output::FunctionError {
-            localized_message: "Not possible to order more than one of each".to_owned(),
+        errors.push(output::ValidationError {
+            message: "Not possible to order more than one of each".to_owned(),
             target: "$.cart".to_owned(),
         })
     }
-    Ok(output::FunctionRunResult { errors })
+
+    let operation = output::ValidationAddOperation { errors };
+    operations.push(output::Operation::ValidationAdd(operation));
+
+    Ok(output::CartValidationsGenerateRunResult { operations })
 }
 
 #[cfg(test)]
@@ -48,11 +53,13 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult {
-            errors: vec![FunctionError {
-                localized_message: "Not possible to order more than one of each".to_owned(),
-                target: "$.cart".to_owned(),
-            }],
+        let expected = CartValidationsGenerateRunResult {
+            operations: vec![Operation::ValidationAdd(ValidationAddOperation {
+                errors: vec![ValidationError {
+                    message: "Not possible to order more than one of each".to_owned(),
+                    target: "$.cart".to_owned(),
+                }],
+            })],
         };
 
         assert_eq!(result, expected);
@@ -77,7 +84,11 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult { errors: vec![] };
+        let expected = CartValidationsGenerateRunResult {
+            operations: vec![Operation::ValidationAdd(ValidationAddOperation {
+                errors: vec![],
+            })],
+        };
 
         assert_eq!(result, expected);
         Ok(())

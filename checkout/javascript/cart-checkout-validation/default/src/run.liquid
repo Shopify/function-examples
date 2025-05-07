@@ -3,42 +3,54 @@
 
 /**
  * @typedef {import("../generated/api").RunInput} RunInput
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartValidationsGenerateRunResult} CartValidationsGenerateRunResult
  */
 
 /**
  * @param {RunInput} input
- * @returns {FunctionRunResult}
+ * @returns {CartValidationsGenerateRunResult}
  */
 export function run(input) {
   const errors = input.cart.lines
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({
-      localizedMessage: "Not possible to order more than one of each",
-      target: "$.cart",
+      message: "Not possible to order more than one of each",
+      target: "$.cart"
     }));
 
-  return {
-    errors
-  }
+  const operations = [
+    {
+      validationAdd: {
+        errors
+      },
+    },
+  ];
+
+  return { operations };
 };
 {%- elsif flavor contains "typescript" -%}
 import type {
   RunInput,
-  FunctionRunResult,
-  FunctionError,
+  CartValidationsGenerateRunResult,
+  ValidationError,
 } from "../generated/api";
 
-export function run(input: RunInput): FunctionRunResult {
-  const errors: FunctionError[] = input.cart.lines
+export function run(input: RunInput): CartValidationsGenerateRunResult {
+  const errors: ValidationError[] = input.cart.lines
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({
-      localizedMessage: "Not possible to order more than one of each",
-      target: "$.cart",
+      message: "Not possible to order more than one of each",
+      target: "$.cart"
     }));
 
-  return {
-    errors
-  }
+  const operations = [
+    {
+      validationAdd: {
+        errors
+      },
+    },
+  ];
+
+  return { operations };
 };
 {%- endif -%}
