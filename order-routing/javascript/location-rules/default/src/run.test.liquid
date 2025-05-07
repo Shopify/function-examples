@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartFulfillmentGroupsLocationRankingsGenerateRunResult} CartFulfillmentGroupsLocationRankingsGenerateRunResult
  */
 
 describe('order routing location rule function', () => {
@@ -14,9 +14,9 @@ describe('order routing location rule function', () => {
           "inventoryLocationHandles": ["456"]
       }]
     });
-    const expected = /** @type {FunctionRunResult} */ ({
+    const expected = /** @type {CartFulfillmentGroupsLocationRankingsGenerateRunResult} */ ({
       operations: [{
-        rank: {
+        fulfillment_group_location_ranking_add {
           fulfillmentGroupHandle: "123",
           rankings: [{
             locationHandle: "456",
@@ -32,7 +32,7 @@ describe('order routing location rule function', () => {
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
 import { run } from './run';
-import { FunctionRunResult } from '../generated/api';
+import { CartFulfillmentGroupsLocationRankingsGenerateRunResult } from '../generated/api';
 
 describe('order routing location rule function', () => {
   it('returns rank operations with all locations rank 0', () => {
@@ -42,9 +42,9 @@ describe('order routing location rule function', () => {
           inventoryLocationHandles: ["456"]
       }]
     });
-    const expected: FunctionRunResult = {
+    const expected: CartFulfillmentGroupsLocationRankingsGenerateRunResult = {
       operations: [{
-        rank: {
+        fulfillment_group_location_ranking_add {
           fulfillmentGroupHandle: "123",
           rankings: [{
             locationHandle: "456",
