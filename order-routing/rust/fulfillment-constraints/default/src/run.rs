@@ -7,12 +7,12 @@ use serde::{Deserialize, Serialize};
 struct Config {}
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(_input: input::ResponseData) -> Result<output::FunctionRunResult> {
+fn run(_input: input::ResponseData) -> Result<output::CartFulfillmentConstraintsGenerateRunResult> {
     let operations = vec![];
 
     // Build operations based on the input query response here.
 
-    Ok(output::FunctionRunResult { operations })
+    Ok(output::CartFulfillmentConstraintsGenerateRunResult { operations })
 }
 
 #[cfg(test)]
@@ -45,7 +45,7 @@ mod tests {
             "#,
         )?;
 
-        let expected = FunctionRunResult { operations: vec![] };
+        let expected = CartFulfillmentConstraintsGenerateRunResult { operations: vec![] };
 
         assert_eq!(result, expected);
         Ok(())
