@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 struct Config {}
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
+fn run(input: input::ResponseData) -> Result<output::CartFulfillmentGroupsLocationRankingsGenerateRunResult> {
     let operations = input
         .fulfillment_groups
         .iter()
@@ -22,7 +22,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
                 .collect::<Vec<output::RankedLocation>>();
 
             output::Operation {
-                rank: output::FulfillmentGroupRankedLocations {
+                fulfillment_group_location_ranking_add output::FulfillmentGroupLocationRankingAddOperation {
                     fulfillment_group_handle: group.handle.clone(),
                     rankings,
                 },
@@ -30,7 +30,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         })
         .collect();
 
-    Ok(output::FunctionRunResult { operations })
+    Ok(output::CartFulfillmentGroupsLocationRankingsGenerateRunResult { operations })
 }
 
 #[cfg(test)]
@@ -53,9 +53,9 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult {
+        let expected = CartFulfillmentGroupsLocationRankingsGenerateRunResult {
             operations: vec![Operation {
-                rank: FulfillmentGroupRankedLocations {
+                fulfillment_group_location_ranking_add FulfillmentGroupLocationRankingAddOperation {
                     fulfillment_group_handle: "123".to_string(),
                     rankings: vec![RankedLocation {
                         location_handle: "456".to_string(),

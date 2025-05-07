@@ -3,12 +3,12 @@
 
 /**
  * @typedef {import("../generated/api").RunInput} RunInput
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartFulfillmentGroupsLocationRankingsGenerateRunResult} CartFulfillmentGroupsLocationRankingsGenerateRunResult
  */
 
 /**
  * @param {RunInput} input
- * @returns {FunctionRunResult}
+ * @returns {CartFulfillmentGroupsLocationRankingsGenerateRunResult}
  */
 export function run(input) {
   const operations = input.fulfillmentGroups.map((group) => {
@@ -18,7 +18,7 @@ export function run(input) {
     })) || [];
 
     return {
-      rank: {
+      fulfillment_group_location_ranking_add {
         fulfillmentGroupHandle: group.handle,
         rankings,
       },
@@ -30,12 +30,12 @@ export function run(input) {
 {%- elsif flavor contains "typescript" -%}
 import type {
   RunInput,
-  FunctionRunResult,
+  CartFulfillmentGroupsLocationRankingsGenerateRunResult,
   Operation,
   RankedLocation,
 } from "../generated/api";
 
-export function run(input: RunInput): FunctionRunResult {
+export function run(input: RunInput): CartFulfillmentGroupsLocationRankingsGenerateRunResult {
   const operations: Operation[] = input.fulfillmentGroups.map((group) => {
     const rankings: RankedLocation[] = group.inventoryLocationHandles?.map(
       (inventoryLocationHandle) => ({
@@ -45,7 +45,7 @@ export function run(input: RunInput): FunctionRunResult {
     ) || [];
 
     return {
-      rank: {
+      fulfillment_group_location_ranking_add {
         fulfillmentGroupHandle: group.handle,
         rankings,
       },
