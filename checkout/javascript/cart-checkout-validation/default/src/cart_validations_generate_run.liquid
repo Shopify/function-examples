@@ -2,12 +2,12 @@
 // @ts-check
 
 /**
- * @typedef {import("../generated/api").RunInput} RunInput
+ * @typedef {import("../generated/api").CartValidationsGenerateRunInput} CartValidationsGenerateRunInput
  * @typedef {import("../generated/api").CartValidationsGenerateRunResult} CartValidationsGenerateRunResult
  */
 
 /**
- * @param {RunInput} input
+ * @param {CartValidationsGenerateRunInput} input
  * @returns {CartValidationsGenerateRunResult}
  */
 export function cartValidationsGenerateRun(input) {
@@ -30,12 +30,12 @@ export function cartValidationsGenerateRun(input) {
 };
 {%- elsif flavor contains "typescript" -%}
 import type {
-  RunInput,
+  CartValidationsGenerateRunInput,
   CartValidationsGenerateRunResult,
   ValidationError,
 } from "../generated/api";
 
-export function cartValidationsGenerateRun(input: RunInput): CartValidationsGenerateRunResult {
+export function cartValidationsGenerateRun(input: CartValidationsGenerateRunInput): CartValidationsGenerateRunResult {
   const errors: ValidationError[] = input.cart.lines
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({
