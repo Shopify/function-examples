@@ -9,8 +9,8 @@ description = "t:description"
 
   [[extensions.targeting]]
   target = "cart.payment-methods.transform.run"
-  input_query = "src/run.graphql"
-  export = "run"
+  input_query = "src/cart_payment_methods_transform_run.graphql"
+  export = "cart_payment_methods_transform_run"
 
   [extensions.build]
   command = "cargo build --target=wasm32-wasip1 --release"

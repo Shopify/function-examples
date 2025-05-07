@@ -17,7 +17,7 @@ const NO_CHANGES = {
  * @param {RunInput} input
  * @returns {CartPaymentMethodsTransformRunResult}
  */
-export function run(input) {
+export function cartPaymentMethodsTransformRun(input) {
   const configuration = JSON.parse(
     input?.paymentCustomization?.metafield?.value ?? "{}"
   );
@@ -36,7 +36,7 @@ const NO_CHANGES: CartPaymentMethodsTransformRunResult = {
 
 type Configuration = {};
 
-export function run(input: RunInput): CartPaymentMethodsTransformRunResult {
+export function cartPaymentMethodsTransformRun(input: RunInput): CartPaymentMethodsTransformRunResult {
   const configuration: Configuration = JSON.parse(
     input?.paymentCustomization?.metafield?.value ?? "{}"
   );

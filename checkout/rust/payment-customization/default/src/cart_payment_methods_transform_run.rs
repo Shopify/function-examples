@@ -13,8 +13,8 @@ impl Configuration {
     }
 }
 
-#[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::CartPaymentMethodsTransformRunResult> {
+#[shopify_function_target(query_path = "src/cart_payment_methods_transform_run.graphql", schema_path = "schema.graphql")]
+fn cart_payment_methods_transform_run(input: input::ResponseData) -> Result<output::CartPaymentMethodsTransformRunResult> {
     let no_changes = output::CartPaymentMethodsTransformRunResult { operations: vec![] };
 
     let _config = match input.payment_customization.metafield {
@@ -34,10 +34,10 @@ mod tests {
 
     #[test]
     fn test_result_contains_no_operations() -> Result<()> {
-        use run::output::*;
+        use cart_payment_methods_transform_run::output::*;
 
         let result = run_function_with_input(
-            run,
+            cart_payment_methods_transform_run,
             r#"
                 {
                     "paymentCustomization": {
