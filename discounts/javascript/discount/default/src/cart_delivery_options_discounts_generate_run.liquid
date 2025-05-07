@@ -8,11 +8,11 @@ import {  DeliveryDiscountSelectionStrategy} from '../generated/api';
  * @typedef {import("../generated/api").CartDeliveryOptionsDiscountsGenerateRunResult} CartDeliveryOptionsDiscountsGenerateRunResult
  */
 /**
- * generateDeliveryRun
+ * cartDeliveryOptionsDiscountsGenerateRun
  * @param {RunInput} input - The DeliveryInput
  * @returns {CartDeliveryOptionsDiscountsGenerateRunResult} - The function result with discounts.
  */
-export function generateDeliveryRun(input) {
+export function cartDeliveryOptionsDiscountsGenerateRun(input) {
   const firstDeliveryGroup = input.cart.deliveryGroups[0];
   if (!firstDeliveryGroup) {
       throw new Error('No delivery groups found');
@@ -51,7 +51,7 @@ import {
   CartDeliveryOptionsDiscountsGenerateRunResult,
 } from '../generated/api';
 
-export function generateDeliveryRun(
+export function cartDeliveryOptionsDiscountsGenerateRun(
   input: DeliveryInput,
 ): CartDeliveryOptionsDiscountsGenerateRunResult {
   const firstDeliveryGroup = input.cart.deliveryGroups[0];

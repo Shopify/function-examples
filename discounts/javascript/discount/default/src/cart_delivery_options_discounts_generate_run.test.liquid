@@ -1,7 +1,7 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from "vitest";
 
-import { generateDeliveryRun } from "./generate_delivery_run";
+import { cartDeliveryOptionsDiscountsGenerateRun } from "./cart_delivery_options_discounts_generate_run";
 import {
   DeliveryDiscountSelectionStrategy,
 } from "../generated/api";
@@ -11,7 +11,7 @@ import {
  * @typedef {import("../generated/api").DeliveryInput} DeliveryInput
  */
 
-describe("generateDeliveryRun", () => {
+describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
   it("returns a delivery discount", () => {
     const input = /** @type {DeliveryInput} */ ({
       cart: {
@@ -23,7 +23,7 @@ describe("generateDeliveryRun", () => {
       },
     });
 
-    const result = generateDeliveryRun(input);
+    const result = cartDeliveryOptionsDiscountsGenerateRun(input);
 
     expect(result.operations.length).toBe(1);
     expect(result.operations[0]).toMatchObject({
@@ -53,14 +53,14 @@ describe("generateDeliveryRun", () => {
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from "vitest";
 
-import { generateDeliveryRun } from "./generate_delivery_run";
+import { cartDeliveryOptionsDiscountsGenerateRun } from "./cart_delivery_options_discounts_generate_run";
 import {
   DeliveryDiscountSelectionStrategy,
   DeliveryInput,
   CartDeliveryOptionsDiscountsGenerateRunResult
 } from "../generated/api";
 
-describe("generateDeliveryRun", () => {
+describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
   it("returns a delivery discount", () => {
     const input: DeliveryInput = {
       cart: {
@@ -72,7 +72,7 @@ describe("generateDeliveryRun", () => {
       },
     };
 
-    const result: CartDeliveryOptionsDiscountsGenerateRunResult = generateDeliveryRun(input);
+    const result: CartDeliveryOptionsDiscountsGenerateRunResult = cartDeliveryOptionsDiscountsGenerateRun(input);
 
     expect(result.operations.length).toBe(1);
     expect(result.operations[0]).toMatchObject({

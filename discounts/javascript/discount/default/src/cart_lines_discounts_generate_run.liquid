@@ -12,11 +12,11 @@ import {
  */
 
 /**
- * generateCartRun
+ * cartLinesDiscountsGenerateRun
  * @param {CartInput} input - The CartInput
  * @returns {CartLinesDiscountsGenerateRunResult} - The function result with discounts.
  */
-export function generateCartRun(input) {
+export function cartLinesDiscountsGenerateRun(input) {
     if (!input.cart.lines.length) {
         throw new Error('No cart lines found');
     }
@@ -83,7 +83,7 @@ import {
   CartLinesDiscountsGenerateRunResult,
 } from '../generated/api';
 
-export function generateCartRun(input: CartInput): CartLinesDiscountsGenerateRunResult {
+export function cartLinesDiscountsGenerateRun(input: CartInput): CartLinesDiscountsGenerateRunResult {
   if (!input.cart.lines.length) {
     throw new Error('No cart lines found');
   }
