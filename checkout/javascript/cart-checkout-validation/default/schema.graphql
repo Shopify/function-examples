@@ -14,6 +14,11 @@ Scale the Functions resource limits based on the field's length.
 directive @scaleLimits(rate: Float!) on FIELD_DEFINITION
 
 """
+Requires that exactly one field must be supplied and that field must not be `null`.
+"""
+directive @oneOf on INPUT_OBJECT
+
+"""
 A custom property. Attributes are used to store additional information about a Shopify resource, such as
 products, customers, or orders. Attributes are stored as key-value pairs.
 
@@ -361,6 +366,27 @@ type CartLineCost {
   The total cost of items in a cart.
   """
   totalAmount: MoneyV2!
+}
+
+"""
+The fetch target result. Your Function must return this data structure when generating the request.
+"""
+input CartValidationsGenerateFetchResult {
+  """
+  The attributes associated with an HTTP request.
+  """
+  request: HttpRequest
+}
+
+"""
+The output of the Function run target. The object contains the validation errors
+that display to customers and prevent them from proceeding through checkout.
+"""
+input CartValidationsGenerateRunResult {
+  """
+  The ordered list of operations to apply.
+  """
+  operations: [Operation!]!
 }
 
 """
@@ -3030,9 +3056,9 @@ type HttpResponse {
   headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
 
   """
-  The HTTP response body parsed as JSON. 
-  If the body is valid JSON, it will be parsed and returned as a JSON object. 
-  If parsing fails, then raw body is returned as a string. 
+  The HTTP response body parsed as JSON.
+  If the body is valid JSON, it will be parsed and returned as a JSON object.
+  If parsing fails, then raw body is returned as a string.
   Use this field when you expect the response to be JSON, or when you're dealing
   with mixed response types, meaning both JSON and non-JSON.
   Using this field reduces function instruction consumption and ensures that the data is formatted in logs.
@@ -3099,7 +3125,7 @@ type Input {
   your fetch target, and that is passed as input to the run target. For more
   information, refer to [network access for Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/network-access).
   """
-  fetchResult: HttpResponse @restrictTarget(only: ["purchase.validation.run"])
+  fetchResult: HttpResponse @restrictTarget(only: ["purchase.validation.run", "cart.validations.generate.run"])
 
   """
   The regional and language settings that determine how the Function
@@ -3973,7 +3999,7 @@ type Localization {
   """
   The market of the active localized experience.
   """
-  market: Market!
+  market: Market! @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 }
 
 """
@@ -4241,7 +4267,7 @@ type MailingAddress {
   """
   The market of the address.
   """
-  market: Market
+  market: Market @deprecated(reason: "This `market` field will be removed in a future version of the API.")
 
   """
   The full name of the customer, based on firstName and lastName.
@@ -4401,6 +4427,26 @@ The root mutation for the API.
 """
 type MutationRoot {
   """
+  Handles the Function result for the cart.validations.generate.fetch target.
+  """
+  cartValidationsGenerateFetch(
+    """
+    The result of the Function.
+    """
+    result: CartValidationsGenerateFetchResult!
+  ): Void!
+
+  """
+  Handles the Function result for the cart.validations.generate.run target.
+  """
+  cartValidationsGenerateRun(
+    """
+    The result of the Function.
+    """
+    result: CartValidationsGenerateRunResult!
+  ): Void!
+
+  """
   Handles the Function result for the purchase.validation.fetch target.
   """
   fetch(
@@ -4429,6 +4475,16 @@ type MutationRoot {
     """
     result: FunctionRunResult!
   ): Void!
+}
+
+"""
+An operation to apply.
+"""
+input Operation @oneOf {
+  """
+  Add a performed validation.
+  """
+  validationAdd: ValidationAddOperation
 }
 
 """
@@ -4818,6 +4874,32 @@ type Validation implements HasMetafields {
     """
     namespace: String
   ): Metafield
+}
+
+"""
+Add a performed validation.
+"""
+input ValidationAddOperation {
+  """
+  Errors.
+  """
+  errors: [ValidationError!]!
+}
+
+"""
+A Function error for a path.
+"""
+input ValidationError {
+  """
+  Returns a message describing the error.
+  """
+  message: String!
+
+  """
+  Specifies the path/target for use by the UI. See [Supported checkout field targets](https://shopify.dev/docs/api/functions/reference/cart-checkout-validation/graphql#supported-checkout-field-targets)
+  for a list of supported targets.
+  """
+  target: String!
 }
 
 """
