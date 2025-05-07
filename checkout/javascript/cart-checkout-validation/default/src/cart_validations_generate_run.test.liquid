@@ -1,6 +1,6 @@
 {%- if flavor contains "vanilla-js" -%}
 import { describe, it, expect } from 'vitest';
-import { run } from './run';
+import { cartValidationsGenerateRun } from './cart_validations_generate_run';
 
 /**
  * @typedef {import("../generated/api").CartValidationsGenerateRunResult} CartValidationsGenerateRunResult
@@ -61,7 +61,7 @@ describe('cart checkout validation function', () => {
 
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
-import { run } from './run';
+import { cartValidationsGenerateRun } from './cart_validations_generate_run';
 import { CartValidationsGenerateRunResult } from "../generated/api";
 
 describe('cart checkout validation function', () => {
