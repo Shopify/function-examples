@@ -10,7 +10,7 @@
  * @param {RunInput} input
  * @returns {CartValidationsGenerateRunResult}
  */
-export function run(input) {
+export function cartValidationsGenerateRun(input) {
   const errors = input.cart.lines
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({
@@ -35,7 +35,7 @@ import type {
   ValidationError,
 } from "../generated/api";
 
-export function run(input: RunInput): CartValidationsGenerateRunResult {
+export function cartValidationsGenerateRun(input: RunInput): CartValidationsGenerateRunResult {
   const errors: ValidationError[] = input.cart.lines
     .filter(({ quantity }) => quantity > 1)
     .map(() => ({

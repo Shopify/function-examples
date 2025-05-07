@@ -8,7 +8,7 @@ import { run } from './run';
 
 describe('cart checkout validation function', () => {
   it('returns an error when quantity exceeds one', () => {
-    const result = run({
+    const result = cartValidationsGenerateRun({
       cart: {
         lines: [
           {
@@ -36,7 +36,7 @@ describe('cart checkout validation function', () => {
   });
 
   it('returns no errors when quantity is one', () => {
-    const result = run({
+    const result = cartValidationsGenerateRun({
       cart: {
         lines: [
           {
@@ -66,7 +66,7 @@ import { CartValidationsGenerateRunResult } from "../generated/api";
 
 describe('cart checkout validation function', () => {
   it('returns an error when quantity exceeds one', () => {
-    const result = run({
+    const result = cartValidationsGenerateRun({
       cart: {
         lines: [
           {
@@ -94,7 +94,7 @@ describe('cart checkout validation function', () => {
   });
 
   it('returns no errors when quantity is one', () => {
-    const result = run({
+    const result = cartValidationsGenerateRun({
       cart: {
         lines: [
           {

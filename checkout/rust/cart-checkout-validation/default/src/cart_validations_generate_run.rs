@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Default, PartialEq)]
 struct Config {}
 
-#[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::CartValidationsGenerateRunResult> {
+#[shopify_function_target(query_path = "src/cart_validations_generate_run.graphql", schema_path = "schema.graphql")]
+fn cart_validations_generate_run(input: input::ResponseData) -> Result<output::CartValidationsGenerateRunResult> {
     let mut operations = Vec::new();
     let mut errors = Vec::new();
 
@@ -37,10 +37,10 @@ mod tests {
 
     #[test]
     fn test_result_contains_single_error_when_quantity_exceeds_one() -> Result<()> {
-        use run::output::*;
+        use cart_validations_generate_run::output::*;
 
         let result = run_function_with_input(
-            run,
+            cart_validations_generate_run,
             r#"
                 {
                     "cart": {
@@ -68,10 +68,10 @@ mod tests {
 
     #[test]
     fn test_result_contains_no_errors_when_quantity_is_one() -> Result<()> {
-        use run::output::*;
+        use cart_validations_generate_run::output::*;
 
         let result = run_function_with_input(
-            run,
+            cart_validations_generate_run,
             r#"
                 {
                     "cart": {
