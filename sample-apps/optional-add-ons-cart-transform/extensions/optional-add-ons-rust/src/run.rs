@@ -52,6 +52,7 @@ fn get_update_cart_operations(
                                 },
                             ),
                         }),
+                        attributes: None,
                     };
                     let expanded_cart_item = ExpandedItem {
                         merchandise_id: _warranty_variant_id.value.clone(),
@@ -67,6 +68,7 @@ fn get_update_cart_operations(
                                 },
                             ),
                         }),
+                        attributes: None,
                     };
                     let expand_operation = ExpandOperation {
                         cart_line_id: line.id.clone(),
