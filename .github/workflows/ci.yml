@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Expand liquid
+        run: yarn expand-liquid
+
+      - name: Validate schemas
+        run: yarn validate-schemas
