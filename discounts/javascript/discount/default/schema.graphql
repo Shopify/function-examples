@@ -3372,7 +3372,7 @@ type Input {
 
   """
   The discount node that owns the [Shopify
-  Function](https://shopify.dev/docs/apps/build/functions)). Discounts are a way
+  Function](https://shopify.dev/docs/apps/build/functions). Discounts are a way
   for merchants to promote sales and special offers, or as customer loyalty
   rewards. A single discount can be automatic or code-based, and can be applied
   to a cart lines, orders, and delivery.
