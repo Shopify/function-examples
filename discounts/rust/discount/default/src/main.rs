@@ -1,6 +1,6 @@
 use std::process;
-pub mod generate_cart_run;
-pub mod generate_delivery_run;
+pub mod cart_delivery_options_discounts_generate_run;
+pub mod cart_lines_discounts_generate_run;
 
 fn main() {
     eprintln!("Please invoke a named export.");
