@@ -2,12 +2,12 @@
 
 /**
  * @typedef {import("../generated/api").RunInput} RunInput
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartDeliveryOptionsTransformRunResult} CartDeliveryOptionsTransformRunResult
  * @typedef {import("../generated/api").Operation} Operation
  */
 
 /**
- * @type {FunctionRunResult}
+ * @type {CartDeliveryOptionsTransformRunResult}
  */
 const NO_CHANGES = {
   operations: [],
@@ -15,7 +15,7 @@ const NO_CHANGES = {
 
 /**
  * @param {RunInput} input
- * @returns {FunctionRunResult}
+ * @returns {CartDeliveryOptionsTransformRunResult}
  */
 export function run(input) {
   /**
@@ -36,7 +36,7 @@ export function run(input) {
       group.deliveryAddress.provinceCode == configuration.stateProvinceCode)
     .flatMap(group => group.deliveryOptions)
     .map(option => /** @type {Operation} */({
-      rename: {
+      deliveryOptionRename: {
         deliveryOptionHandle: option.handle,
         title: option.title ? `${option.title} - ${configuration.message}` : configuration.message
       }

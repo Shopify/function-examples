@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartDeliveryOptionsTransformRunResult} CartDeliveryOptionsTransformRunResult
  */
 
 describe('delivery customization function', () => {
@@ -15,7 +15,7 @@ describe('delivery customization function', () => {
                 "metafield": null
             }
         });
-        const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
+        const expected = /** @type {CartDeliveryOptionsTransformRunResult} */ ({ operations: [] });
 
         expect(result).toEqual(expected);
     });
@@ -42,16 +42,16 @@ describe('delivery customization function', () => {
                 }
             }
         });
-        const expected = /** @type {FunctionRunResult} */ ({
+        const expected = /** @type {CartDeliveryOptionsTransformRunResult} */ ({
             operations: [
                 {
-                    rename: {
+                    deliveryOptionRename: {
                         deliveryOptionHandle: "test_delivery_option",
                         title: "Test Delivery Option - Test Message"
                     }
                 },
                 {
-                    rename: {
+                    deliveryOptionRename: {
                         deliveryOptionHandle: "test_delivery_option_2",
                         title: "Test Delivery Option 2 - Test Message"
                     }
@@ -81,7 +81,7 @@ describe('delivery customization function', () => {
                 }
             }
         });
-        const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
+        const expected = /** @type {CartDeliveryOptionsTransformRunResult} */ ({ operations: [] });
 
         expect(result).toEqual(expected);
     });

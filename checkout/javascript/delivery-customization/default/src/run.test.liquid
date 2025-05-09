@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { run } from './run';
 
 /**
- * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
+ * @typedef {import("../generated/api").CartDeliveryOptionsTransformRunResult} CartDeliveryOptionsTransformRunResult
  */
 
 describe('delivery customization function', () => {
@@ -13,7 +13,7 @@ describe('delivery customization function', () => {
         metafield: null
       }
     });
-    const expected = /** @type {FunctionRunResult} */ ({ operations: [] });
+    const expected = /** @type {CartDeliveryOptionsTransformRunResult} */ ({ operations: [] });
 
     expect(result).toEqual(expected);
   });
@@ -21,7 +21,7 @@ describe('delivery customization function', () => {
 {%- elsif flavor contains "typescript" -%}
 import { describe, it, expect } from 'vitest';
 import { run } from './run';
-import { FunctionRunResult } from '../generated/api';
+import { CartDeliveryOptionsTransformRunResult } from '../generated/api';
 
 describe('delivery customization function', () => {
   it('returns no operations without configuration', () => {
@@ -30,7 +30,7 @@ describe('delivery customization function', () => {
         metafield: null
       }
     });
-    const expected: FunctionRunResult = { operations: [] };
+    const expected: CartDeliveryOptionsTransformRunResult = { operations: [] };
 
     expect(result).toEqual(expected);
   });

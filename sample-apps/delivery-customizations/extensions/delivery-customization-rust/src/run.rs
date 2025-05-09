@@ -19,8 +19,8 @@ impl Configuration {
 }
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
-    let no_changes = output::FunctionRunResult { operations: vec![] };
+fn run(input: input::ResponseData) -> Result<output::CartDeliveryOptionsTransformRunResult> {
+    let no_changes = output::CartDeliveryOptionsTransformRunResult { operations: vec![] };
 
     // Get the configuration from the metafield on your function owner
     let config = match input.delivery_customization.metafield {
@@ -47,7 +47,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         })
         .flat_map(|group| &group.delivery_options)
         .map(|option| {
-            output::Operation::Rename(output::RenameOperation {
+            output::Operation::DeliveryOptionRename(output::DeliveryOptionRenameOperation {
                 delivery_option_handle: option.handle.to_string(),
                 title: match &option.title {
                     // Use the configured message, instead of a hardcoded value
@@ -58,7 +58,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         })
         .collect();
 
-    Ok(output::FunctionRunResult {
+    Ok(output::CartDeliveryOptionsTransformRunResult {
         operations: to_rename,
     })
 }
@@ -85,7 +85,7 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult { operations: vec![] };
+        let expected = CartDeliveryOptionsTransformRunResult { operations: vec![] };
 
         assert_eq!(result, expected);
         Ok(())
@@ -121,13 +121,13 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult {
+        let expected = CartDeliveryOptionsTransformRunResult {
             operations: vec![
-                Operation::Rename(RenameOperation {
+                Operation::DeliveryOptionRename(DeliveryOptionRenameOperation {
                     delivery_option_handle: "test_delivery_option".to_string(),
                     title: "Test Delivery Option - Test Message".to_string(),
                 }),
-                Operation::Rename(RenameOperation {
+                Operation::DeliveryOptionRename(DeliveryOptionRenameOperation {
                     delivery_option_handle: "test_delivery_option_2".to_string(),
                     title: "Test Delivery Option 2 - Test Message".to_string(),
                 }),
@@ -165,7 +165,7 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult { operations: vec![] };
+        let expected = CartDeliveryOptionsTransformRunResult { operations: vec![] };
 
         assert_eq!(result, expected);
         Ok(())
