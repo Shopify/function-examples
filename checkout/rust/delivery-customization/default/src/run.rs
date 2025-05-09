@@ -14,8 +14,8 @@ impl Configuration {
 }
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
-    let no_changes = output::FunctionRunResult { operations: vec![] };
+fn run(input: input::ResponseData) -> Result<output::CartDeliveryOptionsTransformRunResult> {
+    let no_changes = output::CartDeliveryOptionsTransformRunResult { operations: vec![] };
 
     let _config = match input.delivery_customization.metafield {
         Some(input::InputDeliveryCustomizationMetafield { value }) => {
@@ -24,7 +24,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         None => return Ok(no_changes),
     };
 
-    Ok(output::FunctionRunResult { operations: vec![] })
+    Ok(output::CartDeliveryOptionsTransformRunResult { operations: vec![] })
 }
 
 #[cfg(test)]
@@ -46,7 +46,7 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult { operations: vec![] };
+        let expected = CartDeliveryOptionsTransformRunResult { operations: vec![] };
 
         assert_eq!(result, expected);
         Ok(())
