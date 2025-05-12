@@ -1,4 +1,4 @@
-api_version = "unstable"
+api_version = "2025-04"
 
 [[extensions]]
 name = "t:name"
@@ -10,12 +10,12 @@ description = "t:description"
   [[extensions.targeting]]
   target = "cart.lines.discounts.generate.run"
   input_query = "src/generate_cart_run.graphql"
-  export = "generate_cart_run"
+  export = "cart_lines_discounts_generate_run"
 
   [[extensions.targeting]]
   target = "cart.delivery-options.discounts.generate.run"
   input_query = "src/generate_delivery_run.graphql"
-  export = "generate_delivery_run"
+  export = "cart_delivery_options_discounts_generate_run"
 
   [extensions.build]
   command = "cargo build --target=wasm32-wasip1 --release"
