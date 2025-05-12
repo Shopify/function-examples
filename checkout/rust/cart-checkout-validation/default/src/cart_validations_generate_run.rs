@@ -6,8 +6,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Default, PartialEq)]
 struct Config {}
 
-#[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
-fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
+#[shopify_function_target(query_path = "src/cart_validations_generate_run.graphql", schema_path = "schema.graphql")]
+fn cart_validations_generate_run(input: input::ResponseData) -> Result<output::CartValidationsGenerateRunResult> {
+    let mut operations = Vec::new();
     let mut errors = Vec::new();
 
     if input
@@ -17,12 +18,16 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         .map(|line| line.quantity)
         .any(|quantity| quantity > 1)
     {
-        errors.push(output::FunctionError {
-            localized_message: "Not possible to order more than one of each".to_owned(),
+        errors.push(output::ValidationError {
+            message: "Not possible to order more than one of each".to_owned(),
             target: "$.cart".to_owned(),
         })
     }
-    Ok(output::FunctionRunResult { errors })
+
+    let operation = output::ValidationAddOperation { errors };
+    operations.push(output::Operation::ValidationAdd(operation));
+
+    Ok(output::CartValidationsGenerateRunResult { operations })
 }
 
 #[cfg(test)]
@@ -32,10 +37,10 @@ mod tests {
 
     #[test]
     fn test_result_contains_single_error_when_quantity_exceeds_one() -> Result<()> {
-        use run::output::*;
+        use cart_validations_generate_run::output::*;
 
         let result = run_function_with_input(
-            run,
+            cart_validations_generate_run,
             r#"
                 {
                     "cart": {
@@ -48,11 +53,13 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult {
-            errors: vec![FunctionError {
-                localized_message: "Not possible to order more than one of each".to_owned(),
-                target: "$.cart".to_owned(),
-            }],
+        let expected = CartValidationsGenerateRunResult {
+            operations: vec![Operation::ValidationAdd(ValidationAddOperation {
+                errors: vec![ValidationError {
+                    message: "Not possible to order more than one of each".to_owned(),
+                    target: "$.cart".to_owned(),
+                }],
+            })],
         };
 
         assert_eq!(result, expected);
@@ -61,10 +68,10 @@ mod tests {
 
     #[test]
     fn test_result_contains_no_errors_when_quantity_is_one() -> Result<()> {
-        use run::output::*;
+        use cart_validations_generate_run::output::*;
 
         let result = run_function_with_input(
-            run,
+            cart_validations_generate_run,
             r#"
                 {
                     "cart": {
@@ -77,7 +84,11 @@ mod tests {
                 }
             "#,
         )?;
-        let expected = FunctionRunResult { errors: vec![] };
+        let expected = CartValidationsGenerateRunResult {
+            operations: vec![Operation::ValidationAdd(ValidationAddOperation {
+                errors: vec![],
+            })],
+        };
 
         assert_eq!(result, expected);
         Ok(())
