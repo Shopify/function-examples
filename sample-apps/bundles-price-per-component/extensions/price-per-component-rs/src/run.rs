@@ -11,7 +11,6 @@ use serde_json::Value;
 use shopify_function::prelude::*;
 use shopify_function::Result;
 
-
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
 fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
     let presentment_currency_rate_f64 = input.presentment_currency_rate.0;
