@@ -7,37 +7,31 @@ use run::output::ExpandedItemFixedPricePerUnitAdjustment;
 use run::output::ExpandedItemPriceAdjustment;
 use run::output::ExpandedItemPriceAdjustmentValue;
 
+use serde_json::Value;
 use shopify_function::prelude::*;
 use shopify_function::Result;
-use serde_json::Value;
+
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
 fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
     let presentment_currency_rate_f64 = input.presentment_currency_rate.0;
-    let cart_operations: Vec<CartOperation> = get_update_cart_operations(
-        &input.cart,
-        presentment_currency_rate_f64,
-    );
+    let cart_operations: Vec<CartOperation> =
+        get_update_cart_operations(&input.cart, presentment_currency_rate_f64);
 
     Ok(output::FunctionRunResult {
         operations: cart_operations,
     })
 }
 
-fn get_update_cart_operations(
-    cart: &Cart,
-    presentment_currency_rate: f64,
-) -> Vec<CartOperation> {
+fn get_update_cart_operations(cart: &Cart, presentment_currency_rate: f64) -> Vec<CartOperation> {
     cart.lines
         .iter()
         .filter_map(|line| {
             if let ProductVariant(variant) = &line.merchandise {
                 if let Some(bundle_data) = &variant.product.bundled_component_data {
                     if let Some(components) = parse_bundle_components(&bundle_data.value) {
-                        let expanded_items = create_expanded_items(
-                            components,
-                            presentment_currency_rate,
-                        );
+                        let expanded_items =
+                            create_expanded_items(components, presentment_currency_rate);
 
                         if !expanded_items.is_empty() {
                             let expand_operation = ExpandOperation {
@@ -73,7 +67,10 @@ fn create_expanded_items(
         .filter_map(|component| {
             let id = component.get("id")?.as_str()?;
             let price = component.get("price")?.as_str()?;
-            let quantity = component.get("quantity").and_then(|q| q.as_u64()).unwrap_or(1);
+            let quantity = component
+                .get("quantity")
+                .and_then(|q| q.as_u64())
+                .unwrap_or(1);
 
             let price_float = price.parse::<f64>().ok()?;
             let adjusted_price = price_float * presentment_currency_rate;
