@@ -1,0 +1,45 @@
+{
+    "operations": [
+        {
+            "expand": {
+                "cartLineId": "1",
+                "expandedCartItems": [
+                    {
+                        "merchandiseId": "gid://shopify/ProductVariant/2",
+                        "price": {
+                            "adjustment": {
+                                "fixedPricePerUnit": {
+                                    "amount": "25.0"
+                                }
+                            }
+                        },
+                        "quantity": 1
+                    },
+                    {
+                        "merchandiseId": "gid://shopify/ProductVariant/3",
+                        "price": {
+                            "adjustment": {
+                                "fixedPricePerUnit": {
+                                    "amount": "25.0"
+                                }
+                            }
+                        },
+                        "quantity": 1
+                    },
+                    {
+                        "merchandiseId": "gid://shopify/ProductVariant/4",
+                        "price": {
+                            "adjustment": {
+                                "fixedPricePerUnit": {
+                                    "amount": "25.0"
+                                }
+                            }
+                        },
+                        "quantity": 1
+                    }
+                ],
+                "title": "Holiday Package"
+            }
+        }
+    ]
+}
