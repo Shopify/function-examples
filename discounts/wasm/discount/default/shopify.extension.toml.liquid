@@ -1,23 +1,13 @@
 api_version = "2025-04"
 
-[[extensions]]
-name = "t:name"
-handle = "{{handle | replace: " ", "-" | downcase}}"
-type = "function"
+[[extensions]] name = "t:name" handle = "{{ handle | replace: ' ', '-' | downcase }}" type = "function"
 {% if uid %}uid = "{{ uid }}"{% endif %}
 description = "t:description"
 
-  [[extensions.targeting]]
-  target = "cart.lines.discounts.generate.run"
-  input_query = "generate_cart_run.graphql"
-  export = "cart_lines_discounts_generate_run"
+[[extensions.targeting]] target = "cart.lines.discounts.generate.run" input_query =
+"cart_lines_discounts_generate_run.graphql" export = "cart_lines_discounts_generate_run"
 
-  [[extensions.targeting]]
-  target = "cart.delivery-options.discounts.generate.run"
-  input_query = "generate_delivery_run.graphql"
-  export = "cart_delivery_options_discounts_generate_run"
+[[extensions.targeting]] target = "cart.delivery-options.discounts.generate.run" input_query =
+"cart_delivery_options_discounts_generate_run.graphql" export = "cart_delivery_options_discounts_generate_run"
 
-  [extensions.build]
-  command = "echo 'build the wasm'"
-  path = ""
-  watch = []
+[extensions.build] command = "echo 'build the wasm'" path = "" watch = []
