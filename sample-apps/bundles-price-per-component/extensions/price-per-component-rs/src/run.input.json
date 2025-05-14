@@ -1,0 +1,22 @@
+{
+    "presentmentCurrencyRate": "1.0",
+    "cart": {
+        "lines": [
+            {
+                "id": "1",
+                "quantity": 1,
+                "merchandise": {
+                    "__typename": "ProductVariant",
+                    "id": "gid://shopify/ProductVariant/1",
+                    "title": "Holiday Package",
+                    "product": {
+                        "bundledComponentData": {
+                            "type": "json",
+                            "value": "[{\"id\":\"gid://shopify/ProductVariant/2\",\"price\":\"25.00\"},{\"id\":\"gid://shopify/ProductVariant/3\",\"price\":\"25.00\"},{\"id\":\"gid://shopify/ProductVariant/4\",\"price\":\"25.00\"}]"
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}
