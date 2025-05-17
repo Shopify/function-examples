@@ -32,3 +32,4 @@ sample-apps/*/public/build/*
 !sample-apps/**/shopify.extension.toml
 !sample-apps/**/locales/*.json
 dev.sqlite
+shopify.app.toml
