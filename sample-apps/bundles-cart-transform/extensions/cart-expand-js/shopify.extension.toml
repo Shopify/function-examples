@@ -2,8 +2,7 @@ api_version = "2024-04"
 
 [[extensions]]
 name = "test-demo"
-type = "cart_transform"
-title = "cart transform"
+type = "function"
 
   [[extensions.targeting]]
   target = "purchase.cart-transform.run"

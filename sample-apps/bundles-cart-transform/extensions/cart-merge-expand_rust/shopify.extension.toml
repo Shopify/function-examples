@@ -3,8 +3,7 @@ api_version = "2024-04"
 
 [[extensions]]
 name = "cart merge expand"
-type = "cart_transform"
-title = "cart merge expand"
+type = "function"
 
   [[extensions.targeting]]
   target = "purchase.cart-transform.run"
