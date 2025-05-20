@@ -1,8 +1,14 @@
-name = "test-demo"
-type = "cart_transform"
-title = "cart transform"
 api_version = "2024-04"
 
-[build]
-command = ""
-path = "dist/function.wasm"
+[[extensions]]
+name = "test-demo"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
