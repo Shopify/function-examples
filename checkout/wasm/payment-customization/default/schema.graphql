@@ -76,7 +76,7 @@ type BuyerIdentity {
 The cart where the Function is running. A cart contains the merchandise that a customer intends to purchase
 and information about the customer, such as the customer's email address and phone number.
 """
-type Cart {
+type Cart implements HasMetafields {
   """
   The custom attributes associated with a cart to store additional information. Cart attributes
   allow you to collect specific information from customers on the **Cart** page, such as order notes,
@@ -140,6 +140,34 @@ type Cart {
     """
     keys: [LocalizedFieldKey!]! = []
   ): [LocalizedField!]!
+
+  """
+  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
+  about a Shopify resource, such as products, orders, and
+  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
+  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
+  enables you to customize the checkout experience.
+  """
+  metafield(
+    """
+    The unique identifier for the metafield within its namespace. A metafield is composed of a
+    namespace and a key, in the format `namespace.key`.
+    """
+    key: String!
+
+    """
+    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
+    between different apps or different parts of the same app. If omitted, then the
+    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
+    is used.
+    """
+    namespace: String
+  ): Metafield
+
+  """
+  The physical location where a retail order is created or completed.
+  """
+  retailLocation: Location
 }
 
 """
@@ -194,6 +222,11 @@ type CartDeliveryGroup {
   deliveryOptions: [CartDeliveryOption!]!
 
   """
+  The type of merchandise in the delivery group.
+  """
+  groupType: CartDeliveryGroupType!
+
+  """
   A [globally-unique ID](https://shopify.dev/docs/api/usage/gids)
   for the delivery group.
   """
@@ -203,6 +236,22 @@ type CartDeliveryGroup {
   Information about the delivery option that the customer has selected.
   """
   selectedDeliveryOption: CartDeliveryOption
+}
+
+"""
+Defines what type of merchandise is in the delivery group.
+"""
+enum CartDeliveryGroupType {
+  """
+  The delivery group only contains merchandise that is either a one time purchase or a first delivery of
+  subscription merchandise.
+  """
+  ONE_TIME_PURCHASE
+
+  """
+  The delivery group only contains subscription merchandise.
+  """
+  SUBSCRIPTION
 }
 
 """
@@ -2803,6 +2852,16 @@ enum DeliveryMethod {
 }
 
 """
+The percentage deposit required at checkout for the order.
+"""
+input Deposit {
+  """
+  The percentage of the order total that should be paid as a deposit. Must be between 1 and 99, inclusive.
+  """
+  percentage: Float!
+}
+
+"""
 An operation to apply to the list of payment methods.
 """
 input DeprecatedOperation @oneOf {
@@ -2829,6 +2888,11 @@ input DeprecatedOperation @oneOf {
   move: MoveOperation @deprecated(reason: "Use `paymentMethodMove` instead.")
 
   """
+  Request to set the payment terms.
+  """
+  paymentTermsSet: PaymentTermsSetOperation
+
+  """
   A request to change the displayed name of a payment method during checkout.
 
   When your Function returns this operation, it replaces the default name of the
@@ -2839,6 +2903,36 @@ input DeprecatedOperation @oneOf {
   implemented in your Function.
   """
   rename: RenameOperation @deprecated(reason: "Use `paymentMethodRename` instead.")
+}
+
+"""
+The input to set event-based payment terms.
+"""
+input EventPaymentTerms {
+  """
+  The deposit for payment terms. No deposit by default.
+  """
+  deposit: Deposit
+
+  """
+  The event that triggers the payment terms.
+  """
+  trigger: PaymentTermsTriggerEvent!
+}
+
+"""
+The input to set fixed payment terms.
+"""
+input FixedPaymentTerms {
+  """
+  The deposit for payment terms. No deposit by default.
+  """
+  deposit: Deposit
+
+  """
+  The due date for fixed payment terms.
+  """
+  dueAt: DateTime!
 }
 
 """
@@ -4052,6 +4146,119 @@ enum LocalizedFieldKey {
 }
 
 """
+Represents the location where the inventory resides.
+"""
+type Location implements HasMetafields {
+  """
+  The address of this location.
+  """
+  address: LocationAddress!
+
+  """
+  The location handle.
+  """
+  handle: Handle!
+
+  """
+  The location id.
+  """
+  id: ID!
+
+  """
+  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
+  about a Shopify resource, such as products, orders, and
+  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
+  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
+  enables you to customize the checkout experience.
+  """
+  metafield(
+    """
+    The unique identifier for the metafield within its namespace. A metafield is composed of a
+    namespace and a key, in the format `namespace.key`.
+    """
+    key: String!
+
+    """
+    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
+    between different apps or different parts of the same app. If omitted, then the
+    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
+    is used.
+    """
+    namespace: String
+  ): Metafield
+
+  """
+  The name of the location.
+  """
+  name: String!
+}
+
+"""
+Represents the address of a location.
+"""
+type LocationAddress {
+  """
+  The first line of the address for the location.
+  """
+  address1: String
+
+  """
+  The second line of the address for the location.
+  """
+  address2: String
+
+  """
+  The city of the location.
+  """
+  city: String
+
+  """
+  The country of the location.
+  """
+  country: String
+
+  """
+  The country code of the location.
+  """
+  countryCode: String
+
+  """
+  A formatted version of the address for the location.
+  """
+  formatted: [String!]!
+
+  """
+  The approximate latitude coordinates of the location.
+  """
+  latitude: Float
+
+  """
+  The approximate longitude coordinates of the location.
+  """
+  longitude: Float
+
+  """
+  The phone number of the location.
+  """
+  phone: String
+
+  """
+  The province of the location.
+  """
+  province: String
+
+  """
+  The code for the province, state, or district of the address of the location.
+  """
+  provinceCode: String
+
+  """
+  The ZIP code of the location.
+  """
+  zip: String
+}
+
+"""
 Represents a mailing address.
 """
 type MailingAddress {
@@ -4315,6 +4522,29 @@ type MutationRoot {
 }
 
 """
+The input to set net payment terms.
+"""
+input NetPaymentTerms {
+  """
+  The deposit for payment terms. No deposit by default.
+  """
+  deposit: Deposit
+
+  """
+  The number of days until the payment is due.
+  Currently supported values are restricted to 7, 15, 30, 45, 60, and 90.
+  These values may change in the future as restrictions are lifted,
+  but existing values will continue to be supported.
+  """
+  dueInDays: Int!
+
+  """
+  The issued date of net payment terms. Set to current time if nil.
+  """
+  issuedAt: DateTime
+}
+
+"""
 An operation to apply to the list of payment methods.
 """
 input Operation @oneOf {
@@ -4351,6 +4581,11 @@ input Operation @oneOf {
   implemented in your Function.
   """
   paymentMethodRename: PaymentMethodRenameOperation
+
+  """
+  Request to set the payment terms.
+  """
+  paymentTermsSet: PaymentTermsSetOperation
 }
 
 """
@@ -4478,6 +4713,56 @@ input PaymentMethodRenameOperation {
   The identifier of the payment method to rename.
   """
   paymentMethodId: ID!
+}
+
+"""
+The payment terms to set.
+"""
+input PaymentTerms @oneOf {
+  """
+  The input to set event-based payment terms.
+  """
+  event: EventPaymentTerms
+
+  """
+  The input to set fixed payment terms.
+  """
+  fixed: FixedPaymentTerms
+
+  """
+  The input to set net payment terms.
+  """
+  net: NetPaymentTerms
+}
+
+"""
+Request to set the payment terms.
+"""
+input PaymentTermsSetOperation {
+  """
+  The payment terms to set. No payment terms when nil
+  """
+  paymentTerms: PaymentTerms
+}
+
+"""
+The event that triggers the payment terms.
+"""
+enum PaymentTermsTriggerEvent {
+  """
+  Triggered when a fulfillment is created.
+  """
+  FULFILLMENT_CREATED
+
+  """
+  Triggered when an invoice is sent.
+  """
+  INVOICE_SENT
+
+  """
+  Triggered when an order is fulfilled.
+  """
+  ORDER_FULFILLED
 }
 
 """
