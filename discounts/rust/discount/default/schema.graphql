@@ -91,7 +91,7 @@ type BuyerIdentity {
 The cart where the Function is running. A cart contains the merchandise that a customer intends to purchase
 and information about the customer, such as the customer's email address and phone number.
 """
-type Cart implements HasMetafields {
+type Cart {
   """
   The custom attributes associated with a cart to store additional information. Cart attributes
   allow you to collect specific information from customers on the **Cart** page, such as order notes,
@@ -128,6 +128,13 @@ type Cart implements HasMetafields {
   fulfillment by organizing items that can be shipped together, based on the customer's
   shipping address. For example, if a customer orders a t-shirt and a pair of shoes that can be shipped
   together, then the items are included in the same delivery group.
+
+  In the [Order Discount](https://shopify.dev/docs/api/functions/reference/order-discounts) and
+  [Product Discount](https://shopify.dev/docs/api/functions/reference/product-discounts) legacy APIs,
+  the `cart.deliveryGroups` input is always an empty array. This means you can't access delivery groups when
+  creating Order Discount or Product Discount Functions. If you need to apply discounts to shipping costs,
+  then use the [Discount Function API](https://shopify.dev/docs/api/functions/reference/discount)
+  instead.
   """
   deliveryGroups: [CartDeliveryGroup!]!
 
@@ -148,34 +155,6 @@ type Cart implements HasMetafields {
     """
     keys: [LocalizedFieldKey!]! = []
   ): [LocalizedField!]!
-
-  """
-  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
-  about a Shopify resource, such as products, orders, and
-  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
-  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
-  enables you to customize the checkout experience.
-  """
-  metafield(
-    """
-    The unique identifier for the metafield within its namespace. A metafield is composed of a
-    namespace and a key, in the format `namespace.key`.
-    """
-    key: String!
-
-    """
-    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
-    between different apps or different parts of the same app. If omitted, then the
-    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
-    is used.
-    """
-    namespace: String
-  ): Metafield
-
-  """
-  The physical location where a retail order is created or completed.
-  """
-  retailLocation: Location
 }
 
 """
@@ -1917,8 +1896,9 @@ enum CountryCode {
 }
 
 """
-The three-letter currency codes that represent the world currencies used in stores. Currency codes include
-[standard ISO 4217 codes](https://en.wikipedia.org/wiki/ISO_4217), legacy codes, and non-standard codes.
+The currency codes that represent the world currencies throughout the Admin API. Currency codes include
+[standard ISO 4217 codes](https://en.wikipedia.org/wiki/ISO_4217), legacy codes, non-standard codes,
+digital currency codes.
 """
 enum CurrencyCode {
   """
@@ -2044,7 +2024,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+  BYR @deprecated(reason: "Use `BYN` instead.")
 
   """
   Belize Dollar (BZD).
@@ -2569,7 +2549,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+  STD @deprecated(reason: "Use `STN` instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2647,6 +2627,11 @@ enum CurrencyCode {
   USD
 
   """
+  United States Dollars Coin (USDC).
+  """
+  USDC
+
+  """
   Uruguayan Pesos (UYU).
   """
   UYU
@@ -2664,7 +2649,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+  VEF @deprecated(reason: "Use `VES` instead.")
 
   """
   Venezuelan Bolivares Soberanos (VES).
@@ -2931,8 +2916,10 @@ input DeliveryDiscountCandidate {
   associatedDiscountCode: AssociatedDiscountCode
 
   """
-  A notification that informs customers about available discounts.
-  The message is displayed on the **Cart** page. For example, "Save 20% on all t-shirts."
+  A notification on the **Cart** page informs customers about available
+  discounts. If an automatic discount applies, the notification displays this
+  message, such as "Save 20% on all t-shirts." If a discount code is entered,
+  the notification displays the code instead.
   """
   message: String
 
@@ -3189,89 +3176,11 @@ input FixedAmount {
 }
 
 """
-Represents a gate configuration.
-"""
-type GateConfiguration implements HasMetafields {
-  """
-  An optional string identifier.
-  """
-  appId: String
-
-  """
-  A non-unique string used to group gate configurations.
-  """
-  handle: Handle
-
-  """
-  The ID of the gate configuration.
-  """
-  id: ID!
-
-  """
-  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
-  about a Shopify resource, such as products, orders, and
-  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
-  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
-  enables you to customize the checkout experience.
-  """
-  metafield(
-    """
-    The unique identifier for the metafield within its namespace. A metafield is composed of a
-    namespace and a key, in the format `namespace.key`.
-    """
-    key: String!
-
-    """
-    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
-    between different apps or different parts of the same app. If omitted, then the
-    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
-    is used.
-    """
-    namespace: String
-  ): Metafield
-}
-
-"""
-Represents a connection from a subject to a gate configuration.
-"""
-type GateSubject {
-  """
-  The bound gate configuration.
-  """
-  configuration(
-    """
-    The appId of the gate configurations to search for.
-    """
-    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
-  ): GateConfiguration!
-
-  """
-  The ID of the gate subject.
-  """
-  id: ID!
-}
-
-"""
 A function-scoped handle to a refer a resource.
 The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
 Example value: `"10079785100"`
 """
 scalar Handle
-
-"""
-Gate subjects associated to the specified resource.
-"""
-interface HasGates {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates(
-    """
-    The handle of the gate configurations to search for.
-    """
-    handle: Handle
-  ): [GateSubject!]! @deprecated(reason: "Gates API is being sunset and will be removed in a future version. Use `metafields` instead for gate configuration.")
-}
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -3487,14 +3396,18 @@ type Input {
 
   """
   The discount codes that customers enter at checkout. Customers can enter codes
-  as an array of strings, excluding gift cards.
-  Codes aren't validated in any way other than to verify they aren't gift cards.
+  as an array of strings, excluding gift cards. Codes aren't validated in any
+  way other than to verify they aren't gift cards. This input is only available
+  in the `cart.lines.discounts.generate.fetch` and
+  `cart.delivery-options.discounts.generate.fetch` extension targets.
   """
   enteredDiscountCodes: [String!]! @restrictTarget(only: ["cart.lines.discounts.generate.fetch", "cart.delivery-options.discounts.generate.fetch"])
 
   """
   The result of the fetch target. Refer to [network access](https://shopify.dev/apps/build/functions/input-output/network-access/graphql)
-  for Shopify Functions.
+  for Shopify Functions. This input is only available in the
+  `cart.lines.discounts.generate.run` and
+  `cart.delivery-options.discounts.generate.run` extension targets.
   """
   fetchResult: HttpResponse @restrictTarget(only: ["cart.lines.discounts.generate.run", "cart.delivery-options.discounts.generate.run"])
 
@@ -4267,16 +4180,6 @@ enum LanguageCode {
 }
 
 """
-Local pickup settings associated with a location.
-"""
-type LocalPickup {
-  """
-  Whether local pickup is enabled for the location.
-  """
-  enabled: Boolean!
-}
-
-"""
 The current time based on the
 [store's timezone setting](https://help.shopify.com/manual/intro-to-shopify/initial-setup/setup-business-settings).
 """
@@ -4597,124 +4500,6 @@ enum LocalizedFieldKey {
 }
 
 """
-Represents the location where the inventory resides.
-"""
-type Location implements HasMetafields {
-  """
-  The address of this location.
-  """
-  address: LocationAddress!
-
-  """
-  The location handle.
-  """
-  handle: Handle!
-
-  """
-  The location id.
-  """
-  id: ID!
-
-  """
-  Local pickup settings associated with a location.
-  """
-  localPickup: LocalPickup!
-
-  """
-  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
-  about a Shopify resource, such as products, orders, and
-  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
-  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
-  enables you to customize the checkout experience.
-  """
-  metafield(
-    """
-    The unique identifier for the metafield within its namespace. A metafield is composed of a
-    namespace and a key, in the format `namespace.key`.
-    """
-    key: String!
-
-    """
-    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
-    between different apps or different parts of the same app. If omitted, then the
-    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
-    is used.
-    """
-    namespace: String
-  ): Metafield
-
-  """
-  The name of the location.
-  """
-  name: String!
-}
-
-"""
-Represents the address of a location.
-"""
-type LocationAddress {
-  """
-  The first line of the address for the location.
-  """
-  address1: String
-
-  """
-  The second line of the address for the location.
-  """
-  address2: String
-
-  """
-  The city of the location.
-  """
-  city: String
-
-  """
-  The country of the location.
-  """
-  country: String
-
-  """
-  The country code of the location.
-  """
-  countryCode: String
-
-  """
-  A formatted version of the address for the location.
-  """
-  formatted: [String!]!
-
-  """
-  The approximate latitude coordinates of the location.
-  """
-  latitude: Float
-
-  """
-  The approximate longitude coordinates of the location.
-  """
-  longitude: Float
-
-  """
-  The phone number of the location.
-  """
-  phone: String
-
-  """
-  The province of the location.
-  """
-  province: String
-
-  """
-  The code for the province, state, or district of the address of the location.
-  """
-  provinceCode: String
-
-  """
-  The ZIP code of the location.
-  """
-  zip: String
-}
-
-"""
 Represents a mailing address.
 """
 type MailingAddress {
@@ -4981,8 +4766,10 @@ input OrderDiscountCandidate {
   conditions: [Condition!]
 
   """
-  A notification that informs customers about available discounts.
-  The message is displayed on the **Cart** page. For example, "Save 20% on all t-shirts."
+  A notification on the **Cart** page informs customers about available
+  discounts. If an automatic discount applies, the notification displays this
+  message, such as "Save 20% on all t-shirts." If a discount code is entered,
+  the notification displays the code instead.
   """
   message: String
 
@@ -5101,17 +4888,7 @@ Products can be organized by grouping them into a collection.
 
 Learn more about [managing products in a merchant's store](https://help.shopify.com/manual/products).
 """
-type Product implements HasGates & HasMetafields {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates(
-    """
-    The handle of the gate configurations to search for.
-    """
-    handle: Handle
-  ): [GateSubject!]! @deprecated(reason: "Gates API is being sunset and will be removed in a future version. Use `metafields` instead for gate configuration.")
-
+type Product implements HasMetafields {
   """
   A unique, human-readable string of the product's title. A handle can contain letters, hyphens (`-`), and
   numbers, but not spaces. The handle is used in the online store URL for the product. For example, if a product
@@ -5239,8 +5016,10 @@ input ProductDiscountCandidate {
   associatedDiscountCode: AssociatedDiscountCode
 
   """
-  A notification that informs customers about available discounts.
-  The message is displayed on the **Cart** page. For example, "Save 20% on all t-shirts."
+  A notification on the **Cart** page informs customers about available
+  discounts. If an automatic discount applies, the notification displays this
+  message, such as "Save 20% on all t-shirts." If a discount code is entered,
+  the notification displays the code instead.
   """
   message: String
 

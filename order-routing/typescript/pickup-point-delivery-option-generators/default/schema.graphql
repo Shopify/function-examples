@@ -159,6 +159,13 @@ type Cart implements HasMetafields {
   fulfillment by organizing items that can be shipped together, based on the customer's
   shipping address. For example, if a customer orders a t-shirt and a pair of shoes that can be shipped
   together, then the items are included in the same delivery group.
+
+  In the [Order Discount](https://shopify.dev/docs/api/functions/reference/order-discounts) and
+  [Product Discount](https://shopify.dev/docs/api/functions/reference/product-discounts) legacy APIs,
+  the `cart.deliveryGroups` input is always an empty array. This means you can't access delivery groups when
+  creating Order Discount or Product Discount Functions. If you need to apply discounts to shipping costs,
+  then use the [Discount Function API](https://shopify.dev/docs/api/functions/reference/discount)
+  instead.
   """
   deliveryGroups: [CartDeliveryGroup!]!
 
@@ -261,6 +268,11 @@ type CartDeliveryGroup {
   deliveryOptions: [CartDeliveryOption!]!
 
   """
+  The type of merchandise in the delivery group.
+  """
+  groupType: CartDeliveryGroupType!
+
+  """
   A [globally-unique ID](https://shopify.dev/docs/api/usage/gids)
   for the delivery group.
   """
@@ -270,6 +282,22 @@ type CartDeliveryGroup {
   Information about the delivery option that the customer has selected.
   """
   selectedDeliveryOption: CartDeliveryOption
+}
+
+"""
+Defines what type of merchandise is in the delivery group.
+"""
+enum CartDeliveryGroupType {
+  """
+  The delivery group only contains merchandise that is either a one time purchase or a first delivery of
+  subscription merchandise.
+  """
+  ONE_TIME_PURCHASE
+
+  """
+  The delivery group only contains subscription merchandise.
+  """
+  SUBSCRIPTION
 }
 
 """
@@ -1813,8 +1841,9 @@ enum CountryCode {
 }
 
 """
-The three-letter currency codes that represent the world currencies used in stores. Currency codes include
-[standard ISO 4217 codes](https://en.wikipedia.org/wiki/ISO_4217), legacy codes, and non-standard codes.
+The currency codes that represent the world currencies throughout the Admin API. Currency codes include
+[standard ISO 4217 codes](https://en.wikipedia.org/wiki/ISO_4217), legacy codes, non-standard codes,
+digital currency codes.
 """
 enum CurrencyCode {
   """
@@ -1940,7 +1969,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+  BYR @deprecated(reason: "Use `BYN` instead.")
 
   """
   Belize Dollar (BZD).
@@ -2465,7 +2494,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+  STD @deprecated(reason: "Use `STN` instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2543,6 +2572,11 @@ enum CurrencyCode {
   USD
 
   """
+  United States Dollars Coin (USDC).
+  """
+  USDC
+
+  """
   Uruguayan Pesos (UYU).
   """
   UYU
@@ -2560,7 +2594,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+  VEF @deprecated(reason: "Use `VES` instead.")
 
   """
   Venezuelan Bolivares Soberanos (VES).
@@ -2874,89 +2908,11 @@ input FunctionRunResult {
 }
 
 """
-Represents a gate configuration.
-"""
-type GateConfiguration implements HasMetafields {
-  """
-  An optional string identifier.
-  """
-  appId: String
-
-  """
-  A non-unique string used to group gate configurations.
-  """
-  handle: Handle
-
-  """
-  The ID of the gate configuration.
-  """
-  id: ID!
-
-  """
-  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
-  about a Shopify resource, such as products, orders, and
-  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
-  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
-  enables you to customize the checkout experience.
-  """
-  metafield(
-    """
-    The unique identifier for the metafield within its namespace. A metafield is composed of a
-    namespace and a key, in the format `namespace.key`.
-    """
-    key: String!
-
-    """
-    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
-    between different apps or different parts of the same app. If omitted, then the
-    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
-    is used.
-    """
-    namespace: String
-  ): Metafield
-}
-
-"""
-Represents a connection from a subject to a gate configuration.
-"""
-type GateSubject {
-  """
-  The bound gate configuration.
-  """
-  configuration(
-    """
-    The appId of the gate configurations to search for.
-    """
-    appId: String @deprecated(reason: "Use GateSubject.handle to filter gates instead.")
-  ): GateConfiguration!
-
-  """
-  The ID of the gate subject.
-  """
-  id: ID!
-}
-
-"""
 A function-scoped handle to a refer a resource.
 The Handle type appears in a JSON response as a String, but it is not intended to be human-readable.
 Example value: `"10079785100"`
 """
 scalar Handle
-
-"""
-Gate subjects associated to the specified resource.
-"""
-interface HasGates {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates(
-    """
-    The handle of the gate configurations to search for.
-    """
-    handle: Handle
-  ): [GateSubject!]! @deprecated(reason: "Gates API is being sunset and will be removed in a future version. Use `metafields` instead for gate configuration.")
-}
 
 """
 Represents information about the metafields associated to the specified resource.
@@ -4789,17 +4745,7 @@ Products can be organized by grouping them into a collection.
 
 Learn more about [managing products in a merchant's store](https://help.shopify.com/manual/products).
 """
-type Product implements HasGates & HasMetafields {
-  """
-  Returns active gate subjects bound to the resource.
-  """
-  gates(
-    """
-    The handle of the gate configurations to search for.
-    """
-    handle: Handle
-  ): [GateSubject!]! @deprecated(reason: "Gates API is being sunset and will be removed in a future version. Use `metafields` instead for gate configuration.")
-
+type Product implements HasMetafields {
   """
   A unique, human-readable string of the product's title. A handle can contain letters, hyphens (`-`), and
   numbers, but not spaces. The handle is used in the online store URL for the product. For example, if a product
