@@ -1694,8 +1694,9 @@ enum CountryCode {
 }
 
 """
-The three-letter currency codes that represent the world currencies used in stores. Currency codes include
-[standard ISO 4217 codes](https://en.wikipedia.org/wiki/ISO_4217), legacy codes, and non-standard codes.
+The currency codes that represent the world currencies throughout the Admin API. Currency codes include
+[standard ISO 4217 codes](https://en.wikipedia.org/wiki/ISO_4217), legacy codes, non-standard codes,
+digital currency codes.
 """
 enum CurrencyCode {
   """
@@ -1821,7 +1822,7 @@ enum CurrencyCode {
   """
   Belarusian Ruble (BYR).
   """
-  BYR @deprecated(reason: "`BYR` is deprecated. Use `BYN` available from version `2021-01` onwards instead.")
+  BYR @deprecated(reason: "Use `BYN` instead.")
 
   """
   Belize Dollar (BZD).
@@ -2346,7 +2347,7 @@ enum CurrencyCode {
   """
   Sao Tome And Principe Dobra (STD).
   """
-  STD @deprecated(reason: "`STD` is deprecated. Use `STN` available from version `2022-07` onwards instead.")
+  STD @deprecated(reason: "Use `STN` instead.")
 
   """
   Sao Tome And Principe Dobra (STN).
@@ -2424,6 +2425,11 @@ enum CurrencyCode {
   USD
 
   """
+  United States Dollars Coin (USDC).
+  """
+  USDC
+
+  """
   Uruguayan Pesos (UYU).
   """
   UYU
@@ -2441,7 +2447,7 @@ enum CurrencyCode {
   """
   Venezuelan Bolivares (VEF).
   """
-  VEF @deprecated(reason: "`VEF` is deprecated. Use `VES` available from version `2020-10` onwards instead.")
+  VEF @deprecated(reason: "Use `VES` instead.")
 
   """
   Venezuelan Bolivares Soberanos (VES).
