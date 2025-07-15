@@ -1,21 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Banner,
-  Button,
-  Card,
-  FormLayout,
-  Layout,
-  Page,
-  TextField,
-} from "@shopify/polaris";
-import {
-  Form,
-  useActionData,
-  useNavigation,
-  useSubmit,
-  useLoaderData,
-} from "@remix-run/react";
-import { json } from "@remix-run/node";
+import { Form, useActionData, useNavigation, useSubmit, useLoaderData } from "react-router";
+import { boundary } from "@shopify/shopify-app-react-router/server";
 
 import { authenticate } from "../shopify.server";
 
@@ -54,10 +39,10 @@ export const loader = async ({ params, request }) => {
     responseJson.data.paymentCustomization?.metafield?.value &&
     JSON.parse(responseJson.data.paymentCustomization.metafield.value);
 
-  return json({
+  return {
     paymentMethodName: metafield?.paymentMethodName ?? "",
     cartTotal: metafield?.cartTotal ?? "0",
-  });
+  };
 };
 
 // This is a server-side action that is invoked when the form is submitted.
@@ -111,7 +96,7 @@ export const action = async ({ params, request }) => {
     const responseJson = await response.json();
     const errors = responseJson.data.paymentCustomizationCreate?.userErrors;
 
-    return json({ errors });
+    return { errors };
   } else {
     const response = await admin.graphql(
       `#graphql
@@ -136,8 +121,13 @@ export const action = async ({ params, request }) => {
     const responseJson = await response.json();
     const errors = responseJson.data.paymentCustomizationUpdate?.userErrors;
 
-    return json({ errors });
+    return { errors };
   }
+};
+
+// Required for single fetch compatibility
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
 };
 
 // This is the client-side component that renders the form.
@@ -154,8 +144,8 @@ export default function PaymentCustomization() {
   const isLoading = navigation.state === "submitting";
 
   const errorBanner = actionData?.errors.length ? (
-    <Layout.Section>
-      <Banner
+    <s-section>
+      <s-banner
         title="There was an error creating the customization."
         status="critical"
       >
@@ -164,8 +154,8 @@ export default function PaymentCustomization() {
             return <li key={`${index}`}>{error.message}</li>;
           })}
         </ul>
-      </Banner>
-    </Layout.Section>
+      </s-banner>
+    </s-section>
   ) : null;
 
   const handleSubmit = () => {
@@ -179,52 +169,40 @@ export default function PaymentCustomization() {
   }, [actionData?.errors]);
 
   return (
-    <Page
-      title="Hide payment method"
-      backAction={{
-        content: "Payment customizations",
-        onAction: () =>
-          open("shopify:admin/settings/payments/customizations", "_top"),
-      }}
-      primaryAction={{
-        content: "Save",
-        loading: isLoading,
-        onAction: handleSubmit,
-      }}
-    >
-      <Layout>
-        {errorBanner}
-        <Layout.Section>
-          <Card>
-            <Form method="post">
-              <FormLayout>
-                <FormLayout.Group>
-                  <TextField
-                    name="paymentMethodName"
-                    type="text"
-                    label="Payment method"
-                    value={paymentMethodName}
-                    onChange={setPaymentMethodName}
-                    disabled={isLoading}
-                    autoComplete="on"
-                    requiredIndicator
-                  />
-                  <TextField
-                    name="cartTotal"
-                    type="number"
-                    label="Cart total"
-                    value={cartTotal}
-                    onChange={setCartTotal}
-                    disabled={isLoading}
-                    autoComplete="on"
-                    requiredIndicator
-                  />
-                </FormLayout.Group>
-              </FormLayout>
-            </Form>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+    <s-page inlineSize="base">
+      <ui-title-bar title="Hide payment method">
+        <button onClick={() => open("shopify:admin/settings/payments/customizations", "_top")} slot="navigation">
+          Payment customizations
+        </button>
+        <button onClick={handleSubmit} variant="primary" {...(isLoading && { loading: true })} slot="primary-action">Save</button>
+      </ui-title-bar>
+      {errorBanner}
+      <s-section>
+        <Form method="post" id="payment-form">
+          <s-grid gridTemplateColumns="repeat(2, 1fr)" gap="large">
+            <s-text-field
+              name="paymentMethodName"
+              type="text"
+              label="Payment method"
+              value={paymentMethodName}
+              onInput={(e) => setPaymentMethodName(e.target.value)}
+              disabled={isLoading}
+              autoComplete="on"
+              required
+            />
+            <s-number-field
+              name="cartTotal"
+              label="Cart total"
+              value={cartTotal}
+              onInput={(e) => setCartTotal(e.target.value)}
+              disabled={isLoading}
+              min="0"
+              step="0.01"
+              required
+            />
+          </s-grid>
+        </Form>
+      </s-section>
+    </s-page>
   );
 }
