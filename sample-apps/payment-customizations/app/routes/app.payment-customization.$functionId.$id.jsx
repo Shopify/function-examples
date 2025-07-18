@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, useActionData, useNavigation, useSubmit, useLoaderData } from "react-router";
+import { useActionData, useNavigation, useSubmit, useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 
 import { authenticate } from "../shopify.server";
@@ -144,22 +144,23 @@ export default function PaymentCustomization() {
   const isLoading = navigation.state === "submitting";
 
   const errorBanner = actionData?.errors.length ? (
-    <s-section>
-      <s-banner
-        title="There was an error creating the customization."
-        status="critical"
-      >
-        <ul>
-          {actionData?.errors.map((error, index) => {
-            return <li key={`${index}`}>{error.message}</li>;
-          })}
-        </ul>
-      </s-banner>
-    </s-section>
+    <s-banner tone="critical" heading="There was an error creating the customization.">
+      <ul>
+        {actionData?.errors.map((error, index) => {
+          return <li key={`${index}`}>{error.message}</li>;
+        })}
+      </ul>
+    </s-banner>
   ) : null;
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     submit({ paymentMethodName, cartTotal }, { method: "post" });
+  };
+
+  const handleReset = () => {
+    setPaymentMethodName(loaderData.paymentMethodName);
+    setCartTotal(loaderData.cartTotal);
   };
 
   useEffect(() => {
@@ -169,17 +170,18 @@ export default function PaymentCustomization() {
   }, [actionData?.errors]);
 
   return (
-    <s-page inlineSize="base">
-      <ui-title-bar title="Hide payment method">
-        <button onClick={() => open("shopify:admin/settings/payments/customizations", "_top")} slot="navigation">
-          Payment customizations
-        </button>
-        <button onClick={handleSubmit} variant="primary" {...(isLoading && { loading: true })} slot="primary-action">Save</button>
-      </ui-title-bar>
-      {errorBanner}
-      <s-section>
-        <Form method="post" id="payment-form">
-          <s-grid gridTemplateColumns="repeat(2, 1fr)" gap="large">
+    <form data-save-bar onSubmit={handleSubmit} onReset={handleReset}>
+      <s-page>
+        <ui-title-bar title="Hide payment method">
+          <button variant="breadcrumb" href="shopify:admin/settings/payments/customizations">
+            Payment customizations
+          </button>
+        </ui-title-bar>
+
+        {errorBanner}
+
+        <s-section>
+          <s-grid gap="base">
             <s-text-field
               name="paymentMethodName"
               type="text"
@@ -189,7 +191,8 @@ export default function PaymentCustomization() {
               disabled={isLoading}
               autoComplete="on"
               required
-            />
+            ></s-text-field>
+
             <s-number-field
               name="cartTotal"
               label="Cart total"
@@ -199,10 +202,10 @@ export default function PaymentCustomization() {
               min="0"
               step="0.01"
               required
-            />
+            ></s-number-field>
           </s-grid>
-        </Form>
-      </s-section>
-    </s-page>
+        </s-section>
+      </s-page>
+    </form>
   );
 }
