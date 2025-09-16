@@ -10,7 +10,7 @@
 You can build this individual function using `cargo build`.
 
 ```shell
-cargo build --target=wasm32-wasip1 --release
+cargo build --target=wasm32-unknown-unknown --release
 ```
 
 The Shopify CLI `build` command will also execute this, based on the configuration in `shopify.extension.toml`.

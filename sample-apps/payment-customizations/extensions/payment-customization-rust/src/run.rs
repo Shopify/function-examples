@@ -33,7 +33,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
     // Use the configured cart total instead of a hardcoded value
     let cart_total: f64 = input.cart.cost.total_amount.amount.into();
     if cart_total < config.cart_total {
-        eprintln!("Cart total is not high enough, no need to hide the payment method.");
+        log!("Cart total is not high enough, no need to hide the payment method.");
         return Ok(no_changes);
     }
 

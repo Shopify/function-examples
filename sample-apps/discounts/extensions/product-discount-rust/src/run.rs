@@ -58,7 +58,7 @@ fn run(input: input::ResponseData) -> Result<output::FunctionRunResult> {
         .collect::<Vec<output::Target>>();
 
     if targets.is_empty() {
-        eprintln!("No cart lines qualify for volume discount.");
+        log!("No cart lines qualify for volume discount.");
         return Ok(no_discount);
     }
 

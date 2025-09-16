@@ -12,8 +12,8 @@ type = "function"
   export = "run"
 
   [extensions.build]
-  command = "cargo build --target=wasm32-wasip1 --release"
-  path = "target/wasm32-wasip1/release/payment-customization.wasm"
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/payment-customization.wasm"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]

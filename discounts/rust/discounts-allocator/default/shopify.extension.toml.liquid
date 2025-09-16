@@ -13,8 +13,8 @@ description = "t:description"
   export = "run"
 
   [extensions.build]
-  command = "cargo build --target=wasm32-wasip1 --release"
-  path = "target/wasm32-wasip1/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/{{handle | replace: " ", "-" | downcase}}.wasm"
   watch = [ "src/**/*.rs" ]
 
   [extensions.ui.paths]
