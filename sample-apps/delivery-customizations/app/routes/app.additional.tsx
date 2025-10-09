@@ -2,8 +2,7 @@ import { TitleBar } from "@shopify/app-bridge-react";
 
 export default function AdditionalPage() {
   return (
-    <s-page>
-      <TitleBar title="Additional page"></TitleBar>
+    <s-page heading="Additional page">
       <s-section heading="Multiple pages">
         <s-paragraph>
           The app template comes with an additional page which demonstrates how
@@ -19,7 +18,7 @@ export default function AdditionalPage() {
         <s-paragraph>
           To create your own page and have it show up in the app navigation, add
           a page inside <code>app/routes</code>, and a link to it in the{" "}
-          <code>&lt;NavMenu&gt;</code> component found in{" "}
+          <code>&lt;s-app-nav&gt;</code> component found in{" "}
           <code>app/routes/app.jsx</code>.
         </s-paragraph>
       </s-section>

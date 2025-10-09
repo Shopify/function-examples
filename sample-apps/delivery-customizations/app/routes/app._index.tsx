@@ -104,12 +104,8 @@ export default function Index() {
   const generateProduct = () => fetcher.submit({}, { method: "POST" });
 
   return (
-    <s-page>
-      <TitleBar title="React Router app template">
-        <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button>
-      </TitleBar>
+    <s-page heading="React Router app template">
+      <s-button variant="primary" onClick={generateProduct} slot="primary-action">Generate a product</s-button>
       <s-section heading="Congrats on creating a new Shopify app 🎉">
         <s-paragraph>
           This embedded app template uses{" "}

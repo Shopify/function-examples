@@ -155,10 +155,10 @@ export default function DeliveryCustomization() {
   const navigation = useNavigation();
   const loaderData = useLoaderData<LoaderData>();
 
-  const parsedLoaderData: DeliveryCustomizationData = loaderData?.body 
-    ? JSON.parse(loaderData.body) 
+  const parsedLoaderData: DeliveryCustomizationData = loaderData?.body
+    ? JSON.parse(loaderData.body)
     : { stateProvinceCode: "", message: "" };
-  
+
   const [stateProvinceCode, setStateProvinceCode] = useState(parsedLoaderData.stateProvinceCode);
   const [message, setMessage] = useState(parsedLoaderData.message);
 
@@ -200,20 +200,15 @@ const handleReset = () => {
 
 return (
   <form data-save-bar onSubmit={handleSubmit} onReset={handleReset}>
-    <s-page>
-      <ui-title-bar title="Change delivery message">
-        <button variant="breadcrumb" href="shopify:admin/settings/shipping/customizations">
-          Delivery customizations
-        </button>
-      </ui-title-bar>
+    <s-page heading="Change delivery message">
+        <s-link slot="breadcrumb-actions" href="shopify:admin/settings/shipping/customizations">Delivery customizations</s-link>
 
       {errorBanner}
 
       <s-section>
-        <s-grid gap="base">
+        <s-grid gap="base" gridTemplateColumns="1fr 1fr">
           <s-text-field
             name="stateProvinceCode"
-            type="text"
             label="State/Province code"
             value={stateProvinceCode}
             required
@@ -223,7 +218,6 @@ return (
 
           <s-text-field
             name="message"
-            type="text"
             label="Message"
             value={message}
             required
