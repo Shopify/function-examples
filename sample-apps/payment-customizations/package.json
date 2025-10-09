@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@shopify/api-codegen-preset": "^1.1.1",
+    "@shopify/polaris-types": "^1.0.1",
     "eslint": "^8.38.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",

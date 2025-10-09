@@ -171,20 +171,15 @@ export default function PaymentCustomization() {
 
   return (
     <form data-save-bar onSubmit={handleSubmit} onReset={handleReset}>
-      <s-page>
-        <ui-title-bar title="Hide payment method">
-          <button variant="breadcrumb" href="shopify:admin/settings/payments/customizations">
-            Payment customizations
-          </button>
-        </ui-title-bar>
+      <s-page heading="Hide payment method">
+        <s-link href="shopify:admin/settings/payments/customizations" variant="breadcrumb" slot="breadcrumb-actions">Payment customizations</s-link>
 
         {errorBanner}
 
         <s-section>
-          <s-grid gap="base">
+          <s-grid gap="base" gridTemplateColumns="1fr 1fr">
             <s-text-field
               name="paymentMethodName"
-              type="text"
               label="Payment method"
               value={paymentMethodName}
               onInput={(e) => setPaymentMethodName(e.target.value)}
