@@ -1,25 +1,22 @@
 {
-  "include": ["**/*.js", "**/*.jsx"],
-  "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "moduleResolution": "node16",
-    "resolveJsonModule": true,
-    "target": "ES2019",
-    "strict": true,
-    "allowJs": true,
-    "checkJs": true,
-    "noImplicitAny": false,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./app/*"]
-    },
-    "types": [
-      "@shopify/app-bridge-types"
-    ],
-    "noEmit": true
+    "include": ["env.d.ts", "**/*.ts", "**/*.tsx", ".react-router/types/**/*"],
+    "compilerOptions": {
+      "lib": ["DOM", "DOM.Iterable", "ES2022"],
+      "strict": true,
+      "skipLibCheck": true,
+      "isolatedModules": true,
+      "allowSyntheticDefaultImports": true,
+      "removeComments": false,
+      "forceConsistentCasingInFileNames": true,
+      "noEmit": true,
+      "allowJs": true,
+      "resolveJsonModule": true,
+      "jsx": "react-jsx",
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "target": "ES2022",
+      "baseUrl": ".",
+      "types": ["@react-router/node", "vite/client", "@shopify/polaris-types"],
+      "rootDirs": [".", "./.react-router/types"]
+    }
   }
-}

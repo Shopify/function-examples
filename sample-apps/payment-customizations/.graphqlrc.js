@@ -1,36 +1,41 @@
-const fs = require('node:fs');
-const apiVersion = require("@shopify/shopify-app-remix").LATEST_API_VERSION;
+import fs from "fs";
+import { LATEST_API_VERSION } from "@shopify/shopify-api";
+import { shopifyApiProject, ApiType } from "@shopify/api-codegen-preset";
 
 function getConfig() {
-    const config = {
-        projects: {
-            shopifyAdminApi: {
-                schema: `https://shopify.dev/admin-graphql-direct-proxy/${apiVersion}`,
-                documents: ['./app/**/*.{graphql,js,ts,jsx,tsx}']
-            }
-        }
-    }
+  const config = {
+    projects: {
+      default: shopifyApiProject({
+        apiType: ApiType.Admin,
+        apiVersion: LATEST_API_VERSION,
+        documents: ["./app/**/*.{js,jsx}", "./app/.server/**/*.{js,jsx}"],
+        outputDir: "./app/types",
+      }),
+    },
+  };
 
-    let extensions = []
-    try {
-        extensions = fs.readdirSync('./extensions');
-    } catch {
-        // ignore if no extensions
-    }
+  let extensions = [];
+  try {
+    extensions = fs.readdirSync("./extensions");
+  } catch {
+    // ignore if no extensions
+  }
 
-    for (const entry of extensions) {
-        const extensionPath = `./extensions/${entry}`;
-        const schema = `${extensionPath}/schema.graphql`;
-        if(!fs.existsSync(schema)) {
-            continue;
-        }
-        config.projects[entry] = {
-            schema,
-            documents: [`${extensionPath}/input.graphql`]
-        }
+  for (const entry of extensions) {
+    const extensionPath = `./extensions/${entry}`;
+    const schema = `${extensionPath}/schema.graphql`;
+    if (!fs.existsSync(schema)) {
+      continue;
     }
+    config.projects[entry] = {
+      schema,
+      documents: [`${extensionPath}/**/*.graphql`],
+    };
+  }
 
-    return config;
+  return config;
 }
 
-module.exports = getConfig();
+const config = getConfig();
+
+export default config; 
