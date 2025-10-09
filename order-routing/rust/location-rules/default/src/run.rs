@@ -4,6 +4,7 @@ use shopify_function::Result;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Default, PartialEq)]
+#[allow(dead_code)]
 struct Config {}
 
 #[shopify_function_target(query_path = "src/run.graphql", schema_path = "schema.graphql")]
