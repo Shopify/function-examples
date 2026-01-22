@@ -1,4 +1,4 @@
-api_version = "2025-04"
+api_version = "2026-01"
 
 [[extensions]]
 name = "t:name"
@@ -18,6 +18,6 @@ description = "t:description"
   export = "cart_delivery_options_discounts_generate_run"
 
   [extensions.build]
-  command = "cargo build --target=wasm32-wasip1 --release"
-  path = "target/wasm32-wasip1/release/{{handle | replace: " ", "-" | downcase}}.wasm"
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/{{handle | replace: " ", "-" | downcase}}.wasm"
   watch = [ "src/**/*.rs" ]

@@ -57,8 +57,7 @@ are displayed to customers.
 """
 type BuyerIdentity {
   """
-  The customer that's interacting with the cart. A customer is a buyer who has an
-  [account](https://help.shopify.com/manual/customers/customer-accounts) with the store.
+  The [customer](https://help.shopify.com/manual/customers/manage-customers) that's interacting with the cart.
   """
   customer: Customer
 
@@ -70,8 +69,6 @@ type BuyerIdentity {
   """
   Whether the customer is authenticated through their
   [customer account](https://help.shopify.com/manual/customers/customer-accounts).
-  If the customer is authenticated, then the `customer` field returns the customer's information.
-  If the customer isn't authenticated, then the `customer` field returns `null`.
   """
   isAuthenticated: Boolean!
 
@@ -91,7 +88,7 @@ type BuyerIdentity {
 The cart where the Function is running. A cart contains the merchandise that a customer intends to purchase
 and information about the customer, such as the customer's email address and phone number.
 """
-type Cart {
+type Cart implements HasMetafields {
   """
   The custom attributes associated with a cart to store additional information. Cart attributes
   allow you to collect specific information from customers on the **Cart** page, such as order notes,
@@ -155,6 +152,34 @@ type Cart {
     """
     keys: [LocalizedFieldKey!]! = []
   ): [LocalizedField!]!
+
+  """
+  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
+  about a Shopify resource, such as products, orders, and
+  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
+  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
+  enables you to customize the checkout experience.
+  """
+  metafield(
+    """
+    The unique identifier for the metafield within its namespace. A metafield is composed of a
+    namespace and a key, in the format `namespace.key`.
+    """
+    key: String!
+
+    """
+    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
+    between different apps or different parts of the same app. If omitted, then the
+    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
+    is used.
+    """
+    namespace: String
+  ): Metafield
+
+  """
+  The physical location where a retail order is created or completed.
+  """
+  retailLocation: Location
 }
 
 """
@@ -163,7 +188,7 @@ the subtotal before taxes and duties, the tax amount, and duty charges.
 """
 type CartCost {
   """
-  The amount for the customer to pay at checkout, excluding taxes and discounts.
+  The amount, before taxes and cart-level discounts, for the customer to pay.
   """
   subtotalAmount: MoneyV2!
 
@@ -209,6 +234,11 @@ type CartDeliveryGroup {
   deliveryOptions: [CartDeliveryOption!]!
 
   """
+  The type of merchandise in the delivery group.
+  """
+  groupType: CartDeliveryGroupType!
+
+  """
   A [globally-unique ID](https://shopify.dev/docs/api/usage/gids)
   for the delivery group.
   """
@@ -218,6 +248,22 @@ type CartDeliveryGroup {
   Information about the delivery option that the customer has selected.
   """
   selectedDeliveryOption: CartDeliveryOption
+}
+
+"""
+Defines what type of merchandise is in the delivery group.
+"""
+enum CartDeliveryGroupType {
+  """
+  The delivery group only contains merchandise that is either a one time purchase or a first delivery of
+  subscription merchandise.
+  """
+  ONE_TIME_PURCHASE
+
+  """
+  The delivery group only contains subscription merchandise.
+  """
+  SUBSCRIPTION
 }
 
 """
@@ -299,7 +345,7 @@ type CartLine {
   gift wrapping requests, or custom product details. Attributes are stored as key-value pairs.
 
   Cart line attributes are equivalent to the
-  [`line_item`](https://shopify.dev/docs/apps/build/purchase-options/subscriptions/selling-plans)
+  [`line_item`](https://shopify.dev/docs/api/liquid/objects/line_item)
   object in Liquid.
   """
   attribute(
@@ -327,6 +373,12 @@ type CartLine {
   merchandise: Merchandise!
 
   """
+  The [nested relationship](https://shopify.dev/docs/apps/build/product-merchandising/nested-cart-lines)
+  between this line and its parent line, if any.
+  """
+  parentRelationship: CartLineParentRelationship
+
+  """
   The quantity of the item that the customer intends to purchase.
   """
   quantity: Int!
@@ -351,7 +403,7 @@ type CartLineCost {
   amountPerQuantity: MoneyV2!
 
   """
-  The cost of a single unit before any discounts are applied. This field is used to calculate and display
+  The `compareAt` price of a single unit before any discounts are applied. This field is used to calculate and display
   savings for customers. For example, if a product's `compareAtAmountPerQuantity` is $25 and its current price
   is $20, then the customer sees a $5 discount. This value can change based on the buyer's identity and is
   `null` when the value is hidden from buyers.
@@ -398,9 +450,19 @@ input CartLineMinimumSubtotal {
   ids: [ID!]!
 
   """
-  The minimum subtotal amount of the cart line to be eligible for a discount candidate.
+  The minimum subtotal amount of the cart line to be eligible for a discount candidate in the shop's currency.
   """
   minimumAmount: Decimal!
+}
+
+"""
+Represents the relationship between a cart line and its parent line.
+"""
+type CartLineParentRelationship {
+  """
+  The parent line in the relationship.
+  """
+  parent: CartLine!
 }
 
 """
@@ -453,6 +515,13 @@ input CartOperation @oneOf {
   validate discount codes from external systems.
   """
   enteredDiscountCodesAccept: EnteredDiscountCodesAcceptOperation
+
+  """
+  An operation that rejects entered discount codes with a custom message. Use
+  this to conditionally reject discount codes based on business logic. This
+  operation can only be used if the function is backed by an automatic discount.
+  """
+  enteredDiscountCodesReject: EnteredDiscountCodesRejectOperation
 
   """
   An operation that applies order discounts to a cart that share a selection strategy.
@@ -622,6 +691,16 @@ type CompanyLocation implements HasMetafields {
   The name of the company location.
   """
   name: String!
+
+  """
+  The number of orders placed at this company location.
+  """
+  ordersCount: Int!
+
+  """
+  The total amount spent at this company location.
+  """
+  totalSpent: MoneyV2!
 
   """
   The date and time ([ISO 8601 format](http://en.wikipedia.org/wiki/ISO_8601))
@@ -2750,8 +2829,7 @@ type CustomProduct {
 }
 
 """
-Represents a [customer](https://help.shopify.com/manual/customers/manage-customers)
-who has an [account](https://help.shopify.com/manual/customers/customer-accounts) with the store.
+Represents a [customer](https://help.shopify.com/manual/customers/manage-customers).
 `Customer` returns data including the customer's contact information and order history.
 """
 type Customer implements HasMetafields {
@@ -2791,8 +2869,7 @@ type Customer implements HasMetafields {
   ): Boolean!
 
   """
-  Whether the customer is associated with the specified tags. The customer must have all of the tags in the list
-  to return `true`.
+  Whether the customer is associated with the specified tags.
   """
   hasTags(
     """
@@ -2880,7 +2957,7 @@ type DeliverableCartLine {
   gift wrapping requests, or custom product details. Attributes are stored as key-value pairs.
 
   Cart line attributes are equivalent to the
-  [`line_item`](https://shopify.dev/docs/apps/build/purchase-options/subscriptions/selling-plans)
+  [`line_item`](https://shopify.dev/docs/api/liquid/objects/line_item)
   object in Liquid.
   """
   attribute(
@@ -2911,7 +2988,9 @@ The discount that's eligible to be applied to a delivery.
 """
 input DeliveryDiscountCandidate {
   """
-  The discount code that's eligible to be applied to a delivery.
+  An optional discount code associated with this discount candidate, for use
+  with automatic discounts. If a code discount is the function trigger, the
+  associated discount code will be overwritten by the triggering discount code.
   """
   associatedDiscountCode: AssociatedDiscountCode
 
@@ -3069,6 +3148,13 @@ input DeliveryOperation @oneOf {
   validate discount codes from external systems.
   """
   enteredDiscountCodesAccept: EnteredDiscountCodesAcceptOperation
+
+  """
+  An operation that rejects entered discount codes with a custom message. Use
+  this to conditionally reject discount codes based on business logic. This
+  operation can only be used if the function is backed by an automatic discount.
+  """
+  enteredDiscountCodesReject: EnteredDiscountCodesRejectOperation
 }
 
 """
@@ -3088,7 +3174,7 @@ The discount that invoked the [Discount Function](https://shopify.dev/docs/apps/
 """
 type Discount implements HasMetafields {
   """
-  The [discount classes](https://shopify.dev/docs/apps/build/discounts/#discount-classes)) that the [discountNode](https://shopify.dev/docs/api/admin-graphql/latest/queries/discountNode)) supports.
+  The [discount classes](https://shopify.dev/docs/apps/build/discounts/#discount-classes) that the [discountNode](https://shopify.dev/docs/api/admin-graphql/latest/queries/discountNode) supports.
   """
   discountClasses: [DiscountClass!]!
 
@@ -3154,6 +3240,23 @@ input DiscountCode {
 }
 
 """
+A discount code entered by the customer.
+"""
+type EnteredDiscountCode {
+  """
+  The discount code.
+  """
+  code: String!
+
+  """
+  Indicates whether the entered discount code can be rejected.
+
+  A discount code can't be rejected if it's associated with a discount that has already been applied to the cart.
+  """
+  rejectable: Boolean!
+}
+
+"""
 An operation that selects which entered discount codes to accept. Use this to validate discount codes from external systems.
 """
 input EnteredDiscountCodesAcceptOperation {
@@ -3161,6 +3264,23 @@ input EnteredDiscountCodesAcceptOperation {
   The list of discount codes to accept.
   """
   codes: [DiscountCode!]!
+}
+
+"""
+An operation that rejects entered discount codes with a custom message. Use this
+to conditionally reject discount codes based on business logic. This operation
+can only be used if the function is backed by an automatic discount.
+"""
+input EnteredDiscountCodesRejectOperation {
+  """
+  The list of discount codes to reject.
+  """
+  codes: [RejectedDiscountCode!]!
+
+  """
+  The custom message to display to the customer when the discount codes are rejected.
+  """
+  message: String!
 }
 
 """
@@ -3335,9 +3455,9 @@ type HttpResponse {
   headers: [HttpResponseHeader!]! @deprecated(reason: "Use `header` instead.")
 
   """
-  The HTTP response body parsed as JSON. 
-  If the body is valid JSON, it will be parsed and returned as a JSON object. 
-  If parsing fails, then raw body is returned as a string. 
+  The HTTP response body parsed as JSON.
+  If the body is valid JSON, it will be parsed and returned as a JSON object.
+  If parsing fails, then raw body is returned as a string.
   Use this field when you expect the response to be JSON, or when you're dealing
   with mixed response types, meaning both JSON and non-JSON.
   Using this field reduces function instruction consumption and ensures that the data is formatted in logs.
@@ -3395,13 +3515,12 @@ type Input {
   discount: Discount!
 
   """
-  The discount codes that customers enter at checkout. Customers can enter codes
-  as an array of strings, excluding gift cards. Codes aren't validated in any
-  way other than to verify they aren't gift cards. This input is only available
-  in the `cart.lines.discounts.generate.fetch` and
-  `cart.delivery-options.discounts.generate.fetch` extension targets.
+  Discount codes entered by the buyer at checkout, excluding gift cards. For
+  cart.lines.discounts.generate.run and cart.delivery-options.discounts.generate.run targets, these
+  discount codes are validated to ensure they are not deleted, maintain an active status, and are eligible
+  for the current cart. For fetch targets, all entered discount codes are included, excluding gift cards.
   """
-  enteredDiscountCodes: [String!]! @restrictTarget(only: ["cart.lines.discounts.generate.fetch", "cart.delivery-options.discounts.generate.fetch"])
+  enteredDiscountCodes: [EnteredDiscountCode!]!
 
   """
   The result of the fetch target. Refer to [network access](https://shopify.dev/apps/build/functions/input-output/network-access/graphql)
@@ -3434,7 +3553,7 @@ type Input {
   shop: Shop!
 
   """
-  The discount code entered by a customer, which caused the [Discount Function](https://shopify.dev/docs/apps/build/discounts#build-with-shopify-functions)) to run.
+  The discount code entered by a customer, which caused the [Discount Function](https://shopify.dev/docs/apps/build/discounts#build-with-shopify-functions) to run.
   This input is only available in the `cart.lines.discounts.generate.run` and
   `cart.delivery-options.discounts.generate.run` extension targets.
   """
@@ -4500,6 +4619,119 @@ enum LocalizedFieldKey {
 }
 
 """
+Represents the location where the inventory resides.
+"""
+type Location implements HasMetafields {
+  """
+  The address of this location.
+  """
+  address: LocationAddress!
+
+  """
+  The location handle.
+  """
+  handle: Handle!
+
+  """
+  The location id.
+  """
+  id: ID!
+
+  """
+  A [custom field](https://shopify.dev/docs/apps/build/custom-data) that stores additional information
+  about a Shopify resource, such as products, orders, and
+  [many more](https://shopify.dev/docs/api/admin-graphql/latest/enums/MetafieldOwnerType).
+  Using [metafields with Shopify Functions](https://shopify.dev/docs/apps/build/functions/input-output/metafields-for-input-queries)
+  enables you to customize the checkout experience.
+  """
+  metafield(
+    """
+    The unique identifier for the metafield within its namespace. A metafield is composed of a
+    namespace and a key, in the format `namespace.key`.
+    """
+    key: String!
+
+    """
+    A category that organizes a group of metafields. Namespaces are used to prevent naming conflicts
+    between different apps or different parts of the same app. If omitted, then the
+    [app-reserved namespace](https://shopify.dev/docs/apps/build/custom-data/ownership)
+    is used.
+    """
+    namespace: String
+  ): Metafield
+
+  """
+  The name of the location.
+  """
+  name: String!
+}
+
+"""
+Represents the address of a location.
+"""
+type LocationAddress {
+  """
+  The first line of the address for the location.
+  """
+  address1: String
+
+  """
+  The second line of the address for the location.
+  """
+  address2: String
+
+  """
+  The city of the location.
+  """
+  city: String
+
+  """
+  The country of the location.
+  """
+  country: String
+
+  """
+  The country code of the location.
+  """
+  countryCode: String
+
+  """
+  A formatted version of the address for the location.
+  """
+  formatted: [String!]!
+
+  """
+  The approximate latitude coordinates of the location.
+  """
+  latitude: Float
+
+  """
+  The approximate longitude coordinates of the location.
+  """
+  longitude: Float
+
+  """
+  The phone number of the location.
+  """
+  phone: String
+
+  """
+  The province of the location.
+  """
+  province: String
+
+  """
+  The code for the province, state, or district of the address of the location.
+  """
+  provinceCode: String
+
+  """
+  The ZIP code of the location.
+  """
+  zip: String
+}
+
+"""
 Represents a mailing address.
 """
 type MailingAddress {
@@ -4689,7 +4921,9 @@ type Metafield {
 }
 
 """
-A precise monetary value and its associated currency. For example, 12.99 USD.
+A precise monetary value and its associated currency. Combines a decimal amount
+with a three-letter currency code to express prices, costs, and other financial
+values throughout the API. For example, 12.99 USD.
 """
 type MoneyV2 {
   """
@@ -4756,7 +4990,9 @@ A discount candidate to be applied to an eligible order.
 """
 input OrderDiscountCandidate {
   """
-  The discount code associated with this discount candidate, for code-based discounts.
+  An optional discount code associated with this discount candidate, for use
+  with automatic discounts. If a code discount is the function trigger, the
+  associated discount code will be overwritten by the triggering discount code.
   """
   associatedDiscountCode: AssociatedDiscountCode
 
@@ -4851,7 +5087,7 @@ input OrderMinimumSubtotal {
   excludedCartLineIds: [ID!]!
 
   """
-  The minimum subtotal amount of the order to be eligible for the discount.
+  The minimum subtotal amount of the order to be eligible for the discount in the shop's currency.
   """
   minimumAmount: Decimal!
 }
@@ -4909,8 +5145,7 @@ type Product implements HasMetafields {
   ): Boolean!
 
   """
-  Whether the product is associated with the specified tags. The product must have all of the tags in the list
-  to return `true`.
+  Whether the product is associated with the specified tags.
   """
   hasTags(
     """
@@ -5011,7 +5246,9 @@ The target and value of the discount to be applied to a cart line.
 """
 input ProductDiscountCandidate {
   """
-  The discount code associated with this discount candidate, for code-based discounts.
+  An optional discount code associated with this discount candidate, for use
+  with automatic discounts. If a code discount is the function trigger, the
+  associated discount code will be overwritten by the triggering discount code.
   """
   associatedDiscountCode: AssociatedDiscountCode
 
@@ -5217,6 +5454,16 @@ type PurchasingCompany {
   The company location associated to the order or draft order.
   """
   location: CompanyLocation!
+}
+
+"""
+A discount code to be rejected.
+"""
+input RejectedDiscountCode {
+  """
+  The discount code to reject.
+  """
+  code: String!
 }
 
 """
