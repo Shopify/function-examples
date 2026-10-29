@@ -51,24 +51,35 @@ export function run(input) {
 function optionallyBuildUpdateOperation(
   { id: cartLineId, merchandise, cost, fabricLength }
 ) {
-  const hasFabricLength = fabricLength && Number(fabricLength.value) > 0;
-
-  if (
-    merchandise.__typename === "ProductVariant" &&
-    hasFabricLength
-  ) {
-    return {
-      cartLineId,
-      title: `${merchandise.title} (${fabricLength.value}m)`,
-      price: {
-        adjustment: {
-          fixedPricePerUnit: {
-            amount: (Number(fabricLength.value) * cost.amountPerQuantity.amount).toFixed(2)
-          }
-        }
-      }
-    };
+  if (merchandise.__typename !== "ProductVariant" || !fabricLength) {
+    return null;
   }
 
-  return null;
+  // The fabric length is provided by the customer, so treat it as untrusted:
+  // only a positive, finite number is a valid length.
+  const length = Number(fabricLength.value);
+  if (!Number.isFinite(length) || length <= 0) {
+    return null;
+  }
+
+  const amount = (length * cost.amountPerQuantity.amount).toFixed(2);
+
+  // Rounding to cents happens after the multiplication, so a tiny positive
+  // length can still round the price down to "0.00". Never make the line free:
+  // leave it at its original price instead.
+  if (Number(amount) <= 0) {
+    return null;
+  }
+
+  return {
+    cartLineId,
+    title: `${merchandise.title} (${fabricLength.value}m)`,
+    price: {
+      adjustment: {
+        fixedPricePerUnit: {
+          amount
+        }
+      }
+    }
+  };
 }

@@ -138,7 +138,7 @@ fn build_business_hours(
         .map(|day| {
             let day_parts: Vec<&str> = day.as_str().unwrap().split(": ").collect();
             let day_name = serde_json::from_str::<run::output::Weekday>(
-                format!("\"{}\"", &day_parts[0].to_uppercase()).as_str(),
+                format!("\"{}\"", day_parts[0].to_uppercase()).as_str(),
             )
             .unwrap();
             if day_parts[1] == "Closed" {
