@@ -81,4 +81,104 @@ describe("cart transform function", () => {
       ],
     });
   });
+
+  it("returns NO_CHANGES when the fabric length would round the price down to zero", () => {
+    expect(
+      run({
+        cart: {
+          lines: [
+            {
+              id: "1",
+              cost: {
+                amountPerQuantity: {
+                  amount: "10.0",
+                  currencyCode: "CAD"
+                }
+              },
+              fabricLength: {
+                value: "0.0001"
+              },
+              merchandise: {
+                __typename: "ProductVariant",
+                id: "gid://shopify/ProductVariant/2",
+                title: "Custom Fabric"
+              },
+            },
+          ],
+        },
+      })
+    ).toStrictEqual({ operations: [] });
+  });
+
+  it("returns NO_CHANGES when the fabric length is not a finite number", () => {
+    expect(
+      run({
+        cart: {
+          lines: [
+            {
+              id: "1",
+              cost: {
+                amountPerQuantity: {
+                  amount: "10.0",
+                  currencyCode: "CAD"
+                }
+              },
+              fabricLength: {
+                value: "Infinity"
+              },
+              merchandise: {
+                __typename: "ProductVariant",
+                id: "gid://shopify/ProductVariant/2",
+                title: "Custom Fabric"
+              },
+            },
+          ],
+        },
+      })
+    ).toStrictEqual({ operations: [] });
+  });
+
+  it("returns operations when the fabric length prices the line at the smallest chargeable amount", () => {
+    expect(
+      run({
+        cart: {
+          lines: [
+            {
+              id: "1",
+              cost: {
+                amountPerQuantity: {
+                  amount: "10.0",
+                  currencyCode: "CAD"
+                }
+              },
+              fabricLength: {
+                value: "0.001"
+              },
+              merchandise: {
+                __typename: "ProductVariant",
+                id: "gid://shopify/ProductVariant/2",
+                title: "Custom Fabric"
+              },
+            },
+          ],
+        },
+      })
+    ).toStrictEqual({
+      operations: [
+        {
+          update: {
+            cartLineId: "1",
+            title: "Custom Fabric (0.001m)",
+            price: {
+              adjustment: {
+                fixedPricePerUnit: {
+                  amount: "0.01"
+                }
+              }
+            }
+          },
+        },
+      ],
+    });
+  });
 });
