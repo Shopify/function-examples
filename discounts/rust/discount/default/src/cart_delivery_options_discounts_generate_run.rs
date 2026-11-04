@@ -16,7 +16,6 @@ fn cart_delivery_options_discounts_generate_run(
         return Ok(output::CartDeliveryOptionsDiscountsGenerateRunResult { operations: vec![] });
     }
 
-    // A split cart can list the pickup group first, so check every group.
     // Discount only the groups with shipping options.
     let targets: Vec<output::DeliveryDiscountCandidateTarget> = input
         .cart

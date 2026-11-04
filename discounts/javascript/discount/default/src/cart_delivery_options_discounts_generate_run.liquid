@@ -24,7 +24,6 @@ export function cartDeliveryOptionsDiscountsGenerateRun(input) {
     return {operations: []};
   }
 
-  // A split cart can list the pickup group first, so check every group.
   // Discount only the groups with shipping options.
   const targets = input.cart.deliveryGroups
     // If you also want to apply a discount for other delivery methods (e.g. LOCAL), ensure to account for that here.
@@ -81,7 +80,6 @@ export function cartDeliveryOptionsDiscountsGenerateRun(
     return {operations: []};
   }
 
-  // A split cart can list the pickup group first, so check every group.
   // Discount only the groups with shipping options.
   const targets = input.cart.deliveryGroups
     // If you also want to apply a discount for other delivery methods (e.g. LOCAL), ensure to account for that here.
