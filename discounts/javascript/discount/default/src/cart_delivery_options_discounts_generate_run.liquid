@@ -15,16 +15,20 @@ import {
   */
 
 export function cartDeliveryOptionsDiscountsGenerateRun(input) {
-  const firstDeliveryGroup = input.cart.deliveryGroups[0];
-  if (!firstDeliveryGroup) {
-    throw new Error("No delivery groups found");
-  }
-
   const hasShippingDiscountClass = input.discount.discountClasses.includes(
     DiscountClass.Shipping,
   );
 
   if (!hasShippingDiscountClass) {
+    return {operations: []};
+  }
+
+  // A split cart can list the pickup group first, so discount every group.
+  const targets = input.cart.deliveryGroups.map(({id}) => ({
+    deliveryGroup: {id},
+  }));
+
+  if (targets.length === 0) {
     return {operations: []};
   }
 
@@ -35,13 +39,7 @@ export function cartDeliveryOptionsDiscountsGenerateRun(input) {
           candidates: [
             {
               message: "FREE DELIVERY",
-              targets: [
-                {
-                  deliveryGroup: {
-                    id: firstDeliveryGroup.id,
-                  },
-                },
-              ],
+              targets,
               value: {
                 percentage: {
                   value: 100,
@@ -66,16 +64,20 @@ import {
 export function cartDeliveryOptionsDiscountsGenerateRun(
   input: DeliveryInput,
 ): CartDeliveryOptionsDiscountsGenerateRunResult {
-  const firstDeliveryGroup = input.cart.deliveryGroups[0];
-  if (!firstDeliveryGroup) {
-    throw new Error("No delivery groups found");
-  }
-
   const hasShippingDiscountClass = input.discount.discountClasses.includes(
     DiscountClass.Shipping,
   );
 
   if (!hasShippingDiscountClass) {
+    return {operations: []};
+  }
+
+  // A split cart can list the pickup group first, so discount every group.
+  const targets = input.cart.deliveryGroups.map(({id}) => ({
+    deliveryGroup: {id},
+  }));
+
+  if (targets.length === 0) {
     return {operations: []};
   }
 
@@ -86,13 +88,7 @@ export function cartDeliveryOptionsDiscountsGenerateRun(
           candidates: [
             {
               message: "FREE DELIVERY",
-              targets: [
-                {
-                  deliveryGroup: {
-                    id: firstDeliveryGroup.id,
-                  },
-                },
-              ],
+              targets,
               value: {
                 percentage: {
                   value: 100,
