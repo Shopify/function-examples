@@ -115,7 +115,7 @@ describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
     expect(result.operations).toEqual([]);
   });
 
-  it("discounts local delivery and pickup point groups", () => {
+  it("returns empty operations for local delivery and pickup point groups", () => {
     const result = cartDeliveryOptionsDiscountsGenerateRun(
       inputWith([
         deliveryGroup(
@@ -128,12 +128,7 @@ describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
         ),
       ]),
     );
-    expect(result.operations).toEqual([
-      freeDeliveryOperation([
-        "gid://shopify/CartDeliveryGroup/2",
-        "gid://shopify/CartDeliveryGroup/3",
-      ]),
-    ]);
+    expect(result.operations).toEqual([]);
   });
 
   it("returns empty operations when no delivery groups are present", () => {
@@ -245,7 +240,7 @@ describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
     expect(result.operations).toEqual([]);
   });
 
-  it("discounts local delivery and pickup point groups", () => {
+  it("returns empty operations for local delivery and pickup point groups", () => {
     const result: CartDeliveryOptionsDiscountsGenerateRunResult =
       cartDeliveryOptionsDiscountsGenerateRun(
         inputWith([
@@ -259,12 +254,7 @@ describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
           ),
         ]),
       );
-    expect(result.operations).toEqual([
-      freeDeliveryOperation([
-        "gid://shopify/CartDeliveryGroup/2",
-        "gid://shopify/CartDeliveryGroup/3",
-      ]),
-    ]);
+    expect(result.operations).toEqual([]);
   });
 
   it("returns empty operations when no delivery groups are present", () => {

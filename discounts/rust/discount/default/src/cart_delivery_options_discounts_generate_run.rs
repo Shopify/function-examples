@@ -17,19 +17,15 @@ fn cart_delivery_options_discounts_generate_run(
     }
 
     // A split cart can list the pickup group first, so check every group.
-    // Discount the groups that ship, not the local pickup groups.
+    // Discount only the groups with shipping options.
     let targets: Vec<output::DeliveryDiscountCandidateTarget> = input
         .cart
         .delivery_groups
         .iter()
+        // If you also want to apply a discount for other delivery methods (e.g. LOCAL), ensure to account for that here.
         .filter(|group| {
             group.delivery_options.iter().any(|option| {
-                matches!(
-                    option.delivery_method_type,
-                    input::DeliveryMethod::SHIPPING
-                        | input::DeliveryMethod::LOCAL
-                        | input::DeliveryMethod::PICKUP_POINT
-                )
+                matches!(option.delivery_method_type, input::DeliveryMethod::SHIPPING)
             })
         })
         .map(|group| {
@@ -162,13 +158,10 @@ mod tests {
     }
 
     #[test]
-    fn discounts_local_delivery_and_pickup_point_groups() -> Result<()> {
+    fn returns_no_operations_for_local_delivery_and_pickup_point_groups() -> Result<()> {
         assert_eq!(
             run(&[LOCAL_GROUP, PICKUP_POINT_GROUP], r#"["SHIPPING"]"#)?,
-            free_delivery_operations(&[
-                "gid://shopify/CartDeliveryGroup/2",
-                "gid://shopify/CartDeliveryGroup/3",
-            ])
+            vec![]
         );
         Ok(())
     }

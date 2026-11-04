@@ -25,15 +25,13 @@ export function cartDeliveryOptionsDiscountsGenerateRun(input) {
   }
 
   // A split cart can list the pickup group first, so check every group.
-  // Discount the groups that ship, not the local pickup groups.
+  // Discount only the groups with shipping options.
   const targets = input.cart.deliveryGroups
+    // If you also want to apply a discount for other delivery methods (e.g. LOCAL), ensure to account for that here.
     .filter(({deliveryOptions}) =>
-      deliveryOptions.some(({deliveryMethodType}) =>
-        [
-          DeliveryMethod.Shipping,
-          DeliveryMethod.Local,
-          DeliveryMethod.PickupPoint,
-        ].includes(deliveryMethodType),
+      deliveryOptions.some(
+        ({deliveryMethodType}) =>
+          deliveryMethodType === DeliveryMethod.Shipping,
       ),
     )
     .map(({id}) => ({deliveryGroup: {id}}));
@@ -84,15 +82,13 @@ export function cartDeliveryOptionsDiscountsGenerateRun(
   }
 
   // A split cart can list the pickup group first, so check every group.
-  // Discount the groups that ship, not the local pickup groups.
+  // Discount only the groups with shipping options.
   const targets = input.cart.deliveryGroups
+    // If you also want to apply a discount for other delivery methods (e.g. LOCAL), ensure to account for that here.
     .filter(({deliveryOptions}) =>
-      deliveryOptions.some(({deliveryMethodType}) =>
-        [
-          DeliveryMethod.Shipping,
-          DeliveryMethod.Local,
-          DeliveryMethod.PickupPoint,
-        ].includes(deliveryMethodType),
+      deliveryOptions.some(
+        ({deliveryMethodType}) =>
+          deliveryMethodType === DeliveryMethod.Shipping,
       ),
     )
     .map(({id}) => ({deliveryGroup: {id}}));
