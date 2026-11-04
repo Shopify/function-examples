@@ -16,11 +16,22 @@ fn cart_delivery_options_discounts_generate_run(
         return Ok(output::CartDeliveryOptionsDiscountsGenerateRunResult { operations: vec![] });
     }
 
-    // A split cart can list the pickup group first, so discount every group.
+    // A split cart can list the pickup group first, so check every group.
+    // Discount the groups that ship, not the local pickup groups.
     let targets: Vec<output::DeliveryDiscountCandidateTarget> = input
         .cart
         .delivery_groups
         .iter()
+        .filter(|group| {
+            group.delivery_options.iter().any(|option| {
+                matches!(
+                    option.delivery_method_type,
+                    input::DeliveryMethod::SHIPPING
+                        | input::DeliveryMethod::LOCAL
+                        | input::DeliveryMethod::PICKUP_POINT
+                )
+            })
+        })
         .map(|group| {
             output::DeliveryDiscountCandidateTarget::DeliveryGroup(output::DeliveryGroupTarget {
                 id: group.id.clone(),
@@ -55,8 +66,22 @@ mod tests {
     use cart_delivery_options_discounts_generate_run::output;
     use shopify_function::run_function_with_input;
 
-    const PICKUP_GROUP: &str = r#"{ "id": "gid://shopify/CartDeliveryGroup/0" }"#;
-    const SHIPPING_GROUP: &str = r#"{ "id": "gid://shopify/CartDeliveryGroup/1" }"#;
+    const PICKUP_GROUP: &str = r#"{
+        "id": "gid://shopify/CartDeliveryGroup/0",
+        "deliveryOptions": [{ "deliveryMethodType": "PICK_UP" }]
+    }"#;
+    const SHIPPING_GROUP: &str = r#"{
+        "id": "gid://shopify/CartDeliveryGroup/1",
+        "deliveryOptions": [{ "deliveryMethodType": "SHIPPING" }]
+    }"#;
+    const LOCAL_GROUP: &str = r#"{
+        "id": "gid://shopify/CartDeliveryGroup/2",
+        "deliveryOptions": [{ "deliveryMethodType": "LOCAL" }]
+    }"#;
+    const PICKUP_POINT_GROUP: &str = r#"{
+        "id": "gid://shopify/CartDeliveryGroup/3",
+        "deliveryOptions": [{ "deliveryMethodType": "PICKUP_POINT" }]
+    }"#;
 
     fn run(
         delivery_groups: &[&str],
@@ -113,12 +138,36 @@ mod tests {
     }
 
     #[test]
-    fn discounts_every_group_when_the_pickup_group_is_first_in_a_split() -> Result<()> {
+    fn discounts_only_the_shipping_group_when_pickup_is_first() -> Result<()> {
         assert_eq!(
             run(&[PICKUP_GROUP, SHIPPING_GROUP], r#"["SHIPPING"]"#)?,
+            free_delivery_operations(&["gid://shopify/CartDeliveryGroup/1"])
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn discounts_only_the_shipping_group_when_shipping_is_first() -> Result<()> {
+        assert_eq!(
+            run(&[SHIPPING_GROUP, PICKUP_GROUP], r#"["SHIPPING"]"#)?,
+            free_delivery_operations(&["gid://shopify/CartDeliveryGroup/1"])
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn returns_no_operations_for_only_a_pickup_group() -> Result<()> {
+        assert_eq!(run(&[PICKUP_GROUP], r#"["SHIPPING"]"#)?, vec![]);
+        Ok(())
+    }
+
+    #[test]
+    fn discounts_local_delivery_and_pickup_point_groups() -> Result<()> {
+        assert_eq!(
+            run(&[LOCAL_GROUP, PICKUP_POINT_GROUP], r#"["SHIPPING"]"#)?,
             free_delivery_operations(&[
-                "gid://shopify/CartDeliveryGroup/0",
-                "gid://shopify/CartDeliveryGroup/1",
+                "gid://shopify/CartDeliveryGroup/2",
+                "gid://shopify/CartDeliveryGroup/3",
             ])
         );
         Ok(())

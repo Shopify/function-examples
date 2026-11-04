@@ -1,6 +1,7 @@
 {%- if flavor contains "vanilla-js" -%}
 import {
   DeliveryDiscountSelectionStrategy,
+  DeliveryMethod,
   DiscountClass,
 } from "../generated/api";
 
@@ -23,10 +24,19 @@ export function cartDeliveryOptionsDiscountsGenerateRun(input) {
     return {operations: []};
   }
 
-  // A split cart can list the pickup group first, so discount every group.
-  const targets = input.cart.deliveryGroups.map(({id}) => ({
-    deliveryGroup: {id},
-  }));
+  // A split cart can list the pickup group first, so check every group.
+  // Discount the groups that ship, not the local pickup groups.
+  const targets = input.cart.deliveryGroups
+    .filter(({deliveryOptions}) =>
+      deliveryOptions.some(({deliveryMethodType}) =>
+        [
+          DeliveryMethod.Shipping,
+          DeliveryMethod.Local,
+          DeliveryMethod.PickupPoint,
+        ].includes(deliveryMethodType),
+      ),
+    )
+    .map(({id}) => ({deliveryGroup: {id}}));
 
   if (targets.length === 0) {
     return {operations: []};
@@ -56,6 +66,7 @@ export function cartDeliveryOptionsDiscountsGenerateRun(input) {
 {%- elsif flavor contains "typescript" -%}
 import {
   DeliveryDiscountSelectionStrategy,
+  DeliveryMethod,
   DiscountClass,
   DeliveryInput,
   CartDeliveryOptionsDiscountsGenerateRunResult,
@@ -72,10 +83,19 @@ export function cartDeliveryOptionsDiscountsGenerateRun(
     return {operations: []};
   }
 
-  // A split cart can list the pickup group first, so discount every group.
-  const targets = input.cart.deliveryGroups.map(({id}) => ({
-    deliveryGroup: {id},
-  }));
+  // A split cart can list the pickup group first, so check every group.
+  // Discount the groups that ship, not the local pickup groups.
+  const targets = input.cart.deliveryGroups
+    .filter(({deliveryOptions}) =>
+      deliveryOptions.some(({deliveryMethodType}) =>
+        [
+          DeliveryMethod.Shipping,
+          DeliveryMethod.Local,
+          DeliveryMethod.PickupPoint,
+        ].includes(deliveryMethodType),
+      ),
+    )
+    .map(({id}) => ({deliveryGroup: {id}}));
 
   if (targets.length === 0) {
     return {operations: []};

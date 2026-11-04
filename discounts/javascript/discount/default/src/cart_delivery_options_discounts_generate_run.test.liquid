@@ -4,6 +4,7 @@ import {describe, it, expect} from "vitest";
 import {cartDeliveryOptionsDiscountsGenerateRun} from "./cart_delivery_options_discounts_generate_run";
 import {
   DeliveryDiscountSelectionStrategy,
+  DeliveryMethod,
   DiscountClass,
 } from "../generated/api";
 
@@ -13,8 +14,23 @@ import {
   */
 
 describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
-  const pickupGroup = {id: "gid://shopify/CartDeliveryGroup/0"};
-  const shippingGroup = {id: "gid://shopify/CartDeliveryGroup/1"};
+  /**
+    * @param {string} id
+    * @param {DeliveryMethod} deliveryMethodType
+    * @returns {DeliveryInput["cart"]["deliveryGroups"][number]}
+    */
+  function deliveryGroup(id, deliveryMethodType) {
+    return {id, deliveryOptions: [{deliveryMethodType}]};
+  }
+
+  const pickupGroup = deliveryGroup(
+    "gid://shopify/CartDeliveryGroup/0",
+    DeliveryMethod.PickUp,
+  );
+  const shippingGroup = deliveryGroup(
+    "gid://shopify/CartDeliveryGroup/1",
+    DeliveryMethod.Shipping,
+  );
 
   /**
     * @param {DeliveryInput["cart"]["deliveryGroups"]} deliveryGroups
@@ -74,14 +90,48 @@ describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
     ]);
   });
 
-  it("discounts every group when the pickup group is first in a split", () => {
+  it("discounts only the shipping group when the pickup group is first in a split", () => {
     const result = cartDeliveryOptionsDiscountsGenerateRun(
       inputWith([pickupGroup, shippingGroup]),
     );
     expect(result.operations).toEqual([
+      freeDeliveryOperation(["gid://shopify/CartDeliveryGroup/1"]),
+    ]);
+  });
+
+  it("discounts only the shipping group when the shipping group is first in a split", () => {
+    const result = cartDeliveryOptionsDiscountsGenerateRun(
+      inputWith([shippingGroup, pickupGroup]),
+    );
+    expect(result.operations).toEqual([
+      freeDeliveryOperation(["gid://shopify/CartDeliveryGroup/1"]),
+    ]);
+  });
+
+  it("returns empty operations when only a pickup group is present", () => {
+    const result = cartDeliveryOptionsDiscountsGenerateRun(
+      inputWith([pickupGroup]),
+    );
+    expect(result.operations).toEqual([]);
+  });
+
+  it("discounts local delivery and pickup point groups", () => {
+    const result = cartDeliveryOptionsDiscountsGenerateRun(
+      inputWith([
+        deliveryGroup(
+          "gid://shopify/CartDeliveryGroup/2",
+          DeliveryMethod.Local,
+        ),
+        deliveryGroup(
+          "gid://shopify/CartDeliveryGroup/3",
+          DeliveryMethod.PickupPoint,
+        ),
+      ]),
+    );
+    expect(result.operations).toEqual([
       freeDeliveryOperation([
-        "gid://shopify/CartDeliveryGroup/0",
-        "gid://shopify/CartDeliveryGroup/1",
+        "gid://shopify/CartDeliveryGroup/2",
+        "gid://shopify/CartDeliveryGroup/3",
       ]),
     ]);
   });
@@ -97,14 +147,28 @@ import {describe, it, expect} from "vitest";
 import {cartDeliveryOptionsDiscountsGenerateRun} from "./cart_delivery_options_discounts_generate_run";
 import {
   DeliveryDiscountSelectionStrategy,
+  DeliveryMethod,
   DiscountClass,
   DeliveryInput,
   CartDeliveryOptionsDiscountsGenerateRunResult,
 } from "../generated/api";
 
 describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
-  const pickupGroup = {id: "gid://shopify/CartDeliveryGroup/0"};
-  const shippingGroup = {id: "gid://shopify/CartDeliveryGroup/1"};
+  function deliveryGroup(
+    id: string,
+    deliveryMethodType: DeliveryMethod,
+  ): DeliveryInput["cart"]["deliveryGroups"][number] {
+    return {id, deliveryOptions: [{deliveryMethodType}]};
+  }
+
+  const pickupGroup = deliveryGroup(
+    "gid://shopify/CartDeliveryGroup/0",
+    DeliveryMethod.PickUp,
+  );
+  const shippingGroup = deliveryGroup(
+    "gid://shopify/CartDeliveryGroup/1",
+    DeliveryMethod.Shipping,
+  );
 
   function inputWith(
     deliveryGroups: DeliveryInput["cart"]["deliveryGroups"],
@@ -155,15 +219,50 @@ describe("cartDeliveryOptionsDiscountsGenerateRun", () => {
     ]);
   });
 
-  it("discounts every group when the pickup group is first in a split", () => {
+  it("discounts only the shipping group when the pickup group is first in a split", () => {
     const result: CartDeliveryOptionsDiscountsGenerateRunResult =
       cartDeliveryOptionsDiscountsGenerateRun(
         inputWith([pickupGroup, shippingGroup]),
       );
     expect(result.operations).toEqual([
+      freeDeliveryOperation(["gid://shopify/CartDeliveryGroup/1"]),
+    ]);
+  });
+
+  it("discounts only the shipping group when the shipping group is first in a split", () => {
+    const result: CartDeliveryOptionsDiscountsGenerateRunResult =
+      cartDeliveryOptionsDiscountsGenerateRun(
+        inputWith([shippingGroup, pickupGroup]),
+      );
+    expect(result.operations).toEqual([
+      freeDeliveryOperation(["gid://shopify/CartDeliveryGroup/1"]),
+    ]);
+  });
+
+  it("returns empty operations when only a pickup group is present", () => {
+    const result: CartDeliveryOptionsDiscountsGenerateRunResult =
+      cartDeliveryOptionsDiscountsGenerateRun(inputWith([pickupGroup]));
+    expect(result.operations).toEqual([]);
+  });
+
+  it("discounts local delivery and pickup point groups", () => {
+    const result: CartDeliveryOptionsDiscountsGenerateRunResult =
+      cartDeliveryOptionsDiscountsGenerateRun(
+        inputWith([
+          deliveryGroup(
+            "gid://shopify/CartDeliveryGroup/2",
+            DeliveryMethod.Local,
+          ),
+          deliveryGroup(
+            "gid://shopify/CartDeliveryGroup/3",
+            DeliveryMethod.PickupPoint,
+          ),
+        ]),
+      );
+    expect(result.operations).toEqual([
       freeDeliveryOperation([
-        "gid://shopify/CartDeliveryGroup/0",
-        "gid://shopify/CartDeliveryGroup/1",
+        "gid://shopify/CartDeliveryGroup/2",
+        "gid://shopify/CartDeliveryGroup/3",
       ]),
     ]);
   });
